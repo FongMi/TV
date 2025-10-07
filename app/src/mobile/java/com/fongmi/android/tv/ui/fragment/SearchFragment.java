@@ -120,8 +120,9 @@ public class SearchFragment extends BaseFragment implements MenuProvider, WordAd
     }
 
     private void checkKeyword() {
-        if (TextUtils.isEmpty(getKeyword())) Util.showKeyboard(mBinding.keyword);
-        else setKeyword(getKeyword());
+        boolean visible = requireActivity().getSupportFragmentManager().findFragmentByTag(CollectFragment.class.getSimpleName()) != null;
+        if (TextUtils.isEmpty(getKeyword()) && !visible) Util.showKeyboard(mBinding.keyword);
+        setKeyword(getKeyword());
     }
 
     private void setKeyword(String text) {
@@ -131,9 +132,9 @@ public class SearchFragment extends BaseFragment implements MenuProvider, WordAd
 
     private void search() {
         if (empty()) return;
-        Util.hideKeyboard(mBinding.keyword);
         String keyword = mBinding.keyword.getText().toString().trim();
         App.post(() -> mRecordAdapter.add(keyword), 250);
+        Util.hideKeyboard(mBinding.keyword);
         collect(keyword);
     }
 

@@ -74,6 +74,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
                 else getSuggest(s.toString());
             }
         });
+        mBinding.mic.setOnClickListener(v -> mBinding.mic.start());
         mBinding.mic.setListener(this, new CustomTextListener() {
             @Override
             public void onEndOfSpeech() {

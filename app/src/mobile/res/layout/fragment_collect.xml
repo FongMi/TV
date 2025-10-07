@@ -44,7 +44,7 @@
             android:paddingStart="0dp"
             android:paddingEnd="8dp"
             android:paddingBottom="8dp"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
             tools:listitem="@layout/adapter_search" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>

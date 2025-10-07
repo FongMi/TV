@@ -34,20 +34,21 @@ public class ResUtil {
         return context.getResources().getDisplayMetrics();
     }
 
-    public static WindowManager getWindowManager(Context context) {
-        return (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-    }
-
     public static int getScreenWidth() {
         return getScreenWidth(App.get());
     }
 
     public static int getScreenWidth(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Rect rect = getWindowManager(context).getCurrentWindowMetrics().getBounds();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager == null) {
+            return getDisplayMetrics(context).widthPixels;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Rect rect = windowManager.getCurrentWindowMetrics().getBounds();
             return isLand(context) ? Math.max(rect.width(), rect.height()) : Math.min(rect.width(), rect.height());
         } else {
-            return getDisplayMetrics(context).widthPixels;
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+            return displayMetrics.widthPixels;
         }
     }
 
@@ -56,11 +57,16 @@ public class ResUtil {
     }
 
     public static int getScreenHeight(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Rect rect = getWindowManager(context).getCurrentWindowMetrics().getBounds();
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager == null) {
+            return getDisplayMetrics(context).heightPixels;
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Rect rect = windowManager.getCurrentWindowMetrics().getBounds();
             return isLand(context) ? Math.min(rect.width(), rect.height()) : Math.max(rect.width(), rect.height());
         } else {
-            return getDisplayMetrics(context).heightPixels;
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            windowManager.getDefaultDisplay().getMetrics(displayMetrics);
+            return displayMetrics.heightPixels;
         }
     }
 

@@ -75,7 +75,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected void notifyItemChanged(RecyclerView view, ArrayObjectAdapter adapter) {
-        if (!view.isComputingLayout()) adapter.notifyArrayItemRangeChanged(0, adapter.size());
+        view.post(() -> adapter.notifyArrayItemRangeChanged(0, adapter.size()));
     }
 
     private void setBackCallback() {

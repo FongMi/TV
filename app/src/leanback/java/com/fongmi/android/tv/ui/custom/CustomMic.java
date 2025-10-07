@@ -57,10 +57,12 @@ public class CustomMic extends AppCompatImageView {
         }
     }
 
-    private void start() {
-        startListening();
-        requestFocus();
-        updateUI(true);
+    public void start() {
+        PermissionUtil.requestAudio(activity, allGranted -> {
+            startListening();
+            requestFocus();
+            updateUI(true);
+        });
     }
 
     public boolean stop() {
@@ -84,10 +86,8 @@ public class CustomMic extends AppCompatImageView {
     @Override
     protected void onFocusChanged(boolean gainFocus, int direction, @Nullable Rect previouslyFocusedRect) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect);
-        if (!gainFocus) stop();
-        else PermissionUtil.requestAudio(activity, allGranted -> {
-            if (allGranted) start();
-        });
+        if (gainFocus) start();
+        else stop();
     }
 
     @Override

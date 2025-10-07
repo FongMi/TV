@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuProvider;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.api.config.VodConfig;
@@ -88,21 +89,13 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
         mBinding.recycler.setHasFixedSize(true);
         mBinding.recycler.addOnScrollListener(mScroller);
         mBinding.recycler.setAdapter(mSearchAdapter = new SearchAdapter(this));
+        ((GridLayoutManager) (mBinding.recycler.getLayoutManager())).setSpanCount(getCount());
     }
 
     private void setViewModel() {
-        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
-        mViewModel.search.observe(this, result -> {
-            if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addItems(result.getList());
-            mCollectAdapter.addItem(Collect.create(result.getList()));
-            mCollectAdapter.add(result.getList());
-        });
-        mViewModel.result.observe(this, result -> {
-            boolean same = !result.getList().isEmpty() && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
-            if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
-            if (same) mSearchAdapter.addItems(result.getList());
-            mScroller.endLoading(result);
-        });
+        mViewModel = new ViewModelProvider(this).get(SiteViewModel.class).init();
+        mViewModel.search.observe(this, this::setCollect);
+        mViewModel.result.observe(this, this::setSearch);
     }
 
     private List<Site> getSites() {
@@ -112,9 +105,11 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     }
 
     private void search() {
+        if (mExecutor != null) mExecutor.shutdownNow();
         mExecutor = new PauseExecutor(20);
-        mCollectAdapter.setItems(List.of(Collect.all()));
-        for (Site site : getSites()) mExecutor.execute(() -> search(site, getKeyword()));
+        mCollectAdapter.setItems(List.of(Collect.all()), () -> {
+            for (Site site : getSites()) mExecutor.execute(() -> search(site, getKeyword()));
+        });
     }
 
     private void search(Site site, String keyword) {
@@ -122,6 +117,27 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
             mViewModel.searchContent(site, keyword, false);
         } catch (Throwable ignored) {
         }
+    }
+
+    private int getCount() {
+        int count = ResUtil.isLand(requireActivity()) ? 2 : 1;
+        if (ResUtil.isPad()) count++;
+        return count;
+    }
+
+    private void setCollect(Result result) {
+        if (result == null) return;
+        if (mCollectAdapter.getPosition() == 0) mSearchAdapter.addItems(result.getList());
+        mCollectAdapter.addItem(Collect.create(result.getList()));
+        mCollectAdapter.add(result.getList());
+    }
+
+    private void setSearch(Result result) {
+        if (result == null) return;
+        boolean same = !result.getList().isEmpty() && mCollectAdapter.getActivated().getSite().equals(result.getList().get(0).getSite());
+        if (same) mCollectAdapter.getActivated().getList().addAll(result.getList());
+        if (same) mSearchAdapter.addItems(result.getList());
+        mScroller.endLoading(result);
     }
 
     @Override

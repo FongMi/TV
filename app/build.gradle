@@ -11,8 +11,8 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk 24
         targetSdk 36
-        versionCode 436
-        versionName "4.3.6"
+        versionCode 440
+        versionName "4.4.0"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
@@ -28,10 +28,6 @@ android {
         }
         mobile {
             dimension "mode"
-        }
-        x86 {
-            dimension "abi"
-            ndk { abiFilters "x86" }
         }
         arm64_v8a {
             dimension "abi"

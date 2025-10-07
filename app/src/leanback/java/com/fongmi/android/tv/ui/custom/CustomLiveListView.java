@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.leanback.widget.VerticalGridView;
 
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.utils.KeyUtil;
 
 public class CustomLiveListView extends VerticalGridView {
@@ -34,15 +33,13 @@ public class CustomLiveListView extends VerticalGridView {
 
     private boolean onKeyDown() {
         if (getSelectedPosition() != getAdapter().getItemCount() - 1) return false;
-        if (getId() == R.id.channel || getId() == R.id.epgData) setSelectedPosition(0);
-        else if (listener != null) listener.nextGroup(false);
+        setSelectedPosition(0);
         return true;
     }
 
     private boolean onKeyUp() {
         if (getSelectedPosition() != 0) return false;
-        if (getId() == R.id.channel || getId() == R.id.epgData) setSelectedPosition(getAdapter().getItemCount());
-        else if (listener != null) listener.prevGroup(false);
+        setSelectedPosition(getAdapter().getItemCount() - 1);
         return true;
     }
 
@@ -58,9 +55,5 @@ public class CustomLiveListView extends VerticalGridView {
     public interface Callback {
 
         void setUITimer();
-
-        boolean nextGroup(boolean skip);
-
-        boolean prevGroup(boolean skip);
     }
 }

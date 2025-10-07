@@ -49,11 +49,20 @@ public class SiteViewModel extends ViewModel {
     private ExecutorService executor;
 
     public SiteViewModel() {
-        this.episode = new MutableLiveData<>();
-        this.result = new MutableLiveData<>();
-        this.player = new MutableLiveData<>();
-        this.search = new MutableLiveData<>();
-        this.action = new MutableLiveData<>();
+        episode = new MutableLiveData<>();
+        result = new MutableLiveData<>();
+        player = new MutableLiveData<>();
+        search = new MutableLiveData<>();
+        action = new MutableLiveData<>();
+    }
+
+    public SiteViewModel init() {
+        search.setValue(null);
+        result.setValue(null);
+        player.setValue(null);
+        action.setValue(null);
+        episode.setValue(null);
+        return this;
     }
 
     public void setEpisode(Episode value) {
@@ -271,7 +280,7 @@ public class SiteViewModel extends ViewModel {
     private void post(Site site, Result result) {
         if (result.getList().isEmpty()) return;
         for (Vod vod : result.getList()) vod.setSite(site);
-        this.search.postValue(result);
+        search.postValue(result);
     }
 
     private void execute(MutableLiveData<Result> result, Callable<Result> callable) {

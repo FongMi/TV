@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,6 +17,7 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
 import com.bumptech.glide.request.transition.Transition;
@@ -270,7 +272,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
     private void setWidth(Live live) {
         int padding = ResUtil.dp2px(48);
         if (live.getWidth() == 0) for (Group item : live.getGroups()) live.setWidth(Math.max(live.getWidth(), ResUtil.getTextWidth(item.getName(), 14)));
-        mBinding.group.getLayoutParams().width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + padding, ResUtil.getScreenWidth() / 4);
+        int width = live.getWidth() == 0 ? 0 : Math.min(live.getWidth() + padding, ResUtil.getScreenWidth() / 4);
+        setWidth(mBinding.group, width);
     }
 
     @Override
@@ -279,7 +282,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
         int padding = ResUtil.dp2px(60);
         if (group.isKeep()) group.setWidth(0);
         if (group.getWidth() == 0) for (Channel item : group.getChannel()) group.setWidth(Math.max(group.getWidth(), (item.getLogo().isEmpty() ? 0 : logo) + ResUtil.getTextWidth(item.getNumber() + item.getName(), 14)));
-        mBinding.channel.getLayoutParams().width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+        int width = group.getWidth() == 0 ? 0 : Math.min(group.getWidth() + padding, ResUtil.getScreenWidth() / 2);
+        setWidth(mBinding.channel, width);
     }
 
     private void setWidth(Epg epg) {
@@ -287,7 +291,15 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
         if (epg.getList().isEmpty()) return;
         int minWidth = ResUtil.getTextWidth(epg.getList().get(0).getTime(), 14);
         if (epg.getWidth() == 0) for (EpgData item : epg.getList()) epg.setWidth(Math.max(epg.getWidth(), ResUtil.getTextWidth(item.getTitle(), 14)));
-        mBinding.epgData.getLayoutParams().width = epg.getWidth() == 0 ? 0 : Math.min(Math.max(epg.getWidth(), minWidth) + padding, ResUtil.getScreenWidth() / 2);
+        int width = epg.getWidth() == 0 ? 0 : Math.min(Math.max(epg.getWidth(), minWidth) + padding, ResUtil.getScreenWidth() / 2);
+        setWidth(mBinding.epgData, width);
+    }
+
+    private void setWidth(View view, int width) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params.width == width) return;
+        params.width = width;
+        view.setLayoutParams(params);
     }
 
     private void setPosition(int[] position) {
@@ -308,8 +320,8 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
         if (change) mGroupAdapter.setSelected(position);
         if (change) mChannelAdapter.addAll(mGroup.getChannel());
         if (change) mChannelAdapter.setSelected(mGroup.getPosition());
-        mBinding.channel.scrollToPosition(mGroup.getPosition());
-        mBinding.group.scrollToPosition(position);
+        scrollToPosition(mBinding.channel, mGroup.getPosition());
+        scrollToPosition(mBinding.group, position);
     }
 
     private void onBack() {
@@ -431,7 +443,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
 
     private void showEpg(Channel item) {
         if (mChannel == null || mChannel.getData().getList().isEmpty() || mEpgDataAdapter.getItemCount() == 0 || !mChannel.equals(item) || !mChannel.getGroup().equals(mGroup)) return;
-        mBinding.epgData.scrollToPosition(item.getData().getSelected());
+        scrollToPosition(mBinding.epgData, item.getData().getSelected());
         mBinding.epgData.setVisibility(View.VISIBLE);
         mBinding.channel.setVisibility(View.GONE);
         mBinding.group.setVisibility(View.GONE);
@@ -544,7 +556,7 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
         mGroupAdapter.setSelected(mGroup = item);
         mChannelAdapter.addAll(item.getChannel());
         mChannelAdapter.setSelected(item.getPosition());
-        mBinding.channel.scrollToPosition(Math.max(item.getPosition(), 0));
+        scrollToPosition(mBinding.channel, Math.max(item.getPosition(), 0));
         if (!item.isKeep() || ++count < 5 || mHides.isEmpty()) return;
         if (Biometric.enable()) Biometric.show(this);
         else PassDialog.create().show(this);
@@ -923,6 +935,10 @@ public class LiveActivity extends BaseActivity implements CustomKeyDown.Listener
 
     public void setLock(boolean lock) {
         this.lock = lock;
+    }
+
+    private void scrollToPosition(RecyclerView view, int position) {
+        view.post(() -> view.scrollToPosition(position));
     }
 
     @Override
