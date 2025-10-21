@@ -76,6 +76,6 @@ public abstract class Spider {
     }
 
     public static OkHttpClient client() {
-        return OkHttp.client();
+        return OkHttp.client().newBuilder().cookieJar(null).build();
     }
 }
