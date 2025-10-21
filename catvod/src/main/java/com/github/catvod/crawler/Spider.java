@@ -75,7 +75,16 @@ public abstract class Spider {
         return OkHttp.dns();
     }
 
+    private static volatile OkHttpClient spiderClient;
+
     public static OkHttpClient client() {
-        return OkHttp.client().newBuilder().cookieJar(null).build();
+        if (spiderClient == null) {
+            synchronized (Spider.class) {
+                if (spiderClient == null) {
+                    spiderClient = OkHttp.client().newBuilder().cookieJar(null).build();
+                }
+            }
+        }
+        return spiderClient;
     }
 }
