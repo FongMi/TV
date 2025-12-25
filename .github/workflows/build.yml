@@ -2,8 +2,11 @@ name: Build MyBox 64bit Versions
 
 on:
   push:
-    branches: [ main, master ]
-  workflow_dispatch:
+    branches:
+      - fongmi    # 只在 fongmi 分支 push 时触发
+  pull_request:
+    branches:
+      - fongmi    # 只在 fongmi 分支 PR 时触发
 
 jobs:
   build:
