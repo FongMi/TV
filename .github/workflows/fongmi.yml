@@ -1,0 +1,41 @@
+name: Build MyBox 64bit Versions
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Accept Android SDK Licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build 64bit APKs
+        # 编译 Leanback 和 Mobile 的 arm64-v8a 版本
+        run: |
+          ./gradlew assembleLeanbackArm64_v8aDebug \
+                    assembleMobileArm64_v8aDebug \
+                    -Pandroid.injected.signing.config.enable=false
+
+      - name: Upload All APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: MyBox-64bit-APKs
+          # 使用通配符匹配所有生成的 debug APK，防止路径层级错误
+          path: app/build/outputs/apk/**/debug/*.apk
