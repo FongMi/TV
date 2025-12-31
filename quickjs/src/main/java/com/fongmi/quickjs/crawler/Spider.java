@@ -59,7 +59,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     public void init(Context context, String extend) throws Exception {
         initializeJS();
         if (cat) call("init", submit(() -> cfg(extend)).get());
-        else call("init", Json.isObj(extend) ? ctx.parse(extend) : extend);
+        else call("init", Json.isObj(extend) ? submit(() -> ctx.parse(extend)).get() : extend);
     }
 
     @Override
@@ -179,6 +179,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private void createFun() {
         try {
             Global.create(ctx, executor);
+            if (dex == null) return;
             Class<?> clz = dex.loadClass("com.github.catvod.js.Function");
             clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx);
         } catch (Throwable e) {
