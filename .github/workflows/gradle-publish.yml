@@ -2,9 +2,9 @@ name: Build Fongmi/TV
 
 on:
   push:
-    branches: [ fongmi ]
+    branches: [ main ]
   pull_request:
-    branches: [ fongmi ]
+    branches: [ main ]
   workflow_dispatch:  # 允许手动触发
   schedule:
     - cron: '0 0 * * 0'  # 每周日自动编译
