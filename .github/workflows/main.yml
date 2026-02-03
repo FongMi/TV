@@ -1,0 +1,99 @@
+name: Build Fongmi/TV (fongmi branch)
+
+on:
+  workflow_dispatch: {}  # 手动触发
+  push:
+    branches: [ fongmi ]  # 修改：只监听 fongmi 分支
+  
+  # 可选：当 release 分支有更新时也编译
+  # push:
+  #   branches: [ fongmi, release ]
+
+env:
+  JAVA_VERSION: '17'
+  ANDROID_BUILD_TOOLS: '34.0.0'
+  PYTHON_VERSION: '3.10.13'  # 明确指定 Python 3.10.13 版本
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+    - name: Checkout fongmi branch
+      uses: actions/checkout@v4
+      with:
+        ref: fongmi  # 明确指定要 checkout 的分支
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+
+    # 关键：安装 Python 3.10
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+      with:
+        build-tools-version: ${{ env.ANDROID_BUILD_TOOLS }}
+        cmdline-tools-version: 'latest'
+        ndk-version: '25.2.9519653'
+
+    - name: Cache Gradle dependencies
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: fongmi-${{ runner.os }}-gradle-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+        restore-keys: |
+          fongmi-${{ runner.os }}-gradle-
+
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+
+    - name: Verify environment
+      run: |
+        echo "Python version:"
+        python3 --version
+        echo "Java version:"
+        java -version
+        echo "Android SDK:"
+        $ANDROID_SDK_ROOT/tools/bin/sdkmanager --list | head -20
+
+    - name: Build Release APK
+      env:
+        # 强制使用 Python 3.10
+        ORG_GRADLE_PROJECT_pythonVersion: "3.10"
+        ORG_GRADLE_PROJECT_buildPython: python3
+      run: |
+        ./gradlew clean assembleRelease
+
+    - name: List generated APKs
+      run: |
+        echo "=== 查找生成的 APK 文件 ==="
+        find . -name "*.apk" -type f 2>/dev/null | head -10
+        echo ""
+        echo "=== app/build/outputs/apk 目录内容 ==="
+        ls -la app/build/outputs/apk/ || true
+        echo ""
+        echo "=== 检查 release 目录 ==="
+        ls -la app/build/outputs/apk/release/ 2>/dev/null || echo "release 目录不存在"
+
+    - name: Upload APK artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fongmi-tv-${{ github.sha }}-${{ github.run_id }}
+        path: |
+          app/build/outputs/apk/**/*.apk
+          app/build/outputs/apk/**/*.apks
+          app/build/outputs/bundle/**/*.aab
+        retention-days: 90
