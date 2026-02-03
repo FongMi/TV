@@ -1,0 +1,49 @@
+name: Build Fongmi/TV
+
+on:
+  push:
+    branches: [ fongmi ]
+  pull_request:
+    branches: [ fongmi ]
+  workflow_dispatch:  # 允许手动触发
+  schedule:
+    - cron: '0 0 * * 0'  # 每周日自动编译
+
+env:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        fetch-depth: 0
+
+    - name: Set up JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Grant execute permission
+      run: chmod +x gradlew
+
+    - name: Build with Gradle
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        ./gradlew assembleRelease
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: TV-APK
+        path: app/build/outputs/apk/release/
+        retention-days: 7
