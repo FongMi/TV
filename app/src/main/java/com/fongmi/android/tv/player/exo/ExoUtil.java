@@ -34,6 +34,8 @@ import java.util.Map;
 
 public class ExoUtil {
 
+    public static final String MIMETYPES_APPLICATION_OCTET_STREAM = "application/octet-stream";
+
     public static String getUa() {
         return Util.getUserAgent(App.get(), BuildConfig.APPLICATION_ID);
     }
@@ -81,7 +83,7 @@ public class ExoUtil {
     }
 
     public static String getMimeType(int errorCode) {
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return MimeTypes.APPLICATION_OCTET_STREAM;
+        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return MIMETYPES_APPLICATION_OCTET_STREAM;
         if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return MimeTypes.APPLICATION_M3U8;
         return null;
     }
