@@ -108,12 +108,23 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         checkAction(intent);
     }
 
+    // 在类里面定义一个静态变量，记录是否已经执行过自动跳转
+    private static boolean hasAutoJumped = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
-    }
 
+        // 只有在没有跳转过的情况下才执行
+        if (!hasAutoJumped) {
+            hasAutoJumped = true; // 标记为已跳转
+        
+            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                android.content.Intent intent = new android.content.Intent(this, LiveActivity.class);
+                startActivity(intent);
+                // 这里不写 finish()，返回时就能回到首页
+            }, 1000);
+        
     @Override
     protected void initView(Bundle savedInstanceState) {
         mResult = Result.empty();
