@@ -52,20 +52,13 @@ android {
         viewBinding = true
     }
 
-    signingConfigs {
-        release {
-            storeFile file(localProps['tv.jks'])
-            keyAlias localProps['keyAlias']
-            keyPassword localProps['storePassword']
-            storePassword localProps['storePassword']
-        }
-    }
+    
 
     buildTypes {
         release {
             minifyEnabled = true
             shrinkResources = true
-            signingConfig = signingConfigs.release
+            
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-media.pro'
         }
     }
