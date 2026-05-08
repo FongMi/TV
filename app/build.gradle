@@ -54,7 +54,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file(localProps['storeFile'])
+            storeFile file(localProps['tv.jks'])
             keyAlias localProps['keyAlias']
             keyPassword localProps['storePassword']
             storePassword localProps['storePassword']
