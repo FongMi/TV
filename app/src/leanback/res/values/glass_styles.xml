@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 液态玻璃风格主题 - 电视版本 -->
+    <style name="Theme.Glass" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="colorPrimary">@color/glass_primary</item>
+        <item name="colorPrimaryVariant">@color/glass_primary_variant</item>
+        <item name="colorSecondary">@color/glass_secondary</item>
+        <item name="colorTertiary">@color/glass_tertiary</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:windowAnimationStyle">@style/NoAnim</item>
+        <item name="android:windowBackground">@drawable/glass_background</item>
+    </style>
+
+    <!-- 液态玻璃卡片风格 -->
+    <style name="GlassCard">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item>
+        <item name="android:background">@drawable/glass_card_background</item>
+    </style>
+
+    <!-- 液态玻璃按钮风格 -->
+    <style name="GlassButton" parent="Widget.Material3.Button">
+        <item name="cornerRadius">12dp</item>
+        <item name="android:textColor">@color/glass_text_primary</item>
+    </style>
+
+    <!-- 液态玻璃文本视图 -->
+    <style name="GlassText">
+        <item name="android:textColor">@color/glass_text_primary</item>
+    </style>
+
+    <style name="GlassText.Primary">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/glass_text_primary</item>
+    </style>
+
+    <style name="GlassText.Secondary">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/glass_text_secondary</item>
+    </style>
+
+    <!-- 液态玻璃投影 -->
+    <style name="GlassShadow">
+        <item name="android:shadowColor">@color/glass_shadow_light</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">8</item>
+        <item name="android:shadowRadius">16</item>
+    </style>
+
+    <!-- 液态玻璃网格 -->
+    <style name="Glass.Grid">
+        <item name="cornerSizeTopLeft">16dp</item>
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+        <item name="cornerSizeBottomRight">16dp</item>
+    </style>
+
+</resources>
