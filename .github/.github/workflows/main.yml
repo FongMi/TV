@@ -1,0 +1,306 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      force_build:
+        description: "Force build even if no changes detected"
+        required: false
+        default: false
+        type: boolean
+  schedule:
+    - cron: "0 * * * *" # Run every hour
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      # Build configuration
+      SOURCE_REPO: "win78qw1/TV"
+      SOURCE_BRANCH: "release"
+      API_RETRY_COUNT: 3
+      API_RETRY_DELAY: 5
+
+      # Signing configuration (from secrets)
+      KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v6
+
+      - name: Checkout source code
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ env.SOURCE_REPO }}
+          ref: ${{ env.SOURCE_BRANCH }}
+          path: src
+
+      - name: Capture commit hashes
+        id: commit_info
+        run: |
+          cd src
+          SHORT_HASH=$(git rev-parse --short HEAD)
+          FULL_HASH=$(git rev-parse HEAD)
+          COMMIT_DATE=$(git log -1 --format=%cd --date=iso)
+
+          echo "short_hash=$SHORT_HASH" >> "$GITHUB_OUTPUT"
+          echo "full_hash=$FULL_HASH" >> "$GITHUB_OUTPUT"
+          echo "commit_date=$COMMIT_DATE" >> "$GITHUB_OUTPUT"
+
+          echo "✅ Source code hashes captured:"
+          echo "  Short hash: $SHORT_HASH"
+          echo "  Full hash: $FULL_HASH"
+          echo "  Commit date: $COMMIT_DATE"
+
+      - name: Check if build is needed
+        id: check_build
+        run: |
+          echo "🔍 Checking if build is needed..."
+
+          # Force build if requested via workflow dispatch
+          if [ "${{ github.event.inputs.force_build }}" = "true" ]; then
+            echo "🚀 Force build requested via workflow dispatch"
+            echo "build_needed=true" >> "$GITHUB_OUTPUT"
+            echo "is_first_release=false" >> "$GITHUB_OUTPUT"
+            echo "build_reason=force_build" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          latest_tag=""
+          retry_count=0
+
+          while [ $retry_count -lt $API_RETRY_COUNT ]; do
+            echo "📡 Attempting to fetch latest release (attempt $((retry_count + 1))/$API_RETRY_COUNT)..."
+            
+            response=$(curl -s -w "%{http_code}" -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              "https://api.github.com/repos/${{ github.repository }}/releases/latest")
+            
+            http_code="${response: -3}"
+            json_response="${response%???}"
+            
+            if [ "$http_code" = "200" ]; then
+              latest_tag=$(echo "$json_response" | jq -r '.tag_name // "none"')
+              echo "✅ Successfully fetched latest release tag: $latest_tag"
+              break
+            elif [ "$http_code" = "404" ]; then
+              echo "ℹ️ No releases found (404) - this will be the first release"
+              latest_tag="none"
+              break
+            else
+              echo "⚠️ API call failed with HTTP $http_code"
+              retry_count=$((retry_count + 1))
+              if [ $retry_count -lt $API_RETRY_COUNT ]; then
+                echo "🔄 Retrying in $API_RETRY_DELAY seconds..."
+                sleep $API_RETRY_DELAY
+              fi
+            fi
+          done
+
+          if [ $retry_count -eq $API_RETRY_COUNT ] && [ "$http_code" != "200" ] && [ "$http_code" != "404" ]; then
+            echo "❌ Failed to fetch latest release after $API_RETRY_COUNT attempts"
+            echo "🚀 Proceeding with build as fallback"
+            echo "build_needed=true" >> "$GITHUB_OUTPUT"
+            echo "is_first_release=false" >> "$GITHUB_OUTPUT"
+            echo "build_reason=api_failure_fallback" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          current_hash="${{ steps.commit_info.outputs.short_hash }}"
+
+          echo "📊 Comparison results:"
+          echo "  Latest release tag: $latest_tag"
+          echo "  Current short hash: $current_hash"
+          echo "  Commit date: ${{ steps.commit_info.outputs.commit_date }}"
+
+          if [ "$latest_tag" = "none" ]; then
+            echo "🆕 No previous releases found - this will be the first release"
+            echo "build_needed=true" >> "$GITHUB_OUTPUT"
+            echo "is_first_release=true" >> "$GITHUB_OUTPUT"
+            echo "build_reason=first_release" >> "$GITHUB_OUTPUT"
+          elif [ "$latest_tag" != "$current_hash" ]; then
+            echo "🚀 Build needed: latest tag ($latest_tag) != current hash ($current_hash)"
+            echo "build_needed=true" >> "$GITHUB_OUTPUT"
+            echo "is_first_release=false" >> "$GITHUB_OUTPUT"
+            echo "build_reason=code_changes" >> "$GITHUB_OUTPUT"
+          else
+            echo "⏭️ Build not needed: latest tag matches current hash"
+            echo "build_needed=false" >> "$GITHUB_OUTPUT"
+            echo "is_first_release=false" >> "$GITHUB_OUTPUT"
+            echo "build_reason=no_changes" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up JDK 17
+        if: steps.check_build.outputs.build_needed == 'true'
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          cache: "gradle"
+
+      - name: Set up Python 3.10
+        if: steps.check_build.outputs.build_needed == 'true'
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Cache Gradle dependencies
+        if: steps.check_build.outputs.build_needed == 'true'
+        uses: actions/cache@v5
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.android/build-cache
+          key: ${{ runner.os }}-gradle-${{ hashFiles('src/**/*.gradle*', 'src/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Decode signing keystore
+        if: steps.check_build.outputs.build_needed == 'true'
+        run: |
+          echo "🔐 Decoding signing keystore..."
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "❌ KEYSTORE_BASE64 secret is not set"
+            exit 1
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > keystore.jks
+          if [ ! -f keystore.jks ]; then
+            echo "❌ Failed to create keystore file"
+            exit 1
+          fi
+          echo "✅ Keystore decoded successfully"
+
+      - name: Prepare Android local.properties
+        if: steps.check_build.outputs.build_needed == 'true'
+        run: |
+          echo "📝 Preparing Android local.properties for CI..."
+
+          SDK_DIR="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}"
+          if [ -z "$SDK_DIR" ]; then
+            echo "❌ ANDROID_HOME / ANDROID_SDK_ROOT is not set"
+            exit 1
+          fi
+
+          cat > src/local.properties <<EOF
+          sdk.dir=$SDK_DIR
+          storeFile=$GITHUB_WORKSPACE/keystore.jks
+          storePassword=$KEYSTORE_PASSWORD
+          keyAlias=$KEY_ALIAS
+          keyPassword=$KEY_PASSWORD
+          EOF
+
+          echo "✅ local.properties created successfully"
+
+      - name: Build release APKs
+        id: build_apks
+        if: steps.check_build.outputs.build_needed == 'true'
+        continue-on-error: true
+        run: |
+          echo "🔨 Building release APKs..."
+          cd src
+
+          # Verify required secrets are available
+          if [ -z "$KEYSTORE_PASSWORD" ] || [ -z "$KEY_ALIAS" ] || [ -z "$KEY_PASSWORD" ]; then
+            echo "❌ Required signing secrets are missing"
+            exit 1
+          fi
+
+          # Make gradlew executable
+          chmod +x gradlew
+
+          # Build release APK with signing
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file="$GITHUB_WORKSPACE/keystore.jks" \
+            -Pandroid.injected.signing.store.password="$KEYSTORE_PASSWORD" \
+            -Pandroid.injected.signing.key.alias="$KEY_ALIAS" \
+            -Pandroid.injected.signing.key.password="$KEY_PASSWORD" \
+            --no-daemon \
+            --stacktrace
+            
+          echo "✅ APK build completed successfully"
+
+      - name: Clean up keystore
+        if: steps.check_build.outputs.build_needed == 'true'
+        run: |
+          # Clean up generated signing files for security
+          rm -f "$GITHUB_WORKSPACE/keystore.jks"
+          rm -f "$GITHUB_WORKSPACE/src/local.properties"
+          echo "🔐 Keystore cleaned up"
+
+      - name: Create GitHub Release
+        if: steps.check_build.outputs.build_needed == 'true' && steps.build_apks.outcome == 'success'
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.commit_info.outputs.short_hash }}
+          name: "FongMi TV APK Release ${{ steps.commit_info.outputs.short_hash }}"
+          body: |
+            📱 **Build Information:**
+            - **Commit Hash:** [`${{ steps.commit_info.outputs.short_hash }}`](https://github.com/${{ env.SOURCE_REPO }}/commit/${{ steps.commit_info.outputs.full_hash }})
+            - **Commit Date:** ${{ steps.commit_info.outputs.commit_date }}
+            - **Build Reason:** ${{ steps.check_build.outputs.build_reason }}
+
+            📦 **Downloads:**
+            APK files are attached to this release. Choose the appropriate variant for your device.
+
+          files: src/**/build/outputs/apk/**/release/*.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Summary
+        if: always()
+        run: |
+          echo "📋 **Build Summary**"
+          echo "════════════════════════════════════════"
+          echo "🏗️ **Workflow Information:**"
+          echo "    Repository: ${{ github.repository }}"
+          echo "    Workflow: ${{ github.workflow }}"
+          echo "    Run ID: ${{ github.run_id }}"
+          echo "    Trigger: ${{ github.event_name }}"
+          echo "    Runner OS: ${{ runner.os }}"
+          echo ""
+          echo "📊 **Source Code Information:**"
+          echo "    Source Repository: ${{ env.SOURCE_REPO }}"
+          echo "    Source Branch: ${{ env.SOURCE_BRANCH }}"
+          echo "    Short Hash: ${{ steps.commit_info.outputs.short_hash }}"
+          echo "    Full Hash: ${{ steps.commit_info.outputs.full_hash }}"
+          echo "    Commit Date: ${{ steps.commit_info.outputs.commit_date }}"
+          echo ""
+          echo "🚀 **Build Status:**"
+          if [ "${{ steps.check_build.outputs.build_needed }}" = "true" ]; then
+            echo "    Build Attempted: ✅ Yes"
+            echo "    Reason: ${{ steps.check_build.outputs.build_reason }}"
+            if [ "${{ steps.check_build.outputs.is_first_release }}" = "true" ]; then
+              echo "    Type: 🎉 First Release"
+            else
+              echo "    Type: 📦 Update Release"
+            fi
+            
+            # Check APK build result
+            if [ "${{ steps.build_apks.outcome }}" = "success" ]; then
+              echo "    APK Build: ✅ Succeeded"
+              echo "    Release: ✅ Created Successfully"
+              echo "    Tag: ${{ steps.commit_info.outputs.short_hash }}"
+            else
+              echo "    APK Build: ⚠️ Failed (upstream source issue)"
+              echo "    Release: ⏭️ Skipped due to build failure"
+              echo "    Note: The upstream FongMi/TV repository may have build issues"
+            fi
+          else
+            echo "    Status: ⏭️ Build Skipped"
+            echo "    Reason: ${{ steps.check_build.outputs.build_reason }}"
+          fi
+          echo "════════════════════════════════════════"
