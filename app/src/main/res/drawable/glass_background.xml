@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 液态玻璃整体背景 -->
+    <solid android:color="#F0F0FF" />
+</shape>
