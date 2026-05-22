@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 液态玻璃风格颜色配置 -->
+    <color name="glass_primary">#E6E6FA</color>
+    <color name="glass_primary_variant">#D1C4E9</color>
+    <color name="glass_secondary">#B39DDB</color>
+    <color name="glass_tertiary">#CE93D8</color>
+
+    <!-- 玻璃效果背景 - 半透明白色 -->
+    <color name="glass_surface_light">#F8F8FF</color>
+    <color name="glass_surface_semi">#E8E8FF</color>
+    <color name="glass_surface_blur">#DCDCFF</color>
+
+    <!-- 文字颜色 -->
+    <color name="glass_text_primary">#1A1A2E</color>
+    <color name="glass_text_secondary">#4A4A6A</color>
+    <color name="glass_text_tertiary">#8A8AAA</color>
+
+    <!-- 投影颜色 -->
+    <color name="glass_shadow_light">#26000000</color>
+    <color name="glass_shadow_medium">#40000000</color>
+
+    <!-- 边框颜色 -->
+    <color name="glass_border_light">#33FFFFFF</color>
+    <color name="glass_border_medium">#4DFFFFFF</color>
+</resources>
