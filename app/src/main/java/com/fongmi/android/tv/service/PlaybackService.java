@@ -32,6 +32,7 @@ import com.fongmi.android.tv.utils.Task;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.gson.JsonObject;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -48,6 +49,20 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     private static volatile boolean running;
 
     private final List<PlayerCallback> playerCallbacks = new CopyOnWriteArrayList<>();
+    private final android.os.Handler progressHandler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private String currentSiteKey = "";
+    private String currentVodId = "";
+    private String currentEpisodeId = "";
+    private int currentEpisodeIndex = 0;
+    private boolean wasPlaying = false;
+
+    private final Runnable progressRunnable = new Runnable() {
+        @Override
+        public void run() {
+            notifyProgress();
+            progressHandler.postDelayed(this, 5000);
+        }
+    };
     private final IBinder binder = new LocalBinder();
 
     private NavigationCallback navigationCallback;
@@ -158,6 +173,8 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     @Override
     public void onDestroy() {
+        stopProgressTracking();
+        notifyPlaybackStop();
         running = false;
         releaseSession();
         player.release();
@@ -412,8 +429,62 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     private void startBrowse(PlayerManager manager, MediaItem item, Result result, long startPositionMs) {
+        currentSiteKey = result.getKey();
+        currentVodId = result.getVodId();
+        currentEpisodeIndex = result.getEpisodeIndex();
+        currentEpisodeId = result.getEpisodeId();
         manager.startBrowse(PlaySpec.from(result, item.mediaId, item.mediaMetadata));
         if (startPositionMs > 0) manager.seekTo(startPositionMs);
+        notifyPlaybackStart();
+        startProgressTracking();
+    }
+
+    private void notifyPlaybackStart() {
+        notifySpider("playback_start");
+    }
+
+    private void notifyPlaybackPause() {
+        notifySpider("playback_pause");
+    }
+
+    private void notifyPlaybackResume() {
+        notifySpider("playback_resume");
+    }
+
+    private void notifyPlaybackStop() {
+        notifySpider("playback_stop");
+    }
+
+    private void notifyProgress() {
+        if (!player.isPlaying()) return;
+        notifySpider("playback_progress");
+    }
+
+    private void notifySpider(String action) {
+        try {
+            com.fongmi.android.tv.bean.Site site = com.fongmi.android.tv.api.config.VodConfig.get().getSite(currentSiteKey);
+            if (site == null || site.spider() == null) return;
+
+            JsonObject json = new JsonObject();
+            json.addProperty("action", action);
+            json.addProperty("vodId", currentVodId);
+            json.addProperty("episodeIndex", currentEpisodeIndex);
+            json.addProperty("episodeUrl", currentEpisodeId);
+            json.addProperty("position", player.getPosition());
+            json.addProperty("duration", player.getDuration());
+
+            site.spider().action(json.toString());
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void startProgressTracking() {
+        progressHandler.removeCallbacks(progressRunnable);
+        progressHandler.postDelayed(progressRunnable, 5000);
+    }
+
+    private void stopProgressTracking() {
+        progressHandler.removeCallbacks(progressRunnable);
     }
 
     @Override
@@ -449,6 +520,16 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         @Override
         public void onPlaybackStateChanged(int state) {
             if (state == Player.STATE_ENDED && !(hasNavigationCallback() && isNavigationOwner())) navigateItem(1);
+        }
+
+        @Override
+        public void onIsPlayingChanged(boolean isPlaying) {
+            if (isPlaying && !wasPlaying) {
+                notifyPlaybackResume();
+            } else if (!isPlaying && wasPlaying) {
+                notifyPlaybackPause();
+            }
+            wasPlaying = isPlaying;
         }
     };
 

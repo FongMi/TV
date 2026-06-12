@@ -84,6 +84,10 @@ public class Result implements Parcelable {
     private String click;
     @SerializedName("key")
     private String key;
+    @SerializedName("vodId")
+    private String vodId;
+    @SerializedName("episodeIndex")
+    private Integer episodeIndex;
     @SerializedName("episodeId")
     private String episodeId;
     @SerializedName("position")
@@ -275,6 +279,22 @@ public class Result implements Parcelable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getVodId() {
+        return TextUtils.isEmpty(vodId) ? "" : vodId;
+    }
+
+    public void setVodId(String vodId) {
+        this.vodId = vodId;
+    }
+
+    public int getEpisodeIndex() {
+        return episodeIndex != null ? episodeIndex : 0;
+    }
+
+    public void setEpisodeIndex(int episodeIndex) {
+        this.episodeIndex = episodeIndex;
     }
 
     public String getEpisodeId() {
