@@ -104,9 +104,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
-    public void onPlayback(String event, String vodId, int episodeIndex, String episodeUrl, long position, long duration) {
+    public void onPlayback(String event, String vodId, String episodeUrl, long position, long duration) {
         try {
-            app.callAttr("onPlayback", obj, event, vodId, episodeIndex, episodeUrl, position, duration);
+            app.callAttr("onPlayback", obj, event, vodId, episodeUrl, position, duration);
         } catch (Exception ignored) {
         }
     }

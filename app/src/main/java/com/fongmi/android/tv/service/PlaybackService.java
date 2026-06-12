@@ -52,8 +52,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     private final android.os.Handler progressHandler = new android.os.Handler(android.os.Looper.getMainLooper());
     private String currentSiteKey = "";
     private String currentVodId = "";
-    private String currentEpisodeId = "";
-    private int currentEpisodeIndex = 0;
+    private String currentEpisodeUrl = "";
     private boolean wasPlaying = false;
 
     private final Runnable progressRunnable = new Runnable() {
@@ -424,19 +423,52 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     private void playViaManager(MediaItem item, long startPositionMs) {
         if (item == null || item.localConfiguration == null) return;
+        android.util.Log.d("PlaybackService", "playViaManager: mediaId=" + item.mediaId);
         Result result = BrowseTree.consumeBrowseResult(item.mediaId);
-        if (result != null) startBrowse(player, item, result, startPositionMs);
+        android.util.Log.d("PlaybackService", "playViaManager: result=" + (result != null));
+        if (result != null) {
+            startBrowse(player, item, result, startPositionMs);
+        } else {
+            extractPlaybackInfo(item);
+        }
     }
 
     private void startBrowse(PlayerManager manager, MediaItem item, Result result, long startPositionMs) {
         currentSiteKey = result.getKey();
         currentVodId = result.getVodId();
-        currentEpisodeIndex = result.getEpisodeIndex();
-        currentEpisodeId = result.getEpisodeId();
+        currentEpisodeUrl = result.getEpisodeId();
+        android.util.Log.d("PlaybackService", "startBrowse: key=" + currentSiteKey + ", vodId=" + currentVodId + ", episodeUrl=" + currentEpisodeUrl);
         manager.startBrowse(PlaySpec.from(result, item.mediaId, item.mediaMetadata));
         if (startPositionMs > 0) manager.seekTo(startPositionMs);
         notifyPlaybackStart();
         startProgressTracking();
+    }
+
+    private void extractPlaybackInfo(MediaItem item) {
+        if (item.mediaId == null || !item.mediaId.contains("@@@")) return;
+        String[] parts = item.mediaId.split("@@@", 3);
+        if (parts.length < 2) return;
+        currentSiteKey = parts[0];
+        currentVodId = parts[1];
+        currentEpisodeUrl = "";
+
+        if (item.mediaMetadata.artist != null) {
+            currentEpisodeUrl = item.mediaMetadata.artist.toString();
+        }
+
+        com.fongmi.android.tv.bean.History history = com.fongmi.android.tv.bean.History.find(currentVodId);
+        if (history != null && currentEpisodeUrl.isEmpty()) {
+            currentEpisodeUrl = history.getEpisodeUrl();
+        }
+
+        android.util.Log.d("PlaybackService", "extractPlaybackInfo: key=" + currentSiteKey + ", vodId=" + currentVodId + ", episodeUrl=" + currentEpisodeUrl);
+    }
+
+    private void ensurePlaybackInfo() {
+        if (currentSiteKey.isEmpty() || currentVodId.isEmpty()) {
+            MediaItem item = player.getCurrentMediaItem();
+            if (item != null) extractPlaybackInfo(item);
+        }
     }
 
     private void notifyPlaybackStart() {
@@ -457,14 +489,17 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     private void notifyProgress() {
         if (!player.isPlaying()) return;
+        ensurePlaybackInfo();
         notifySpider("playback_progress");
     }
 
     private void notifySpider(String event) {
         try {
+            android.util.Log.d("PlaybackService", "notifySpider: event=" + event + ", siteKey=" + currentSiteKey + ", vodId=" + currentVodId);
             com.fongmi.android.tv.bean.Site site = com.fongmi.android.tv.api.config.VodConfig.get().getSite(currentSiteKey);
             if (site == null || site.spider() == null) return;
-            site.spider().onPlayback(event, currentVodId, currentEpisodeIndex, currentEpisodeId, player.getPosition(), player.getDuration());
+            android.util.Log.d("PlaybackService", "notifySpider: calling spider.onPlayback");
+            site.spider().onPlayback(event, currentVodId, currentEpisodeUrl, player.getPosition(), player.getDuration());
         } catch (Exception ignored) {
         }
     }
@@ -515,10 +550,13 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
         @Override
         public void onIsPlayingChanged(boolean isPlaying) {
+            ensurePlaybackInfo();
             if (isPlaying && !wasPlaying) {
                 notifyPlaybackResume();
+                startProgressTracking();
             } else if (!isPlaying && wasPlaying) {
                 notifyPlaybackPause();
+                stopProgressTracking();
             }
             wasPlaying = isPlaying;
         }
