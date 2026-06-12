@@ -41,6 +41,13 @@ public class Media implements Process {
         result.addProperty("title", getString(meta.title));
         result.addProperty("artist", getString(meta.artist));
         result.addProperty("artwork", getString(meta.artworkUri));
+        result.addProperty("mediaId", item != null ? item.mediaId : "");
+        String episodeId = "";
+        if (meta.extras != null) {
+            String value = meta.extras.getString("episodeId");
+            if (value != null) episodeId = value;
+        }
+        result.addProperty("episodeId", episodeId);
         return Nano.ok(result.toString());
     }
 

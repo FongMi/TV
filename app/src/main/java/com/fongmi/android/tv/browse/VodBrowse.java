@@ -245,7 +245,7 @@ class VodBrowse {
         BrowseTree.putBrowseResult(mediaId, result);
         String vodName = vod.getName();
         if (TextUtils.isEmpty(vodName) && browseHistory != null) vodName = browseHistory.getVodName();
-        return BrowseTree.stream(mediaId, result.getRealUrl(), vodName, episode.getName(), entry.vodPic);
+        return BrowseTree.stream(mediaId, result.getRealUrl(), vodName, episode.getName(), entry.vodPic, episode.getUrl());
     }
 
     private static void updateHistory(@NonNull Episode episode) {

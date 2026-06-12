@@ -84,6 +84,8 @@ public class Result implements Parcelable {
     private String click;
     @SerializedName("key")
     private String key;
+    @SerializedName("episodeId")
+    private String episodeId;
     @SerializedName("position")
     private Long position;
     @SerializedName("pagecount")
@@ -273,6 +275,14 @@ public class Result implements Parcelable {
 
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getEpisodeId() {
+        return TextUtils.isEmpty(episodeId) ? "" : episodeId;
+    }
+
+    public void setEpisodeId(String episodeId) {
+        this.episodeId = episodeId;
     }
 
     public Long getPosition() {

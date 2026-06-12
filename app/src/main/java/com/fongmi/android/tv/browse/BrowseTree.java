@@ -133,22 +133,31 @@ public class BrowseTree {
     }
 
     static MediaItem folder(@NonNull String id, @NonNull String title) {
-        return build(id, true, false, MediaMetadata.MEDIA_TYPE_FOLDER_MIXED, title, null, null, null);
+        return build(id, true, false, MediaMetadata.MEDIA_TYPE_FOLDER_MIXED, title, null, null, null, null);
     }
 
     static MediaItem playable(@NonNull String id, @NonNull String title, @Nullable String subtitle, @Nullable String art) {
-        return build(id, false, true, MediaMetadata.MEDIA_TYPE_VIDEO, title, subtitle, art, null);
+        return build(id, false, true, MediaMetadata.MEDIA_TYPE_VIDEO, title, subtitle, art, null, null);
     }
 
     static MediaItem stream(@NonNull String id, @NonNull String url, @NonNull String title, @Nullable String subtitle, @Nullable String art) {
-        return build(id, false, true, MediaMetadata.MEDIA_TYPE_VIDEO, title, subtitle, art, Uri.parse(url));
+        return stream(id, url, title, subtitle, art, null);
     }
 
-    private static MediaItem build(@NonNull String id, boolean browsable, boolean playable, int mediaType, @NonNull String title, @Nullable String subtitle, @Nullable String art, @Nullable Uri uri) {
+    static MediaItem stream(@NonNull String id, @NonNull String url, @NonNull String title, @Nullable String subtitle, @Nullable String art, @Nullable String episodeId) {
+        return build(id, false, true, MediaMetadata.MEDIA_TYPE_VIDEO, title, subtitle, art, Uri.parse(url), episodeId);
+    }
+
+    private static MediaItem build(@NonNull String id, boolean browsable, boolean playable, int mediaType, @NonNull String title, @Nullable String subtitle, @Nullable String art, @Nullable Uri uri, @Nullable String episodeId) {
         MediaMetadata.Builder metadata = new MediaMetadata.Builder().setTitle(title).setIsBrowsable(browsable).setIsPlayable(playable).setMediaType(mediaType);
         if (!TextUtils.isEmpty(subtitle)) metadata.setSubtitle(subtitle);
         if (!TextUtils.isEmpty(art)) metadata.setArtworkUri(Uri.parse(art));
         if (!TextUtils.isEmpty(subtitle) && uri != null) metadata.setArtist(subtitle);
+        if (!TextUtils.isEmpty(episodeId)) {
+            Bundle extras = new Bundle();
+            extras.putString("episodeId", episodeId);
+            metadata.setExtras(extras);
+        }
         MediaItem.Builder builder = new MediaItem.Builder().setMediaId(id).setMediaMetadata(metadata.build());
         if (uri != null) builder.setUri(uri);
         return builder.build();
