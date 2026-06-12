@@ -78,6 +78,9 @@ public abstract class Spider {
         return null;
     }
 
+    public void onPlayback(String event, String vodId, int episodeIndex, String episodeUrl, long position, long duration) {
+    }
+
     public void destroy() {
     }
 }

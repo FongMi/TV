@@ -460,20 +460,11 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         notifySpider("playback_progress");
     }
 
-    private void notifySpider(String action) {
+    private void notifySpider(String event) {
         try {
             com.fongmi.android.tv.bean.Site site = com.fongmi.android.tv.api.config.VodConfig.get().getSite(currentSiteKey);
             if (site == null || site.spider() == null) return;
-
-            JsonObject json = new JsonObject();
-            json.addProperty("action", action);
-            json.addProperty("vodId", currentVodId);
-            json.addProperty("episodeIndex", currentEpisodeIndex);
-            json.addProperty("episodeUrl", currentEpisodeId);
-            json.addProperty("position", player.getPosition());
-            json.addProperty("duration", player.getDuration());
-
-            site.spider().action(json.toString());
+            site.spider().onPlayback(event, currentVodId, currentEpisodeIndex, currentEpisodeId, player.getPosition(), player.getDuration());
         } catch (Exception ignored) {
         }
     }
