@@ -141,10 +141,6 @@ public class SiteApi {
 
     @NonNull
     public static Result playerContent(@NonNull String key, @NonNull String flag, @NonNull String id) throws Exception {
-        return playerContent(key, "", 0, flag, id);
-    }
-
-    public static Result playerContent(@NonNull String key, @NonNull String vodId, int episodeIndex, @NonNull String flag, @NonNull String id) throws Exception {
         SpiderDebug.log("player", "key=%s,flag=%s,id=%s", key, flag, id);
         Site site = VodConfig.get().getSite(key);
         Source.get().stop();
@@ -156,8 +152,6 @@ public class SiteApi {
             result.setUrl(Source.get().fetch(result));
             result.setHeader(site.getHeader());
             result.setKey(key);
-            result.setVodId(vodId);
-            result.setEpisodeIndex(episodeIndex);
             result.setEpisodeId(id);
             return result;
         } else if (site.getType() == 4) {
@@ -170,8 +164,6 @@ public class SiteApi {
             if (result.getFlag().isEmpty()) result.setFlag(flag);
             result.setUrl(Source.get().fetch(result));
             result.setHeader(site.getHeader());
-            result.setVodId(vodId);
-            result.setEpisodeIndex(episodeIndex);
             result.setEpisodeId(id);
             return result;
         } else if (site.isEmpty() && "push_agent".equals(key)) {
@@ -180,8 +172,6 @@ public class SiteApi {
             result.setParse(0);
             result.setFlag(flag);
             result.setUrl(Source.get().fetch(result));
-            result.setVodId(vodId);
-            result.setEpisodeIndex(episodeIndex);
             result.setEpisodeId(id);
             SpiderDebug.log("player", result.toString());
             return result;
@@ -193,8 +183,6 @@ public class SiteApi {
             result.setPlayUrl(site.getPlayUrl());
             result.setParse(Sniffer.isVideoFormat(id) && result.getPlayUrl().isEmpty() ? 0 : 1);
             result.setUrl(Source.get().fetch(result));
-            result.setVodId(vodId);
-            result.setEpisodeIndex(episodeIndex);
             result.setEpisodeId(id);
             SpiderDebug.log("player", result.toString());
             return result;
