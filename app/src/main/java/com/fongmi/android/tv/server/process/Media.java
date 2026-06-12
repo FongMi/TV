@@ -1,11 +1,15 @@
 package com.fongmi.android.tv.server.process;
 
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 
+import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.browse.BrowseTree;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.server.Server;
@@ -14,11 +18,16 @@ import com.fongmi.android.tv.service.PlaybackService;
 import com.google.gson.JsonObject;
 
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
 import fi.iki.elonen.NanoHTTPD.Response;
 
 public class Media implements Process {
+
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     public boolean isRequest(IHTTPSession session, String url) {
@@ -27,11 +36,36 @@ public class Media implements Process {
 
     @Override
     public Response doResponse(IHTTPSession session, String url, Map<String, String> files) {
+        AtomicReference<String> result = new AtomicReference<>("");
+        CountDownLatch latch = new CountDownLatch(1);
+
+        mainHandler.post(() -> {
+            try {
+                result.set(getMediaInfo());
+            } finally {
+                latch.countDown();
+            }
+        });
+
+        try {
+            if (!latch.await(1, TimeUnit.SECONDS)) {
+                return Nano.error("Timeout");
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return Nano.error("Interrupted");
+        }
+
+        return Nano.ok(result.get());
+    }
+
+    private String getMediaInfo() {
         PlaybackService service = Server.get().getService();
-        if (service == null) return Nano.ok("{}");
+        if (service == null) return "{}";
         PlayerManager player = service.player();
         MediaItem item = player.getCurrentMediaItem();
-        MediaMetadata meta = item != null ? item.mediaMetadata : MediaMetadata.EMPTY;
+        if (item == null) return "{}";
+        MediaMetadata meta = item.mediaMetadata;
         JsonObject result = new JsonObject();
         result.addProperty("state", getState(player));
         result.addProperty("speed", player.getSpeed());
@@ -41,14 +75,14 @@ public class Media implements Process {
         result.addProperty("title", getString(meta.title));
         result.addProperty("artist", getString(meta.artist));
         result.addProperty("artwork", getString(meta.artworkUri));
-        result.addProperty("mediaId", item != null ? item.mediaId : "");
+        result.addProperty("mediaId", item.mediaId);
         String episodeId = "";
         if (meta.extras != null) {
             String value = meta.extras.getString("episodeId");
             if (value != null) episodeId = value;
         }
         result.addProperty("episodeId", episodeId);
-        return Nano.ok(result.toString());
+        return result.toString();
     }
 
     private int getState(PlayerManager player) {
