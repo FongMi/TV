@@ -239,7 +239,9 @@ class VodBrowse {
         Flag flag = findFlag(vod, entry.flagName);
         if (flag == null || entry.index >= flag.getEpisodes().size()) return null;
         Episode episode = flag.getEpisodes().get(entry.index);
-        Result result = SiteApi.playerContent(entry.siteKey, entry.historyKey, entry.index, entry.flagName, episode.getUrl());
+        boolean revPlay = browseHistory != null && browseHistory.isRevPlay();
+        int episodeIndex = revPlay ? flag.getEpisodes().size() - 1 - entry.index : entry.index;
+        Result result = SiteApi.playerContent(entry.siteKey, entry.historyKey, episodeIndex, entry.flagName, episode.getUrl());
         if (TextUtils.isEmpty(result.getRealUrl())) return null;
         updateHistory(episode);
         BrowseTree.putBrowseResult(mediaId, result);
