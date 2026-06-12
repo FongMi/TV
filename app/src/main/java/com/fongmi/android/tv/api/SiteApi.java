@@ -152,7 +152,6 @@ public class SiteApi {
             result.setUrl(Source.get().fetch(result));
             result.setHeader(site.getHeader());
             result.setKey(key);
-            result.setEpisodeId(id);
             return result;
         } else if (site.getType() == 4) {
             ArrayMap<String, String> params = new ArrayMap<>();
@@ -164,7 +163,6 @@ public class SiteApi {
             if (result.getFlag().isEmpty()) result.setFlag(flag);
             result.setUrl(Source.get().fetch(result));
             result.setHeader(site.getHeader());
-            result.setEpisodeId(id);
             return result;
         } else if (site.isEmpty() && "push_agent".equals(key)) {
             Result result = new Result();
@@ -172,7 +170,6 @@ public class SiteApi {
             result.setParse(0);
             result.setFlag(flag);
             result.setUrl(Source.get().fetch(result));
-            result.setEpisodeId(id);
             SpiderDebug.log("player", result.toString());
             return result;
         } else {
@@ -183,7 +180,6 @@ public class SiteApi {
             result.setPlayUrl(site.getPlayUrl());
             result.setParse(Sniffer.isVideoFormat(id) && result.getPlayUrl().isEmpty() ? 0 : 1);
             result.setUrl(Source.get().fetch(result));
-            result.setEpisodeId(id);
             SpiderDebug.log("player", result.toString());
             return result;
         }

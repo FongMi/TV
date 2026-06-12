@@ -245,6 +245,7 @@ class VodBrowse {
         int episodeIndex = revPlay ? flag.getEpisodes().size() - 1 - entry.index : entry.index;
         result.setVodId(entry.historyKey);
         result.setEpisodeIndex(episodeIndex);
+        result.setEpisodeId(episode.getUrl());
         updateHistory(episode);
         BrowseTree.putBrowseResult(mediaId, result);
         String vodName = vod.getName();
