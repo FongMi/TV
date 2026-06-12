@@ -34,13 +34,7 @@ public class PlaySpec {
     }
 
     public static PlaySpec from(Result result, String key, MediaMetadata metadata) {
-        MediaMetadata.Builder builder = metadata.buildUpon();
-        if (!result.getEpisodeId().isEmpty()) {
-            android.os.Bundle extras = metadata.extras != null ? new android.os.Bundle(metadata.extras) : new android.os.Bundle();
-            extras.putString("episodeId", result.getEpisodeId());
-            builder.setExtras(extras);
-        }
-        return new PlaySpec(key, result.getRealUrl(), result.getHeader(), result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), builder.build());
+        return new PlaySpec(key, result.getRealUrl(), result.getHeader(), result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
     }
 
     public static PlaySpec fromParse(Result result, String key, MediaMetadata metadata) {

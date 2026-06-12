@@ -59,9 +59,6 @@ public class Media implements Process {
         return Nano.ok(result.get());
     }
 
-    private static String lastEpisodeId = "";
-    private static long episodeSeq = 0;
-
     private String getMediaInfo() {
         PlaybackService service = Server.get().getService();
         if (service == null) return "{}";
@@ -69,18 +66,6 @@ public class Media implements Process {
         MediaItem item = player.getCurrentMediaItem();
         if (item == null) return "{}";
         MediaMetadata meta = item.mediaMetadata;
-
-        String episodeId = "";
-        if (meta.extras != null) {
-            String value = meta.extras.getString("episodeId");
-            if (value != null) episodeId = value;
-        }
-
-        if (!episodeId.equals(lastEpisodeId)) {
-            lastEpisodeId = episodeId;
-            episodeSeq++;
-        }
-
         JsonObject result = new JsonObject();
         result.addProperty("state", getState(player));
         result.addProperty("speed", player.getSpeed());
@@ -91,15 +76,6 @@ public class Media implements Process {
         result.addProperty("artist", getString(meta.artist));
         result.addProperty("artwork", getString(meta.artworkUri));
         result.addProperty("mediaId", item.mediaId);
-        result.addProperty("episodeSeq", episodeSeq);
-
-        if (item.mediaId != null && item.mediaId.contains("@@@")) {
-            String[] parts = item.mediaId.split("@@@", 3);
-            if (parts.length >= 1) result.addProperty("siteKey", parts[0]);
-            if (parts.length >= 2) result.addProperty("vodId", parts[1]);
-        }
-
-        result.addProperty("episodeId", episodeId);
         return result.toString();
     }
 
