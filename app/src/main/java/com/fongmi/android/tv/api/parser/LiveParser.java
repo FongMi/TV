@@ -20,17 +20,17 @@ import java.util.regex.Pattern;
 public class LiveParser {
 
     private static final Pattern M3U = Pattern.compile("^(?!.*#genre#).*#EXTM3U.*", Pattern.MULTILINE);
-    private static final Pattern HTTP_USER_AGENT = Pattern.compile(".*http-user-agent=\"(.?|.+?)\".*");
-    private static final Pattern CATCHUP_REPLACE = Pattern.compile(".*catchup-replace=\"(.?|.+?)\".*");
-    private static final Pattern CATCHUP_SOURCE = Pattern.compile(".*catchup-source=\"(.?|.+?)\".*");
-    private static final Pattern CATCHUP = Pattern.compile(".*catchup=\"(.?|.+?)\".*");
-    private static final Pattern TVG_CHNO = Pattern.compile(".*tvg-chno=\"(.?|.+?)\".*");
-    private static final Pattern TVG_LOGO = Pattern.compile(".*tvg-logo=\"(.?|.+?)\".*");
-    private static final Pattern TVG_NAME = Pattern.compile(".*tvg-name=\"(.?|.+?)\".*");
-    private static final Pattern TVG_URL = Pattern.compile(".*tvg-url=\"(.?|.+?)\".*");
-    private static final Pattern TVG_ID = Pattern.compile(".*tvg-id=\"(.?|.+?)\".*");
-    private static final Pattern URL_TVG = Pattern.compile(".*url-tvg=\"(.?|.+?)\".*");
-    private static final Pattern GROUP = Pattern.compile(".*group-title=\"(.?|.+?)\".*");
+    private static final Pattern HTTP_USER_AGENT = Pattern.compile(".*http-user-agent=\"(.?|.+?)\"");
+    private static final Pattern CATCHUP_REPLACE = Pattern.compile(".*catchup-replace=\"(.?|.+?)\"");
+    private static final Pattern CATCHUP_SOURCE = Pattern.compile(".*catchup-source=\"(.?|.+?)\"");
+    private static final Pattern CATCHUP = Pattern.compile(".*catchup=\"(.?|.+?)\"");
+    private static final Pattern TVG_CHNO = Pattern.compile(".*tvg-chno=\"(.?|.+?)\"");
+    private static final Pattern TVG_LOGO = Pattern.compile(".*tvg-logo=\"(.?|.+?)\"");
+    private static final Pattern TVG_NAME = Pattern.compile(".*tvg-name=\"(.?|.+?)\"");
+    private static final Pattern TVG_URL = Pattern.compile(".*tvg-url=\"(.?|.+?)\"");
+    private static final Pattern TVG_ID = Pattern.compile(".*tvg-id=\"(.?|.+?)\"");
+    private static final Pattern URL_TVG = Pattern.compile(".*url-tvg=\"(.?|.+?)\"");
+    private static final Pattern GROUP = Pattern.compile(".*group-title=\"(.?|.+?)\"");
     private static final Pattern NAME = Pattern.compile(".*,(.+?)$");
 
     private static String extract(String line, Pattern pattern) {
@@ -164,7 +164,7 @@ public class LiveParser {
         }
 
         private boolean find(String line) {
-            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("header") || line.startsWith("format") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("forceKey") || line.startsWith("#EXTHTTP:") || line.startsWith("#EXTVLCOPT:") || line.startsWith("#KODIPROP:");
+            return line.startsWith("ua") || line.startsWith("parse") || line.startsWith("click") || line.startsWith("header") || line.startsWith("format") || line.startsWith("origin") || line.startsWith("referer") || line.startsWith("#EXTHTTP") || line.startsWith("forceKey") || line.startsWith("#EXTVLCOPT") || line.startsWith("#KODIPROP");
         }
 
         private void check(String line) {
@@ -252,6 +252,7 @@ public class LiveParser {
                 if (line.contains("manifest_type=")) format = line.split("manifest_type=")[1].trim();
                 if ("mpd".equals(format) || "dash".equals(format)) format = MimeTypes.APPLICATION_MPD;
                 if ("hls".equals(format)) format = MimeTypes.APPLICATION_M3U8;
+                if ("rtsp".equals(format) || "rtspt".equals(format)) format = "application/rtsp";
             } catch (Exception e) {
                 e.printStackTrace();
                 format = null;

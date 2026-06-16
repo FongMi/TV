@@ -91,6 +91,10 @@ public class ExoUtil {
         return extras.keySet().stream().filter(key -> extras.getString(key) != null).collect(Collectors.toMap(key -> key, extras::getString));
     }
 
+    public static boolean isRtspUrl(String url) {
+        return url != null && (url.toLowerCase().startsWith("rtsp://") || url.toLowerCase().startsWith("rtspt://"));
+    }
+
     private static int getRenderMode(int decode) {
         return decode == PlayerEngine.HARD ? DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON : DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER;
     }
@@ -137,6 +141,6 @@ public class ExoUtil {
     }
 
     private static MediaItem.DrmConfiguration buildDrmConfig(Drm drm) {
-        return drm == null ? null : new MediaItem.DrmConfiguration.Builder(drm.getUUID()).setMultiSession(!C.CLEARKEY_UUID.equals(drm.getUUID())).setForceDefaultLicenseUri(drm.isForceKey()).setLicenseRequestHeaders(drm.getHeader()).setLicenseUri(drm.getKey()).build();
+        return drm == null ? null : new MediaItem.DrmConfiguration.Builder(drm.getUUID()).setMultiSession(!C.CLEARKEY_UUID.equals(drm.getUUID())).setForceDefaultLicenseUri(drm.isForceKey()).setLicenseUri(drm.getKey()).setRequestHeaders(drm.getHeader()).build();
     }
 }
