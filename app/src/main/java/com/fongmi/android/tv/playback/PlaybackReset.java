@@ -10,8 +10,8 @@ public final class PlaybackReset {
     }
 
     public static void afterError(PlayerManager player, Runnable beforeReset) {
-        Track.delete(player.getKey());
         if (beforeReset != null) beforeReset.run();
+        Track.delete(player.getKey());
         player.resetTrack();
         player.reset();
         player.stop();

@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingTop="16dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="8dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/video_setting"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textColor="?attr/colorOnSurface" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/compare"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:text="@string/video_effect_compare"
+            android:textColor="?attr/colorPrimary" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/reset"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/video_effect_reset"
+            android:textColor="?attr/colorPrimary" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/tabGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tabPreset"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/video_effect_tab_preset" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tabAdjust"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/video_effect_tab_adjust" />
+
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/unsupported"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        android:text="@string/error_video_effect_unsupported"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
+        android:textColor="?attr/colorError"
+        android:visibility="gone" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="24dp">
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/presetSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/setting_effect_basic"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/presetBasicGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    app:chipSpacingVertical="0dp"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetOriginal"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/setting_preset_original" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetNatural"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_natural" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/video_effect_category_boost"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/presetBoostGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    app:chipSpacingVertical="0dp"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetVivid"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_vivid" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetClear"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_clear" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetBright"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_bright" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/video_effect_category_tone"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/presetToneGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    app:chipSpacingVertical="0dp"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetSoft"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_soft" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetCinema"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_cinema" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetWarm"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_warm" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetCool"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_cool" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetComfort"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_comfort" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/setting_effect_scene"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/presetSceneGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    app:chipSpacingVertical="0dp"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetAnime"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_anime" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetSport"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_sport" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetGame"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_game" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    android:paddingTop="8dp"
+                    android:text="@string/setting_effect_custom"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/presetCustomGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="24dp"
+                    app:chipSpacingVertical="0dp"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/presetCustom"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/video_effect_custom" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/adjustSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <include
+                    android:id="@+id/saturation"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/contrast"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/brightness"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/gamma"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/hue"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/temperature"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/sharpness"
+                    layout="@layout/view_setting_slider" />
+
+                <include
+                    android:id="@+id/shadow"
+                    layout="@layout/view_setting_slider" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+</androidx.appcompat.widget.LinearLayoutCompat>

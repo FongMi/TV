@@ -1,24 +1,29 @@
 package com.fongmi.android.tv.player.mpv;
 
+import androidx.annotation.NonNull;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
+import androidx.media3.common.Tracks;
 import androidx.media3.mpvplayer.MpvPlayer;
 
 import com.fongmi.android.tv.bean.Sub;
+import com.fongmi.android.tv.player.effect.PlayerEffect;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 
-import java.util.concurrent.TimeUnit;
+public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
-public class MpvPlayerEngine implements PlayerEngine {
-
-    private final MpvErrorMsgProvider provider;
+    private final MpvErrorMessageProvider provider;
+    private final MpvPlayerEffect effect;
     private final MpvPlayer player;
 
     public MpvPlayerEngine(int decode, Player.Listener listener) {
         this.player = MpvUtil.buildPlayer(decode, listener);
-        this.provider = new MpvErrorMsgProvider();
+        this.provider = new MpvErrorMessageProvider();
+        this.effect = new MpvPlayerEffect(player);
+        this.player.setAudioOutputListener(effect::applyAudioEffect);
+        this.player.addListener(this);
     }
 
     public static boolean isAvailable() {
@@ -36,13 +41,20 @@ public class MpvPlayerEngine implements PlayerEngine {
     }
 
     @Override
-    public void release() {
-        player.release();
+    public int getAudioChannelCount() {
+        return player.getAudioChannelCount();
     }
 
     @Override
-    public Player rebuild() {
-        return player;
+    public PlayerEffect getEffect() {
+        return effect;
+    }
+
+    @Override
+    public void release() {
+        player.removeListener(this);
+        player.setAudioOutputListener(null);
+        player.release();
     }
 
     @Override
@@ -59,26 +71,31 @@ public class MpvPlayerEngine implements PlayerEngine {
     }
 
     @Override
-    public boolean setDecode(int decode) {
+    public void setDecode(int decode) {
         player.setDecode(decode);
-        return false;
+    }
+
+    @Override
+    public void onTracksChanged(@NonNull Tracks tracks) {
+        effect.applyVideoEffect();
     }
 
     @Override
     public void start(PlaySpec spec, long startPositionMs) {
+        effect.applyVideoEffect();
+        effect.clearAudioEffect();
         player.setMediaItem(MediaItemFactory.from(spec), startPositionMs);
+        prepareAndPlay();
+    }
+
+    private void prepareAndPlay() {
         player.prepare();
         player.play();
     }
 
     @Override
-    public boolean isLive() {
-        return player.getDuration() < TimeUnit.MINUTES.toMillis(1);
-    }
-
-    @Override
-    public boolean isVod() {
-        return player.getDuration() > TimeUnit.MINUTES.toMillis(1);
+    public void stop() {
+        player.stop();
     }
 
     @Override

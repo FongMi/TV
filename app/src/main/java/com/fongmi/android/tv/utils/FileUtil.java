@@ -69,9 +69,11 @@ public class FileUtil {
     public static void zipDecompress(File target, File path) {
         try (ZipFile zip = new ZipFile(target)) {
             Enumeration<?> entries = zip.entries();
+            String root = path.getCanonicalPath() + File.separator;
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
                 File out = new File(path, entry.getName());
+                if (!out.getCanonicalPath().startsWith(root)) continue;
                 if (entry.isDirectory()) out.mkdirs();
                 else Path.copy(zip.getInputStream(entry), out);
             }

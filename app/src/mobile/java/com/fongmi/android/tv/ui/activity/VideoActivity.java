@@ -61,10 +61,18 @@ import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.model.VideoViewModel;
+import com.fongmi.android.tv.playback.PlaybackAction;
+import com.fongmi.android.tv.playback.PlaybackOrientation;
+import com.fongmi.android.tv.playback.PlaybackReset;
+import com.fongmi.android.tv.playback.vod.VodPlayRequest;
+import com.fongmi.android.tv.playback.vod.VodPlaybackController;
+import com.fongmi.android.tv.playback.vod.VodPlaybackHost;
+import com.fongmi.android.tv.playback.vod.VodPlaybackMedia;
 import com.fongmi.android.tv.player.util.PlayerHelper;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
+import com.fongmi.android.tv.setting.SpeedSetting;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.QualityAdapter;
@@ -84,15 +92,8 @@ import com.fongmi.android.tv.ui.dialog.InfoDialog;
 import com.fongmi.android.tv.ui.dialog.ParseDialog;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
 import com.fongmi.android.tv.ui.dialog.ReceiveDialog;
-import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
+import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
-import com.fongmi.android.tv.playback.PlaybackAction;
-import com.fongmi.android.tv.playback.PlaybackOrientation;
-import com.fongmi.android.tv.playback.PlaybackReset;
-import com.fongmi.android.tv.playback.vod.VodPlayRequest;
-import com.fongmi.android.tv.playback.vod.VodPlaybackController;
-import com.fongmi.android.tv.playback.vod.VodPlaybackHost;
-import com.fongmi.android.tv.playback.vod.VodPlaybackMedia;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ImgUtil;
@@ -113,7 +114,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
-public class VideoActivity extends PlaybackActivity implements Clock.Callback, CustomKeyDown.Listener, TrackDialog.Listener, ControlDialog.Listener, ParseDialog.Listener, VodPlaybackHost, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, CastDialog.Listener, InfoDialog.Listener {
+public class VideoActivity extends PlaybackActivity implements Clock.Callback, CustomKeyDown.Listener, ControlDialog.Listener, ParseDialog.Listener, VodPlaybackHost, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, CastDialog.Listener, InfoDialog.Listener {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -351,7 +352,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
         mBinding.control.action.edition.setOnClickListener(view -> onEdition());
         mBinding.control.action.chapter.setOnClickListener(view -> onChapter());
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
-        mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
+        mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -627,7 +628,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
         mHistory = history;
         mBinding.control.action.opening.setText(history.getOpening() <= 0 ? getString(R.string.play_op) : Util.timeMs(history.getOpening()));
         mBinding.control.action.ending.setText(history.getEnding() <= 0 ? getString(R.string.play_ed) : Util.timeMs(history.getEnding()));
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, history.getSpeed());
+        player().setSpeed(SpeedSetting.getPlayback());
         setScale(getScale());
     }
 
@@ -873,7 +874,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void onSetting() {
-        ControlDialog.create().parent(mBinding).history(mHistory).parse(isUseParse()).player(player()).show(this);
+        ControlDialog.create().parent(mBinding).parse(isUseParse()).player(player()).show(this);
     }
 
     private void onLock() {
@@ -891,7 +892,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
         hideControl();
     }
 
@@ -935,8 +936,14 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void onSpeed() {
-        mVod.setSpeed(PlaybackAction.addSpeed(player(), mBinding.control.action.speed));
+        SpeedSettingDialog.create().player(player()).save(true).show(this);
+        hideControl();
+    }
+
+    private boolean onSpeedLong() {
+        SpeedSetting.putPlayback(PlaybackAction.toggleSpeed(player(), mBinding.widget.message));
         setR1Callback();
+        return true;
     }
 
     private void onReset() {
@@ -958,7 +965,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     private void onDecode() {
         mClock.setCallback(null);
-        PlaybackAction.toggleDecode(player());
+        player().toggleDecode();
         setR1Callback();
     }
 
@@ -1005,12 +1012,6 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     private void onChoose() {
         PlayerEngineDialog.show(this, mBinding.control.action.player, player(), mBinding.control.title.getText());
         hideControl();
-    }
-
-    private boolean onTextLong() {
-        if (!player().haveTrack(C.TRACK_TYPE_TEXT)) return false;
-        onSubtitleClick();
-        return true;
     }
 
     private boolean onActionTouch(View v, MotionEvent e) {
@@ -1080,6 +1081,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void showError(String text) {
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.error.setText(text);
         hideProgress();
@@ -1334,12 +1336,6 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     @Override
-    public void onSubtitleClick() {
-        SubtitleDialog.create().view(mBinding.player.getSubtitleView()).player(player()).show(this);
-        hideControl();
-    }
-
-    @Override
     public void onTimeChanged(long time) {
         if (!isOwner() || !player().isVod()) return;
         long position = player().getPosition();
@@ -1475,15 +1471,13 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     @Override
     public void onSpeedUp() {
         if (!player().isPlaying()) return;
-        mBinding.widget.speed.setVisibility(View.VISIBLE);
-        mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, PlayerSetting.getSpeed());
+        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
     public void onSpeedEnd() {
-        mBinding.widget.speed.clearAnimation();
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, mHistory.getSpeed());
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
+        player().setSpeed(SpeedSetting.getPlayback());
     }
 
     @Override
@@ -1552,9 +1546,9 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     @Override
     public void onTouchEnd() {
         mBinding.widget.seek.setVisibility(View.GONE);
-        mBinding.widget.speed.setVisibility(View.GONE);
         mBinding.widget.bright.setVisibility(View.GONE);
         mBinding.widget.volume.setVisibility(View.GONE);
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
     }
 
     @Override
@@ -1602,7 +1596,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if (isFullscreen() && hasFocus) Util.hideSystemUI(this);
+        if (isFullscreen() && hasFocus && !Util.isFullscreen(this)) Util.hideSystemUI(this);
     }
 
     @Override

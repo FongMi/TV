@@ -226,71 +226,6 @@
             </androidx.appcompat.widget.LinearLayoutCompat>
 
             <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/caption"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_caption"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/captionText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ellipsize="middle"
-                    android:gravity="end"
-                    android:singleLine="true"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="預設" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/speed"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/shape_item"
-                android:orientation="horizontal">
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:text="@string/player_speed"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:id="@+id/speedText"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="end"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    tools:text="1" />
-
-                <com.google.android.material.textview.MaterialTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:text="@string/times"
-                    android:textColor="@color/white"
-                    android:textSize="16sp" />
-
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/background"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -314,6 +249,42 @@
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     tools:text="畫中畫" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/buffer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/shape_item"
+                android:orientation="horizontal">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="@string/player_buffer"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/bufferText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    tools:text="1" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="@string/times"
+                    android:textColor="@color/white"
+                    android:textSize="16sp" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

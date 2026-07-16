@@ -25,31 +25,31 @@
             tools:text="選擇字幕" />
 
         <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_action_search"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/choose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_action_choose"
             android:visibility="gone"
             tools:visibility="visible" />
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/subtitle"
+            android:id="@+id/setting"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_action_subtitle"
-            android:visibility="gone"
-            tools:visibility="visible" />
-
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/offset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_action_offset"
+            android:src="@drawable/ic_action_setting"
             android:visibility="gone"
             tools:visibility="visible" />
 

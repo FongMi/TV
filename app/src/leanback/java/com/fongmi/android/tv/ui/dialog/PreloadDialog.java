@@ -11,6 +11,7 @@ import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.ui.activity.SettingPreloadActivity;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.KeyUtil;
+import com.fongmi.android.tv.utils.SliderUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class PreloadDialog extends BaseAlertDialog {
@@ -46,14 +47,14 @@ public class PreloadDialog extends BaseAlertDialog {
         binding.slider.setValueTo(getMax());
         binding.slider.setValueFrom(getMin());
         binding.slider.setStepSize(getStep());
-        binding.slider.setValue(getValue());
+        SliderUtil.setValue(binding.slider, getValue());
         binding.slider.setLabelFormatter(value -> format(Math.round(value)));
     }
 
     @Override
     protected void initEvent() {
         binding.slider.addOnChangeListener((slider, value, fromUser) -> {
-            if (fromUser) ((SettingPreloadActivity) requireActivity()).setPreload(type, Math.round(value));
+            if (fromUser) ((SettingPreloadActivity) requireActivity()).setPreload(type, Math.round(SliderUtil.snap(slider, value)));
         });
         binding.slider.setOnKeyListener((view, keyCode, event) -> {
             boolean enter = KeyUtil.isEnterKey(event);
@@ -87,9 +88,9 @@ public class PreloadDialog extends BaseAlertDialog {
     }
 
     private int getValue() {
-        if (type == THREADS) return PreloadSetting.getPreloadThreads();
-        if (type == SIZE) return PreloadSetting.getPreloadSizeMb();
-        return PreloadSetting.getPreloadTimeSeconds();
+        if (type == THREADS) return PreloadSetting.getThreads();
+        if (type == SIZE) return PreloadSetting.getSizeMb();
+        return PreloadSetting.getTimeSeconds();
     }
 
     private String format(int value) {

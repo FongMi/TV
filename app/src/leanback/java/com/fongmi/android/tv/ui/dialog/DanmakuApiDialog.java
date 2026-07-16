@@ -4,6 +4,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
@@ -27,6 +28,10 @@ public class DanmakuApiDialog extends BaseAlertDialog {
 
     public static void show(FragmentActivity activity) {
         new DanmakuApiDialog().show(activity.getSupportFragmentManager(), null);
+    }
+
+    public static void show(Fragment fragment) {
+        new DanmakuApiDialog().show(fragment.getChildFragmentManager(), null);
     }
 
     @Override
@@ -59,8 +64,14 @@ public class DanmakuApiDialog extends BaseAlertDialog {
     }
 
     private void onPositive(View view) {
-        ((DanmakuListener) requireActivity()).setDanmakuApi(binding.text.getText().toString().trim());
+        getListener().setDanmakuApi(binding.text.getText().toString().trim());
         dismiss();
+    }
+
+    private DanmakuListener getListener() {
+        Fragment parent = getParentFragment();
+        if (parent instanceof DanmakuListener) return (DanmakuListener) parent;
+        return (DanmakuListener) requireActivity();
     }
 
     private void onNegative(View view) {

@@ -23,12 +23,12 @@ public final class ChapterDialog extends BaseBottomSheetDialog implements Chapte
     private DialogChapterBinding binding;
     private PlayerManager player;
 
-    public static ChapterDialog create() {
-        return new ChapterDialog();
-    }
-
     public ChapterDialog() {
         this.adapter = new ChapterAdapter(this);
+    }
+
+    public static ChapterDialog create() {
+        return new ChapterDialog();
     }
 
     public ChapterDialog player(PlayerManager player) {

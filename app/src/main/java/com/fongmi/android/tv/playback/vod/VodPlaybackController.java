@@ -256,10 +256,6 @@ public class VodPlaybackController {
         if (state.getHistory() != null) state.getHistory().setEnding(ending);
     }
 
-    public void setSpeed(float speed) {
-        if (state.getHistory() != null) state.getHistory().setSpeed(speed);
-    }
-
     public void setScale(int scale) {
         if (state.getHistory() != null) state.getHistory().setScale(scale);
     }

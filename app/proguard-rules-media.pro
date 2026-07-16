@@ -87,7 +87,7 @@
 
 -dontnote androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer
 -keepclassmembers class androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer {
-  <init>(android.os.Handler, androidx.media3.exoplayer.audio.AudioRendererEventListener, androidx.media3.exoplayer.audio.AudioSink);
+  <init>(android.os.Handler, androidx.media3.exoplayer.audio.AudioRendererEventListener, androidx.media3.exoplayer.audio.AudioSink, boolean);
 }
 
 -dontnote androidx.media3.decoder.midi.MidiRenderer
@@ -149,6 +149,7 @@
   <init>();
   androidx.media3.effect.DefaultVideoFrameProcessor$Factory build();
   androidx.media3.effect.DefaultVideoFrameProcessor$Factory$Builder setEnableReplayableCache(boolean);
+  androidx.media3.effect.DefaultVideoFrameProcessor$Factory$Builder setOutputSurfaceSizeAdjustmentEnabled(boolean);
 }
 
 -dontnote androidx.media3.effect.SingleInputVideoGraph$Factory

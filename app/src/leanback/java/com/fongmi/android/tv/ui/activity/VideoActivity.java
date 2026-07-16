@@ -55,6 +55,7 @@ import com.fongmi.android.tv.player.util.PlayerHelper;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
+import com.fongmi.android.tv.setting.SpeedSetting;
 import com.fongmi.android.tv.ui.adapter.ArrayAdapter;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
@@ -69,7 +70,7 @@ import com.fongmi.android.tv.ui.dialog.DanmakuDialog;
 import com.fongmi.android.tv.ui.dialog.EditionDialog;
 import com.fongmi.android.tv.ui.dialog.ParseDialog;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
-import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
+import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.playback.PlaybackAction;
 import com.fongmi.android.tv.playback.PlaybackReset;
@@ -99,7 +100,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, CustomKeyDownVod.Listener, TrackDialog.Listener, ParseDialog.Listener, ArrayAdapter.OnClickListener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, Clock.Callback {
+public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, CustomKeyDownVod.Listener, ParseDialog.Listener, ArrayAdapter.OnClickListener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, Clock.Callback {
 
     private ActivityVideoBinding mBinding;
     private ViewGroup.LayoutParams mFrameParams;
@@ -292,14 +293,10 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
-        mBinding.control.action.speed.setUpListener(this::onSpeedAdd);
-        mBinding.control.action.speed.setDownListener(this::onSpeedSub);
         mBinding.control.action.ending.setUpListener(this::onEndingAdd);
         mBinding.control.action.ending.setDownListener(this::onEndingSub);
         mBinding.control.action.opening.setUpListener(this::onOpeningAdd);
         mBinding.control.action.opening.setDownListener(this::onOpeningSub);
-        mBinding.control.action.text.setUpListener(this::onSubtitleClick);
-        mBinding.control.action.text.setDownListener(this::onSubtitleClick);
         mBinding.control.action.next.setOnClickListener(view -> checkNext());
         mBinding.control.action.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
@@ -315,6 +312,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.edition.setOnClickListener(view -> onEdition());
         mBinding.control.action.chapter.setOnClickListener(view -> onChapter());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
+        mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -582,7 +580,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mHistory = history;
         mBinding.control.action.opening.setText(history.getOpening() <= 0 ? getString(R.string.play_op) : Util.timeMs(history.getOpening()));
         mBinding.control.action.ending.setText(history.getEnding() <= 0 ? getString(R.string.play_ed) : Util.timeMs(history.getEnding()));
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, history.getSpeed());
+        player().setSpeed(SpeedSetting.getPlayback());
         setScale(getScale());
         setPartAdapter();
     }
@@ -862,15 +860,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void onSpeed() {
-        mVod.setSpeed(PlaybackAction.addSpeed(player(), mBinding.control.action.speed));
+        SpeedSettingDialog.create().player(player()).save(true).show(this);
+        hideControl();
     }
 
-    private void onSpeedAdd() {
-        mVod.setSpeed(PlaybackAction.addSpeed(player(), mBinding.control.action.speed, 0.25f));
-    }
-
-    private void onSpeedSub() {
-        mVod.setSpeed(PlaybackAction.subSpeed(player(), mBinding.control.action.speed, 0.25f));
+    private boolean onSpeedLong() {
+        SpeedSetting.putPlayback(PlaybackAction.toggleSpeed(player(), mBinding.widget.message));
+        return true;
     }
 
     private void onReset() {
@@ -945,11 +941,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     private void onDecode() {
         mClock.setCallback(null);
-        PlaybackAction.toggleDecode(player());
+        player().toggleDecode();
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
         hideControl();
     }
 
@@ -987,6 +983,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void showError(String text) {
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.text.setText(text);
         hideProgress();
@@ -1217,12 +1214,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
-    public void onSubtitleClick() {
-        SubtitleDialog.create().view(mBinding.player.getSubtitleView()).player(player()).show(this);
-        App.post(this::hideControl, 100);
-    }
-
-    @Override
     public void onTimeChanged(long time) {
         if (!isOwner() || !player().isVod()) return;
         long position = player().getPosition();
@@ -1345,16 +1336,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void onSpeedUp() {
         if (!player().isPlaying()) return;
-        mBinding.widget.speed.setVisibility(View.VISIBLE);
-        mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, PlayerSetting.getSpeed());
+        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
     public void onSpeedEnd() {
-        mBinding.widget.speed.clearAnimation();
-        mBinding.widget.speed.setVisibility(View.GONE);
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, mHistory.getSpeed());
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
+        player().setSpeed(SpeedSetting.getPlayback());
     }
 
     @Override

@@ -23,6 +23,10 @@ public final class DanmakuSettingDialog {
         return new DanmakuSettingDialog();
     }
 
+    private static DialogDanmakuSettingBinding inflate(LayoutInflater inflater, ViewGroup container) {
+        return DialogDanmakuSettingBinding.inflate(inflater, container, false);
+    }
+
     public DanmakuSettingDialog player(PlayerManager player) {
         this.player = player;
         return this;
@@ -35,14 +39,11 @@ public final class DanmakuSettingDialog {
         else new BottomSheet(player).show(manager, null);
     }
 
-    private static DialogDanmakuSettingBinding inflate(LayoutInflater inflater, ViewGroup container) {
-        return DialogDanmakuSettingBinding.inflate(inflater, container, false);
-    }
-
     public static final class BottomSheet extends BaseBottomSheetDialog {
 
-        private DialogDanmakuSettingBinding binding;
         private final PlayerManager player;
+        private DialogDanmakuSettingBinding binding;
+        private DanmakuSettingPanel panel;
 
         BottomSheet(PlayerManager player) {
             this.player = player;
@@ -54,15 +55,30 @@ public final class DanmakuSettingDialog {
         }
 
         @Override
+        protected int getMaxHeight() {
+            return ResUtil.getScreenHeight() / 2;
+        }
+
+        @Override
         protected void initView() {
-            new DanmakuSettingPanel(binding, player).bind();
+            panel = new DanmakuSettingPanel(binding, player);
+            panel.bind();
+        }
+
+        @Override
+        public void onDestroyView() {
+            if (panel != null) panel.release();
+            panel = null;
+            binding = null;
+            super.onDestroyView();
         }
     }
 
     public static final class SideSheet extends BaseSideSheetDialog {
 
-        private DialogDanmakuSettingBinding binding;
         private final PlayerManager player;
+        private DialogDanmakuSettingBinding binding;
+        private DanmakuSettingPanel panel;
 
         SideSheet(PlayerManager player) {
             this.player = player;
@@ -80,7 +96,16 @@ public final class DanmakuSettingDialog {
 
         @Override
         protected void initView() {
-            new DanmakuSettingPanel(binding, player).bind();
+            panel = new DanmakuSettingPanel(binding, player);
+            panel.bind();
+        }
+
+        @Override
+        public void onDestroyView() {
+            if (panel != null) panel.release();
+            panel = null;
+            binding = null;
+            super.onDestroyView();
         }
     }
 }

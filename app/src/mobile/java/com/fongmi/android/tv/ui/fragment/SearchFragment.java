@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.fragment;
 
 import static androidx.fragment.app.FragmentTransaction.TRANSIT_FRAGMENT_OPEN;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -40,7 +41,6 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Map;
 import java.util.Optional;
 
@@ -162,7 +162,7 @@ public class SearchFragment extends BaseFragment implements MenuProvider, WordAd
 
     private void getSuggest(String text) {
         mBinding.word.setText(R.string.search_suggest);
-        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + URLEncoder.encode(text)).enqueue(getCallback(false));
+        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + Uri.encode(text)).enqueue(getCallback(false));
     }
 
     private Callback getCallback(boolean hot) {

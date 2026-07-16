@@ -18,10 +18,6 @@ public final class MediaItemFactory {
         return buildUpon(spec).build();
     }
 
-    public static MediaItem from(PlaySpec spec, int decode) {
-        return buildUpon(spec).setDecode(decode).build();
-    }
-
     private static MediaItem.Builder buildUpon(PlaySpec spec) {
         return new MediaItem.Builder().setUri(spec.getUri())
                 .setSubtitleConfigurations(buildSubtitleConfigs(spec.getSubs()))

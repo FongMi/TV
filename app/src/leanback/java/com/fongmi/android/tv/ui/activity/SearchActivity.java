@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -34,7 +35,6 @@ import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.common.net.HttpHeaders;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -133,7 +133,7 @@ public class SearchActivity extends BaseActivity implements WordAdapter.OnClickL
 
     private void getSuggest(String text) {
         mBinding.word.setText(R.string.search_suggest);
-        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + URLEncoder.encode(ZhuToPin.get(text))).enqueue(getCallback(false));
+        OkHttp.newCall("https://suggest.video.iqiyi.com/?if=mobile&key=" + Uri.encode(ZhuToPin.get(text))).enqueue(getCallback(false));
     }
 
     private Callback getCallback(boolean hot) {

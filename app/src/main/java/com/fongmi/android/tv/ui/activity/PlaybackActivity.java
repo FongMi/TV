@@ -2,17 +2,14 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.accessibility.CaptioningManager;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -25,7 +22,6 @@ import androidx.media3.common.VideoSize;
 import androidx.media3.exoplayer.drm.FrameworkMediaDrm;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
-import androidx.media3.ui.CaptionStyleCompat;
 import androidx.media3.ui.PlayerSeekView;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.TimeBar;
@@ -39,6 +35,7 @@ import com.fongmi.android.tv.player.util.PlayerHelper;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
+import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
@@ -235,10 +232,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         } else if (result.getRealUrl().isEmpty()) {
             onError(ResUtil.getString(R.string.error_play_url));
         } else if (result.needParse() || useParse) {
-            attachSurface();
+            attachPlayerView();
             player().parse(key, result, useParse, metadata, startPositionMs);
         } else {
-            attachSurface();
+            attachPlayerView();
             player().start(PlaySpec.from(result, key, metadata), timeout, startPositionMs);
         }
     }
@@ -341,19 +338,17 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         finish();
     }
 
-    private void attachSurface() {
-        if (mService != null && getPlayerView().getPlayer() == null) getPlayerView().setPlayer(player().getPlayer());
-        applyDanmaku();
+    private void attachPlayerView() {
+        if (mService != null) syncPlayerView(player().getPlayer());
     }
 
-    private void detachSurface() {
+    private void detachPlayerView() {
         getPlayerView().setPlayer(null);
     }
 
-    private void setRender() {
-        getPlayerView().setRender(PlayerSetting.getRender());
-        detachSurface();
-        attachSurface();
+    private void syncPlayerView(Player player) {
+        getPlayerView().setPlayer(player);
+        syncDanmakuSource();
     }
 
     private void configurePlayerView() {
@@ -362,20 +357,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         playerView.setDanmakuOkHttpClient(OkHttp.player());
         playerView.setDanmakuEnabled(DanmakuSetting.isShow());
         playerView.setDanmakuConfig(DanmakuSetting.getConfig());
-        playerView.getSubtitleView().setStyle(getCaptionStyle());
-        playerView.getSubtitleView().setApplyEmbeddedStyles(true);
-        playerView.getSubtitleView().setApplyEmbeddedFontSizes(false);
-        if (PlayerSetting.getSubtitlePosition() != 0) playerView.getSubtitleView().setBottomPosition(PlayerSetting.getSubtitlePosition());
-        if (PlayerSetting.getSubtitleTextSize() != 0) playerView.getSubtitleView().setFractionalTextSize(PlayerSetting.getSubtitleTextSize());
+        SubtitleSetting.applyStyle(this, playerView.getSubtitleView());
     }
 
-    private CaptionStyleCompat getCaptionStyle() {
-        CaptioningManager manager = (CaptioningManager) getSystemService(Context.CAPTIONING_SERVICE);
-        if (PlayerSetting.isCaption() && manager != null) return CaptionStyleCompat.createFromCaptionStyle(manager.getUserStyle());
-        return new CaptionStyleCompat(Color.WHITE, Color.TRANSPARENT, Color.TRANSPARENT, CaptionStyleCompat.EDGE_TYPE_OUTLINE, Color.BLACK, null);
-    }
-
-    private void applyDanmaku() {
+    private void syncDanmakuSource() {
         if (mService == null || !isOwner()) return;
         getPlayerView().setDanmakuSource(player().getSelectedDanmakuUri());
     }
@@ -451,7 +436,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
         @Override
         public void onPlayerRebuild(Player player) {
-            if (isOwner()) setRender();
+            if (isOwner()) syncPlayerView(player);
         }
 
         @Override
@@ -514,7 +499,6 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         mService.setNavigationCallback(getNavigationCallback(), getPlaybackKey());
         mService.addPlayerCallback(mPlayerCallback);
         onServiceConnected();
-        applyDanmaku();
     }
 
     @Override
@@ -527,10 +511,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         super.onResume();
         setRedirect(false);
         if (shouldReclaim()) {
-            detachSurface();
+            detachPlayerView();
             onReclaim();
         } else {
-            attachSurface();
+            attachPlayerView();
         }
     }
 

@@ -21,8 +21,6 @@ import com.github.catvod.utils.Path;
 
 import java.io.File;
 import java.io.InputStream;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class FileChooser {
@@ -82,7 +80,7 @@ public class FileChooser {
         if (DocumentsContract.isDocumentUri(context, uri)) path = getPathFromDocumentUri(context, uri);
         else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) path = getDataColumn(context, uri);
         else if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) path = uri.getPath();
-        return path != null ? URLDecoder.decode(path, StandardCharsets.UTF_8) : createFileFromUri(context, uri);
+        return path != null ? Uri.decode(path) : createFileFromUri(context, uri);
     }
 
     private static String getPathFromDocumentUri(Context context, Uri uri) {

@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.ui.fragment;
 
-import android.content.Intent;
-import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,26 +10,22 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.FragmentSettingPlayerBinding;
-import com.fongmi.android.tv.impl.SpeedListener;
+import com.fongmi.android.tv.impl.BufferListener;
 import com.fongmi.android.tv.impl.UaListener;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.activity.HomeActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.ui.dialog.BufferDialog;
 import com.fongmi.android.tv.ui.dialog.MpvConfDialog;
-import com.fongmi.android.tv.ui.dialog.SpeedDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.text.DecimalFormat;
-
-public class SettingPlayerFragment extends BaseFragment implements UaListener, SpeedListener {
+public class SettingPlayerFragment extends BaseFragment implements UaListener, BufferListener {
 
     private FragmentSettingPlayerBinding mBinding;
-    private DecimalFormat format;
     private String[] background;
-    private String[] caption;
     private String[] render;
     private String[] scale;
     private String[] engine;
@@ -49,31 +43,27 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, S
     protected void initView() {
         setVisible();
         setPlaybackModeText();
-        format = new DecimalFormat("0.#");
-        mBinding.speedText.setText(format.format(PlayerSetting.getSpeed()));
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
+        mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
         mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
         mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[PlayerSetting.getScale()]);
-        mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[PlayerSetting.isCaption() ? 1 : 0]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[PlayerSetting.getBackground()]);
     }
 
     @Override
     protected void initEvent() {
         mBinding.engine.setOnClickListener(this::setEngine);
+        mBinding.decode.setOnClickListener(this::onDecode);
+        mBinding.adblock.setOnClickListener(this::setAdblock);
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::onScale);
-        mBinding.caption.setOnClickListener(this::setCaption);
-        mBinding.caption.setOnLongClickListener(this::onCaption);
-        mBinding.speed.setOnClickListener(this::onSpeed);
         mBinding.background.setOnClickListener(this::onBackground);
-        mBinding.adblock.setOnClickListener(this::setAdblock);
+        mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.preload.setOnClickListener(this::onPreload);
-        mBinding.decode.setOnClickListener(this::onDecode);
         mBinding.ua.setOnClickListener(this::onUa);
     }
 
@@ -82,9 +72,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, S
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
-        mBinding.decode.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.adblock.setVisibility(exo ? View.VISIBLE : View.GONE);
-        mBinding.caption.setVisibility(PlayerSetting.hasCaption() ? View.VISIBLE : View.GONE);
+        mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
     private void setEngine(View view) {
@@ -129,24 +118,14 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, S
         }).show();
     }
 
-    private void setCaption(View view) {
-        PlayerSetting.putCaption(!PlayerSetting.isCaption());
-        mBinding.captionText.setText(caption[PlayerSetting.isCaption() ? 1 : 0]);
-    }
-
-    private boolean onCaption(View view) {
-        if (PlayerSetting.isCaption()) startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
-        return PlayerSetting.isCaption();
-    }
-
-    private void onSpeed(View view) {
-        SpeedDialog.show(this);
+    private void onBuffer(View view) {
+        BufferDialog.show(this);
     }
 
     @Override
-    public void setSpeed(float speed) {
-        mBinding.speedText.setText(format.format(speed));
-        PlayerSetting.putSpeed(speed);
+    public void setBuffer(int times) {
+        mBinding.bufferText.setText(String.valueOf(times));
+        PlayerSetting.putBuffer(times);
     }
 
     private void onBackground(View view) {

@@ -13,7 +13,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogMpvConfBinding;
-import com.fongmi.android.tv.player.mpv.MpvConfigFiles;
+import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -40,7 +40,7 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     @Override
     protected void initView() {
-        setText(MpvConfigFiles.read());
+        setText(MpvConfigFile.read());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MpvConfDialog extends BaseAlertDialog {
     }
 
     private void onPositive(DialogInterface dialog, int which) {
-        MpvConfigFiles.write(binding.text.getText().toString());
+        MpvConfigFile.write(binding.text.getText().toString());
     }
 
     private void onChoose(View view) {
@@ -63,8 +63,8 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) return;
-        MpvConfigFiles.importFrom(requireContext(), result.getData().getData());
+        MpvConfigFile.importFrom(requireContext(), result.getData().getData());
         Notify.show(R.string.player_mpv_conf_import_success);
-        setText(MpvConfigFiles.read());
+        setText(MpvConfigFile.read());
     });
 }

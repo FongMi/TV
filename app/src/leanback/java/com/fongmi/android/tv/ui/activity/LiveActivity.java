@@ -61,7 +61,7 @@ import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.dialog.PassDialog;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
-import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
+import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.playback.PlaybackAction;
 import com.fongmi.android.tv.utils.Clock;
@@ -78,7 +78,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, TrackDialog.Listener, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
+public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
 
     private ActivityLiveBinding mBinding;
     private ChannelAdapter mChannelAdapter;
@@ -152,7 +152,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     @Override
     protected void onServiceConnected() {
         PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
-        PlaybackAction.setSpeedText(player(), mBinding.control.action.speed);
         checkLive();
     }
 
@@ -183,10 +182,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
-        mBinding.control.action.speed.setUpListener(this::onSpeedAdd);
-        mBinding.control.action.speed.setDownListener(this::onSpeedSub);
-        mBinding.control.action.text.setUpListener(this::onSubtitleClick);
-        mBinding.control.action.text.setDownListener(this::onSubtitleClick);
         mBinding.control.action.home.setOnClickListener(view -> onHome());
         mBinding.control.action.line.setOnClickListener(view -> onLine());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
@@ -198,6 +193,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onChoose());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
+        mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
@@ -371,7 +367,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
         hideControl();
     }
 
@@ -392,15 +388,13 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onSpeed() {
-        PlaybackAction.addSpeed(player(), mBinding.control.action.speed);
+        SpeedSettingDialog.create().player(player()).show(this);
+        hideControl();
     }
 
-    private void onSpeedAdd() {
-        PlaybackAction.addSpeed(player(), mBinding.control.action.speed, 0.25f);
-    }
-
-    private void onSpeedSub() {
-        PlaybackAction.subSpeed(player(), mBinding.control.action.speed, 0.25f);
+    private boolean onSpeedLong() {
+        PlaybackAction.toggleSpeed(player(), mBinding.widget.message);
+        return true;
     }
 
     private void onConfig() {
@@ -433,7 +427,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onDecode() {
-        PlaybackAction.toggleDecode(player());
+        player().toggleDecode();
     }
 
     private void hideUI() {
@@ -556,6 +550,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void showError(String text) {
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.text.setText(text);
         hideProgress();
@@ -823,12 +818,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mHides.clear();
         mChannel = null;
         mGroup = null;
-    }
-
-    @Override
-    public void onSubtitleClick() {
-        SubtitleDialog.create().view(mBinding.player.getSubtitleView()).player(player()).show(this);
-        App.post(this::hideControl, 100);
     }
 
     @Override

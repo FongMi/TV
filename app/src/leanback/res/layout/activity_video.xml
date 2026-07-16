@@ -12,6 +12,7 @@
         android:layout_height="225dp"
         android:layout_margin="24dp"
         android:background="@color/black"
+        android:defaultFocusHighlightEnabled="false"
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:foreground="@drawable/selector_video"

@@ -146,6 +146,7 @@ public class VodConfig extends BaseConfig {
         initSite(config, object);
         initParse(config, object);
         config.setLogo(Json.safeString(object, "logo"));
+        config.setAssrt(Json.safeString(object, "assrt"));
         config.setNotice(Json.safeString(object, "notice"));
         config.setDanmaku(Json.safeString(object, "danmaku"));
     }

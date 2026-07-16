@@ -78,6 +78,20 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/shape_widget"
+        android:fontFeatureSettings="tnum"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        android:visibility="gone"
+        tools:text="Speed 3.0x"
+        tools:visibility="visible" />
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/center"
         android:layout_width="wrap_content"
@@ -129,14 +143,5 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/speed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|center"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/ic_widget_forward"
-        android:visibility="gone" />
 
 </FrameLayout>

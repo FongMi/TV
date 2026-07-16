@@ -21,7 +21,7 @@ public final class PlayerEngineFactory {
         return create(decode, resolve(spec), listener);
     }
 
-    private static PlayerEngine create(int decode, PlayerEngine.Type type, Player.Listener listener) {
+    public static PlayerEngine create(int decode, PlayerEngine.Type type, Player.Listener listener) {
         return switch (type) {
             case EXO -> new ExoPlayerEngine(decode, listener);
             case MPV -> new MpvPlayerEngine(decode, listener);
@@ -33,8 +33,8 @@ public final class PlayerEngineFactory {
     }
 
     private static PlayerEngine.Type resolve(PlaySpec spec) {
-        if (!isMpvReady()) return EXO;
         if (requiresExo(spec)) return EXO;
+        if (!isMpvReady()) return EXO;
         return MPV;
     }
 

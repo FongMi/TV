@@ -27,13 +27,18 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
     private final DanmakuAdapter adapter;
     private DialogDanmakuBinding binding;
     private PlayerManager player;
-
-    public static DanmakuDialog create() {
-        return new DanmakuDialog();
-    }
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) return;
+        player.setDanmaku(Danmaku.from(FileChooser.getPathFromUri(result.getData().getData())));
+        dismiss();
+    });
 
     public DanmakuDialog() {
         this.adapter = new DanmakuAdapter(this);
+    }
+
+    public static DanmakuDialog create() {
+        return new DanmakuDialog();
     }
 
     public DanmakuDialog player(PlayerManager player) {
@@ -89,10 +94,4 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
         player.setDanmaku(item.isSelected() ? Danmaku.empty() : item);
         dismiss();
     }
-
-    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) return;
-        player.setDanmaku(Danmaku.from(FileChooser.getPathFromUri(result.getData().getData())));
-        dismiss();
-    });
 }

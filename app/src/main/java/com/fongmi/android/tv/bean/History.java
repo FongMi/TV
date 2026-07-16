@@ -297,7 +297,6 @@ public class History implements Diffable<History> {
     private History copyTo(History item) {
         if (getOpening() > 0) item.setOpening(getOpening());
         if (getEnding() > 0) item.setEnding(getEnding());
-        if (getSpeed() != 1) item.setSpeed(getSpeed());
         return this;
     }
 

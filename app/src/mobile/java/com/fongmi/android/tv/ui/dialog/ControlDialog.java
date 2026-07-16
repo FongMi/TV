@@ -13,14 +13,15 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.databinding.ActivityVideoBinding;
 import com.fongmi.android.tv.databinding.DialogControlBinding;
 import com.fongmi.android.tv.player.PlayerManager;
+import com.fongmi.android.tv.setting.SpeedSetting;
 import com.fongmi.android.tv.ui.adapter.ParseAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SliderUtil;
 import com.fongmi.android.tv.utils.Timer;
 import com.google.android.material.slider.Slider;
 
@@ -34,7 +35,6 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
     private ActivityVideoBinding parent;
     private List<TextView> scales;
     private PlayerManager player;
-    private History history;
     private boolean parse;
 
     public ControlDialog() {
@@ -47,11 +47,6 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
 
     public ControlDialog parent(ActivityVideoBinding parent) {
         this.parent = parent;
-        return this;
-    }
-
-    public ControlDialog history(History history) {
-        this.history = history;
         return this;
     }
 
@@ -85,6 +80,7 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
         binding.opening.setText(parent.control.action.opening.getText());
         binding.repeat.setSelected(parent.control.action.repeat.isSelected());
         binding.timer.setSelected(Timer.get().isRunning());
+        SpeedSetting.setup(binding.speed);
         setMediaOptionVisible();
         setTrackVisible();
         setScaleText();
@@ -119,8 +115,7 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
     }
 
     private void setSpeed(@NonNull Slider slider, float value, boolean fromUser) {
-        parent.control.action.speed.setText(player.setSpeed(value));
-        if (history != null) history.setSpeed(player.getSpeed());
+        if (fromUser) SpeedSetting.putPlayback(player.setSpeed(value));
     }
 
     private void setScaleText() {
@@ -166,7 +161,7 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
     }
 
     public void setPlayer() {
-        binding.speed.setValue(Math.max(player.getSpeed(), 0.5f));
+        SliderUtil.setValue(binding.speed, player.getSpeed());
         binding.player.setText(parent.control.action.player.getText());
         binding.decode.setVisibility(parent.control.action.decode.getVisibility());
         binding.danmaku.setVisibility(parent.control.action.danmaku.getVisibility());

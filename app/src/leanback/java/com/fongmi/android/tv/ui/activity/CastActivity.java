@@ -25,13 +25,14 @@ import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.databinding.ActivityCastBinding;
 import com.fongmi.android.tv.dlna.CastAction;
 import com.fongmi.android.tv.event.RefreshEvent;
+import com.fongmi.android.tv.playback.PlaybackAction;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.service.DLNARendererService;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
-import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
+import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.KeyUtil;
@@ -42,7 +43,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jupnp.support.contentdirectory.DIDLParser;
 
-public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.Listener, TrackDialog.Listener {
+public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.Listener {
 
     private ActivityCastBinding mBinding;
     private DLNARendererService mRenderer;
@@ -89,7 +90,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     protected void onServiceConnected() {
         mBinding.control.action.decode.setText(player().getDecodeText());
-        mBinding.control.action.speed.setText(player().getSpeedText());
         setAction(getIntent());
     }
 
@@ -117,10 +117,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     @SuppressLint("ClickableViewAccessibility")
     protected void initEvent() {
-        mBinding.control.action.speed.setUpListener(this::onSpeedAdd);
-        mBinding.control.action.speed.setDownListener(this::onSpeedSub);
-        mBinding.control.action.text.setUpListener(this::onSubtitleClick);
-        mBinding.control.action.text.setDownListener(this::onSubtitleClick);
         mBinding.control.action.text.setOnClickListener(this::onTrack);
         mBinding.control.action.audio.setOnClickListener(this::onTrack);
         mBinding.control.action.video.setOnClickListener(this::onTrack);
@@ -129,6 +125,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mBinding.control.action.reset.setOnClickListener(view -> onReset());
         mBinding.control.action.player.setOnClickListener(view -> onChoose());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
+        mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
     }
 
@@ -185,15 +182,13 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void onSpeed() {
-        mBinding.control.action.speed.setText(player().addSpeed());
+        SpeedSettingDialog.create().player(player()).show(this);
+        hideControl();
     }
 
-    private void onSpeedAdd() {
-        mBinding.control.action.speed.setText(player().addSpeed(0.25f));
-    }
-
-    private void onSpeedSub() {
-        mBinding.control.action.speed.setText(player().subSpeed(0.25f));
+    private boolean onSpeedLong() {
+        PlaybackAction.toggleSpeed(player(), mBinding.widget.message);
+        return true;
     }
 
     private void onReset() {
@@ -214,7 +209,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
         hideControl();
     }
 
@@ -237,6 +232,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void showError(String text) {
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.text.setText(text);
         hideProgress();
@@ -411,12 +407,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     @Override
-    public void onSubtitleClick() {
-        SubtitleDialog.create().view(mBinding.player.getSubtitleView()).player(player()).show(this);
-        App.post(this::hideControl, 100);
-    }
-
-    @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
@@ -444,16 +434,13 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     public void onSpeedUp() {
         if (!player().isPlaying()) return;
-        mBinding.widget.speed.setVisibility(View.VISIBLE);
-        mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
-        mBinding.control.action.speed.setText(player().setSpeed(PlayerSetting.getSpeed()));
+        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
     public void onSpeedEnd() {
-        mBinding.widget.speed.clearAnimation();
-        mBinding.widget.speed.setVisibility(View.GONE);
-        mBinding.control.action.speed.setText(player().setSpeed(1.0f));
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
+        player().setSpeed(1.0f);
     }
 
     @Override

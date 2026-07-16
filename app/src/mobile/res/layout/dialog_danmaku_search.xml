@@ -17,8 +17,9 @@
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/keyword"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:background="@drawable/shape_danmaku_search_keyword"
             android:hint="@string/search_keyword"
             android:imeOptions="actionSearch"
@@ -26,6 +27,15 @@
             android:maxLength="255"
             android:singleLine="true"
             android:textSize="14sp" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/setting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:focusable="true"
+            android:src="@drawable/ic_action_setting" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

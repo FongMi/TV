@@ -3,30 +3,25 @@ package com.fongmi.android.tv.ui.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.view.View;
 
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivitySettingPlayerBinding;
-import com.fongmi.android.tv.impl.SpeedListener;
+import com.fongmi.android.tv.impl.BufferListener;
 import com.fongmi.android.tv.impl.UaListener;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.dialog.BufferDialog;
 import com.fongmi.android.tv.ui.dialog.MpvConfDialog;
-import com.fongmi.android.tv.ui.dialog.SpeedDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
 import com.fongmi.android.tv.utils.ResUtil;
 
-import java.text.DecimalFormat;
-
-public class SettingPlayerActivity extends BaseActivity implements UaListener, SpeedListener {
+public class SettingPlayerActivity extends BaseActivity implements UaListener, BufferListener {
 
     private ActivitySettingPlayerBinding mBinding;
-    private DecimalFormat format;
-    private String[] caption;
     private String[] render;
     private String[] scale;
     private String[] engine;
@@ -45,31 +40,27 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, S
         setVisible();
         setPlaybackModeText();
         mBinding.engine.requestFocus();
-        format = new DecimalFormat("0.#");
-        mBinding.speedText.setText(format.format(PlayerSetting.getSpeed()));
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
+        mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
         mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
         mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
         mBinding.backgroundText.setText(Setting.getSwitch(PlayerSetting.isBackgroundOn()));
         mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[PlayerSetting.getScale()]);
-        mBinding.captionText.setText((caption = ResUtil.getStringArray(R.array.select_caption))[PlayerSetting.isCaption() ? 1 : 0]);
     }
 
     @Override
     protected void initEvent() {
         mBinding.engine.setOnClickListener(this::setEngine);
+        mBinding.decode.setOnClickListener(this::onDecodeSetting);
+        mBinding.adblock.setOnClickListener(this::setAdblock);
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.scale.setOnClickListener(this::setScale);
-        mBinding.caption.setOnClickListener(this::setCaption);
-        mBinding.caption.setOnLongClickListener(this::onCaption);
-        mBinding.speed.setOnClickListener(this::onSpeed);
         mBinding.background.setOnClickListener(this::onBackground);
-        mBinding.adblock.setOnClickListener(this::setAdblock);
+        mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.preload.setOnClickListener(this::onPreloadSetting);
-        mBinding.decode.setOnClickListener(this::onDecodeSetting);
         mBinding.ua.setOnClickListener(this::onUa);
     }
 
@@ -79,9 +70,8 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, S
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
-        mBinding.decode.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.adblock.setVisibility(exo ? View.VISIBLE : View.GONE);
-        mBinding.caption.setVisibility(PlayerSetting.hasCaption() ? View.VISIBLE : View.GONE);
+        mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
     private void setEngine(View view) {
@@ -124,24 +114,14 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, S
         PlayerSetting.putScale(index);
     }
 
-    private void setCaption(View view) {
-        PlayerSetting.putCaption(!PlayerSetting.isCaption());
-        mBinding.captionText.setText(caption[PlayerSetting.isCaption() ? 1 : 0]);
-    }
-
-    private boolean onCaption(View view) {
-        if (PlayerSetting.isCaption()) startActivity(new Intent(Settings.ACTION_CAPTIONING_SETTINGS));
-        return PlayerSetting.isCaption();
-    }
-
-    private void onSpeed(View view) {
-        SpeedDialog.show(this);
+    private void onBuffer(View view) {
+        BufferDialog.show(this);
     }
 
     @Override
-    public void setSpeed(float speed) {
-        mBinding.speedText.setText(format.format(speed));
-        PlayerSetting.putSpeed(speed);
+    public void setBuffer(int times) {
+        mBinding.bufferText.setText(String.valueOf(times));
+        PlayerSetting.putBuffer(times);
     }
 
     private void onBackground(View view) {

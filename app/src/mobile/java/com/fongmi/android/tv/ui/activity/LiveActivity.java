@@ -44,11 +44,17 @@ import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.impl.LiveListener;
 import com.fongmi.android.tv.impl.PassListener;
 import com.fongmi.android.tv.model.LiveViewModel;
+import com.fongmi.android.tv.playback.PlaybackAction;
+import com.fongmi.android.tv.playback.PlaybackOrientation;
+import com.fongmi.android.tv.playback.PlaybackReset;
+import com.fongmi.android.tv.playback.live.LivePlayRequest;
+import com.fongmi.android.tv.playback.live.LivePlaybackController;
+import com.fongmi.android.tv.playback.live.LivePlaybackHost;
+import com.fongmi.android.tv.playback.live.LivePlaybackMedia;
 import com.fongmi.android.tv.player.extractor.Source;
 import com.fongmi.android.tv.player.util.PlayerHelper;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.LiveSetting;
-import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.EpgDataAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
@@ -59,15 +65,8 @@ import com.fongmi.android.tv.ui.dialog.InfoDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
 import com.fongmi.android.tv.ui.dialog.PassDialog;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
-import com.fongmi.android.tv.ui.dialog.SubtitleDialog;
+import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
-import com.fongmi.android.tv.playback.live.LivePlayRequest;
-import com.fongmi.android.tv.playback.live.LivePlaybackController;
-import com.fongmi.android.tv.playback.live.LivePlaybackHost;
-import com.fongmi.android.tv.playback.live.LivePlaybackMedia;
-import com.fongmi.android.tv.playback.PlaybackAction;
-import com.fongmi.android.tv.playback.PlaybackOrientation;
-import com.fongmi.android.tv.playback.PlaybackReset;
 import com.fongmi.android.tv.utils.Biometric;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.Notify;
@@ -84,7 +83,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LiveActivity extends PlaybackActivity implements CustomKeyDown.Listener, TrackDialog.Listener, Biometric.Callback, PassListener, ConfigListener, LiveListener, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CastDialog.Listener, InfoDialog.Listener, LivePlaybackHost {
+public class LiveActivity extends PlaybackActivity implements CustomKeyDown.Listener, Biometric.Callback, PassListener, ConfigListener, LiveListener, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CastDialog.Listener, InfoDialog.Listener, LivePlaybackHost {
 
     private ActivityLiveBinding mBinding;
     private ChannelAdapter mChannelAdapter;
@@ -155,7 +154,6 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     @Override
     protected void onServiceConnected() {
         PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
-        PlaybackAction.setSpeedText(player(), mBinding.control.action.speed);
         checkLive();
     }
 
@@ -207,7 +205,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
         mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onChoose());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
-        mBinding.control.action.text.setOnLongClickListener(view -> onTextLong());
+        mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
     }
@@ -382,7 +380,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
         hideControl();
     }
 
@@ -405,8 +403,14 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void onSpeed() {
-        PlaybackAction.addSpeed(player(), mBinding.control.action.speed);
+        SpeedSettingDialog.create().player(player()).show(this);
+        hideControl();
+    }
+
+    private boolean onSpeedLong() {
+        PlaybackAction.toggleSpeed(player(), mBinding.widget.message);
         setR1Callback();
+        return true;
     }
 
     private void onConfig() {
@@ -433,19 +437,13 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void onDecode() {
-        PlaybackAction.toggleDecode(player());
+        player().toggleDecode();
         setR1Callback();
     }
 
     private void onChoose() {
         PlayerEngineDialog.show(this, mBinding.control.action.player, player(), mBinding.control.title.getText());
         hideControl();
-    }
-
-    private boolean onTextLong() {
-        if (!player().haveTrack(C.TRACK_TYPE_TEXT)) return false;
-        onSubtitleClick();
-        return true;
     }
 
     private boolean onActionTouch(View v, MotionEvent e) {
@@ -499,6 +497,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void showError(String text) {
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mBinding.widget.error.setVisibility(View.VISIBLE);
         mBinding.widget.error.setText(text);
         hideProgress();
@@ -857,12 +856,6 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     @Override
-    public void onSubtitleClick() {
-        SubtitleDialog.create().view(mBinding.player.getSubtitleView()).player(player()).show(this);
-        hideControl();
-    }
-
-    @Override
     public void setConfig(Config config) {
         Config current = LiveConfig.get().getConfig();
         LiveConfig.load(config, getCallback(current));
@@ -993,15 +986,13 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     public void onSpeedUp() {
         if (player().isLive()) return;
         if (!player().isPlaying()) return;
-        mBinding.widget.speed.setVisibility(View.VISIBLE);
-        mBinding.widget.speed.startAnimation(ResUtil.getAnim(R.anim.forward));
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, PlayerSetting.getSpeed());
+        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
     public void onSpeedEnd() {
-        mBinding.widget.speed.clearAnimation();
-        PlaybackAction.setSpeed(player(), mBinding.control.action.speed, 1.0f);
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
+        player().setSpeed(1.0f);
     }
 
     @Override
@@ -1064,9 +1055,9 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     @Override
     public void onTouchEnd() {
         mBinding.widget.seek.setVisibility(View.GONE);
-        mBinding.widget.speed.setVisibility(View.GONE);
         mBinding.widget.bright.setVisibility(View.GONE);
         mBinding.widget.volume.setVisibility(View.GONE);
+        PlaybackAction.hideSpeedHint(mBinding.widget.message);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.api;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -31,7 +32,7 @@ public class DanmakuApi {
         episode = Trans.t2s(episode);
         String url = DanmakuSetting.getEffectiveApiUrl();
         if (url.contains("{name}") || url.contains("{episode}")) {
-            return OkHttp.newCall(url.replace("{name}", name).replace("{episode}", episode), TAG);
+            return OkHttp.newCall(url.replace("{name}", Uri.encode(name)).replace("{episode}", Uri.encode(episode)), TAG);
         } else {
             ArrayMap<String, String> params = new ArrayMap<>();
             params.put("name", name);
