@@ -73,6 +73,11 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         setLoading(false);
     }
 
+    public void endLoading(boolean hasMore) {
+        enable = hasMore;
+        setLoading(false);
+    }
+
     public interface Callback {
         boolean onLoadMore(String page);
     }

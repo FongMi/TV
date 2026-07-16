@@ -67,18 +67,35 @@ public class FileUtil {
     }
 
     public static void zipDecompress(File target, File path) {
+        zipDecompress(target, path, Integer.MAX_VALUE, Long.MAX_VALUE);
+    }
+
+    public static boolean zipDecompress(File target, File path, int maxEntries, long maxBytes) {
         try (ZipFile zip = new ZipFile(target)) {
             Enumeration<?> entries = zip.entries();
             String root = path.getCanonicalPath() + File.separator;
+            byte[] buffer = new byte[16384];
+            long totalBytes = 0;
+            int totalEntries = 0;
             while (entries.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) entries.nextElement();
+                if (++totalEntries > maxEntries) throw new IOException("Archive entry limit exceeded");
                 File out = new File(path, entry.getName());
                 if (!out.getCanonicalPath().startsWith(root)) continue;
                 if (entry.isDirectory()) out.mkdirs();
-                else Path.copy(zip.getInputStream(entry), out);
+                else try (BufferedInputStream is = new BufferedInputStream(zip.getInputStream(entry)); BufferedOutputStream os = new BufferedOutputStream(new FileOutputStream(Path.create(out)))) {
+                    int read;
+                    while ((read = is.read(buffer)) != -1) {
+                        totalBytes += read;
+                        if (totalBytes > maxBytes) throw new IOException("Archive size limit exceeded");
+                        os.write(buffer, 0, read);
+                    }
+                }
             }
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
 

@@ -4,31 +4,21 @@ import android.content.DialogInterface;
 import android.text.TextUtils;
 import android.view.inputmethod.EditorInfo;
 
-import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogSubtitleApiBinding;
+import com.fongmi.android.tv.impl.SubtitleListener;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SubtitleApiDialog extends BaseAlertDialog {
 
     private DialogSubtitleApiBinding binding;
-    private Runnable onSaved;
 
-    public static SubtitleApiDialog create() {
-        return new SubtitleApiDialog();
-    }
-
-    public SubtitleApiDialog onSaved(Runnable onSaved) {
-        this.onSaved = onSaved;
-        return this;
-    }
-
-    public void show(FragmentActivity activity) {
-        show(activity.getSupportFragmentManager(), null);
+    public static void show(Fragment fragment) {
+        new SubtitleApiDialog().show(fragment.getChildFragmentManager(), null);
     }
 
     @Override
@@ -59,8 +49,13 @@ public class SubtitleApiDialog extends BaseAlertDialog {
     private void onPositive(DialogInterface dialog, int which) {
         CharSequence text = binding.text.getText();
         String token = text == null ? "" : text.toString().trim();
-        SubtitleSetting.putSearchToken(token);
-        if (!TextUtils.isEmpty(SubtitleSetting.getEffectiveToken()) && onSaved != null) App.post(onSaved);
+        getListener().setSubtitleToken(token);
         dismiss();
+    }
+
+    private SubtitleListener getListener() {
+        Fragment parent = getParentFragment();
+        if (parent instanceof SubtitleListener) return (SubtitleListener) parent;
+        return (SubtitleListener) requireActivity();
     }
 }

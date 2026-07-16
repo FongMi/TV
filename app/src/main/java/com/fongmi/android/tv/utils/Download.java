@@ -20,6 +20,7 @@ public class Download {
     private final String url;
     private Callback callback;
     private Future<?> future;
+    private long maxBytes;
     private String tag;
 
     public static Download create(String url, File file) {
@@ -27,6 +28,7 @@ public class Download {
     }
 
     public Download(String url, File file) {
+        this.maxBytes = Long.MAX_VALUE;
         this.tag = url;
         this.url = url;
         this.file = file;
@@ -34,6 +36,11 @@ public class Download {
 
     public Download tag(String tag) {
         this.tag = tag;
+        return this;
+    }
+
+    public Download maxBytes(long maxBytes) {
+        this.maxBytes = maxBytes > 0 ? maxBytes : Long.MAX_VALUE;
         return this;
     }
 
@@ -66,6 +73,7 @@ public class Download {
     }
 
     private void download(InputStream is, double length) throws IOException {
+        if (length > maxBytes) throw new IOException("Download size limit exceeded");
         try (BufferedInputStream input = new BufferedInputStream(is); FileOutputStream os = new FileOutputStream(Path.create(file))) {
             byte[] buffer = new byte[16384];
             int readBytes;
@@ -73,6 +81,7 @@ public class Download {
             while ((readBytes = input.read(buffer)) != -1) {
                 if (Thread.interrupted()) return;
                 totalBytes += readBytes;
+                if (totalBytes > maxBytes) throw new IOException("Download size limit exceeded");
                 os.write(buffer, 0, readBytes);
                 if (length <= 0) continue;
                 int progress = (int) (totalBytes / length * 100.0);

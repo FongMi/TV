@@ -22,7 +22,7 @@ public class Danmaku {
     @SerializedName("url")
     private String url;
 
-    private boolean selected;
+    private transient boolean selected;
 
     public static List<Danmaku> arrayFrom(String str) {
         Type listType = TypeToken.getParameterized(List.class, Danmaku.class).getType();
@@ -35,10 +35,6 @@ public class Danmaku {
         danmaku.setName(path);
         danmaku.setUrl(path);
         return danmaku;
-    }
-
-    public static Danmaku empty() {
-        return new Danmaku();
     }
 
     public String getName() {
@@ -78,6 +74,11 @@ public class Danmaku {
         if (this == obj) return true;
         if (!(obj instanceof Danmaku it)) return false;
         return getUrl().equals(it.getUrl());
+    }
+
+    @Override
+    public int hashCode() {
+        return getUrl().hashCode();
     }
 
     @NonNull

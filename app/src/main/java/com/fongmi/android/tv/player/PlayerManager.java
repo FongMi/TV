@@ -174,11 +174,11 @@ public class PlayerManager implements ParseCallback {
     }
 
     public boolean isLive() {
-        return engine.isLive();
+        return player.getCurrentMediaItem() != null && player.isCurrentMediaItemLive();
     }
 
     public boolean isVod() {
-        return engine.isVod();
+        return player.getCurrentMediaItem() != null && !player.isCurrentMediaItemLive();
     }
 
     public boolean haveTrack(int type) {

@@ -482,8 +482,18 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     @Override
+    public boolean canTrackPlaybackProgress() {
+        return service() != null && isOwner() && player().isVod();
+    }
+
+    @Override
     public long getPlayerPosition() {
         return player().getPosition();
+    }
+
+    @Override
+    public long getPlayerDuration() {
+        return player().getDuration();
     }
 
     @Override

@@ -36,6 +36,10 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
         loadMore();
     }
 
+    public void checkMore(RecyclerView view) {
+        if (isBottom(view)) loadMore();
+    }
+
     private void loadMore() {
         if (isDisable() || isLoading() || callback == null) return;
         if (callback.onLoadMore(String.valueOf(page + 1))) {
@@ -73,6 +77,11 @@ public class CustomScroller extends RecyclerView.OnScrollListener {
     public void endLoading(Result result) {
         if (result.getList().isEmpty()) page--;
         setEnable(result.getPageCount());
+        setLoading(false);
+    }
+
+    public void endLoading(boolean hasMore) {
+        enable = hasMore;
         setLoading(false);
     }
 

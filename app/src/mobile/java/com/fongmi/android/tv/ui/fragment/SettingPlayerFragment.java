@@ -68,7 +68,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
     }
 
     private void setVisible() {
-        boolean exo = !PlayerSetting.isMpv();
+        boolean exo = PlayerSetting.isExo();
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);

@@ -23,12 +23,11 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.api.SubtitleApi;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.PlayerManager;
-import com.fongmi.android.tv.player.util.PlayerHelper;
+import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
@@ -121,12 +120,7 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
     private void onSearch(View view) {
         FragmentActivity activity = requireActivity();
         dismissNow();
-        showSearch(activity);
-    }
-
-    private void showSearch(FragmentActivity activity) {
-        if (SubtitleApi.hasToken()) SubtitleSearchDialog.create().player(player).show(activity);
-        else SubtitleApiDialog.create().onSaved(() -> SubtitleSearchDialog.create().player(player).show(activity)).show(activity);
+        SubtitleSearchDialog.create().player(player).show(activity);
     }
 
     private void onChoose(View view) {
@@ -162,7 +156,7 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
             for (int j = 0; j < trackGroup.length; j++) {
                 Format format = trackGroup.getTrackFormat(j);
                 String name = provider.getTrackName(format);
-                Track item = new Track(type, name, PlayerHelper.describeFormat(format));
+                Track item = new Track(type, name, TrackUtil.describeFormat(format));
                 item.setSelected(trackGroup.isTrackSelected(j));
                 items.add(item);
             }

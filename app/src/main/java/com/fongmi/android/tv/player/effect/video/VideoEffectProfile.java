@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.player.effect.video;
 
+import androidx.media3.effect.VideoAdjustment;
+
 public final class VideoEffectProfile {
 
     private static final VideoEffectProfile OFF = custom(1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f);
@@ -100,6 +102,13 @@ public final class VideoEffectProfile {
 
     public float getTemperature() {
         return temperature;
+    }
+
+    VideoAdjustment toAdjustment() {
+        return new VideoAdjustment.Builder().setSaturation(saturation).setContrast(contrast)
+                .setBrightness(brightness).setGamma(gamma).setHue(hue).setRedGain(redGain())
+                .setBlueGain(blueGain()).setSharpness(sharpness).setThreshold(threshold)
+                .setShadowLift(shadowLift).build();
     }
 
     boolean isNoOp() {

@@ -24,10 +24,6 @@ public final class LangUtil {
         return tag.equals(language) ? unique(getChineseScript(locale), language) : unique(tag, getChineseScript(locale), language);
     }
 
-    public static String getPreferredTextLanguageList() {
-        return String.join(",", getPreferredTextLanguages());
-    }
-
     public static int getPreferredTextLanguageScore(String languageTag) {
         Locale locale = Locale.getDefault();
         String preferred = normalize(locale.toLanguageTag());

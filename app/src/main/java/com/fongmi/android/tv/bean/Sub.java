@@ -8,7 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.player.util.PlayerHelper;
+import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
@@ -31,7 +31,7 @@ public class Sub {
         sub.url = path;
         sub.name = UrlUtil.path(path);
         sub.flag = C.SELECTION_FLAG_FORCED;
-        sub.format = PlayerHelper.getSubtitleMimeType(sub.name);
+        sub.format = TrackUtil.getSubtitleMimeType(sub.name);
         return sub;
     }
 
