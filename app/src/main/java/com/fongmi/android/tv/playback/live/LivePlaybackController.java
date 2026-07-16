@@ -94,13 +94,6 @@ public class LivePlaybackController {
         host.startPlayback(result, position, request.getChannel());
     }
 
-    public void reclaim(long position) {
-        Result result = state.getResult();
-        Channel channel = state.getChannel();
-        if (result == null || channel == null) return;
-        host.startPlayback(result, position, channel);
-    }
-
     public void playbackError(String msg) {
         host.resetPlaybackForError(msg);
         fallbackPolicy.playbackError();

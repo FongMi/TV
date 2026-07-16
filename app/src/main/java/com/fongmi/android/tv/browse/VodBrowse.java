@@ -16,6 +16,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.playback.vod.VodHistoryPolicy;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.utils.Task;
 import com.github.catvod.utils.Trans;
@@ -38,6 +39,7 @@ class VodBrowse {
     private static final int SEARCH_LIMIT = 50;
     private static final int SEARCH_TIMEOUT = 5;
     private static final char KEY_SEPARATOR = '|';
+    private static final VodHistoryPolicy policy = new VodHistoryPolicy();
     private static final Map<String, Vod> vodCache = new ConcurrentHashMap<>();
     private static final Map<String, String> epNavMap = new ConcurrentHashMap<>();
     private static final Map<String, EpEntry> epEntries = new ConcurrentHashMap<>();
@@ -138,7 +140,7 @@ class VodBrowse {
         history.setPosition(position);
         history.setDuration(duration);
         history.setCreateTime(System.currentTimeMillis());
-        if (history.canSave()) Task.execute(() -> history.merge().save());
+        policy.save(history);
         return true;
     }
 

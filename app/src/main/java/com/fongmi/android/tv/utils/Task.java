@@ -7,6 +7,8 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -17,6 +19,7 @@ public class Task {
 
     private static final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(5));
     private static final ListeningExecutorService largeExecutor = MoreExecutors.listeningDecorator(Executors.newFixedThreadPool(20));
+    private static final ListeningExecutorService serialExecutor = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
     private static final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     public static ListeningExecutorService executor() {
@@ -39,8 +42,24 @@ public class Task {
         return largeExecutor.submit(task);
     }
 
+    public static Future<?> submitSerial(Runnable task) {
+        return serialExecutor.submit(task);
+    }
+
+    public static <T> Future<T> submitSerial(Callable<T> task) {
+        return serialExecutor.submit(task);
+    }
+
     public static void execute(Runnable task) {
         executor.execute(task);
+    }
+
+    public static void executeSerial(Runnable task) {
+        serialExecutor.execute(task);
+    }
+
+    public static void awaitSerial() throws InterruptedException, ExecutionException {
+        submitSerial(() -> {}).get();
     }
 
     public static void schedule(Runnable task, long delay, TimeUnit unit) {

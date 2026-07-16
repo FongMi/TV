@@ -75,7 +75,7 @@ public class ReceiveDialog extends BaseBottomSheetDialog {
 
     private void onReceiveCast() {
         if (VodConfig.get().getConfig().equals(event.config())) {
-            VideoActivity.cast(requireActivity(), event.history().save(VodConfig.getCid()));
+            VideoActivity.cast(requireActivity(), event.history());
             dismiss();
         } else {
             showProgress();

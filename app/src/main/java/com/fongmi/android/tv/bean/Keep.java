@@ -81,6 +81,15 @@ public class Keep implements Diffable<Keep> {
                 .ifPresent(config -> target.save(Config.find(config).getId())));
     }
 
+    public static void replace(String oldKey, String newKey) {
+        if (oldKey.equals(newKey)) return;
+        Keep keep = find(oldKey);
+        if (keep == null) return;
+        keep.delete();
+        keep.setKey(newKey);
+        keep.save();
+    }
+
     @NonNull
     public String getKey() {
         return key;
@@ -147,6 +156,7 @@ public class Keep implements Diffable<Keep> {
     }
 
     public void save(int cid) {
+        setKey(getSiteKey().concat(AppDatabase.SYMBOL).concat(getVodId()).concat(AppDatabase.SYMBOL) + cid);
         setCid(cid);
         save();
     }

@@ -351,7 +351,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.array.setAdapter(mArrayAdapter = new ArrayAdapter(this));
         mBinding.part.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.part.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
-        mBinding.part.setAdapter(mPartAdapter = new PartAdapter(item -> mVod.search(item, false)));
+        mBinding.part.setAdapter(mPartAdapter = new PartAdapter(item -> mVod.search(item)));
         mBinding.quick.setHorizontalSpacing(ResUtil.dp2px(8));
         mBinding.quick.setRowHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         mBinding.quick.setAdapter(mQuickAdapter = new QuickAdapter(this));
@@ -402,6 +402,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    public void setVodId(String id) {
+        getIntent().putExtra("id", id);
+    }
+
+    @Override
     public String getVodName() {
         String name = mBinding.name.getText().toString();
         return name.isEmpty() ? getName() : name;
@@ -435,6 +440,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public boolean isFullscreenForPlayback() {
         return isFullscreen();
+    }
+
+    @Override
+    public boolean isLivePlayback() {
+        return service() != null && isOwner() && player().isLive();
     }
 
     @Override
@@ -526,6 +536,23 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         setArtwork(item.getPic());
         checkKeepImg();
         setText(item);
+        updateKeep();
+    }
+
+    @Override
+    public void renderVodUpdate(Vod item) {
+        if (!item.getId().isEmpty()) updateNavigationKey();
+        renderVodMetadata(item.getName(), item.getPic());
+        setText(item);
+    }
+
+    private void renderVodMetadata(String name, String pic) {
+        if (name.isEmpty() && pic.isEmpty()) return;
+        if (!name.isEmpty()) mBinding.name.setText(name);
+        if (!name.isEmpty()) mBinding.widget.title.setText(name);
+        if (!name.isEmpty()) setPartAdapter();
+        if (!pic.isEmpty()) setArtwork();
+        setMetadata();
         updateKeep();
     }
 
@@ -1084,10 +1111,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         if (mVod != null) mVod.saveHistory(exit, System.currentTimeMillis(), position, duration);
     }
 
-    private void syncHistory() {
-        if (mVod != null) mVod.syncHistory();
-    }
-
     private void checkKeepImg() {
         mBinding.keep.setCompoundDrawablesWithIntrinsicBounds(Keep.find(getHistoryKey()) == null ? R.drawable.ic_detail_keep_off : R.drawable.ic_detail_keep_on, 0, 0, 0);
     }
@@ -1110,25 +1133,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
             keep.setVodPic(mHistory.getVodPic());
             keep.save();
         }
-    }
-
-    private void updateVod(Vod item) {
-        boolean id = !item.getId().isEmpty();
-        boolean pic = !item.getPic().isEmpty();
-        boolean name = !item.getName().isEmpty();
-        if (id) getIntent().putExtra("id", item.getId());
-        if (id) mHistory.replace(getHistoryKey());
-        if (name) mHistory.setVodName(item.getName());
-        if (name) mBinding.name.setText(item.getName());
-        if (name) mBinding.widget.title.setText(item.getName());
-        mVod.mergeFlags(item.getFlags());
-        if (pic) setArtwork(item.getPic());
-        if (pic || name) setMetadata();
-        if (pic || name) syncHistory();
-        if (pic || name) updateKeep();
-        if (id) updateNavigationKey();
-        if (name) setPartAdapter();
-        setText(item);
     }
 
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
@@ -1185,7 +1189,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onReclaim() {
-        mVod.reclaim(player().getPosition());
+        mVod.refresh();
     }
 
     @Override
@@ -1237,7 +1241,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         if (isRedirect()) return;
         if (event.getType() == RefreshEvent.Type.DETAIL) mVod.requestDetail();
         else if (event.getType() == RefreshEvent.Type.PLAYER) mVod.refresh();
-        else if (event.getType() == RefreshEvent.Type.VOD) updateVod(event.getVod());
+        else if (event.getType() == RefreshEvent.Type.VOD) mVod.updateVod(event.getVod());
         else if (event.getType() == RefreshEvent.Type.SUBTITLE) player().setSub(Sub.from(event.getPath()));
         else if (event.getType() == RefreshEvent.Type.DANMAKU) player().setDanmaku(Danmaku.from(event.getPath()));
     }
@@ -1406,6 +1410,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     protected void onStop() {
         super.onStop();
+        saveHistory(false);
         if (PlayerSetting.isBackgroundOff()) mClock.stop();
     }
 

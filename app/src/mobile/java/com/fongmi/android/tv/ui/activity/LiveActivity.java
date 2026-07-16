@@ -824,7 +824,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
 
     @Override
     protected void onReclaim() {
-        mLive.reclaim(player().getPosition());
+        mLive.refresh();
     }
 
     @Override

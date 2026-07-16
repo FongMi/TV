@@ -484,7 +484,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     protected void onReclaim() {
-        mLive.reclaim(player().getPosition());
+        mLive.refresh();
     }
 
     @Override

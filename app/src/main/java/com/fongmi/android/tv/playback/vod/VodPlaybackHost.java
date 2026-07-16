@@ -15,6 +15,8 @@ public interface VodPlaybackHost {
 
     String getVodId();
 
+    void setVodId(String id);
+
     String getVodName();
 
     String getVodPic();
@@ -33,7 +35,13 @@ public interface VodPlaybackHost {
 
     boolean isFullscreenForPlayback();
 
+    boolean isLivePlayback();
+
+    boolean canTrackPlaybackProgress();
+
     long getPlayerPosition();
+
+    long getPlayerDuration();
 
     void usePushId(String id);
 
@@ -56,6 +64,8 @@ public interface VodPlaybackHost {
     void loadDanmaku(Result result, History history, Episode episode);
 
     void renderDetail(Vod item, History history);
+
+    void renderVodUpdate(Vod item);
 
     void renderEmptyDetail();
 
