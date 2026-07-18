@@ -192,8 +192,7 @@
 }
 
 -dontnote androidx.media3.exoplayer.util.DebugTextViewHelper
--keepnames class androidx.media3.exoplayer.util.DebugTextViewHelper {}
--keepclassmembers class androidx.media3.exoplayer.util.DebugTextViewHelper {
+-keep class androidx.media3.exoplayer.util.DebugTextViewHelper {
   <init>(androidx.media3.exoplayer.ExoPlayer, android.widget.TextView);
   void start();
   void stop();

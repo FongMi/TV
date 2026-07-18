@@ -133,10 +133,6 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         getPlayerView().toggleDebugView();
     }
 
-    public void hideDebugView() {
-        getPlayerView().hideDebugView();
-    }
-
     public void chooseOtherPlayer(CharSequence title) {
         PlayerManager player = player();
         PlayerHelper.choose(this, player.getUrl(), player.getHeaders(), player.isVod(), player.getPosition(), title);
