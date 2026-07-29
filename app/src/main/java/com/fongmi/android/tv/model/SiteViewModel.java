@@ -19,7 +19,6 @@ import java.util.concurrent.Callable;
 public class SiteViewModel extends ViewModel {
 
     private final MutableLiveData<Result> result;
-    private final MutableLiveData<Result> player;
     private final MutableLiveData<Result> search;
     private final MutableLiveData<Result> action;
 
@@ -28,7 +27,6 @@ public class SiteViewModel extends ViewModel {
 
     public SiteViewModel() {
         result = new MutableLiveData<>();
-        player = new MutableLiveData<>();
         search = new MutableLiveData<>();
         action = new MutableLiveData<>();
         tasks = new ViewModelTaskRunner<>(TaskType.class);
@@ -37,10 +35,6 @@ public class SiteViewModel extends ViewModel {
 
     public LiveData<Result> getResult() {
         return result;
-    }
-
-    public LiveData<Result> getPlayer() {
-        return player;
     }
 
     public LiveData<Result> getSearch() {
@@ -54,7 +48,6 @@ public class SiteViewModel extends ViewModel {
     public SiteViewModel init() {
         search.setValue(null);
         result.setValue(null);
-        player.setValue(null);
         action.setValue(null);
         return this;
     }
@@ -73,10 +66,6 @@ public class SiteViewModel extends ViewModel {
 
     public void detailContent(String key, String id) {
         execute(TaskType.RESULT, result, () -> SiteApi.detailContent(key, id));
-    }
-
-    public void playerContent(String key, String flag, String id) {
-        execute(TaskType.PLAYER, player, () -> SiteApi.playerContent(key, flag, id));
     }
 
     public void searchContent(Site site, String keyword, boolean quick, String page) {
@@ -128,5 +117,5 @@ public class SiteViewModel extends ViewModel {
         }
     }
 
-    private enum TaskType {RESULT, PLAYER, ACTION}
+    private enum TaskType {RESULT, ACTION}
 }

@@ -249,7 +249,7 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
     private void startCastActivity(CastAction action) {
         Intent intent = new Intent(context, CastActivity.class);
         intent.putExtra(CastAction.KEY_EXTRA, action);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         context.startActivity(intent);
     }
 

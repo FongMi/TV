@@ -7,35 +7,27 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogInfoBinding;
+import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class InfoDialog extends BaseAlertDialog {
 
+    private final Map<String, String> headers = new LinkedHashMap<>();
     private DialogInfoBinding binding;
-    private String header;
-    private String title;
-    private String url;
+    private String title = "";
+    private String url = "";
 
-    public static InfoDialog create() {
-        return new InfoDialog();
-    }
-
-    public InfoDialog title(CharSequence title) {
-        this.title = TextUtils.isEmpty(title) ? "" : title.toString();
-        return this;
-    }
-
-    public InfoDialog headers(Map<String, String> header) {
-        this.header = buildHeader(header);
-        return this;
-    }
-
-    public InfoDialog url(String url) {
-        this.url = TextUtils.isEmpty(url) ? "" : url.startsWith("data") ? url.substring(0, Math.min(url.length(), 128)).concat("...") : url;
-        return this;
+    public static InfoDialog create(PlayerManager player) {
+        InfoDialog dialog = new InfoDialog();
+        String url = player.getUrl();
+        dialog.title = player.getMediaTitle();
+        dialog.headers.putAll(player.getHeaders());
+        dialog.url = TextUtils.isEmpty(url) ? "" : url;
+        return dialog;
     }
 
     public void show(FragmentActivity activity) {
@@ -54,12 +46,10 @@ public class InfoDialog extends BaseAlertDialog {
 
     @Override
     protected void initView() {
-        if (header == null) header = "";
-        if (title == null) title = "";
-        if (url == null) url = "";
-        binding.url.setText(url);
+        String url, header;
         binding.title.setText(title);
-        binding.header.setText(header);
+        binding.url.setText(url = buildUrl());
+        binding.header.setText(header = buildHeader());
         binding.title.setSingleLine(title.contains(url));
         binding.url.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
         binding.header.setVisibility(TextUtils.isEmpty(header) ? View.GONE : View.VISIBLE);
@@ -69,11 +59,11 @@ public class InfoDialog extends BaseAlertDialog {
     protected void initEvent() {
         binding.url.setOnClickListener(this::onShare);
         binding.url.setOnLongClickListener(v -> onCopy(url));
-        binding.header.setOnLongClickListener(v -> onCopy(header));
+        binding.header.setOnLongClickListener(v -> onCopy(binding.header.getText().toString()));
     }
 
     private void onShare(View view) {
-        ((Listener) requireActivity()).onShare(title);
+        ((Listener) requireActivity()).onShare(title, url, headers);
         dismiss();
     }
 
@@ -82,8 +72,12 @@ public class InfoDialog extends BaseAlertDialog {
         return true;
     }
 
-    private String buildHeader(Map<String, String> headers) {
-        if (headers == null || headers.isEmpty()) return "";
+    private String buildUrl() {
+        return url.startsWith("data") ? url.substring(0, Math.min(url.length(), 128)).concat("...") : url;
+    }
+
+    private String buildHeader() {
+        if (headers.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         for (String key : headers.keySet()) sb.append(key).append(" : ").append(headers.get(key)).append("\n");
         return Util.substring(sb.toString());
@@ -91,6 +85,6 @@ public class InfoDialog extends BaseAlertDialog {
 
     public interface Listener {
 
-        void onShare(CharSequence title);
+        void onShare(CharSequence title, String url, Map<String, String> headers);
     }
 }

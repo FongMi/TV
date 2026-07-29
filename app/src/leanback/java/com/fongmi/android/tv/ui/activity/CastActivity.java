@@ -26,7 +26,7 @@ import com.fongmi.android.tv.databinding.ActivityCastBinding;
 import com.fongmi.android.tv.dlna.CastAction;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.playback.PlaybackAction;
-import com.fongmi.android.tv.player.PlayerManager;
+import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.service.DLNARendererService;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.PlayerSetting;
@@ -45,6 +45,7 @@ import org.jupnp.support.contentdirectory.DIDLParser;
 
 public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.Listener {
 
+    private final Object mDlnaOwner = new Object();
     private ActivityCastBinding mBinding;
     private DLNARendererService mRenderer;
     private CustomKeyDownVod mKeyDown;
@@ -96,10 +97,10 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        if (!intent.hasExtra(CastAction.KEY_EXTRA)) return;
         setIntent(intent);
-        if (mRenderer != null) mRenderer.setDlnaActive(true);
-        if (intent.hasExtra(CastAction.KEY_EXTRA)) setAction(intent);
-        else finish();
+        if (mRenderer != null) mRenderer.activateDlna(mDlnaOwner);
+        setAction(intent);
     }
 
     @Override
@@ -123,7 +124,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.reset.setOnClickListener(view -> onReset());
-        mBinding.control.action.player.setOnClickListener(view -> onChoose());
+        mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -197,8 +198,8 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         start();
     }
 
-    private void onChoose() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player(), mBinding.widget.title.getText());
+    private void onPlayer() {
+        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
         hideControl();
     }
 
@@ -293,7 +294,8 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private MediaMetadata buildMetadata() {
-        return PlayerManager.buildMetadata(mBinding.widget.title.getText().toString(), "", "");
+        String title = mBinding.widget.title.getText().toString();
+        return MediaItemFactory.buildMetadata(title, "", "", "");
     }
 
     private void onPaused() {
@@ -317,7 +319,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         public void onServiceConnected(ComponentName name, IBinder binder) {
             if (!bound) return;
             mRenderer = ((DLNARendererService.LocalBinder) binder).getService();
-            mRenderer.setDlnaActive(true);
+            mRenderer.activateDlna(mDlnaOwner);
             consumePendingSeek();
         }
 
@@ -494,7 +496,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void releaseRenderer() {
-        if (mRenderer != null) mRenderer.setDlnaActive(false);
+        if (mRenderer != null) mRenderer.deactivateDlna(mDlnaOwner);
         if (bound) unbindService(mRendererConnection);
         mRenderer = null;
         bound = false;

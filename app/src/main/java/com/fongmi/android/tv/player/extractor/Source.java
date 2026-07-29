@@ -31,7 +31,7 @@ public class Source {
         extractors.add(new Thunder());
         extractors.add(new TVBus());
         extractors.add(new Video());
-        extractors.add(new Youtube());
+        extractors.add(new YouTube());
     }
 
     public static Source get() {
@@ -47,8 +47,8 @@ public class Source {
         if (Thunder.Parser.match(url)) {
             items.add(Thunder.Parser.get(url));
             iterator.remove();
-        } else if (Youtube.Parser.match(url)) {
-            items.add(Youtube.Parser.get(url));
+        } else if (YouTube.Parser.match(url)) {
+            items.add(YouTube.Parser.get(url));
             iterator.remove();
         }
     }

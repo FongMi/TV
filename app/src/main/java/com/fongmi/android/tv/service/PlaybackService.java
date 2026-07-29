@@ -63,7 +63,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     private NavigationCallback navigationCallback;
     private MediaLibrarySession session;
-    private Runnable onNewBinding;
+    private ActivityBinding binding;
     private PlayerManager player;
     private String navigationKey;
     private Player sessionPlayer;
@@ -72,9 +72,21 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         return running;
     }
 
-    public void replaceBinding(Runnable callback) {
-        if (onNewBinding != null) onNewBinding.run();
-        onNewBinding = callback;
+    public void claimBinding(NavigationCallback owner, Runnable onReplaced) {
+        if (ownsBinding(owner)) return;
+        if (binding != null) binding.onReplaced().run();
+        binding = new ActivityBinding(owner, onReplaced);
+    }
+
+    public boolean ownsBinding(NavigationCallback owner) {
+        return binding != null && binding.owner() == owner;
+    }
+
+    public boolean releaseBinding(NavigationCallback owner) {
+        if (navigationCallback == owner) setNavigationCallback(null, null);
+        if (!ownsBinding(owner)) return false;
+        binding = null;
+        return true;
     }
 
     public PlayerManager player() {
@@ -183,6 +195,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     private void stopAndClear() {
         player.stop();
+        player.clearPreload();
         player.clearMediaItems();
     }
 
@@ -624,6 +637,9 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
         default void onAudio() {
         }
+    }
+
+    private record ActivityBinding(NavigationCallback owner, Runnable onReplaced) {
     }
 
     public class LocalBinder extends Binder {

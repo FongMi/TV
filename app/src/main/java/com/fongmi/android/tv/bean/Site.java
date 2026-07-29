@@ -91,6 +91,10 @@ public class Site implements Parcelable {
     private Integer quickSearch;
 
     @Ignore
+    @SerializedName("danmaku")
+    private Integer danmaku;
+
+    @Ignore
     @SerializedName("categories")
     private List<String> categories;
 
@@ -224,6 +228,10 @@ public class Site implements Parcelable {
 
     public Integer getQuickSearch() {
         return quickSearch == null ? 1 : quickSearch;
+    }
+
+    public Integer getDanmaku() {
+        return danmaku == null ? 1 : danmaku;
     }
 
     public List<String> getCategories() {

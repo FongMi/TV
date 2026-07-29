@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.media3.common.C;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.App;
@@ -24,6 +25,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.databinding.DialogDeviceBinding;
 import com.fongmi.android.tv.dlna.DLNACast;
 import com.fongmi.android.tv.dlna.DLNACastManager;
+import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.ui.activity.ScanActivity;
 import com.fongmi.android.tv.ui.adapter.DeviceAdapter;
@@ -61,8 +63,11 @@ public class CastDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
         client = OkHttp.client(Constant.TIMEOUT_SYNC);
     }
 
-    public static CastDialog create() {
-        return new CastDialog();
+    public static CastDialog create(PlayerManager player) {
+        CastDialog dialog = new CastDialog();
+        dialog.fm = player.isVod();
+        dialog.video = CastVideo.create(player, dialog.fm ? player.getPosition() : C.TIME_UNSET);
+        return dialog;
     }
 
     public CastDialog history(History history) {
@@ -72,16 +77,6 @@ public class CastDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
         if (fd.startsWith("file")) fd = Server.get().getAddress() + "/" + fd.replace(Path.rootPath(), "").replace("://", "");
         if (fd.contains("127.0.0.1")) fd = fd.replace("127.0.0.1", Util.getIp());
         body.add("history", history.toString().replace(id, fd));
-        return this;
-    }
-
-    public CastDialog video(CastVideo video) {
-        this.video = video;
-        return this;
-    }
-
-    public CastDialog fm(boolean fm) {
-        this.fm = fm;
         return this;
     }
 

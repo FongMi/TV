@@ -104,6 +104,8 @@ public class FileChooser {
         String fileName = getNameColumn(context, uri);
         if (docId.startsWith("raw:")) {
             return docId.replaceFirst("raw:", "");
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && docId.startsWith("msf:")) {
+            return getDataColumn(context, ContentUris.withAppendedId(MediaStore.Downloads.getContentUri(MediaStore.VOLUME_EXTERNAL), Long.parseLong(docId.substring(4))));
         } else if (fileName != null) {
             return Environment.getExternalStorageDirectory() + "/Download/" + fileName;
         } else {

@@ -9,35 +9,35 @@ import com.fongmi.android.tv.bean.Vod;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VodFallbackPolicy {
+class VodFallbackPolicy {
 
     private final VodPlaybackController controller;
     private final VodPlaybackState state;
     private final VodPlaybackHost host;
 
-    public VodFallbackPolicy(VodPlaybackController controller, VodPlaybackState state, VodPlaybackHost host) {
+    VodFallbackPolicy(VodPlaybackController controller, VodPlaybackState state, VodPlaybackHost host) {
         this.controller = controller;
         this.state = state;
         this.host = host;
     }
 
-    public void playbackError() {
+    void playbackError() {
         fallbackToNextLineOrSource();
     }
 
-    public void emptyFlag() {
+    void emptyFlag() {
         fallbackToNextLineOrSource();
     }
 
-    public void emptyDetail() {
+    void emptyDetail() {
         fallbackToNextSource(false);
     }
 
-    public void manualSwitchSource() {
+    void manualSwitchSource() {
         fallbackToNextSource(true);
     }
 
-    public void search(String keyword, boolean autoFallback) {
+    void search(String keyword, boolean autoFallback) {
         state.setSearchKeyword(keyword);
         state.setAutoFallback(autoFallback);
         state.setSelectFirstSource(autoFallback);
@@ -45,7 +45,7 @@ public class VodFallbackPolicy {
         host.requestSearch(getSearchableSites(), keyword);
     }
 
-    public void onSearchResult(Result result) {
+    void onSearchResult(Result result) {
         List<Vod> items = new ArrayList<>(result.getList());
         items.removeIf(this::mismatch);
         state.setSources(items);

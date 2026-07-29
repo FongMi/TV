@@ -1,18 +1,44 @@
 package com.fongmi.android.tv.player.media;
 
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.TextUtils;
+
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.util.Util;
 
+import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.BuildConfig;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.track.LangUtil;
-import com.fongmi.android.tv.player.util.PlayerHelper;
 import com.fongmi.android.tv.setting.Setting;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public final class MediaItemFactory {
+
+    public static MediaMetadata buildMetadata(String title, String artist, String artUri, String displayName) {
+        title = TextUtils.isEmpty(title) ? "" : title;
+        artist = TextUtils.isEmpty(artist) ? "" : artist;
+        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setDisplayTitle(formatDisplayTitle(title, displayName)).setArtworkUri(TextUtils.isEmpty(artUri) ? null : Uri.parse(artUri)).build();
+    }
+
+    public static String formatDisplayTitle(String title, String name) {
+        if (TextUtils.isEmpty(title)) return TextUtils.isEmpty(name) ? "" : name;
+        if (TextUtils.isEmpty(name) || TextUtils.equals(title, name)) return title;
+        return ResUtil.getString(R.string.detail_title, title, name);
+    }
+
+    public static String getDefaultUserAgent() {
+        return Util.getUserAgent(App.get(), BuildConfig.APPLICATION_ID);
+    }
 
     public static MediaItem from(PlaySpec spec) {
         return buildUpon(spec).build();
@@ -31,7 +57,13 @@ public final class MediaItemFactory {
     }
 
     private static MediaItem.RequestMetadata buildRequestMetadata(PlaySpec spec) {
-        return new MediaItem.RequestMetadata.Builder().setMediaUri(spec.getUri()).setExtras(PlayerHelper.toBundle(spec.getHeaders())).build();
+        return new MediaItem.RequestMetadata.Builder().setMediaUri(spec.getUri()).setExtras(toBundle(spec.getHeaders())).build();
+    }
+
+    private static Bundle toBundle(Map<String, String> headers) {
+        Bundle bundle = new Bundle();
+        if (headers != null) headers.forEach(bundle::putString);
+        return bundle;
     }
 
     private static List<MediaItem.SubtitleConfiguration> buildSubtitleConfigs(List<Sub> subs) {

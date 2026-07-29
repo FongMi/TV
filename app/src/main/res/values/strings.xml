@@ -339,11 +339,7 @@
     <string name="error_play_drm">This device does not support the required DRM scheme</string>
     <string name="error_play_url">Unable to load url</string>
     <string name="error_play_flag">No flag data</string>
-    <string name="error_play_timeout">Timed out</string>
-    <string name="error_decode_fallback">Hardware decoding failed, switched to software decoding</string>
-    <string name="error_decode_fallback_hardware">Software decoding failed, switched to hardware decoding</string>
-    <string name="error_decode_unsupported">Software decoding is unavailable for the current video format</string>
-    <string name="error_audio_effect_unsupported">Audio settings are unavailable for the current playback mode</string>
+    <string name="error_play_timeout">Timed out</string><string name="error_audio_effect_unsupported">Audio settings are unavailable for the current playback mode</string>
     <string name="error_audio_effect_tunnel">Audio settings are unavailable in tunnel mode</string>
     <string name="error_audio_effect_passthrough">Audio settings are unavailable for passthrough audio</string>
     <string name="error_audio_effect_apply">Unable to apply audio settings</string>

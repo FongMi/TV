@@ -54,6 +54,7 @@ public class DLNARendererService extends AndroidUpnpServiceImpl implements Servi
     private DLNAAvTransportImpl avTransportImpl;
     private PlaybackService playbackService;
     private Player currentListenerPlayer;
+    private Object dlnaOwner;
     private boolean bound;
 
     public static void start(Context context) {
@@ -162,14 +163,23 @@ public class DLNARendererService extends AndroidUpnpServiceImpl implements Servi
         unbindService(this);
     }
 
-    public void setDlnaActive(boolean active) {
+    public void activateDlna(Object owner) {
+        dlnaOwner = owner;
+        setDlnaActive(true);
+        bindPlaybackService();
+    }
+
+    public void deactivateDlna(Object owner) {
+        if (dlnaOwner != owner) return;
+        dlnaOwner = null;
+        setDlnaActive(false);
+        if (avTransportImpl != null) avTransportImpl.reset();
+        unbindPlaybackService();
+    }
+
+    private void setDlnaActive(boolean active) {
         isDlnaActive = active;
         if (avTransportImpl != null) avTransportImpl.setDlnaActive(active);
-        if (active) bindPlaybackService();
-        else {
-            if (avTransportImpl != null) avTransportImpl.reset();
-            unbindPlaybackService();
-        }
     }
 
     public long consumePendingSeekMs() {

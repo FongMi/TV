@@ -18,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.leanback.widget.OnChildViewHolderSelectedListener;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
@@ -51,7 +50,16 @@ import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.model.VideoViewModel;
-import com.fongmi.android.tv.player.util.PlayerHelper;
+import com.fongmi.android.tv.playback.PlaybackAction;
+import com.fongmi.android.tv.playback.PlaybackIntent;
+import com.fongmi.android.tv.playback.PlaybackReset;
+import com.fongmi.android.tv.playback.PlaybackResult;
+import com.fongmi.android.tv.playback.vod.VodDetailResult;
+import com.fongmi.android.tv.playback.vod.VodPlayRequest;
+import com.fongmi.android.tv.playback.vod.VodPlaybackController;
+import com.fongmi.android.tv.playback.vod.VodPlaybackHost;
+import com.fongmi.android.tv.playback.vod.VodPlaybackMedia;
+import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
@@ -72,12 +80,6 @@ import com.fongmi.android.tv.ui.dialog.ParseDialog;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
 import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
-import com.fongmi.android.tv.playback.PlaybackAction;
-import com.fongmi.android.tv.playback.PlaybackReset;
-import com.fongmi.android.tv.playback.vod.VodPlayRequest;
-import com.fongmi.android.tv.playback.vod.VodPlaybackController;
-import com.fongmi.android.tv.playback.vod.VodPlaybackHost;
-import com.fongmi.android.tv.playback.vod.VodPlaybackMedia;
 import com.fongmi.android.tv.utils.Clock;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.ImgUtil;
@@ -103,29 +105,26 @@ import java.util.Objects;
 public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, CustomKeyDownVod.Listener, ParseDialog.Listener, ArrayAdapter.OnClickListener, FlagAdapter.OnClickListener, EpisodeAdapter.OnClickListener, QualityAdapter.OnClickListener, QuickAdapter.OnClickListener, Clock.Callback {
 
     private ActivityVideoBinding mBinding;
-    private ViewGroup.LayoutParams mFrameParams;
-    private Observer<Result> mObserveDetail;
-    private Observer<Result> mObservePlayer;
-    private Observer<Result> mObserveSearch;
+    private VideoViewModel mViewModel;
+    private VodPlaybackController mVod;
+    private FlagAdapter mFlagAdapter;
     private EpisodeAdapter mEpisodeAdapter;
     private QualityAdapter mQualityAdapter;
     private ArrayAdapter mArrayAdapter;
-    private QuickAdapter mQuickAdapter;
-    private FlagAdapter mFlagAdapter;
     private PartAdapter mPartAdapter;
-    private VodPlaybackController mVod;
+    private QuickAdapter mQuickAdapter;
+    private ViewGroup.LayoutParams mFrameParams;
     private CustomKeyDownVod mKeyDown;
-    private VideoViewModel mViewModel;
-    private History mHistory;
-    private boolean fullscreen;
-    private boolean useParse;
+    private Clock mClock;
+    private View mFocus1;
+    private View mFocus2;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
     private Runnable mR4;
-    private Clock mClock;
-    private View mFocus1;
-    private View mFocus2;
+    private History mHistory;
+    private boolean fullscreen;
+    private boolean useParse;
 
     public static void push(FragmentActivity activity, String text) {
         Uri uri = UrlUtil.uri(text);
@@ -199,6 +198,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         return Objects.toString(getIntent().getStringExtra("id"), "");
     }
 
+    private boolean isSameVideo(Intent intent) {
+        String key = Objects.toString(intent.getStringExtra("key"), "");
+        String id = Objects.toString(intent.getStringExtra("id"), "");
+        return TextUtils.equals(key, getKey()) && TextUtils.equals(id, getId());
+    }
+
     @Override
     public String getHistoryKey() {
         return getKey().concat(AppDatabase.SYMBOL).concat(getId()).concat(AppDatabase.SYMBOL) + VodConfig.getCid();
@@ -249,18 +254,17 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onServiceConnected() {
-        checkId();
+        mVod.onPlaybackServiceReady();
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
-        String oldId = getId();
         super.onNewIntent(intent);
-        String id = Objects.toString(intent.getStringExtra("id"), "");
-        if (TextUtils.isEmpty(id) || id.equals(oldId)) return;
-        saveHistory(false);
-        getIntent().putExtras(intent);
+        if (TextUtils.isEmpty(intent.getStringExtra("id")) || isSameVideo(intent)) return;
+        saveHistory(true);
         mVod.reset();
+        setIntent(intent);
+        updateNavigationKey();
         checkId();
     }
 
@@ -270,9 +274,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mFrameParams = mBinding.video.getLayoutParams();
         mClock = Clock.create(mBinding.widget.clock);
         mKeyDown = CustomKeyDownVod.create(this);
-        mObserveDetail = this::onDetailObserved;
-        mObservePlayer = this::onPlayerObserved;
-        mObserveSearch = this::onSearchObserved;
         mR1 = this::hideControl;
         mR2 = this::updateFocus;
         mR3 = this::setTraffic;
@@ -281,6 +282,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         setVideoView();
         setViewModel();
         checkCast();
+        checkId();
     }
 
     @Override
@@ -304,7 +306,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.reset.setOnClickListener(view -> onReset());
         mBinding.control.action.replay.setOnClickListener(view -> onReplay());
         mBinding.control.action.parse.setOnClickListener(view -> onParse());
-        mBinding.control.action.player.setOnClickListener(view -> onChoose());
+        mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.repeat.setOnClickListener(view -> onRepeat());
@@ -370,24 +372,26 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(VideoViewModel.class);
-        observeForever(mViewModel.getResult(), mObserveDetail);
-        observeForever(mViewModel.getPlayer(), mObservePlayer);
-        observeForever(mViewModel.getSearch(), mObserveSearch);
         mVod = mViewModel.createPlaybackController(this);
+        observeWhenServiceReady(mViewModel.getDetail(), this::onDetailObserved);
+        observeWhenServiceReady(mViewModel.getSearch(), this::onSearchObserved);
+        observeWhenServiceReady(mViewModel.getPreload(), this::onPreloadObserved);
+        observeWhenServiceReady(mViewModel.getPlayback(), this::onPlaybackObserved);
     }
 
-    private void onDetailObserved(Result result) {
-        if (service() == null) return;
+    private void onDetailObserved(VodDetailResult result) {
         mVod.onDetailResult(result);
     }
 
-    private void onPlayerObserved(Result result) {
-        if (service() == null) return;
-        mVod.onPlayerResult(result);
+    private void onPlaybackObserved(PlaybackResult<VodPlayRequest> result) {
+        mVod.onPlaybackResult(result);
+    }
+
+    private void onPreloadObserved(PlaybackResult<VodPlayRequest> result) {
+        mVod.onPreloadResult(result);
     }
 
     private void onSearchObserved(Result result) {
-        if (service() == null) return;
         mVod.onSearchResult(result);
     }
 
@@ -438,6 +442,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    public boolean hasPlaybackSession() {
+        return service() != null && isOwner() && player().hasPlaySpec();
+    }
+
+    @Override
     public boolean isFullscreenForPlayback() {
         return isFullscreen();
     }
@@ -450,6 +459,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public boolean canTrackPlaybackProgress() {
         return service() != null && isOwner() && player().isVod();
+    }
+
+    @Override
+    public boolean canPreloadNext() {
+        return service() != null && isOwner() && player().canPreloadNext();
     }
 
     @Override
@@ -474,10 +488,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void requestPlayer(VodPlayRequest request) {
-        mBinding.widget.title.setText(getString(R.string.detail_title, mBinding.name.getText(), request.getTitle()));
-        mViewModel.playerContent(request.getKey(), request.getFlag(), request.getId());
-        mBinding.widget.title.setSelected(true);
+        mViewModel.playerContent(request);
         showProgress();
+    }
+
+    @Override
+    public void requestPreload(VodPlayRequest request) {
+        mViewModel.preloadContent(request);
     }
 
     @Override
@@ -517,8 +534,18 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
-    public void startPlayback(Result result, boolean useParse, long startPositionMs, History history, Episode episode) {
-        startPlayer(getHistoryKey(), result, useParse, getSite().getTimeout(), startPositionMs, VodPlaybackMedia.metadata(history, episode));
+    public void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata) {
+        startPlayer(getHistoryKey(), result, useParse, getSite().getTimeout(), startPositionMs, metadata);
+    }
+
+    @Override
+    public boolean preloadPlayback(Result result, long startPositionMs, MediaMetadata metadata) {
+        return player().preload(PlaySpec.from(result, getHistoryKey(), metadata), startPositionMs);
+    }
+
+    @Override
+    public void clearPreload() {
+        if (service() != null && isOwner()) player().clearPreload();
     }
 
     @Override
@@ -549,10 +576,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     private void renderVodMetadata(String name, String pic) {
         if (name.isEmpty() && pic.isEmpty()) return;
         if (!name.isEmpty()) mBinding.name.setText(name);
-        if (!name.isEmpty()) mBinding.widget.title.setText(name);
         if (!name.isEmpty()) setPartAdapter();
         if (!pic.isEmpty()) setArtwork();
-        setMetadata();
         updateKeep();
     }
 
@@ -636,6 +661,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void renderDescription(String desc) {
         mBinding.content.setTag(desc);
+    }
+
+    @Override
+    public void renderPlaybackMetadata(MediaMetadata metadata) {
+        if (service() != null && isOwner()) player().setMetadata(metadata);
+        mBinding.widget.title.setText(metadata.displayTitle);
+        mBinding.widget.title.setSelected(true);
     }
 
     @Override
@@ -971,8 +1003,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.ending.setText(ending <= 0 ? getString(R.string.play_ed) : Util.timeMs(mHistory.getEnding()));
     }
 
-    private void onChoose() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player(), mBinding.widget.title.getText());
+    private void onPlayer() {
+        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
         hideControl();
     }
 
@@ -1105,9 +1137,10 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void saveHistory(boolean exit) {
-        boolean owner = service() != null && isOwner();
-        long position = owner ? player().getPosition() : C.TIME_UNSET;
-        long duration = owner ? player().getDuration() : C.TIME_UNSET;
+        PlaybackService service = service();
+        boolean owner = service != null && getPlaybackKey().equals(service.player().getKey());
+        long position = owner ? service.player().getPosition() : C.TIME_UNSET;
+        long duration = owner ? service.player().getDuration() : C.TIME_UNSET;
         if (mVod != null) mVod.saveHistory(exit, System.currentTimeMillis(), position, duration);
     }
 
@@ -1259,14 +1292,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         PlaybackAction.setMediaOptions(player(), mBinding.control.action.edition, mBinding.control.action.chapter);
     }
 
-    private MediaMetadata buildMetadata() {
-        return VodPlaybackMedia.metadata(mHistory, getEpisode());
-    }
-
-    private void setMetadata() {
-        player().setMetadata(buildMetadata());
-    }
-
     @Override
     public void onItemClick(Vod item) {
         mVod.selectSource(item);
@@ -1398,7 +1423,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == 1001) PlayerHelper.onExternalResult(data, service()::dispatchNext, controller()::seekTo);
+        if (resultCode == RESULT_OK && requestCode == 1001) PlaybackIntent.onExternalResult(data, service()::dispatchNext, controller()::seekTo);
     }
 
     @Override

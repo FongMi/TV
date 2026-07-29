@@ -339,9 +339,6 @@
     <string name="error_play_url">播放地址加载失败</string>
     <string name="error_play_flag">暂无线路数据</string>
     <string name="error_play_timeout">连接超时</string>
-    <string name="error_decode_fallback">硬解失败，已切换软解</string>
-    <string name="error_decode_fallback_hardware">软解失败，已切换硬解</string>
-    <string name="error_decode_unsupported">当前视频格式不支持软解</string>
     <string name="error_audio_effect_unsupported">当前播放方式不支持音质设置</string>
     <string name="error_audio_effect_tunnel">隧道模式下不支持音质设置</string>
     <string name="error_audio_effect_passthrough">音频直通音轨不支持音质设置</string>
