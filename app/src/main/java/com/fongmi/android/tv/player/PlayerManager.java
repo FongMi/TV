@@ -374,12 +374,15 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void toggleDecode() {
+        long position = getPosition();
+        boolean playWhenReady = player.getPlayWhenReady();
         decode = isHard() ? PlayerEngine.SOFT : PlayerEngine.HARD;
         boolean rebuild = engine.setDecode(decode);
         callback.onDecodeChanged();
         if (!rebuild) return;
         setPlayer(engine.rebuild());
-        startCurrent(getPosition());
+        startCurrent(position);
+        if (!playWhenReady) player.pause();
     }
 
     private void handleDecodeError(PlaybackException e) {

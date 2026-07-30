@@ -537,7 +537,9 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     @Override
     protected void onPause() {
         super.onPause();
-        if (isRedirect() && mController != null) mController.pause();
+        boolean shouldPause = isRedirect() || (isOwner() && PlayerSetting.isBackgroundOff());
+        if (shouldPause && mController != null) mController.pause();
+        if (shouldPause && !isInPictureInPictureMode() && PlayerSetting.getRender() == PlayerSetting.RENDER_SURFACE) detachSurface();
     }
 
     @Override
