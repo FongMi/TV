@@ -53,6 +53,7 @@ public class PlayerManager implements ParseCallback {
     private DanmakuConfig danmakuConfig;
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
+    private boolean surfaceSuspended;
     private boolean initTrack;
     private int retry;
     private int decode;
@@ -310,10 +311,27 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void play() {
+        resumeAfterSurfaceLoss();
         player.play();
     }
 
     public void pause() {
+        player.pause();
+    }
+
+    public void suspendForSurfaceLoss() {
+        if (surfaceSuspended) return;
+        surfaceSuspended = true;
+        App.removeCallbacks(runnable);
+        player.pause();
+        engine.stop();
+    }
+
+    public void resumeAfterSurfaceLoss() {
+        if (!surfaceSuspended) return;
+        surfaceSuspended = false;
+        if (player.getCurrentMediaItem() == null) return;
+        player.prepare();
         player.pause();
     }
 
@@ -374,15 +392,22 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void toggleDecode() {
+        long position = getPosition();
+        boolean playWhenReady = player.getPlayWhenReady();
         decode = isHard() ? PlayerEngine.SOFT : PlayerEngine.HARD;
         boolean rebuild = engine.setDecode(decode);
         callback.onDecodeChanged();
         if (!rebuild) return;
         setPlayer(engine.rebuild());
-        startCurrent(getPosition());
+        startCurrent(position);
+        if (!playWhenReady) player.pause();
     }
 
     private void handleDecodeError(PlaybackException e) {
+        if (surfaceSuspended || !player.getPlayWhenReady()) {
+            suspendForSurfaceLoss();
+            return;
+        }
         if (++retry > 1) {
             callback.onError(engine.getErrorMessage(e));
         } else {

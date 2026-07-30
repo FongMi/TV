@@ -531,19 +531,31 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
             onReclaim();
         } else {
             attachSurface();
+            if (ownsPlaybackSurface()) player().resumeAfterSurfaceLoss();
         }
+    }
+
+    private boolean ownsPlaybackSurface() {
+        return mService != null && getPlayerView().getPlayer() == player().getPlayer();
     }
 
     @Override
     protected void onPause() {
+        boolean ownsSurface = ownsPlaybackSurface();
+        boolean backgroundOff = PlayerSetting.isBackgroundOff();
+        boolean shouldPause = isRedirect() || (ownsSurface && backgroundOff);
+        boolean shouldSuspendSurface = shouldPause && ownsSurface && !isInPictureInPictureMode() && PlayerSetting.getRender() == PlayerSetting.RENDER_SURFACE;
+        if (shouldSuspendSurface) player().suspendForSurfaceLoss();
+        else if (shouldPause && ownsSurface) player().pause();
+        else if (shouldPause && mController != null) mController.pause();
+        if (shouldSuspendSurface) detachSurface();
         super.onPause();
-        if (isRedirect() && mController != null) mController.pause();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (isOwner() && PlayerSetting.isBackgroundOff() && mController != null) mController.pause();
+        if (mService != null && isOwner() && PlayerSetting.isBackgroundOff()) player().pause();
     }
 
     @Override
