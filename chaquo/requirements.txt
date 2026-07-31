@@ -1,6 +1,6 @@
 lxml
 ujson
-pyquery
+pyquery==1.4.3
 requests
 jsonpath
 cachetools
