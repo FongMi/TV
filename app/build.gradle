@@ -111,6 +111,10 @@ dependencies {
     implementation 'androidx.media3:media3-exoplayer:' + media3Version
     implementation 'androidx.media3:media3-extractor:' + media3Version
     implementation 'androidx.media3:media3-ui:' + media3Version
+    // 弹幕库（FongMi 原依赖本地 AAR，改用 Maven 公开版；包名 master.flame.danmaku）
+    implementation 'com.github.ctiao:DanmakuFlameMaster:0.11.0'
+    // FFmpeg 软解扩展（提供 io.github.anilbeesetti.nextlib.media3ext.ffdecoder）
+    implementation 'io.github.anilbeesetti.nextlib:nextlib-media3-ext-ffmpeg:2.0.0'
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.media:media:1.7.0'
     implementation 'androidx.room:room-runtime:2.7.2'

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="ScopedStorage">
 
-    <uses-sdk tools:overrideLibrary="com.github.catvod.crawler,com.fongmi.chaquo,com.fongmi.android.tv.quickjs" />
+    <uses-sdk tools:overrideLibrary="com.github.catvod.crawler,com.fongmi.chaquo,com.fongmi.android.tv.quickjs,com.fongmi.hook,com.forcetech,com.tvbus.engine,com.p2p,com.xunlei.downloadlib,master.flame.danmaku" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />

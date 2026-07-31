@@ -385,7 +385,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
                 PushActivity.start(this);
                 break;
             case R.string.home_cast:
-                CastActivity.start(this);
+                // 投屏接收(CastActivity)已禁用：依赖 FongMi 私有库 com.android.cast.dlna.dmr，未公开发布，无法在公开 CI 编译
                 break;
             case R.string.home_setting:
                 SettingActivity.start(this);

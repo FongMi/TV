@@ -1,1 +1,7 @@
 *.aar
+# 以下为编译必需的 FongMi 私有 AAR（从 shaka999/TV@fongmi 借用；仓库原 gitignore 排除 *.aar），需纳入版本控制以便在 CI 编译
+!forcetech-release.aar
+!hook-release.aar
+!jianpian-release.aar
+!thunder-release.aar
+!tvbus-release.aar
