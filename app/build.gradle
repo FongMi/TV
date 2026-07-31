@@ -11,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.fongmi.android.tv"
-        minSdk 24
+        minSdk 23
         //noinspection ExpiredTargetSdkVersion
         targetSdk 28
         versionCode 407
@@ -66,6 +66,12 @@ android {
         resources {
             exclude 'META-INF/beans.xml'
             exclude 'META-INF/versions/9/OSGI-INF/MANIFEST.MF'
+            exclude 'META-INF/LICENSE*'
+            exclude 'META-INF/NOTICE*'
+            exclude 'META-INF/DEPENDENCIES'
+            exclude 'META-INF/*.kotlin_module'
+            exclude 'META-INF/AL2.0'
+            exclude 'META-INF/LGPL2.1'
         }
     }
 
@@ -97,6 +103,14 @@ dependencies {
     implementation project(':catvod')
     implementation project(':chaquo')
     implementation project(':quickjs')
+    // Media3 标准版（FongMi 原把私有 AAR 放 app/libs 且 gitignore，公开 CI 改为从 Maven 拉 1.8.0）
+    implementation 'androidx.media3:media3-common:' + media3Version
+    implementation 'androidx.media3:media3-database:' + media3Version
+    implementation 'androidx.media3:media3-datasource:' + media3Version
+    implementation 'androidx.media3:media3-datasource-okhttp:' + media3Version
+    implementation 'androidx.media3:media3-exoplayer:' + media3Version
+    implementation 'androidx.media3:media3-extractor:' + media3Version
+    implementation 'androidx.media3:media3-ui:' + media3Version
     implementation 'androidx.appcompat:appcompat:1.7.1'
     implementation 'androidx.media:media:1.7.0'
     implementation 'androidx.room:room-runtime:2.7.2'

@@ -96,7 +96,7 @@ public class Action implements Process {
         boolean keep = Objects.equals(params.get("type"), "keep");
         boolean force = Objects.equals(params.get("force"), "true");
         boolean history = Objects.equals(params.get("type"), "history");
-        String mode = Objects.requireNonNullElse(params.get("mode"), "0");
+        String mode = params.get("mode") != null ? params.get("mode") : "0";
         if (params.get("device") != null && (mode.equals("0") || mode.equals("2"))) {
             Device device = Device.objectFrom(params.get("device"));
             if (history) sendHistory(device, params);

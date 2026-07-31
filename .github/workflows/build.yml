@@ -1,0 +1,41 @@
+name: Build TV (leanback) Debug
+
+on:
+  push:
+    branches: [ fongmi-4.0.7 ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Create local.properties
+        run: echo "sdk.dir=$ANDROID_HOME" > local.properties
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build leanback arm64_v8a & armeabi_v7a debug APKs
+        run: ./gradlew assembleLeanbackArm64_v8aDebug assembleLeanbackArmeabi_v7aDebug --no-daemon
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: leanback-tv-debug
+          path: app/build/outputs/apk/**/*.apk
