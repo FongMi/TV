@@ -28,7 +28,7 @@
 }
 
 -keep, includedescriptorclasses class androidx.media3.decoder.ffmpeg.FfmpegAudioDecoder {
-  private java.nio.ByteBuffer growOutputBuffer(androidx.media3.decoder.SimpleDecoderOutputBuffer, int);
+  private java.nio.ByteBuffer growOutputBuffer(androidx.media3.decoder.SimpleDecoderOutputBuffer, int, int);
 }
 
 -keep class is.xyz.mpv.MPVLib { *; }
@@ -60,7 +60,7 @@
 
 -dontnote androidx.media3.decoder.ffmpeg.FfmpegVideoRenderer
 -keepclassmembers class androidx.media3.decoder.ffmpeg.FfmpegVideoRenderer {
-  <init>(long, android.os.Handler, androidx.media3.exoplayer.video.VideoRendererEventListener, int, int);
+  <init>(android.content.Context, long, android.os.Handler, androidx.media3.exoplayer.video.VideoRendererEventListener, int);
 }
 
 -dontnote androidx.media3.decoder.opus.LibopusAudioRenderer
@@ -87,7 +87,7 @@
 
 -dontnote androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer
 -keepclassmembers class androidx.media3.decoder.ffmpeg.FfmpegAudioRenderer {
-  <init>(android.os.Handler, androidx.media3.exoplayer.audio.AudioRendererEventListener, androidx.media3.exoplayer.audio.AudioSink, boolean);
+  <init>(android.os.Handler, androidx.media3.exoplayer.audio.AudioRendererEventListener, androidx.media3.exoplayer.audio.AudioSink);
 }
 
 -dontnote androidx.media3.decoder.midi.MidiRenderer
@@ -201,6 +201,8 @@
 -dontnote androidx.media3.mpvplayer.MpvPlayer
 -keepclassmembers class androidx.media3.mpvplayer.MpvPlayer {
   boolean toggleGeneralStats();
+  void setOsdSurfaceView(android.view.SurfaceView);
+  void clearOsdSurfaceView(android.view.SurfaceView);
 }
 
 -keepnames class androidx.media3.transformer.CompositionPlayer {}
