@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import okhttp3.Dns;
@@ -21,15 +22,21 @@ import okhttp3.dnsoverhttps.DnsOverHttps;
 public class OkDns implements Dns {
 
     private final ConcurrentHashMap<String, String> map;
-    private DnsOverHttps doh;
+    private volatile Supplier<Doh> supplier;
+    private volatile DnsOverHttps doh;
 
     public OkDns() {
         this.map = new ConcurrentHashMap<>();
     }
 
-    public void setDoh(Doh item) {
+    public synchronized void setDoh(Doh item) {
         if (item.getUrl().isEmpty()) return;
         this.doh = new DnsOverHttps.Builder().client(new OkHttpClient()).url(HttpUrl.get(item.getUrl())).bootstrapDnsHosts(item.getHosts()).build();
+        this.supplier = null;
+    }
+
+    public synchronized void setDoh(Supplier<Doh> supplier) {
+        this.supplier = supplier;
     }
 
     public void clear() {
@@ -50,6 +57,13 @@ public class OkDns implements Dns {
     @NonNull
     @Override
     public List<InetAddress> lookup(@NonNull String hostname) throws UnknownHostException {
+        Supplier<Doh> supplier = this.supplier;
+        if (supplier != null) initDoh(supplier);
         return (doh != null ? doh : Dns.SYSTEM).lookup(get(hostname));
+    }
+
+    private synchronized void initDoh(Supplier<Doh> supplier) {
+        if (supplier != this.supplier) return;
+        setDoh(supplier.get());
     }
 }
