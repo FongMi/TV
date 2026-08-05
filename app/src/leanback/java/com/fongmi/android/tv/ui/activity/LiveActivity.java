@@ -501,17 +501,18 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
                 break;
             case Player.STATE_ENDED:
                 mLive.playbackEnded();
+                updatePlayControl(false);
                 break;
         }
     }
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying) {
-            mBinding.control.action.action.setText(R.string.pause);
-        } else if (isPaused()) {
-            mBinding.control.action.action.setText(R.string.play);
-        }
+        if (isPlaying || isPaused()) updatePlayControl(isPlaying);
+    }
+
+    private void updatePlayControl(boolean isPlaying) {
+        mBinding.control.action.action.setText(isPlaying ? R.string.pause : R.string.play);
     }
 
     @Override
