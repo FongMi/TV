@@ -47,7 +47,7 @@ public final class MpvUtil {
     private static MpvPlayerConfig buildConfig() {
         File configDir = Path.mpv();
         File cacheDir = Path.mpvCache();
-        MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().setHlsHttpPersistent(false).addConfigDirectory(configDir).addAndroidFontConfig(configDir, cacheDir).addAndroidDefaults(buildAndroidOptions(cacheDir)).addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions());
+        MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().addConfigDirectory(configDir).addAndroidFontConfig(configDir, cacheDir).addAndroidDefaults(buildAndroidOptions(cacheDir)).addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions());
         addPreloadOptions(builder);
         return builder.build();
     }

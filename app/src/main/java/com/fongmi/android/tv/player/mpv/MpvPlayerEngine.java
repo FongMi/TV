@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.player.mpv;
 
 import androidx.annotation.NonNull;
+import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
@@ -17,6 +18,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvErrorMessageProvider provider;
     private final MpvPlayerEffect effect;
     private final MpvPlayer player;
+    private PlaySpec spec;
 
     public MpvPlayerEngine(int decode, Player.Listener listener) {
         this.player = MpvUtil.buildPlayer(decode, listener);
@@ -82,6 +84,11 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     @Override
     public void start(PlaySpec spec, long startPositionMs) {
+        this.spec = spec;
+        startInternal(startPositionMs);
+    }
+
+    private void startInternal(long startPositionMs) {
         effect.applyVideoEffect();
         effect.clearAudioEffect();
         player.setMediaItem(MediaItemFactory.from(spec), startPositionMs);
@@ -107,7 +114,15 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     public ErrorAction handleError(PlaybackException e) {
         return switch (e.errorCode) {
             case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED, PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED, PlaybackException.ERROR_CODE_DECODING_FAILED -> ErrorAction.DECODE;
+            case PlaybackException.ERROR_CODE_IO_UNSPECIFIED -> retryHls();
             default -> ErrorAction.FATAL;
         };
+    }
+
+    private ErrorAction retryHls() {
+        if (spec == null || MimeTypes.APPLICATION_M3U8.equals(spec.getFormat())) return ErrorAction.FATAL;
+        spec.setFormat(MimeTypes.APPLICATION_M3U8);
+        startInternal(player.getCurrentPosition());
+        return ErrorAction.RECOVERED;
     }
 }
