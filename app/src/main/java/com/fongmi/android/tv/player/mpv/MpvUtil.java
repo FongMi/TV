@@ -54,8 +54,8 @@ public final class MpvUtil {
 
     private static MpvAndroidOptions buildAndroidOptions(File shaderCacheDirectory) {
         MpvAndroidOptions.Builder builder = new MpvAndroidOptions.Builder().setShaderCacheDirectory(shaderCacheDirectory).setAudioPassthroughEnabled(DecodeSetting.isAudioPassThrough()).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
-        if (PlayerSetting.isMpvGpuNext()) builder.setGpuNextEnabled(true);
-        if (PlayerSetting.isMpvVulkan()) builder.setVulkanEnabled(true);
+        builder.setGpuNextEnabled(PlayerSetting.isMpvGpuNext());
+        builder.setVulkanEnabled(PlayerSetting.isMpvVulkan());
         return builder.build();
     }
 
