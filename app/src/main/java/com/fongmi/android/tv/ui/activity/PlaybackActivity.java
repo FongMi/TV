@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.media3.common.C;
@@ -54,6 +55,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private ListenableFuture<MediaController> mControllerFuture;
     private MediaController mController;
     private PlaybackService mService;
+    private boolean initialized;
     private boolean audioOnly;
     private boolean scrubbing;
     private boolean redirect;
@@ -143,8 +145,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     protected <T> void observeWhenServiceReady(LiveData<T> liveData, Observer<T> observer) {
         ServiceReadyObserver<T> serviceObserver = new ServiceReadyObserver<>(observer);
         serviceReadyObservers.add(serviceObserver);
-        liveData.observeForever(serviceObserver);
-        foreverObserverRemovers.add(() -> liveData.removeObserver(serviceObserver));
+        observeForever(liveData, serviceObserver);
     }
 
     public void toggleDebugView() {
@@ -229,13 +230,14 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         return C.TIME_UNSET;
     }
 
-    protected void seekTo(long deltaMs) {
+    protected boolean seekTo(long deltaMs) {
         PlayerManager player = player();
         long targetMs = Math.max(0, player.getPosition() + deltaMs);
         long durationMs = player.getDuration();
         boolean seekToEnd = durationMs > 0 && targetMs >= durationMs;
         mController.seekTo(seekToEnd ? durationMs : targetMs);
         if (!seekToEnd) mController.play();
+        return seekToEnd;
     }
 
     protected void startPlayer(String key, Result result, boolean useParse, long timeout, MediaMetadata metadata) {
@@ -369,6 +371,28 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         mService.setSessionActivity(buildSessionIntent());
     }
 
+    private boolean canActivate() {
+        return mService != null && !isFinishing() && getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED);
+    }
+
+    private boolean canDispatch() {
+        return !isFinishing() && isBindingOwner();
+    }
+
+    private void activateService() {
+        if (!canActivate()) return;
+        claimBinding();
+        if (!isRedirect()) updateNavigationKey();
+        dispatchPendingObservers();
+        initService();
+    }
+
+    private void initService() {
+        if (initialized) return;
+        initialized = true;
+        onServiceConnected();
+    }
+
     private void closePiP() {
         if (!isInPictureInPictureMode()) return;
         detach();
@@ -428,6 +452,11 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         releaseBinding();
     }
 
+    private void pausePlayback() {
+        if (mController != null) mController.pause();
+        else if (mService != null) player().pause();
+    }
+
     private void releaseController() {
         if (mControllerFuture != null) MediaController.releaseFuture(mControllerFuture);
         if (mController != null) mController.removeListener(this);
@@ -444,13 +473,14 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         mService = null;
     }
 
-    private void clearForeverObservers() {
+    private void clearObservers() {
         foreverObserverRemovers.forEach(Runnable::run);
         foreverObserverRemovers.clear();
         serviceReadyObservers.clear();
     }
 
-    private void dispatchServiceReadyObservers() {
+    private void dispatchPendingObservers() {
+        if (!canDispatch()) return;
         serviceReadyObservers.forEach(ServiceReadyObserver::dispatch);
     }
 
@@ -542,16 +572,20 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     @Override
     public void onServiceConnected(ComponentName name, IBinder binder) {
         mService = ((PlaybackService.LocalBinder) binder).getService();
-        claimBinding();
-        updateNavigationKey();
         mService.addPlayerCallback(mPlayerCallback);
-        dispatchServiceReadyObservers();
-        onServiceConnected();
+        activateService();
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+        initialized = false;
         mService = null;
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        activateService();
     }
 
     @Override
@@ -559,25 +593,26 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         super.onResume();
         claimBinding();
         setRedirect(false);
+        dispatchPendingObservers();
         resumePlayback();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (isRedirect() && mController != null) mController.pause();
+        if (isRedirect()) pausePlayback();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        if (isOwner() && PlayerSetting.isBackgroundOff() && mController != null) mController.pause();
+        if (isOwner() && (isFinishing() || PlayerSetting.isBackgroundOff())) pausePlayback();
         if (!isInPictureInPictureMode()) detachPlayerView();
     }
 
     @Override
     protected void onDestroy() {
-        clearForeverObservers();
+        clearObservers();
         detachPlayerView();
         super.onDestroy();
         releasePlaybackService();
@@ -595,7 +630,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
         @Override
         public void onChanged(T value) {
-            if (mService == null) {
+            if (!canDispatch()) {
                 pendingValue = value;
                 pending = true;
             } else {
