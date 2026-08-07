@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
@@ -36,6 +37,14 @@ public class Util {
     public static void toggleFullscreen(Activity activity, boolean fullscreen) {
         if (fullscreen) hideSystemUI(activity);
         else showSystemUI(activity);
+    }
+
+    public static void moveToBackground(Activity activity) {
+        try {
+            activity.moveTaskToBack(true);
+        } catch (NullPointerException ignored) {
+            activity.startActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+        }
     }
 
     public static void hideSystemUI(Activity activity) {

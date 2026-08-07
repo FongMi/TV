@@ -67,6 +67,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.PermissionUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 import com.google.common.collect.Lists;
 
@@ -471,7 +472,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         } else if (mBinding.recycler.getSelectedPosition() != 0) {
             mBinding.recycler.scrollToPosition(0);
         } else {
-            if (PlaybackService.isRunning()) moveTaskToBack(true);
+            if (PlaybackService.isRunning()) Util.moveToBackground(this);
             else super.onBackInvoked();
         }
     }
