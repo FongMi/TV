@@ -30,8 +30,8 @@ public class OkDns implements Dns {
     }
 
     public synchronized void setDoh(Doh item) {
-        if (item.getUrl().isEmpty()) return;
-        this.doh = new DnsOverHttps.Builder().client(new OkHttpClient()).url(HttpUrl.get(item.getUrl())).bootstrapDnsHosts(item.getHosts()).build();
+        HttpUrl url = HttpUrl.parse(item.getUrl());
+        this.doh = url == null ? null : new DnsOverHttps.Builder().client(new OkHttpClient()).url(url).bootstrapDnsHosts(item.getHosts()).build();
         this.supplier = null;
     }
 
