@@ -25,14 +25,6 @@ public final class AssrtResponse {
         return response == null ? new AssrtResponse() : response;
     }
 
-    public static String errorFrom(String text) {
-        try {
-            return from(text).getError();
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
     public String getError() {
         if (status == 0) return "";
         return TextUtils.isEmpty(error) ? String.valueOf(status) : error.trim();
