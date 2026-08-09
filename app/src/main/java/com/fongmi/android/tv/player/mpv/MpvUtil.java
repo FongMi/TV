@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.player.mpv;
 
+import android.content.pm.PackageManager;
+
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
 import androidx.media3.mpvplayer.MpvAndroidOptions;
@@ -20,6 +22,7 @@ import java.io.File;
 public final class MpvUtil {
 
     private static final String ASSET_CA_FILE = "cacert.pem";
+    private static final int VULKAN_1_2 = 0x00402000;
     private static final double DEFAULT_SUB_POS = 100.0;
     private static final double DEFAULT_SUB_SCALE = 1.0;
     private static final double MIN_SUB_POS = 0.0;
@@ -31,6 +34,10 @@ public final class MpvUtil {
         } catch (Throwable e) {
             return false;
         }
+    }
+
+    public static boolean isVulkanSupported() {
+        return App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION, VULKAN_1_2);
     }
 
     public static MpvPlayer buildPlayer(int decode, Player.Listener listener) {
@@ -54,8 +61,8 @@ public final class MpvUtil {
 
     private static MpvAndroidOptions buildAndroidOptions(File shaderCacheDirectory) {
         MpvAndroidOptions.Builder builder = new MpvAndroidOptions.Builder().setShaderCacheDirectory(shaderCacheDirectory).setAudioPassthroughEnabled(DecodeSetting.isAudioPassThrough()).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
+        builder.setVulkanEnabled(isVulkanSupported() && PlayerSetting.isMpvVulkan());
         builder.setGpuNextEnabled(PlayerSetting.isMpvGpuNext());
-        builder.setVulkanEnabled(PlayerSetting.isMpvVulkan());
         return builder.build();
     }
 
