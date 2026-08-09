@@ -77,7 +77,7 @@ public class Sub {
     }
 
     public boolean isEmpty() {
-        return getUrl().isEmpty();
+        return url == null || url.isEmpty();
     }
 
     public Uri getUri() {

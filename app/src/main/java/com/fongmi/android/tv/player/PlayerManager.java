@@ -291,6 +291,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void setSub(Sub sub) {
+        if (sub == null || sub.isEmpty()) return;
         if (spec != null) spec.setSub(sub);
         if (engine.addSubtitle(sub)) play();
         else startCurrent();

@@ -18,9 +18,9 @@ import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.utils.ResUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 public final class MediaItemFactory {
 
@@ -67,11 +67,11 @@ public final class MediaItemFactory {
     }
 
     private static List<MediaItem.SubtitleConfiguration> buildSubtitleConfigs(List<Sub> subs) {
-        List<MediaItem.SubtitleConfiguration> configs = new ArrayList<>();
-        if (subs == null || subs.isEmpty()) return configs;
-        SubtitleFlags flags = SubtitleFlags.create(subs);
-        for (int i = 0; i < subs.size(); i++) configs.add(buildSubConfig(subs.get(i), flags.get(subs.get(i), i)));
-        return configs;
+        if (subs == null) return List.of();
+        List<Sub> valid = subs.stream().filter(sub -> sub != null && !sub.isEmpty()).toList();
+        if (valid.isEmpty()) return List.of();
+        SubtitleFlags flags = SubtitleFlags.create(valid);
+        return IntStream.range(0, valid.size()).mapToObj(i -> buildSubConfig(valid.get(i), flags.get(valid.get(i), i))).toList();
     }
 
     public static MediaItem.SubtitleConfiguration buildSubConfig(Sub sub) {
