@@ -134,7 +134,8 @@ dependencies {
     implementation libs.permissionx
     implementation libs.simple.xml
     implementation libs.textdrawable
-    implementation "androidx.media3:media3-common:1.4.1"
+    implementation "androidx.media3:media3-exoplayer:1.4.1"
+    implementation "androidx.media3:media3-session:1.4.1"
     leanbackImplementation libs.leanback
     leanbackImplementation libs.androidautosize
     mobileImplementation libs.biometric
