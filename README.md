@@ -4,7 +4,7 @@
 
 [討論群組](https://t.me/fongmi_official) | [發布頻道](https://t.me/fongmi_release)
 
-[![Star History Chart](https://api.star-history.com/svg?repos=FongMi/TV&type=Date)](https://www.star-history.com/#FongMi/TV&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=FongMi/TV&type=Date)](https://star-history.dera.page/#FongMi/TV&Date)
 
 ---
 
