@@ -1,3 +1,6 @@
+import com.android.build.api.artifact.SingleArtifact
+import com.fongmi.gradle.AbiApkPackaging
+
 plugins {
     alias libs.plugins.android.application
 }
@@ -25,22 +28,14 @@ android {
         }
     }
 
-    flavorDimensions = ["mode", "abi"]
+    flavorDimensions = ["device"]
 
     productFlavors {
         leanback {
-            dimension "mode"
+            dimension "device"
         }
         mobile {
-            dimension "mode"
-        }
-        arm64_v8a {
-            dimension "abi"
-            ndk { abiFilters "arm64-v8a" }
-        }
-        armeabi_v7a {
-            dimension "abi"
-            ndk { abiFilters "armeabi-v7a" }
+            dimension "device"
         }
     }
 
@@ -88,16 +83,7 @@ android {
     }
 }
 
-androidComponents {
-    onVariants(selector().withBuildType('release')) { variant ->
-        def flavors = variant.productFlavors.collectEntries { [(it.first): it.second] }
-        def mode = flavors['mode'] ?: 'mode'
-        def abi = flavors['abi'] ?: 'abi'
-        variant.outputs.each { output ->
-            output.outputFileName.set("${mode}-${abi}.apk")
-        }
-    }
-}
+AbiApkPackaging.configure(project, SingleArtifact.APK.INSTANCE)
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
