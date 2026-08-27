@@ -527,25 +527,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     @Override
-    public void requestDetail(String key, String id) {
-        mViewModel.detailContent(key, id);
-    }
-
-    @Override
-    public void requestPlayer(VodPlayRequest request) {
-        mViewModel.playerContent(request);
+    public void onPlaybackRequested() {
         showProgress();
-    }
-
-    @Override
-    public void requestPreload(VodPlayRequest request) {
-        mViewModel.preloadContent(request);
-    }
-
-    @Override
-    public void requestSearch(List<Site> sites, String keyword) {
-        mQuickAdapter.clear();
-        mViewModel.searchContent(sites, keyword, true);
     }
 
     @Override
@@ -731,6 +714,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     @Override
     public void onSearchStarted(String keyword) {
+        mQuickAdapter.clear();
     }
 
     @Override

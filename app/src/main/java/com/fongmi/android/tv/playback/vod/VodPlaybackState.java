@@ -12,6 +12,7 @@ import com.fongmi.android.tv.bean.Vod;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class VodPlaybackState {
@@ -117,6 +118,30 @@ public class VodPlaybackState {
 
     boolean hasEpisode() {
         return hasFlags() && !getFlag().getEpisodes().isEmpty();
+    }
+
+    Episode getRelativeEpisode(int offset) {
+        List<Episode> episodes = getFlag().getEpisodes();
+        int position = Math.clamp(getFlag().getPosition() + offset, 0, episodes.size() - 1);
+        return episodes.get(position);
+    }
+
+    @Nullable
+    Episode findEpisode(String key, VodPlayRequest request) {
+        if (request == null) return null;
+        return flags.stream().map(flag -> findEpisode(key, flag, request)).filter(Objects::nonNull).findFirst().orElse(null);
+    }
+
+    @Nullable
+    Episode findEpisode(String key, Flag flag, VodPlayRequest request) {
+        if (flag == null || request == null) return null;
+        return flag.getEpisodes().stream().filter(episode -> request.matches(key, flag, episode)).findFirst().orElse(null);
+    }
+
+    @Nullable
+    Flag findFlag(String key, VodPlayRequest request) {
+        if (request == null) return null;
+        return flags.stream().filter(flag -> findEpisode(key, flag, request) != null).findFirst().orElse(null);
     }
 
     Result getQuality() {

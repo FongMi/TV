@@ -14,11 +14,13 @@ class VodFallbackPolicy {
     private final VodPlaybackController controller;
     private final VodPlaybackState state;
     private final VodPlaybackHost host;
+    private final VodDataSource dataSource;
 
-    VodFallbackPolicy(VodPlaybackController controller, VodPlaybackState state, VodPlaybackHost host) {
+    VodFallbackPolicy(VodPlaybackController controller, VodPlaybackState state, VodPlaybackHost host, VodDataSource dataSource) {
         this.controller = controller;
         this.state = state;
         this.host = host;
+        this.dataSource = dataSource;
     }
 
     void playbackError() {
@@ -42,15 +44,15 @@ class VodFallbackPolicy {
         state.setAutoFallback(autoFallback);
         state.setSelectFirstSource(autoFallback);
         host.onSearchStarted(keyword);
-        host.requestSearch(getSearchableSites(), keyword);
+        dataSource.searchContent(getSearchableSites(), keyword, true);
     }
 
     void onSearchResult(Result result) {
         List<Vod> items = new ArrayList<>(result.getList());
         items.removeIf(this::mismatch);
         state.setSources(items);
-        host.renderSources(state.getSources());
-        if (state.isSelectFirstSource()) nextSource();
+        if (state.isSelectFirstSource() && state.hasSources()) nextSource();
+        else host.renderSources(state.getSources());
         if (items.isEmpty()) return;
         host.onSearchResult();
     }

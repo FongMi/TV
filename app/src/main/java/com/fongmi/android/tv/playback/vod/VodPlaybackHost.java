@@ -6,7 +6,6 @@ import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
-import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 
 import java.util.List;
@@ -51,13 +50,7 @@ public interface VodPlaybackHost {
 
     void usePushId(String id);
 
-    void requestDetail(String key, String id);
-
-    void requestPlayer(VodPlayRequest request);
-
-    void requestPreload(VodPlayRequest request);
-
-    void requestSearch(List<Site> sites, String keyword);
+    void onPlaybackRequested();
 
     void prepareSource(Vod item);
 
