@@ -167,10 +167,16 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         intent.putExtra("cast", cast);
         intent.putExtra("mark", mark);
         intent.putExtra("name", name);
-        intent.putExtra("pic", pic);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
+        putPic(intent, pic);
         activity.startActivity(intent);
+    }
+
+    private static void putPic(Intent intent, String pic) {
+        intent.removeExtra("pic");
+        pic = ImgUtil.cache(pic);
+        if (!TextUtils.isEmpty(pic)) intent.putExtra("pic", pic);
     }
 
     private boolean isCast() {
@@ -505,8 +511,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void prepareSource(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
-        getIntent().putExtra("pic", item.getPic());
         getIntent().putExtra("id", item.getId());
+        putPic(getIntent(), item.getPic());
         mBinding.scroll.scrollTo(0, 0);
         mClock.setCallback(null);
         updateNavigationKey();

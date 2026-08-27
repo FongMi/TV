@@ -178,10 +178,16 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
         intent.putExtra("collect", collect);
         intent.putExtra("mark", mark);
         intent.putExtra("name", name);
-        intent.putExtra("pic", pic);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
+        putPic(intent, pic);
         activity.startActivity(intent);
+    }
+
+    private static void putPic(Intent intent, String pic) {
+        intent.removeExtra("pic");
+        pic = ImgUtil.cache(pic);
+        if (!TextUtils.isEmpty(pic)) intent.putExtra("pic", pic);
     }
 
     private String getName() {
@@ -545,10 +551,10 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     @Override
     public void prepareSource(Vod item) {
         getIntent().putExtra("key", item.getSiteKey());
-        getIntent().putExtra("pic", item.getPic());
         getIntent().putExtra("id", item.getId());
         mBinding.swipeLayout.setRefreshing(true);
         mBinding.swipeLayout.setEnabled(false);
+        putPic(getIntent(), item.getPic());
         mBinding.scroll.scrollTo(0, 0);
         mClock.setCallback(null);
         updateNavigationKey();

@@ -16,6 +16,7 @@ import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.setting.Setting;
+import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.List;
@@ -27,7 +28,12 @@ public final class MediaItemFactory {
     public static MediaMetadata buildMetadata(String title, String artist, String artUri, String displayName) {
         title = TextUtils.isEmpty(title) ? "" : title;
         artist = TextUtils.isEmpty(artist) ? "" : artist;
-        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setDisplayTitle(formatDisplayTitle(title, displayName)).setArtworkUri(TextUtils.isEmpty(artUri) ? null : Uri.parse(artUri)).build();
+        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setDisplayTitle(formatDisplayTitle(title, displayName)).setArtworkUri(getArtworkUri(artUri)).build();
+    }
+
+    public static Uri getArtworkUri(String artUri) {
+        artUri = ImgUtil.cache(artUri);
+        return TextUtils.isEmpty(artUri) ? null : Uri.parse(artUri);
     }
 
     public static String formatDisplayTitle(String title, String name) {

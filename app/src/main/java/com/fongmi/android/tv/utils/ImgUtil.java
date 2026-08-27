@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -25,19 +26,29 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.impl.CustomTarget;
+import com.fongmi.android.tv.server.Server;
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Json;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.google.common.net.HttpHeaders;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import jahirfiquitiva.libs.textdrawable.TextDrawable;
 
 public class ImgUtil {
 
+    private static final int MAX_CACHE_SIZE = 16 * 1024 * 1024;
+    private static final int MAX_DATA_URI_LENGTH = 8 * 1024 * 1024;
+    private static final Pattern IMAGE_MIME = Pattern.compile("image/[a-z0-9.+-]+");
     private static final Set<String> failed = Collections.synchronizedSet(new HashSet<>());
+    private static final Cache<String, Image> CACHE = CacheBuilder.newBuilder().maximumWeight(MAX_CACHE_SIZE).weigher((String key, Image value) -> value.data().length).build();
 
     public static void logo(ImageView view) {
         try {
@@ -91,6 +102,42 @@ public class ImgUtil {
         if (url.contains("@User-Agent=")) builder.addHeader(HttpHeaders.USER_AGENT, param = url.split("@User-Agent=")[1].split("@")[0]);
         url = param == null ? url : url.split("@")[0];
         return TextUtils.isEmpty(url) ? null : new GlideUrl(url, builder.build());
+    }
+
+    public static String cache(String url) {
+        if (!isData(url)) return url;
+        if (url.length() > MAX_DATA_URI_LENGTH) return "";
+        String key = Crypto.md5(url);
+        if (TextUtils.isEmpty(key)) return "";
+        if (CACHE.asMap().computeIfAbsent(key, ignored -> decode(url)) == null) return "";
+        String address = Server.get().getAddress("/image/" + key);
+        failed.remove(address);
+        return address;
+    }
+
+    private static boolean isData(String url) {
+        return !TextUtils.isEmpty(url) && url.regionMatches(true, 0, "data:", 0, 5);
+    }
+
+    private static Image decode(String url) {
+        try {
+            int comma = url.indexOf(',');
+            if (comma == -1) return null;
+            String metadata = url.substring(5, comma).toLowerCase(Locale.ROOT);
+            String mime = metadata.split(";", 2)[0];
+            if (!IMAGE_MIME.matcher(mime).matches() || !metadata.endsWith(";base64")) return null;
+            byte[] data = Base64.decode(url.substring(comma + 1), Base64.DEFAULT);
+            return data.length == 0 ? null : new Image(mime, data);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public static Image getImage(String key) {
+        return CACHE.getIfPresent(key);
+    }
+
+    public record Image(String mime, byte[] data) {
     }
 
     private static void addHeader(LazyHeaders.Builder builder, String header) {
