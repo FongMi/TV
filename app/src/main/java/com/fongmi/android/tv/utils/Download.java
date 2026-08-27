@@ -3,23 +3,33 @@ package com.fongmi.android.tv.utils;
 import com.fongmi.android.tv.App;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
-import com.google.common.net.HttpHeaders;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
+import okhttp3.Call;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class Download {
 
-    private final File file;
+    private static final int BUFFER_SIZE = 16 * 1024;
+
     private final String url;
+    private final File file;
+
+    private volatile Call call;
+    private volatile boolean canceled;
+
     private Callback callback;
     private Future<?> future;
+    private int lastProgress;
     private long maxBytes;
     private String tag;
 
@@ -50,58 +60,110 @@ public class Download {
     }
 
     public void start(Callback callback) {
+        this.lastProgress = -1;
+        this.canceled = false;
         this.callback = callback;
         future = Task.submit(this::doInBackground);
     }
 
     public Download cancel() {
+        canceled = true;
         if (future != null) future.cancel(true);
+        Call request = call;
+        if (request != null) request.cancel();
         OkHttp.cancel(tag);
         future = null;
         return this;
     }
 
     private void doInBackground() {
-        try (Response res = OkHttp.newCall(url, tag).execute()) {
-            download(res.body().byteStream(), getLength(res));
-            if (callback != null) App.post(() -> callback.success(file));
-        } catch (Exception e) {
-            Path.clear(file);
-            if (callback != null) App.post(() -> callback.error(e.getMessage()));
-            else throw new RuntimeException(e.getMessage(), e);
+        Call request = null;
+        try {
+            request = createCall();
+            execute(request);
+            postCallback(listener -> listener.success(file));
+        } catch (Exception error) {
+            handleError(error);
+        } finally {
+            clearCall(request);
         }
     }
 
-    private void download(InputStream is, double length) throws IOException {
-        if (length > maxBytes) throw new IOException("Download size limit exceeded");
-        try (BufferedInputStream input = new BufferedInputStream(is); FileOutputStream os = new FileOutputStream(Path.create(file))) {
-            byte[] buffer = new byte[16384];
+    private Call createCall() {
+        Call request = OkHttp.newCall(url, tag);
+        call = request;
+        return request;
+    }
+
+    private void execute(Call request) throws IOException {
+        checkCanceled();
+        try (Response response = request.execute()) {
+            checkCanceled();
+            validateResponse(response);
+            ResponseBody body = response.body();
+            write(body.byteStream(), body.contentLength());
+        }
+    }
+
+    private void validateResponse(Response response) throws IOException {
+        if (!response.isSuccessful()) throw new IOException("HTTP " + response.code() + " " + response.message());
+    }
+
+    private void write(InputStream stream, long length) throws IOException {
+        checkSize(length);
+        try (BufferedInputStream input = new BufferedInputStream(stream); FileOutputStream output = new FileOutputStream(Path.create(file))) {
+            byte[] buffer = new byte[BUFFER_SIZE];
             int readBytes;
             long totalBytes = 0;
             while ((readBytes = input.read(buffer)) != -1) {
-                if (Thread.interrupted()) return;
+                checkCanceled();
                 totalBytes += readBytes;
-                if (totalBytes > maxBytes) throw new IOException("Download size limit exceeded");
-                os.write(buffer, 0, readBytes);
-                if (length <= 0) continue;
-                int progress = (int) (totalBytes / length * 100.0);
-                if (callback != null) App.post(() -> callback.progress(progress));
+                checkSize(totalBytes);
+                output.write(buffer, 0, readBytes);
+                updateProgress(totalBytes, length);
             }
+            if (totalBytes == 0) throw new IOException("Empty download");
         }
     }
 
-    private double getLength(Response res) {
-        try {
-            String header = res.header(HttpHeaders.CONTENT_LENGTH);
-            return header != null ? Double.parseDouble(header) : -1;
-        } catch (Exception e) {
-            return -1;
-        }
+    private void checkCanceled() throws InterruptedIOException {
+        if (Thread.interrupted() || canceled) throw new InterruptedIOException();
+    }
+
+    private void checkSize(long size) throws IOException {
+        if (size > maxBytes) throw new IOException("Download size limit exceeded");
+    }
+
+    private void updateProgress(long totalBytes, long length) {
+        if (length <= 0) return;
+        int progress = Math.min(100, (int) (totalBytes * 100.0 / length));
+        if (progress == lastProgress) return;
+        lastProgress = progress;
+        postCallback(listener -> listener.progress(progress));
+    }
+
+    private void handleError(Exception error) {
+        if (!canceled) Path.clear(file);
+        if (callback == null) throw new RuntimeException(error.getMessage(), error);
+        postCallback(listener -> listener.error(error.getMessage()));
+    }
+
+    private void clearCall(Call request) {
+        if (call == request) call = null;
+    }
+
+    private void postCallback(Consumer<Callback> action) {
+        Callback current = callback;
+        if (current == null || canceled) return;
+        App.post(() -> {
+            if (!canceled && callback == current) action.accept(current);
+        });
     }
 
     public interface Callback {
 
-        void progress(int progress);
+        default void progress(int progress) {
+        }
 
         void error(String msg);
 

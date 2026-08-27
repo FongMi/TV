@@ -58,11 +58,11 @@ public class SubtitleApi {
         newDetailCall(id).enqueue(new ApiCallback<>(requestId, REQUEST_ID, response -> parseDetail(read(response)), success, error));
     }
 
-    public static void loadArchive(SubtitleSearchItem item, Consumer<List<SubtitleSearchItem>> success, Consumer<Exception> error) {
+    public static void loadSubtitle(SubtitleSearchItem item, Consumer<List<SubtitleSearchItem>> success, Consumer<Exception> error) {
         int requestId = begin();
-        Download task = SubtitleArchive.createDownload(item.getUrl()).tag(TAG);
+        Download task = SubtitleArchive.createDownload(item.getName(), item.getUrl()).tag(TAG);
         download = task;
-        task.start(new ArchiveCallback(task, requestId, item, success, error));
+        task.start(new SubtitleDownloadCallback(task, requestId, item, success, error));
     }
 
     private static void cancelDownload() {
@@ -113,6 +113,11 @@ public class SubtitleApi {
         ApiCallback.post(requestId, REQUEST_ID, () -> success.accept(items));
     }
 
+    private static void completeDownload(int requestId, SubtitleSearchItem item, File file, Consumer<List<SubtitleSearchItem>> success) {
+        SubtitleSearchItem local = SubtitleSearchItem.from(item.getId(), item.getName(), file.getAbsolutePath(), item.getLang());
+        ApiCallback.post(requestId, REQUEST_ID, () -> success.accept(List.of(local)));
+    }
+
     private static String read(Response response) throws IOException {
         String text = response.body().string();
         if (!response.isSuccessful()) throw new IOException("HTTP " + response.code() + " " + response.message());
@@ -161,11 +166,7 @@ public class SubtitleApi {
         return "";
     }
 
-    private record ArchiveCallback(Download task, int requestId, SubtitleSearchItem item, Consumer<List<SubtitleSearchItem>> success, Consumer<Exception> error) implements Download.Callback {
-
-        @Override
-        public void progress(int progress) {
-        }
+    private record SubtitleDownloadCallback(Download task, int requestId, SubtitleSearchItem item, Consumer<List<SubtitleSearchItem>> success, Consumer<Exception> error) implements Download.Callback {
 
         @Override
         public void error(String msg) {
@@ -178,7 +179,8 @@ public class SubtitleApi {
         public void success(File file) {
             if (download != task) return;
             download = null;
-            Task.execute(() -> unzip(requestId, item, file, success));
+            if (item.isZip()) Task.execute(() -> unzip(requestId, item, file, success));
+            else completeDownload(requestId, item, file, success);
         }
     }
 }

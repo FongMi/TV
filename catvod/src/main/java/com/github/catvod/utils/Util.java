@@ -51,11 +51,6 @@ public class Util {
         return bytes;
     }
 
-    @Deprecated
-    public static String md5(String text) {
-        return Crypto.md5(text);
-    }
-
     public static boolean containOrMatch(String text, String regex) {
         try {
             return text.contains(regex) || text.matches(regex);

@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.utils.SubtitleArchive;
+import com.fongmi.android.tv.utils.UrlUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,7 +63,12 @@ public final class SubtitleSearchItem {
         return SubtitleArchive.isZip(getName(), getUrl());
     }
 
+    public boolean isRemote() {
+        String scheme = UrlUtil.scheme(getUrl());
+        return scheme.equals("http") || scheme.equals("https");
+    }
+
     public Sub toSub() {
-        return Sub.from(getName(), getUrl(), getLang(), TrackUtil.getSubtitleMimeType(getName()));
+        return Sub.from(getName(), getUrl(), getLang(), TrackUtil.getSubtitleMimeType(getUrl()));
     }
 }

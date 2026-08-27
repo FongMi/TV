@@ -1,9 +1,7 @@
 package com.fongmi.android.tv.utils;
 
-import android.text.TextUtils;
-
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Util;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -28,16 +26,12 @@ public final class SubtitleArchive {
         return isSubtitle(name) || isSubtitle(url) || isZip(name, url);
     }
 
-    public static File getFile(String url) {
-        return Path.cache(CACHE_DIR + getKey(url) + ZIP);
-    }
-
     public static File getDir(String url) {
         return Path.cache(CACHE_DIR + getKey(url));
     }
 
-    public static Download createDownload(String url) {
-        return Download.create(url, getFile(url)).maxBytes(MAX_DOWNLOAD_BYTES);
+    public static Download createDownload(String name, String url) {
+        return Download.create(url, getFile(name, url)).maxBytes(MAX_DOWNLOAD_BYTES);
     }
 
     public static List<File> unzip(File archive, File dir) {
@@ -55,7 +49,19 @@ public final class SubtitleArchive {
     }
 
     private static String getKey(String url) {
-        return Util.md5(stripUrlSuffix(url));
+        return Crypto.md5(url);
+    }
+
+    private static File getFile(String name, String url) {
+        boolean archive = isZip(name, url);
+        String extension = archive ? ZIP : getSubtitleExtension(name, url);
+        return Path.cache(CACHE_DIR + getKey(url) + extension);
+    }
+
+    private static String getSubtitleExtension(String name, String url) {
+        for (String extension : EXTENSIONS) if (hasExtension(name, extension)) return extension;
+        for (String extension : EXTENSIONS) if (hasExtension(url, extension)) return extension;
+        return "";
     }
 
     private static boolean isSubtitle(File file) {
@@ -68,14 +74,14 @@ public final class SubtitleArchive {
     }
 
     private static boolean hasExtension(String text, String extension) {
-        if (TextUtils.isEmpty(text)) return false;
+        if (text == null || text.isEmpty()) return false;
         String lower = text.trim().toLowerCase(Locale.ROOT);
         if (lower.contains("://")) lower = stripUrlSuffix(lower);
         return lower.endsWith(extension);
     }
 
     private static String stripUrlSuffix(String url) {
-        if (TextUtils.isEmpty(url)) return "";
+        if (url == null || url.isEmpty()) return "";
         int query = url.indexOf('?');
         int fragment = url.indexOf('#');
         int end = query < 0 ? url.length() : query;
