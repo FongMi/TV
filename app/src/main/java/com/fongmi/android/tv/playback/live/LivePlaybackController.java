@@ -18,12 +18,14 @@ import com.fongmi.android.tv.setting.LiveSetting;
 
 public class LivePlaybackController {
 
-    private final LivePlaybackState state;
     private final LivePlaybackHost host;
+    private final LiveDataSource dataSource;
+    private final LivePlaybackState state;
 
-    public LivePlaybackController(LivePlaybackHost host, LivePlaybackState state) {
-        this.state = state;
+    public LivePlaybackController(LivePlaybackHost host, LiveDataSource dataSource, LivePlaybackState state) {
         this.host = host;
+        this.dataSource = dataSource;
+        this.state = state;
     }
 
     public void reset() {
@@ -223,8 +225,9 @@ public class LivePlaybackController {
         state.setPendingRequest(request);
         host.stopPlaybackForRefresh();
         publishPlaybackMetadata(getEpgData(request));
-        host.requestUrl(request);
+        if (request.isCatchup()) host.onCatchupRequested();
         if (showProgress) host.showProgress();
+        dataSource.getUrl(request);
     }
 
     private EpgData getEpgData(LivePlayRequest request) {

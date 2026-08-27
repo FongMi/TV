@@ -13,6 +13,7 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.playback.PlaybackResult;
+import com.fongmi.android.tv.playback.live.LiveDataSource;
 import com.fongmi.android.tv.playback.live.LivePlayRequest;
 import com.fongmi.android.tv.playback.live.LivePlaybackController;
 import com.fongmi.android.tv.playback.live.LivePlaybackHost;
@@ -22,7 +23,7 @@ import java.time.ZoneId;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 
-public class LiveViewModel extends ViewModel {
+public class LiveViewModel extends ViewModel implements LiveDataSource {
 
     private final MutableLiveData<PlaybackResult<LivePlayRequest>> playback;
     private final MutableLiveData<String> error;
@@ -70,7 +71,7 @@ public class LiveViewModel extends ViewModel {
     }
 
     public LivePlaybackController createPlaybackController(LivePlaybackHost host) {
-        return new LivePlaybackController(host, playbackState);
+        return new LivePlaybackController(host, this, playbackState);
     }
 
     public void parse(Live item) {
@@ -92,6 +93,7 @@ public class LiveViewModel extends ViewModel {
         execute(TaskType.EPG, () -> LiveApi.getEpg(item, zoneId), epg::postValue, error -> epg.postValue(new Epg()));
     }
 
+    @Override
     public void getUrl(LivePlayRequest request) {
         execute(TaskType.URL, () -> getUrlResult(request), result -> postUrl(request, result), error -> handleUrlError(request, error));
     }

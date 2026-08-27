@@ -711,9 +711,8 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     @Override
-    public void requestUrl(LivePlayRequest request) {
-        if (request.isCatchup()) hideUI();
-        mViewModel.getUrl(request);
+    public void onCatchupRequested() {
+        hideUI();
     }
 
     @Override
