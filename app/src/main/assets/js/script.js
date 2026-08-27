@@ -186,10 +186,15 @@ function confirmUpload(yes) {
         data: formData,
         processData: false,
         contentType: false,
+        success: function () {
+            listFile(currentRoot);
+        },
+        error: function () {
+            warnToast('上傳失敗');
+        },
         complete: function () {
             $('#loadingToast').hide();
             $('#file_uploader').val('');
-            listFile(currentRoot);
         }
     });
 }
