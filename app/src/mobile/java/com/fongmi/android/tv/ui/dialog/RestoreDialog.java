@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogRestoreBinding;
-import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.db.BackupManager;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.ui.adapter.RestoreAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
@@ -50,7 +50,7 @@ public class RestoreDialog extends BaseBottomSheetDialog implements RestoreAdapt
 
     @Override
     public void onItemClick(File item) {
-        AppDatabase.restore(item, callback);
+        BackupManager.restore(item, callback);
         dismiss();
     }
 

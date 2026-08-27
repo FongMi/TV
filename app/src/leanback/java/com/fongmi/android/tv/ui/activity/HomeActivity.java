@@ -37,7 +37,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Style;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.databinding.ActivityHomeBinding;
-import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.db.BackupManager;
 import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.ConfigEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
@@ -482,7 +482,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         DLNARendererService.stop(this);
         LiveConfig.get().clear();
         VodConfig.get().clear();
-        AppDatabase.backup();
+        BackupManager.backup();
         OkHttp.get().clear();
         Source.get().exit();
         Server.get().stop();

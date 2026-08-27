@@ -18,7 +18,7 @@
         android:singleLine="true"
         android:textColor="@color/white"
         android:textSize="18sp"
-        tools:text="tv-2024-12-26.bk.gz" />
+        tools:text="2024-12-26.tv" />
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/delete"

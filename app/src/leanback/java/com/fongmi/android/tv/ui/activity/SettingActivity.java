@@ -17,7 +17,7 @@ import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.ActivitySettingBinding;
-import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.db.BackupManager;
 import com.fongmi.android.tv.event.ConfigEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
@@ -281,7 +281,7 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
     }
 
     private void onBackup(View view) {
-        PermissionUtil.requestFile(this, allGranted -> AppDatabase.backup(new Callback() {
+        PermissionUtil.requestFile(this, allGranted -> BackupManager.backup(new Callback() {
             @Override
             public void success() {
                 Notify.show(R.string.backup_success);
