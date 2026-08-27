@@ -6,7 +6,8 @@
     android:orientation="vertical"
     android:paddingStart="24dp"
     android:paddingTop="16dp"
-    android:paddingEnd="24dp">
+    android:paddingEnd="24dp"
+    android:paddingBottom="16dp">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/input"
@@ -27,4 +28,14 @@
             android:maxLines="4" />
 
     </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:lineSpacingExtra="2dp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="12sp" />
+
 </androidx.appcompat.widget.LinearLayoutCompat>

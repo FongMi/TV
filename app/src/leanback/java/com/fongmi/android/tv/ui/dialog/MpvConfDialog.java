@@ -1,5 +1,8 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import static androidx.appcompat.R.attr.colorError;
+import static com.google.android.material.R.attr.colorOnSurfaceVariant;
+
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -7,16 +10,22 @@ import android.view.inputmethod.EditorInfo;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogMpvConfBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.ui.custom.CustomTextListener;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.QRCode;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
+
+import java.util.List;
 
 public class MpvConfDialog extends BaseAlertDialog {
 
@@ -39,6 +48,7 @@ public class MpvConfDialog extends BaseAlertDialog {
     @Override
     protected void initView() {
         setText(MpvConfigFile.read());
+        updateConflictHint(binding.text.getText());
         binding.code.setImageBitmap(QRCode.getBitmap(Server.get().getAddress(4), 200, 0));
     }
 
@@ -50,6 +60,12 @@ public class MpvConfDialog extends BaseAlertDialog {
             if (actionId == EditorInfo.IME_ACTION_DONE) binding.positive.performClick();
             return true;
         });
+        binding.text.addTextChangedListener(new CustomTextListener() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateConflictHint(s);
+            }
+        });
     }
 
     private void setText(String text) {
@@ -57,9 +73,17 @@ public class MpvConfDialog extends BaseAlertDialog {
         binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
     }
 
+    private void updateConflictHint(CharSequence text) {
+        List<String> conflicts = MpvConfigFile.findInterfaceManagedOptions(text);
+        boolean hasConflicts = !conflicts.isEmpty();
+        int color = hasConflicts ? colorError : colorOnSurfaceVariant;
+        binding.hint.setTextColor(MaterialColors.getColor(binding.hint, color));
+        binding.hint.setText(hasConflicts ? getString(R.string.player_mpv_conf_conflict_hint, TextUtils.join(", ", conflicts)) : getString(R.string.player_mpv_conf_priority_hint));
+    }
+
     private void onPositive(View view) {
-        MpvConfigFile.write(binding.text.getText().toString());
-        dismiss();
+        if (MpvConfigFile.write(binding.text.getText().toString())) dismiss();
+        else Notify.show(R.string.player_mpv_conf_save_failed);
     }
 
     private void onNegative(View view) {

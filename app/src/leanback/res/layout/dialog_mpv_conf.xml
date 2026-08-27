@@ -64,4 +64,15 @@
             android:textSize="14sp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/code"
+        android:layout_marginTop="12dp"
+        android:lineSpacingExtra="2dp"
+        android:textColor="?attr/colorOnSurfaceVariant"
+        android:textSize="14sp" />
+
 </RelativeLayout>
