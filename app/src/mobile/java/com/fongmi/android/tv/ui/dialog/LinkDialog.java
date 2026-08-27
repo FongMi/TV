@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.View;
@@ -65,9 +65,11 @@ public class LinkDialog extends BaseAlertDialog {
         dismiss();
     }
 
-    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) return;
-        VideoActivity.file(requireActivity(), FileChooser.getPathFromUri(result.getData().getData()));
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> FileChooser.getUri(result, this::openFile));
+
+    private void openFile(Uri uri) {
+        if (!isAdded()) return;
+        VideoActivity.file(requireActivity(), uri);
         dismiss();
-    });
+    }
 }

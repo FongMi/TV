@@ -1,7 +1,7 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +21,7 @@ import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.ui.adapter.DanmakuAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
+import com.fongmi.android.tv.utils.FileUtil;
 
 public final class DanmakuDialog extends BaseBottomSheetDialog implements DanmakuAdapter.OnClickListener {
 
@@ -90,9 +91,11 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
         dismiss();
     }
 
-    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() != Activity.RESULT_OK || result.getData() == null || result.getData().getData() == null) return;
-        player.setDanmaku(Danmaku.from(FileChooser.getPathFromUri(result.getData().getData())));
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> FileChooser.getUri(result, this::setDanmaku));
+
+    private void setDanmaku(Uri uri) {
+        if (!isAdded()) return;
+        player.setDanmaku(Danmaku.from(FileUtil.getDisplayName(uri), uri.toString()));
         dismiss();
-    });
+    }
 }

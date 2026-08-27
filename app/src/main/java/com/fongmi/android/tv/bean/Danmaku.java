@@ -30,10 +30,14 @@ public class Danmaku {
         return items == null ? Collections.emptyList() : items;
     }
 
-    public static Danmaku from(String path) {
+    public static Danmaku from(String url) {
+        return from(url, url);
+    }
+
+    public static Danmaku from(String name, String url) {
         Danmaku danmaku = new Danmaku();
-        danmaku.setName(path);
-        danmaku.setUrl(path);
+        danmaku.name = name;
+        danmaku.url = url;
         return danmaku;
     }
 
@@ -41,16 +45,8 @@ public class Danmaku {
         return TextUtils.isEmpty(name) ? getUrl() : name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getUrl() {
         return TextUtils.isEmpty(url) ? "" : url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
     }
 
     public boolean isSelected() {

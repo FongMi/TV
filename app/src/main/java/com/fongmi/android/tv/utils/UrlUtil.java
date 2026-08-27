@@ -1,8 +1,11 @@
 package com.fongmi.android.tv.utils;
 
+import android.content.ContentResolver;
 import android.net.Uri;
+import android.text.TextUtils;
 
 import com.fongmi.android.tv.server.Server;
+import com.github.catvod.utils.Path;
 import com.github.catvod.utils.UriUtil;
 import com.google.common.net.HttpHeaders;
 
@@ -40,6 +43,13 @@ public class UrlUtil {
     public static String path(Uri uri) {
         String path = uri.getLastPathSegment();
         return path == null ? "" : path.trim();
+    }
+
+    public static String toLocalUrl(Uri uri) {
+        String path = uri.getPath();
+        String root = Path.rootPath();
+        if (!ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme()) || TextUtils.isEmpty(path) || !path.startsWith(root + File.separator)) return uri.toString();
+        return "file://" + path.substring(root.length() + 1);
     }
 
     public static String resolve(String baseUri, String referenceUri) {

@@ -156,9 +156,9 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void checkType(Intent intent) {
         if ("text/plain".equals(intent.getType()) || UrlUtil.path(intent.getData()).endsWith(".m3u")) {
-            loadLive("file:/" + FileChooser.getPathFromUri(intent.getData()));
+            FileChooser.getUri(intent, uri -> loadLive(UrlUtil.toLocalUrl(uri)));
         } else {
-            VideoActivity.push(this, intent.getData().toString());
+            FileChooser.getUri(intent, uri -> VideoActivity.file(this, uri));
         }
     }
 
@@ -225,6 +225,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     }
 
     private void loadLive(String url) {
+        if (isFinishing() || isDestroyed()) return;
         LiveConfig.load(Config.find(url, 1), new Callback() {
             @Override
             public void success() {
