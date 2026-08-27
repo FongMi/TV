@@ -29,6 +29,13 @@
             app:singleSelection="true">
 
             <com.google.android.material.chip.Chip
+                android:id="@+id/secondaryDefault"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/subtitle_secondary_default" />
+
+            <com.google.android.material.chip.Chip
                 android:id="@+id/secondaryOff"
                 style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
@@ -67,14 +74,24 @@
             android:text="@string/subtitle_secondary_track_select"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/secondaryTrackGroup"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingHorizontal="24dp"
-            app:chipSpacingVertical="0dp"
-            app:selectionRequired="true"
-            app:singleSelection="true" />
+            android:fillViewport="false"
+            android:focusable="false"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/secondaryTrackGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                app:chipSpacingVertical="0dp"
+                app:selectionRequired="true"
+                app:singleLine="true"
+                app:singleSelection="true" />
+
+        </HorizontalScrollView>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 

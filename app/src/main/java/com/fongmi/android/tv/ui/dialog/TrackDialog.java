@@ -35,7 +35,6 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public final class TrackDialog extends BaseBottomSheetDialog implements TrackAdapter.OnClickListener {
@@ -166,7 +165,7 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
 
     @Override
     public void onItemClick(Track item) {
-        player.setTrack(Arrays.asList(item.key(player.getKey()).save()));
+        player.setTrack(item.key(player.getKey()).save());
         dismiss();
     }
 

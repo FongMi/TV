@@ -13,6 +13,7 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogSubtitleSettingBinding;
 import com.fongmi.android.tv.player.PlayerManager;
+import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 
@@ -50,6 +51,7 @@ public final class SubtitleSettingDialog {
 
         private final SubtitleView subtitleView;
         private final PlayerManager player;
+        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
         private DialogSubtitleSettingBinding binding;
         private SubtitleSettingPanel panel;
 
@@ -70,8 +72,12 @@ public final class SubtitleSettingDialog {
 
         @Override
         protected void initView() {
-            panel = new SubtitleSettingPanel(binding, subtitleView, player);
+            panel = new SubtitleSettingPanel(binding, subtitleView, player, fontSelector);
             panel.bind();
+        }
+
+        private void onFontSelected(@Nullable ExternalFont.Item font) {
+            if (panel != null) panel.onFontSelected(font);
         }
 
         @Override
@@ -82,7 +88,7 @@ public final class SubtitleSettingDialog {
 
         @Override
         public void onDestroyView() {
-            if (panel != null) panel.release();
+            fontSelector.release();
             panel = null;
             binding = null;
             super.onDestroyView();
@@ -93,6 +99,7 @@ public final class SubtitleSettingDialog {
 
         private final SubtitleView subtitleView;
         private final PlayerManager player;
+        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
         private DialogSubtitleSettingBinding binding;
         private SubtitleSettingPanel panel;
 
@@ -113,8 +120,12 @@ public final class SubtitleSettingDialog {
 
         @Override
         protected void initView() {
-            panel = new SubtitleSettingPanel(binding, subtitleView, player);
+            panel = new SubtitleSettingPanel(binding, subtitleView, player, fontSelector);
             panel.bind();
+        }
+
+        private void onFontSelected(@Nullable ExternalFont.Item font) {
+            if (panel != null) panel.onFontSelected(font);
         }
 
         @Override
@@ -125,7 +136,7 @@ public final class SubtitleSettingDialog {
 
         @Override
         public void onDestroyView() {
-            if (panel != null) panel.release();
+            fontSelector.release();
             panel = null;
             binding = null;
             super.onDestroyView();

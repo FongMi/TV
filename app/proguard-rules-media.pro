@@ -27,6 +27,11 @@
     native <methods>;
 }
 
+# libmedia3ass resolves these classes and constructors by their binary names.
+-keep class androidx.media3.exoplayer.libass.LibassNative { *; }
+-keep class androidx.media3.exoplayer.libass.LibassFrame { *; }
+-keep class androidx.media3.exoplayer.libass.LibassImage { *; }
+
 -keep, includedescriptorclasses class androidx.media3.decoder.ffmpeg.FfmpegAudioDecoder {
   private java.nio.ByteBuffer growOutputBuffer(androidx.media3.decoder.SimpleDecoderOutputBuffer, int, int);
 }
@@ -61,6 +66,11 @@
 -dontnote androidx.media3.decoder.ffmpeg.FfmpegVideoRenderer
 -keepclassmembers class androidx.media3.decoder.ffmpeg.FfmpegVideoRenderer {
   <init>(android.content.Context, long, android.os.Handler, androidx.media3.exoplayer.video.VideoRendererEventListener, int);
+}
+
+-dontnote androidx.media3.decoder.ffmpeg.FfmpegDolbyVisionP7Converter$Factory
+-keep class androidx.media3.decoder.ffmpeg.FfmpegDolbyVisionP7Converter$Factory {
+  <init>();
 }
 
 -dontnote androidx.media3.decoder.opus.LibopusAudioRenderer

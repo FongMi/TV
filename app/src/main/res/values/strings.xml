@@ -159,7 +159,13 @@
     <string name="subtitle_offset">Subtitle offset</string>
     <string name="subtitle_size">Size</string>
     <string name="subtitle_position">Position</string>
-    <string name="subtitle_style_source">Style source</string>
+    <string name="subtitle_style">Style</string>
+    <string name="playback_font">Font</string>
+    <string name="playback_font_default">System default</string>
+    <string name="playback_font_import">Import font</string>
+    <string name="playback_font_imported">Font imported: %1$s</string>
+    <string name="playback_font_import_failed">Unable to import font</string>
+    <string name="playback_font_load_failed">Unable to load fonts</string>
     <string name="subtitle_style_original">Original</string>
     <string name="subtitle_style_system">System</string>
     <string name="subtitle_style_custom">Custom</string>
@@ -177,6 +183,7 @@
     <string name="subtitle_background">Background</string>
     <string name="subtitle_background_opacity">Background transparency</string>
     <string name="subtitle_secondary_track">Secondary subtitles</string>
+    <string name="subtitle_secondary_default">Default</string>
     <string name="subtitle_secondary_off">Off</string>
     <string name="subtitle_secondary_auto">Auto</string>
     <string name="subtitle_secondary_select">Select</string>
@@ -282,7 +289,7 @@
     <string name="player">Player</string>
     <string name="player_engine">Engine</string>
     <string name="player_debug">Debug</string>
-    <string name="player_render">Render</string>
+    <string name="player_render">Video output</string>
     <string name="player_scale">Scale</string>
     <string name="player_libass">libass</string>
     <string name="player_background">Background play</string>
@@ -306,7 +313,11 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
+    <string name="player_mpv_conf_priority_hint">Priority: player settings &gt; mpv.conf &gt; Android defaults. Reopen playback after saving.</string>
+    <string name="player_mpv_conf_conflict_hint">Overridden by player settings: %1$s\nThe values remain in mpv.conf. Reopen playback after saving.</string>
     <string name="player_mpv_conf_import_success">Imported mpv.conf</string>
+    <string name="player_mpv_conf_import_failed">Unable to import mpv.conf</string>
+    <string name="player_mpv_conf_save_failed">Unable to save mpv.conf</string>
     <string name="player_ua">User-Agent</string>
 
     <!-- Danmaku -->
@@ -333,6 +344,7 @@
 
     <!-- Error -->
     <string name="error_config_get">Configuration get failed</string>
+    <string name="error_file_open">Unable to open file</string>
     <string name="error_play_next">It\'s the last episode!</string>
     <string name="error_play_prev">It\'s the first episode!</string>
     <string name="error_play_parse">Unable to parse url</string>

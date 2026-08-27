@@ -2,8 +2,11 @@ package com.fongmi.android.tv.player.exo;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MimeTypes;
@@ -14,12 +17,16 @@ import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.LoadControl;
+import androidx.media3.exoplayer.Renderer;
 import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.analytics.PlayerId;
 import androidx.media3.exoplayer.audio.AudioSink;
 import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider;
 import androidx.media3.exoplayer.audio.DefaultAudioSink;
+import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
+import androidx.media3.exoplayer.text.TextOutput;
+import androidx.media3.exoplayer.text.TextRenderer;
 import androidx.media3.exoplayer.trackselection.DecodeTrackSelector;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 import androidx.media3.exoplayer.util.EventLogger;
@@ -32,11 +39,12 @@ import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ExoUtil {
+public final class ExoUtil {
 
     public static ExoPlayer buildPlayer(Player.Listener listener, DefaultPreloadManager.Builder preloadManagerBuilder) {
         ExoPlayer.Builder playerBuilder = new ExoPlayer.Builder(App.get()).setSkipSilenceEnabled(SpeedSetting.isSkipSilence());
@@ -49,10 +57,13 @@ public class ExoUtil {
         return player;
     }
 
+    @Nullable
     public static String getMimeType(int errorCode) {
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED || errorCode == PlaybackException.ERROR_CODE_IO_UNSPECIFIED) return MimeTypes.APPLICATION_M3U8;
-        if (errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED || errorCode == PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED) return MimeTypes.APPLICATION_OCTET_STREAM;
-        return null;
+        return switch (errorCode) {
+            case PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED, PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED, PlaybackException.ERROR_CODE_IO_UNSPECIFIED -> MimeTypes.APPLICATION_M3U8;
+            case PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED, PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED -> MimeTypes.APPLICATION_OCTET_STREAM;
+            default -> null;
+        };
     }
 
     static LoadControl buildLoadControl(int maxPreloadBufferBytes) {
@@ -93,23 +104,51 @@ public class ExoUtil {
     }
 
     static RenderersFactory buildRenderersFactory() {
-        return buildRenderersFactory(null);
+        return new ExoRenderersFactory(null, null, null);
     }
 
-    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor) {
-        DefaultRenderersFactory factory = new DefaultRenderersFactory(App.get()) {
-            @Override
-            protected AudioSink buildAudioSink(@NonNull Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams) {
-                return ExoUtil.buildAudioSink(context, enableFloatOutput, enableAudioOutputPlaybackParams, audioProcessor);
-            }
-        };
-        return factory.setEnableDecoderFallback(true).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor, TextOutput secondaryTextOutput, LibassPlaybackSession libassPlaybackSession) {
+        return new ExoRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession);
     }
 
-    private static AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams, AudioProcessor audioProcessor) {
+    private static AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams, @Nullable AudioProcessor audioProcessor) {
         DefaultAudioSink.Builder builder = new DefaultAudioSink.Builder(context).setEnableFloatOutput(enableFloatOutput).setEnableAudioOutputPlaybackParameters(enableAudioOutputPlaybackParams);
         if (!DecodeSetting.isAudioPassThrough()) builder.setAudioOutputProvider(new AudioTrackAudioOutputProvider.Builder(null).build());
         if (audioProcessor != null) builder.setAudioProcessors(new AudioProcessor[]{audioProcessor});
         return builder.build();
+    }
+
+    private static final class ExoRenderersFactory extends DefaultRenderersFactory {
+
+        @Nullable private final AudioProcessor audioProcessor;
+        @Nullable private final TextOutput secondaryTextOutput;
+        @Nullable private final LibassPlaybackSession libassPlaybackSession;
+
+        private ExoRenderersFactory(@Nullable AudioProcessor audioProcessor, @Nullable TextOutput secondaryTextOutput, @Nullable LibassPlaybackSession libassPlaybackSession) {
+            super(App.get());
+            this.audioProcessor = audioProcessor;
+            this.secondaryTextOutput = secondaryTextOutput;
+            this.libassPlaybackSession = libassPlaybackSession;
+            setEnableDecoderFallback(true);
+            setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);
+            setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
+        }
+
+        @Override
+        protected AudioSink buildAudioSink(@NonNull Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams) {
+            return ExoUtil.buildAudioSink(context, enableFloatOutput, enableAudioOutputPlaybackParams, audioProcessor);
+        }
+
+        @Override
+        protected void buildMiscellaneousRenderers(@NonNull Context context, @NonNull Handler eventHandler, int extensionRendererMode, @NonNull ArrayList<Renderer> out) {
+            super.buildMiscellaneousRenderers(context, eventHandler, extensionRendererMode, out);
+            if (libassPlaybackSession != null && libassPlaybackSession.isAvailable()) out.add(libassPlaybackSession.createClockRenderer());
+        }
+
+        @Override
+        protected void buildTextRenderers(@NonNull Context context, @NonNull TextOutput output, @NonNull Looper outputLooper, int extensionRendererMode, @NonNull ArrayList<Renderer> out) {
+            super.buildTextRenderers(context, output, outputLooper, extensionRendererMode, out);
+            if (secondaryTextOutput != null) out.add(new TextRenderer(secondaryTextOutput, outputLooper));
+        }
     }
 }

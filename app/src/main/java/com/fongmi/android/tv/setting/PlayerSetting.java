@@ -42,6 +42,14 @@ public class PlayerSetting {
         Prefers.put("player_debug", debug);
     }
 
+    public static boolean isLibass() {
+        return Prefers.getBoolean("player_libass", true);
+    }
+
+    public static void putLibass(boolean libass) {
+        Prefers.put("player_libass", libass);
+    }
+
     public static boolean isMpvGpuNext() {
         return Prefers.getBoolean("mpv_gpu_next");
     }

@@ -51,11 +51,11 @@ public class TrackUtil {
     }
 
     public static void reset(Player player) {
-        TrackSelectionParameters.Builder builder = player.getTrackSelectionParameters().buildUpon().clearOverrides();
-        builder.setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, false);
-        builder.setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false);
-        builder.setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false);
-        player.setTrackSelectionParameters(builder.build());
+        player.setTrackSelectionParameters(createResetBuilder(player).build());
+    }
+
+    private static TrackSelectionParameters.Builder createResetBuilder(Player player) {
+        return player.getTrackSelectionParameters().buildUpon().clearOverrides().setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, false).setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false).setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false);
     }
 
     private static TrackInfo find(Player player, Track track) {
@@ -73,23 +73,32 @@ public class TrackUtil {
         return null;
     }
 
+    public static void setTrackSelection(Player player, Track track) {
+        applyTrackSelection(player, player.getTrackSelectionParameters().buildUpon(), List.of(track));
+    }
+
     public static void setTrackSelection(Player player, List<Track> tracks) {
-        Map<Integer, TrackGroup> mediaGroupMapByType = new HashMap<>();
-        Map<Integer, Integer> selectedIndexMapByType = new HashMap<>();
-        for (Track track : tracks) {
-            TrackInfo info = find(player, track);
-            if (info == null) continue;
-            int type = info.trackGroup.getType();
-            mediaGroupMapByType.put(type, info.trackGroup.getMediaTrackGroup());
-            if (track.isSelected()) selectedIndexMapByType.put(type, info.trackIndex);
-        }
-        TrackSelectionParameters.Builder builder = player.getTrackSelectionParameters().buildUpon();
-        mediaGroupMapByType.forEach((type, mediaGroup) -> {
-            Integer selectedIndex = selectedIndexMapByType.get(type);
-            List<Integer> indices = selectedIndex != null ? List.of(selectedIndex) : List.of();
-            builder.setOverrideForType(new TrackSelectionOverride(mediaGroup, indices));
-        });
+        applyTrackSelection(player, createResetBuilder(player), tracks);
+    }
+
+    private static void applyTrackSelection(Player player, TrackSelectionParameters.Builder builder, List<Track> tracks) {
+        Map<Integer, TrackSelectionOverride> overridesByType = new HashMap<>();
+        tracks.forEach(track -> putOverride(player, track, overridesByType));
+        overridesByType.values().forEach(builder::setOverrideForType);
         player.setTrackSelectionParameters(builder.build());
+    }
+
+    private static void putOverride(Player player, Track track, Map<Integer, TrackSelectionOverride> overridesByType) {
+        TrackInfo info = find(player, track);
+        if (info == null) return;
+        TrackSelectionOverride override = createOverride(track, info);
+        if (track.isSelected()) overridesByType.put(override.getType(), override);
+        else overridesByType.putIfAbsent(override.getType(), override);
+    }
+
+    private static TrackSelectionOverride createOverride(Track track, TrackInfo info) {
+        TrackGroup group = info.trackGroup.getMediaTrackGroup();
+        return track.isSelected() ? new TrackSelectionOverride(group, info.trackIndex) : new TrackSelectionOverride(group, List.of());
     }
 
     private record TrackInfo(Tracks.Group trackGroup, int trackIndex) {

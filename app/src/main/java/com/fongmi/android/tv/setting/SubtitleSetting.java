@@ -2,6 +2,7 @@ package com.fongmi.android.tv.setting;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.view.accessibility.CaptioningManager;
 
@@ -9,16 +10,19 @@ import androidx.annotation.Nullable;
 import androidx.media3.ui.CaptionStyleCompat;
 import androidx.media3.ui.SubtitleView;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.github.catvod.utils.Prefers;
 
 public class SubtitleSetting {
 
-    public static final int STYLE_SOURCE_ORIGINAL = 0;
-    public static final int STYLE_SOURCE_SYSTEM = 1;
-    public static final int STYLE_SOURCE_CUSTOM = 2;
-    public static final int SECONDARY_SUBTITLE_OFF = -2;
-    public static final int SECONDARY_SUBTITLE_AUTO = -1;
+    public static final int STYLE_ORIGINAL = 0;
+    public static final int STYLE_SYSTEM = 1;
+    public static final int STYLE_CUSTOM = 2;
+    public static final int SECONDARY_MODE_DEFAULT = -3;
+    public static final int SECONDARY_MODE_OFF = -2;
+    public static final int SECONDARY_MODE_AUTO = -1;
     public static final float MIN_SCALE = 0.5f;
     public static final float MAX_SCALE = 2.0f;
     public static final float MIN_POSITION = -20.0f;
@@ -55,7 +59,9 @@ public class SubtitleSetting {
     private static final float DEFAULT_BACKGROUND_OPACITY = 1.0f;
     private static final float DEFAULT_EDGE_WIDTH = CaptionStyleCompat.DEFAULT_EDGE_WIDTH;
     private static final float DEFAULT_SHADOW = CaptionStyleCompat.DEFAULT_SHADOW_OFFSET;
-    private static final int DEFAULT_SECONDARY_TRACK = SECONDARY_SUBTITLE_OFF;
+    private static final float SYSTEM_EDGE_WIDTH = 1.65f;
+    private static final CaptionStyleCompat DEFAULT_STYLE = createCaptionStyle(DEFAULT_TEXT_COLOR, DEFAULT_BACKGROUND_COLOR, DEFAULT_EDGE_TYPE, DEFAULT_EDGE_COLOR, DEFAULT_EDGE_WIDTH, DEFAULT_SHADOW);
+    private static final int DEFAULT_SECONDARY_MODE = SECONDARY_MODE_DEFAULT;
     private static final float DEFAULT_SECONDARY_POSITION = 10.0f;
 
     public static String getSearchToken() {
@@ -64,29 +70,28 @@ public class SubtitleSetting {
 
     public static String getEffectiveToken() {
         String userToken = getSearchToken();
-        if (!TextUtils.isEmpty(userToken)) return userToken;
-        return VodConfig.get().getConfig().getAssrt();
+        return TextUtils.isEmpty(userToken) ? VodConfig.get().getConfig().getAssrt() : userToken;
     }
 
     public static void putSearchToken(String token) {
         Prefers.put("subtitle_search_token", token);
     }
 
-    public static int getStyleSource() {
-        int legacy = Prefers.getBoolean("caption") ? STYLE_SOURCE_SYSTEM : STYLE_SOURCE_ORIGINAL;
-        return Math.clamp(Prefers.getInt("subtitle_style_source", legacy), STYLE_SOURCE_ORIGINAL, STYLE_SOURCE_CUSTOM);
+    public static int getStyleMode() {
+        int legacy = Prefers.getBoolean("caption") ? STYLE_SYSTEM : STYLE_ORIGINAL;
+        return Math.clamp(Prefers.getInt("subtitle_style", legacy), STYLE_ORIGINAL, STYLE_CUSTOM);
     }
 
-    public static void putStyleSource(int source) {
-        Prefers.put("subtitle_style_source", Math.clamp(source, STYLE_SOURCE_ORIGINAL, STYLE_SOURCE_CUSTOM));
+    public static void putStyleMode(int style) {
+        Prefers.put("subtitle_style", Math.clamp(style, STYLE_ORIGINAL, STYLE_CUSTOM));
     }
 
     public static boolean isSystemStyle() {
-        return getStyleSource() == STYLE_SOURCE_SYSTEM;
+        return getStyleMode() == STYLE_SYSTEM;
     }
 
     public static boolean isCustomStyle() {
-        return getStyleSource() == STYLE_SOURCE_CUSTOM;
+        return getStyleMode() == STYLE_CUSTOM;
     }
 
     public static float getScale() {
@@ -95,15 +100,13 @@ public class SubtitleSetting {
         return Math.clamp(Prefers.getFloat("subtitle_scale", legacy), MIN_SCALE, MAX_SCALE);
     }
 
-    public static float getScale(Context context) {
+    public static float getAppliedScale() {
         float scale = getScale();
-        if (scale == DEFAULT_SCALE) scale *= getSystemCaptionFontScale(context);
-        return scale;
+        return scale == DEFAULT_SCALE ? scale * getSystemCaptionFontScale() : scale;
     }
 
-    private static float getSystemCaptionFontScale(Context context) {
-        if (!isSystemStyle()) return 1.0f;
-        CaptioningManager manager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
+    private static float getSystemCaptionFontScale() {
+        CaptioningManager manager = isSystemStyle() ? (CaptioningManager) App.get().getSystemService(Context.CAPTIONING_SERVICE) : null;
         return manager == null ? 1.0f : manager.getFontScale();
     }
 
@@ -205,12 +208,12 @@ public class SubtitleSetting {
         Prefers.put("subtitle_shadow", Math.clamp(value, MIN_SHADOW, MAX_SHADOW));
     }
 
-    public static int getSecondaryTrackId() {
-        return clampSecondaryTrackId(Prefers.getInt("subtitle_secondary_track", DEFAULT_SECONDARY_TRACK));
+    public static int getSecondaryMode() {
+        return Math.clamp(Prefers.getInt("subtitle_secondary_track", DEFAULT_SECONDARY_MODE), SECONDARY_MODE_DEFAULT, SECONDARY_MODE_AUTO);
     }
 
-    public static void putSecondaryTrackId(int trackId) {
-        Prefers.put("subtitle_secondary_track", clampSecondaryTrackId(trackId));
+    public static void putSecondaryMode(int mode) {
+        Prefers.put("subtitle_secondary_track", Math.clamp(mode, SECONDARY_MODE_DEFAULT, SECONDARY_MODE_AUTO));
     }
 
     public static float getSecondaryPosition() {
@@ -221,8 +224,24 @@ public class SubtitleSetting {
         Prefers.put("subtitle_secondary_position", Math.clamp(value, MIN_SECONDARY_POSITION, MAX_SECONDARY_POSITION));
     }
 
-    private static int clampSecondaryTrackId(int trackId) {
-        return Math.max(trackId, SECONDARY_SUBTITLE_OFF);
+    @Nullable
+    public static ExternalFont.Item getFont() {
+        return ExternalFont.find(Prefers.getString("subtitle_font", ""));
+    }
+
+    public static void putFont(@Nullable ExternalFont.Item font) {
+        Prefers.put("subtitle_font", font == null ? "" : font.fileName());
+    }
+
+    @Nullable
+    public static String getFontFamily() {
+        ExternalFont.Item font = getFont();
+        return font == null ? null : font.familyName();
+    }
+
+    @Nullable
+    private static Typeface getTypeface() {
+        return ExternalFont.getTypeface(getFont());
     }
 
     private static float getOpacity(String key, float defaultValue) {
@@ -238,7 +257,7 @@ public class SubtitleSetting {
     }
 
     public static boolean isStyleForced() {
-        return getStyleSource() != STYLE_SOURCE_ORIGINAL;
+        return getStyleMode() != STYLE_ORIGINAL;
     }
 
     public static boolean isScaleForced() {
@@ -253,20 +272,49 @@ public class SubtitleSetting {
         return getPosition() != DEFAULT_POSITION;
     }
 
-    public static CaptionStyleCompat getStyle(Context context) {
-        CaptioningManager manager = (CaptioningManager) context.getSystemService(Context.CAPTIONING_SERVICE);
-        if (getStyleSource() == STYLE_SOURCE_ORIGINAL) return CaptionStyleCompat.DEFAULT;
-        if (isSystemStyle()) return manager == null ? CaptionStyleCompat.DEFAULT : CaptionStyleCompat.createFromCaptionStyle(manager.getUserStyle());
-        return new CaptionStyleCompat(getTextColor(), getBackgroundColor(), Color.TRANSPARENT, getEdgeType(), getEdgeColor(), null, getEdgeWidth(), getShadow());
+    public static boolean isSecondaryPositionSet() {
+        return getSecondaryPosition() != DEFAULT_SECONDARY_POSITION;
     }
 
-    public static void applyStyle(Context context, @Nullable SubtitleView subtitleView) {
+    public static CaptionStyleCompat getStyle() {
+        return withTypeface(getBaseStyle(), getTypeface());
+    }
+
+    private static CaptionStyleCompat getBaseStyle() {
+        return switch (getStyleMode()) {
+            case STYLE_SYSTEM -> getSystemStyle();
+            case STYLE_CUSTOM -> getCustomStyle();
+            default -> DEFAULT_STYLE;
+        };
+    }
+
+    private static CaptionStyleCompat getCustomStyle() {
+        return createCaptionStyle(getTextColor(), getBackgroundColor(), getEdgeType(), getEdgeColor(), getEdgeWidth(), getShadow());
+    }
+
+    private static CaptionStyleCompat getSystemStyle() {
+        CaptioningManager manager = (CaptioningManager) App.get().getSystemService(Context.CAPTIONING_SERVICE);
+        CaptionStyleCompat style = manager == null ? CaptionStyleCompat.DEFAULT : CaptionStyleCompat.createFromCaptionStyle(manager.getUserStyle());
+        int backgroundColor = style.edgeType == CaptionStyleCompat.EDGE_TYPE_DROP_SHADOW ? Color.TRANSPARENT : style.backgroundColor;
+        return createCaptionStyle(style.foregroundColor, backgroundColor, style.edgeType, style.edgeColor, SYSTEM_EDGE_WIDTH, DEFAULT_SHADOW);
+    }
+
+    private static CaptionStyleCompat createCaptionStyle(int foregroundColor, int backgroundColor, int edgeType, int edgeColor, float edgeWidth, float shadowOffset) {
+        return new CaptionStyleCompat(foregroundColor, backgroundColor, Color.TRANSPARENT, edgeType, edgeColor, null, edgeWidth, shadowOffset);
+    }
+
+    private static CaptionStyleCompat withTypeface(CaptionStyleCompat style, @Nullable Typeface typeface) {
+        if (typeface != null) style = new CaptionStyleCompat(style.foregroundColor, style.backgroundColor, style.windowColor, style.edgeType, style.edgeColor, typeface, style.edgeWidth, style.shadowOffset);
+        return style;
+    }
+
+    public static void applyStyle(@Nullable SubtitleView subtitleView) {
         if (subtitleView == null) return;
         subtitleView.reset();
-        subtitleView.setStyle(getStyle(context));
+        subtitleView.setStyle(getStyle());
         subtitleView.setApplyEmbeddedStyles(!isStyleForced());
         subtitleView.setApplyEmbeddedFontSizes(true);
-        if (isScaleApplied()) subtitleView.setTextSizeScale(getScale(context));
+        if (isScaleApplied()) subtitleView.setTextSizeScale(getAppliedScale());
         if (isPositionSet()) subtitleView.setBottomPosition(getPosition() / 100.0f);
     }
 
@@ -276,7 +324,7 @@ public class SubtitleSetting {
     }
 
     public static void resetStyle() {
-        Prefers.put("subtitle_style_source", STYLE_SOURCE_ORIGINAL);
+        Prefers.put("subtitle_style", STYLE_ORIGINAL);
         Prefers.put("subtitle_foreground_color", DEFAULT_TEXT_COLOR);
         Prefers.put("subtitle_background_color", DEFAULT_BACKGROUND_COLOR);
         Prefers.put("subtitle_edge_type", DEFAULT_EDGE_TYPE);
@@ -286,10 +334,11 @@ public class SubtitleSetting {
         Prefers.put("subtitle_edge_opacity", DEFAULT_EDGE_OPACITY);
         Prefers.put("subtitle_edge_width", DEFAULT_EDGE_WIDTH);
         Prefers.put("subtitle_shadow", DEFAULT_SHADOW);
+        putFont(null);
     }
 
     public static void resetAdvanced() {
-        Prefers.put("subtitle_secondary_track", DEFAULT_SECONDARY_TRACK);
+        Prefers.put("subtitle_secondary_track", DEFAULT_SECONDARY_MODE);
         Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 

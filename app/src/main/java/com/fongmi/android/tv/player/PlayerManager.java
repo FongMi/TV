@@ -14,8 +14,10 @@ import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
+import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.VideoSize;
+import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 
 import com.fongmi.android.tv.App;
@@ -29,6 +31,7 @@ import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.player.effect.PlayerEffectManager;
 import com.fongmi.android.tv.player.effect.audio.AudioEffectBands;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
+import com.fongmi.android.tv.player.engine.PlayerEngine.SecondarySubtitleState;
 import com.fongmi.android.tv.player.engine.PlayerEngineFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.player.parse.ParseJob;
@@ -58,7 +61,6 @@ public class PlayerManager implements ParseCallback {
     private PlaySpec spec;
     private Player player;
 
-    private DanmakuConfig danmakuConfig;
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
     private boolean initTrack;
@@ -72,7 +74,6 @@ public class PlayerManager implements ParseCallback {
         this.pendingStartPositionMs = C.TIME_UNSET;
         this.engine = PlayerEngineFactory.create(decode, listener);
         this.effects = new PlayerEffectManager(() -> engine);
-        this.danmakuConfig = DanmakuSetting.getConfig();
         this.danmakuEnabled = DanmakuSetting.isShow();
         this.player = engine.getPlayer();
     }
@@ -297,11 +298,6 @@ public class PlayerManager implements ParseCallback {
         else startCurrent();
     }
 
-    public void setFormat(String format) {
-        if (spec != null) spec.setFormat(format);
-        startCurrent();
-    }
-
     public void selectChapter(MediaChapter chapter) {
         player.selectChapter(chapter);
     }
@@ -311,8 +307,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void setDanmakuConfig(DanmakuConfig config) {
-        danmakuConfig = config;
-        callback.onDanmakuConfigChanged(danmakuConfig);
+        callback.onDanmakuConfigChanged(config);
     }
 
     public void setDanmakuEnabled(boolean enabled) {
@@ -321,8 +316,16 @@ public class PlayerManager implements ParseCallback {
         callback.onDanmakuEnabledChanged(danmakuEnabled);
     }
 
-    public void setSubtitleSettingStyle() {
-        if (engine != null) engine.setSubtitleStyle();
+    public void applySubtitleStyle() {
+        if (engine != null) engine.applySubtitleStyle();
+    }
+
+    public SecondarySubtitleState getSecondarySubtitleState() {
+        return engine == null ? SecondarySubtitleState.EMPTY : engine.getSecondarySubtitleState();
+    }
+
+    public void setSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
+        if (engine != null) engine.setSecondarySubtitleSelection(selection);
     }
 
     public void sendDanmaku(String text) {
@@ -351,8 +354,8 @@ public class PlayerManager implements ParseCallback {
         effects.setSkipSilenceEnabled(enabled);
     }
 
-    public void setTrack(List<Track> tracks) {
-        if (!tracks.isEmpty()) TrackUtil.setTrackSelection(player, tracks);
+    public void setTrack(Track track) {
+        TrackUtil.setTrackSelection(player, track);
     }
 
     public void setVideoSetting(int preset) {
@@ -453,6 +456,10 @@ public class PlayerManager implements ParseCallback {
     public void clearPreload() {
         pendingPreload = null;
         if (engine != null) engine.clearPreload();
+    }
+
+    public void bindPlayerView(PlayerView playerView) {
+        if (engine != null) engine.bindPlayerView(playerView);
     }
 
     public void resetTrack() {
@@ -610,7 +617,7 @@ public class PlayerManager implements ParseCallback {
 
         void onPlayerRebuild(Player newPlayer);
 
-        void onDanmakuSourceChanged(Uri uri);
+        void onDanmakuSourceChanged(@Nullable Uri uri);
 
         void onDanmakuConfigChanged(DanmakuConfig config);
 
@@ -657,9 +664,9 @@ public class PlayerManager implements ParseCallback {
         @Override
         public void onTracksChanged(@NonNull Tracks tracks) {
             if (tracks.isEmpty() || initTrack) return;
-            setTrack(Track.find(getKey()));
-            callback.onTracksChanged();
             initTrack = true;
+            TrackUtil.setTrackSelection(player, Track.find(getKey()));
+            callback.onTracksChanged();
         }
 
         @Override

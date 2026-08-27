@@ -45,6 +45,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         setVisible();
         setPlaybackModeText();
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
+        mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
         mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
         mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
         mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
@@ -57,6 +58,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.engine.setOnClickListener(this::setEngine);
         mBinding.decode.setOnClickListener(this::onDecode);
         mBinding.adblock.setOnClickListener(this::setAdblock);
+        mBinding.libass.setOnClickListener(this::setLibass);
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
@@ -75,6 +77,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.adblock.setVisibility(exo ? View.VISIBLE : View.GONE);
+        mBinding.libass.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
@@ -141,6 +144,11 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
     private void setAdblock(View view) {
         Setting.putAdblock(!Setting.isAdblock());
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
+    }
+
+    private void setLibass(View view) {
+        PlayerSetting.putLibass(!PlayerSetting.isLibass());
+        mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
     }
 
     private void onPreload(View view) {

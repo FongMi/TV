@@ -98,7 +98,7 @@ public final class FileChooser {
         try {
             deliver(callback, resolveFileUri(uri));
         } catch (IOException | SecurityException e) {
-            App.post(() -> Notify.show(e.getMessage()));
+            App.post(() -> Notify.show(Notify.getError(R.string.error_file_open, e)));
         }
     }
 

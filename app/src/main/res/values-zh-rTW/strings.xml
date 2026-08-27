@@ -159,7 +159,13 @@
     <string name="subtitle_offset">字幕偏移</string>
     <string name="subtitle_size">大小</string>
     <string name="subtitle_position">位置</string>
-    <string name="subtitle_style_source">樣式來源</string>
+    <string name="subtitle_style">樣式</string>
+    <string name="playback_font">字型</string>
+    <string name="playback_font_default">系統預設</string>
+    <string name="playback_font_import">匯入字型</string>
+    <string name="playback_font_imported">已匯入字型：%1$s</string>
+    <string name="playback_font_import_failed">無法匯入字型</string>
+    <string name="playback_font_load_failed">無法載入字型</string>
     <string name="subtitle_style_original">原始</string>
     <string name="subtitle_style_system">系統</string>
     <string name="subtitle_style_custom">自訂</string>
@@ -177,6 +183,7 @@
     <string name="subtitle_background">背景</string>
     <string name="subtitle_background_opacity">背景透明度</string>
     <string name="subtitle_secondary_track">雙字幕</string>
+    <string name="subtitle_secondary_default">預設</string>
     <string name="subtitle_secondary_off">關閉</string>
     <string name="subtitle_secondary_auto">自動</string>
     <string name="subtitle_secondary_select">指定</string>
@@ -281,9 +288,9 @@
     <string name="player">播放核心</string>
     <string name="player_engine">播放引擎</string>
     <string name="player_debug">偵錯</string>
-    <string name="player_render">渲染方式</string>
+    <string name="player_render">視訊輸出</string>
     <string name="player_scale">縮放比例</string>
-    <string name="player_libass">字幕渲染</string>
+    <string name="player_libass">字幕特效</string>
     <string name="player_background">背景播放</string>
     <string name="player_audio_pass_through">音訊直通</string>
     <string name="player_audio_decode">音訊軟解</string>
@@ -305,7 +312,11 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
+    <string name="player_mpv_conf_priority_hint">優先順序：播放器介面 &gt; mpv.conf &gt; Android 預設值。儲存後重新進入播放頁生效。</string>
+    <string name="player_mpv_conf_conflict_hint">將被播放器介面覆蓋：%1$s\n設定仍會保留在 mpv.conf；儲存後重新進入播放頁生效。</string>
     <string name="player_mpv_conf_import_success">已匯入 mpv.conf</string>
+    <string name="player_mpv_conf_import_failed">無法匯入 mpv.conf</string>
+    <string name="player_mpv_conf_save_failed">無法儲存 mpv.conf</string>
     <string name="player_ua">User-Agent</string>
 
     <!-- Danmaku -->
@@ -332,6 +343,7 @@
 
     <!-- Error -->
     <string name="error_config_get">配置取得失敗</string>
+    <string name="error_file_open">無法開啟檔案</string>
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">播放網址解析失敗</string>
