@@ -2,7 +2,6 @@ package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
 
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.utils.Path;
 import com.p2p.P2PClass;
@@ -35,8 +34,8 @@ public class JianPian implements Source.Extractor {
     }
 
     private void check() {
-        double cache = FileUtil.getDirectorySize(Path.jpa());
-        double total = cache + FileUtil.getAvailableStorageSpace(Path.jpa());
+        double cache = Path.size(Path.jpa());
+        double total = cache + Path.available(Path.jpa());
         int percent = (int) (cache / total * 100);
         if (percent > 10) Path.clear(Path.jpa());
     }

@@ -106,7 +106,8 @@ public class EpgParser {
 
     private static void readGzip(Live live, File file, boolean refresh) throws Exception {
         File xml = Path.epg(file.getName() + ".xml");
-        if (!Path.exists(xml) || refresh) FileUtil.gzipDecompress(file, xml);
+        boolean needsDecompression = refresh || !Path.exists(xml);
+        if (needsDecompression && !FileUtil.gzipDecompress(file, xml)) Log.w(TAG, "gzip decompress failed file=" + file);
         readXml(live, xml);
     }
 

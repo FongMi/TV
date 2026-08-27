@@ -1,6 +1,9 @@
 package com.github.catvod.utils;
 
 import android.os.Environment;
+import android.os.StatFs;
+import android.system.ErrnoException;
+import android.system.Os;
 
 import com.github.catvod.Init;
 import com.orhanobut.logger.Logger;
@@ -52,6 +55,22 @@ public class Path {
 
     public static File tv() {
         return mkdir(new File(root(), "TV"));
+    }
+
+    public static File backup() {
+        return mkdir(new File(tv(), "backup"));
+    }
+
+    public static File font() {
+        return mkdir(new File(tv(), "fonts"));
+    }
+
+    public static File wall(int index) {
+        return files("wallpaper_" + index);
+    }
+
+    public static File wallCache() {
+        return files("wallpaper_cache");
     }
 
     public static File so() {
@@ -194,25 +213,54 @@ public class Path {
         }
     }
 
-    public static void move(File in, File out) {
-        if (in.renameTo(out)) return;
-        copy(in, out);
-        clear(in);
-    }
-
     public static void copy(File in, File out) {
         try {
-            copy(new FileInputStream(in), out);
+            copyOrThrow(in, out);
         } catch (IOException ignored) {
         }
     }
 
     public static void copy(InputStream in, File out) {
+        try {
+            copyOrThrow(in, out);
+        } catch (IOException ignored) {
+        }
+    }
+
+    public static void move(File source, File target) throws IOException {
+        try {
+            Os.rename(source.getAbsolutePath(), target.getAbsolutePath());
+        } catch (ErrnoException e) {
+            throw new IOException("Unable to move file", e);
+        }
+    }
+
+    public static long size(File file) {
+        long total = 0;
+        if (file == null) return total;
+        if (file.isDirectory()) for (File child : list(file)) total += size(child);
+        else total = file.length();
+        return total;
+    }
+
+    public static long available(File file) {
+        try {
+            StatFs stat = new StatFs(file.getAbsolutePath());
+            return stat.getAvailableBlocksLong() * stat.getBlockSizeLong();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    private static void copyOrThrow(File in, File out) throws IOException {
+        if (!in.getCanonicalFile().equals(out.getCanonicalFile())) copyOrThrow(new FileInputStream(in), out);
+    }
+
+    private static void copyOrThrow(InputStream in, File out) throws IOException {
         try (InputStream input = in; FileOutputStream output = new FileOutputStream(create(out))) {
             int read;
             byte[] buffer = new byte[16384];
             while ((read = input.read(buffer)) != -1) output.write(buffer, 0, read);
-        } catch (IOException ignored) {
         }
     }
 
@@ -220,7 +268,7 @@ public class Path {
         Arrays.sort(files, (o1, o2) -> {
             if (o1.isDirectory() && o2.isFile()) return -1;
             if (o1.isFile() && o2.isDirectory()) return 1;
-            return o1.getName().toLowerCase().compareTo(o2.getName().toLowerCase());
+            return o1.getName().compareToIgnoreCase(o2.getName());
         });
     }
 
