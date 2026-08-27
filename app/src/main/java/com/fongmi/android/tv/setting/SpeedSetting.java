@@ -15,7 +15,7 @@ public class SpeedSetting {
     private static final float LONG_PRESS_MIN = 2.0f;
     private static final float LONG_PRESS_STEP = 0.5f;
     private static final float EPSILON = 0.001f;
-    private static final float[] PRESETS = {0.1f, 0.5f, 0.8f, 1.0f, 1.2f, 1.5f, 2.0f, 2.5f, 3.0f, 3.5f, 4.0f, 5.0f};
+    private static final float[] PRESETS = {0.5f, 0.8f, 1.0f, 1.2f, 1.5f, 2.0f, 3.0f, 5.0f};
 
     public static void setup(Slider slider) {
         slider.setValueFrom(MIN);

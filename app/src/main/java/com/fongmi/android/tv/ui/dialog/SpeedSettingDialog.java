@@ -96,7 +96,7 @@ public final class SpeedSettingDialog {
 
         @Override
         protected int getWidth() {
-            return Math.min(ResUtil.dp2px(420), ResUtil.getScreenWidth() / 2);
+            return Math.min(ResUtil.dp2px(440), ResUtil.getScreenWidth() / 3 + ResUtil.dp2px(20));
         }
 
         @Override
