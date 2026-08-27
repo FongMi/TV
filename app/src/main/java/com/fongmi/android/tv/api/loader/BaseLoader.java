@@ -9,7 +9,7 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.utils.Task;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
-import com.github.catvod.utils.Util;
+import com.github.catvod.utils.Crypto;
 
 import org.json.JSONObject;
 
@@ -73,7 +73,7 @@ public class BaseLoader {
     public void setRecent(String key, String api, String jar) {
         if (isJs(api)) jsLoader.setRecent(key);
         else if (isPy(api)) pyLoader.setRecent(key);
-        else if (isCsp(api)) jarLoader.setRecent(Util.md5(jar));
+        else if (isCsp(api)) jarLoader.setRecent(Crypto.md5(jar));
     }
 
     public Object[] proxy(Map<String, String> params) throws Exception {
@@ -85,7 +85,7 @@ public class BaseLoader {
 
     public void parseJar(String jar, boolean recent) {
         if (TextUtils.isEmpty(jar)) return;
-        String key = Util.md5(jar);
+        String key = Crypto.md5(jar);
         jarLoader.parseJar(key, jar);
         if (recent) jarLoader.setRecent(key);
     }

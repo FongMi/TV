@@ -127,7 +127,7 @@ public class Path {
     }
 
     public static File jar(String name) {
-        return new File(jar(), Util.md5(name).concat(".jar"));
+        return new File(jar(), Crypto.md5(name).concat(".jar"));
     }
 
     public static File thunder(String name) {

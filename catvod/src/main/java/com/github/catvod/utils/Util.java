@@ -2,21 +2,14 @@ package com.github.catvod.utils;
 
 import android.content.Context;
 import android.net.wifi.WifiManager;
-import android.text.TextUtils;
 import android.util.Base64;
 
 import com.github.catvod.Init;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.Locale;
 
@@ -58,38 +51,9 @@ public class Util {
         return bytes;
     }
 
-    public static boolean equals(String name, String md5) {
-        return md5(Path.jar(name)).equalsIgnoreCase(md5);
-    }
-
-    public static String md5(String src) {
-        try {
-            if (TextUtils.isEmpty(src)) return "";
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            byte[] bytes = digest.digest(src.getBytes(StandardCharsets.UTF_8));
-            BigInteger no = new BigInteger(1, bytes);
-            StringBuilder sb = new StringBuilder(no.toString(16));
-            while (sb.length() < 32) sb.insert(0, "0");
-            return sb.toString().toLowerCase();
-        } catch (NoSuchAlgorithmException e) {
-            return "";
-        }
-    }
-
-    public static String md5(File file) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");
-            FileInputStream fis = new FileInputStream(file);
-            byte[] bytes = new byte[16384];
-            int count;
-            while ((count = fis.read(bytes)) != -1) digest.update(bytes, 0, count);
-            fis.close();
-            StringBuilder sb = new StringBuilder();
-            for (byte b : digest.digest()) sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-            return sb.toString();
-        } catch (Exception e) {
-            return "";
-        }
+    @Deprecated
+    public static String md5(String text) {
+        return Crypto.md5(text);
     }
 
     public static boolean containOrMatch(String text, String regex) {

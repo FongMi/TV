@@ -9,8 +9,8 @@ import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Util;
 import com.xunlei.downloadlib.XLTaskHelper;
 import com.xunlei.downloadlib.parameter.GetTaskId;
 import com.xunlei.downloadlib.parameter.TorrentFileInfo;
@@ -52,7 +52,7 @@ public class Thunder implements Source.Extractor {
     }
 
     private String addThunderTask(String url) {
-        File folder = Path.thunder(Util.md5(url));
+        File folder = Path.thunder(Crypto.md5(url));
         taskId = XLTaskHelper.get().addThunderTask(url, folder);
         return XLTaskHelper.get().getLocalUrl(taskId.getSaveFile());
     }
@@ -97,7 +97,7 @@ public class Thunder implements Source.Extractor {
         @Override
         public List<Episode> call() {
             boolean torrent = isTorrent(url);
-            GetTaskId taskId = XLTaskHelper.get().parse(url, Path.thunder(Util.md5(url)));
+            GetTaskId taskId = XLTaskHelper.get().parse(url, Path.thunder(Crypto.md5(url)));
             if (!torrent && !taskId.getRealUrl().startsWith("magnet")) return Arrays.asList(create(taskId));
             if (torrent && url.startsWith("http")) Download.create(url, taskId.getSaveFile()).get();
             if (!torrent) waitDone(taskId);

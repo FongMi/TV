@@ -8,8 +8,8 @@ import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
-import com.github.catvod.utils.Util;
 
 import org.json.JSONObject;
 
@@ -91,7 +91,7 @@ public class JarLoader {
             String md5 = texts.length > 1 ? texts[1].trim() : "";
             if (md5.startsWith("http")) md5 = OkHttp.string(md5).trim();
             jar = texts[0];
-            if (!md5.isEmpty() && Util.equals(jar, md5)) {
+            if (!md5.isEmpty() && Crypto.equals(Path.jar(jar), md5)) {
                 load(key, Path.jar(jar));
             } else if (jar.startsWith("http")) {
                 load(key, Download.create(jar, Path.jar(jar)).get());
@@ -103,7 +103,7 @@ public class JarLoader {
 
     public DexClassLoader dex(String jar) {
         try {
-            String jaKey = Util.md5(jar);
+            String jaKey = Crypto.md5(jar);
             parseJar(jaKey, jar);
             return loaders.get(jaKey);
         } catch (Throwable e) {
@@ -113,7 +113,7 @@ public class JarLoader {
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
-        String jaKey = Util.md5(jar);
+        String jaKey = Crypto.md5(jar);
         String spKey = jaKey + key;
         return spiders.computeIfAbsent(spKey, k -> {
             try {

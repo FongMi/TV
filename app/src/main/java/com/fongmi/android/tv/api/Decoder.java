@@ -4,16 +4,13 @@ import android.util.Base64;
 
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Util;
 
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import okhttp3.HttpUrl;
 import okhttp3.Response;
@@ -57,16 +54,12 @@ public class Decoder {
     }
 
     private static String cbc(String data) throws Exception {
-        String decode = new String(Util.hex2byte(data)).toLowerCase();
+        String decode = new String(Util.hex2byte(data), StandardCharsets.UTF_8).toLowerCase();
         String key = padEnd(decode.substring(decode.indexOf("$#") + 2, decode.indexOf("#$")));
         String iv = padEnd(decode.substring(decode.length() - 13));
-        SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
-        IvParameterSpec ivSpec = new IvParameterSpec(iv.getBytes());
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(Cipher.DECRYPT_MODE, keySpec, ivSpec);
         data = data.substring(data.indexOf("2324") + 4, data.length() - 26);
-        byte[] decryptData = cipher.doFinal(Util.hex2byte(data));
-        return new String(decryptData, StandardCharsets.UTF_8);
+        byte[] decrypted = Crypto.decryptAesCbc(Util.hex2byte(data), key.getBytes(StandardCharsets.UTF_8), iv.getBytes(StandardCharsets.UTF_8));
+        return new String(decrypted, StandardCharsets.UTF_8);
     }
 
     private static String base64(String data) {

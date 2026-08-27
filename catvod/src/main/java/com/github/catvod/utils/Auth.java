@@ -34,8 +34,8 @@ public class Auth {
         String qop = selectQop(params.get("qop"));
         String nc = "00000001";
         String cnonce = newCnonce();
-        String ha1 = Util.md5(username + ":" + realm + ":" + password);
-        String ha2 = Util.md5(request.method() + ":" + uri);
+        String ha1 = Crypto.md5(username + ":" + realm + ":" + password);
+        String ha2 = Crypto.md5(request.method() + ":" + uri);
         String response = digestResponse(ha1, ha2, nonce, nc, cnonce, qop);
         return buildHeader(username, realm, nonce, uri, nc, cnonce, qop, response, opaque);
     }
@@ -47,7 +47,7 @@ public class Auth {
     }
 
     private static String digestResponse(String ha1, String ha2, String nonce, String nc, String cnonce, String qop) {
-        return qop.isEmpty() ? Util.md5(ha1 + ":" + nonce + ":" + ha2) : Util.md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2);
+        return qop.isEmpty() ? Crypto.md5(ha1 + ":" + nonce + ":" + ha2) : Crypto.md5(ha1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + ha2);
     }
 
     private static String buildHeader(String username, String realm, String nonce, String uri, String nc, String cnonce, String qop, String response, String opaque) {

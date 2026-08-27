@@ -7,11 +7,10 @@ import androidx.annotation.NonNull;
 
 import com.fongmi.quickjs.bean.Req;
 import com.fongmi.quickjs.utils.Connect;
-import com.fongmi.quickjs.utils.Crypto;
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.Proxy;
 import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.UriUtil;
-import com.orhanobut.logger.Logger;
 import com.whl.quickjs.wrapper.JSFunction;
 import com.whl.quickjs.wrapper.JSMethod;
 import com.whl.quickjs.wrapper.JSObject;
@@ -159,25 +158,25 @@ public class Global {
     @Keep
     @JSMethod
     public String md5X(String text) {
-        String result = Crypto.md5(text);
-        Logger.t("md5X").d("text:%s\nresult:\n%s", text, result);
-        return result;
+        return Crypto.md5(text);
     }
 
     @Keep
     @JSMethod
     public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
-        String result = Crypto.aes(mode, encrypt, input, inBase64, key, iv, outBase64);
-        Logger.t("aesX").d("mode:%s\nencrypt:%s\ninBase64:%s\noutBase64:%s\nkey:%s\niv:%s\ninput:\n%s\nresult:\n%s", mode, encrypt, inBase64, outBase64, key, iv, input, result);
-        return result;
+        return Crypto.aes(mode, encrypt, input, inBase64, key, iv, outBase64);
+    }
+
+    @Keep
+    @JSMethod
+    public String desX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
+        return Crypto.des(mode, encrypt, input, inBase64, key, iv, outBase64);
     }
 
     @Keep
     @JSMethod
     public String rsaX(String mode, boolean pub, boolean encrypt, String input, boolean inBase64, String key, boolean outBase64) {
-        String result = Crypto.rsa(mode, pub, encrypt, input, inBase64, key, outBase64);
-        Logger.t("rsaX").d("mode:%s\npub:%s\nencrypt:%s\ninBase64:%s\noutBase64:%s\nkey:\n%s\ninput:\n%s\nresult:\n%s", mode, pub, encrypt, inBase64, outBase64, key, input, result);
-        return result;
+        return Crypto.rsa(mode, pub, encrypt, input, inBase64, key, outBase64);
     }
 
     private void requestAsync(String url, JSObject options, JSFunction complete) {
