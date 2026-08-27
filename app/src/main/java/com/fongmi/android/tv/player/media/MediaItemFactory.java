@@ -15,12 +15,15 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.track.LangUtil;
+import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public final class MediaItemFactory {
@@ -85,7 +88,10 @@ public final class MediaItemFactory {
     }
 
     private static MediaItem.SubtitleConfiguration buildSubConfig(Sub sub, int flag) {
-        return new MediaItem.SubtitleConfiguration.Builder(sub.getUri()).setLabel(sub.getName()).setMimeType(sub.getFormat()).setSelectionFlags(flag).setLanguage(sub.getLang()).build();
+        String mimeType = sub.getFormat();
+        String id = "external:" + UUID.nameUUIDFromBytes(sub.getUrl().getBytes(StandardCharsets.UTF_8));
+        if (TextUtils.isEmpty(mimeType)) mimeType = TrackUtil.getSubtitleMimeType(sub.getUri().getPath());
+        return new MediaItem.SubtitleConfiguration.Builder(sub.getUri()).setId(id).setLabel(sub.getName()).setMimeType(mimeType).setSelectionFlags(flag).setLanguage(sub.getLang()).build();
     }
 
     private static int findPreferredSubtitleIndex(List<Sub> subs) {
