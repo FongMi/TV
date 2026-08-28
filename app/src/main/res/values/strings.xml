@@ -313,8 +313,8 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
-    <string name="player_mpv_conf_priority_hint">Priority: player settings &gt; mpv.conf &gt; Android defaults. Reopen playback after saving.</string>
-    <string name="player_mpv_conf_conflict_hint">Overridden by player settings: %1$s\nThe values remain in mpv.conf. Reopen playback after saving.</string>
+    <string name="player_mpv_conf_priority_hint">Player settings take priority; reopen playback to apply.</string>
+    <string name="player_mpv_conf_conflict_hint">Player settings will override: %1$s</string>
     <string name="player_mpv_conf_import_success">Imported mpv.conf</string>
     <string name="player_mpv_conf_import_failed">Unable to import mpv.conf</string>
     <string name="player_mpv_conf_save_failed">Unable to save mpv.conf</string>
@@ -334,6 +334,7 @@
 
     <!-- Dialog -->
     <string name="dialog_edit">Edit</string>
+    <string name="dialog_import">Import</string>
     <string name="dialog_positive">OK</string>
     <string name="dialog_negative">Cancel</string>
     <string name="dialog_select_edition">Select title</string>

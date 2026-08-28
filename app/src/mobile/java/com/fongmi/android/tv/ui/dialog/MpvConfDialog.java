@@ -42,7 +42,7 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     @Override
     protected MaterialAlertDialogBuilder getBuilder() {
-        return builder().setTitle(R.string.player_mpv_conf).setView(getBinding().getRoot()).setPositiveButton(R.string.dialog_positive, null).setNegativeButton(R.string.dialog_negative, null);
+        return builder().setTitle(R.string.player_mpv_conf).setView(getBinding().getRoot()).setNeutralButton(R.string.dialog_import, null).setPositiveButton(R.string.dialog_positive, null).setNegativeButton(R.string.dialog_negative, null);
     }
 
     @Override
@@ -53,7 +53,6 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     @Override
     protected void initEvent() {
-        binding.input.setEndIconOnClickListener(this::onChoose);
         binding.text.addTextChangedListener(new CustomTextListener() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -97,6 +96,9 @@ public class MpvConfDialog extends BaseAlertDialog {
     public void onStart() {
         super.onStart();
         AlertDialog dialog = (AlertDialog) getDialog();
-        if (dialog != null) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(this::onPositive);
+        if (dialog != null) {
+            dialog.getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener(this::onChoose);
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(this::onPositive);
+        }
     }
 }

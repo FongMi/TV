@@ -312,8 +312,8 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
-    <string name="player_mpv_conf_priority_hint">优先级：播放器界面 &gt; mpv.conf &gt; Android 默认值。保存后重新进入播放页生效。</string>
-    <string name="player_mpv_conf_conflict_hint">将被播放器界面覆盖：%1$s\n设置仍会保留在 mpv.conf；保存后重新进入播放页生效。</string>
+    <string name="player_mpv_conf_priority_hint">界面设置优先，重进播放页生效。</string>
+    <string name="player_mpv_conf_conflict_hint">界面设置将覆盖：%1$s</string>
     <string name="player_mpv_conf_import_success">已导入 mpv.conf</string>
     <string name="player_mpv_conf_import_failed">无法导入 mpv.conf</string>
     <string name="player_mpv_conf_save_failed">无法保存 mpv.conf</string>
@@ -333,6 +333,7 @@
 
     <!-- Dialog -->
     <string name="dialog_edit">修改</string>
+    <string name="dialog_import">导入</string>
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_select_edition">选择标题</string>
