@@ -404,6 +404,8 @@ final class SubtitleSettingPanel {
         updateSystemSettingVisibility();
         applyEnabled(binding.appearance.styleHeader, textStyle);
         applyEnabled(binding.appearance.styleGroup, textStyle);
+        binding.appearance.fontHeader.setVisibility(textStyle ? View.VISIBLE : View.GONE);
+        binding.appearance.fontContainer.setVisibility(textStyle ? View.VISIBLE : View.GONE);
         binding.appearance.textSection.setVisibility(custom ? View.VISIBLE : View.GONE);
         binding.appearance.edgeStyleSection.setVisibility(custom ? View.VISIBLE : View.GONE);
         binding.appearance.backgroundSection.setVisibility(custom ? View.VISIBLE : View.GONE);

@@ -62,6 +62,7 @@
         app:iconTint="?attr/colorPrimary" />
 
     <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/fontHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
@@ -70,6 +71,7 @@
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
     <HorizontalScrollView
+        android:id="@+id/fontContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fillViewport="false"
