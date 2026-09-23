@@ -86,6 +86,14 @@ def playerContent(ru, flag, id, vipFlags):
     return formatJo
 
 
+def isVideoFormat(ru, url):
+    return bool(ru.isVideoFormat(url))
+
+
+def manualVideoCheck(ru):
+    return bool(ru.manualVideoCheck())
+
+
 def liveContent(ru, url):
     result = ru.liveContent(url)
     return result
