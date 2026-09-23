@@ -13,6 +13,7 @@ import androidx.media3.mpvplayer.MpvPlayerConfig;
 import androidx.media3.mpvplayer.MpvSubtitleOptions;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
@@ -21,7 +22,10 @@ import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
+import com.fongmi.android.tv.utils.Notify;
 import com.github.catvod.utils.Path;
+
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -94,6 +98,15 @@ public final class MpvUtil {
         builder.addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions(fontFamily, fontDirectory));
         addPreloadOptions(builder);
         return builder.build();
+    }
+
+    static List<MpvScripts.Item> readScripts() {
+        try {
+            return MpvScripts.read();
+        } catch (JSONException e) {
+            Notify.show(Notify.getError(R.string.mpv_script_error, e));
+            return List.of();
+        }
     }
 
     private static MpvAndroidOptions buildAndroidOptions(File shaderCacheDirectory) {

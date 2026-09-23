@@ -35,6 +35,9 @@ import com.fongmi.android.tv.player.engine.PlayerEngine.SecondarySubtitleState;
 import com.fongmi.android.tv.player.engine.PlayerEngineFactory;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
+import com.fongmi.android.tv.player.mpv.MpvPlayerEngine;
+import com.fongmi.android.tv.player.mpv.MpvScriptSession;
+import com.fongmi.android.tv.player.mpv.MpvScripts;
 import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.setting.DanmakuSetting;
@@ -45,6 +48,8 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.google.common.net.HttpHeaders;
+
+import org.json.JSONException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -89,6 +94,23 @@ public class PlayerManager implements ParseCallback {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public boolean runMpvScript(MpvScripts.Item item) {
+        return engine instanceof MpvPlayerEngine mpv && mpv.runScript(item);
+    }
+
+    public MpvScriptSession.Status getMpvScriptStatus(String id) {
+        return engine instanceof MpvPlayerEngine mpv ? mpv.getScriptStatus(id) : null;
+    }
+
+    public List<String> getMpvScriptBindings() throws JSONException {
+        return engine instanceof MpvPlayerEngine mpv ? mpv.getScriptBindings() : List.of();
+    }
+
+    /** Applies managed script changes to the active MPV session. */
+    public void reloadMpvScripts(boolean reloadStartupScripts, String reloadButtonId) {
+        if (engine instanceof MpvPlayerEngine mpv) mpv.reloadScripts(reloadStartupScripts, reloadButtonId);
     }
 
     private void setPlayer(Player player) {

@@ -19,15 +19,22 @@ import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
+import org.json.JSONException;
+
+import java.util.List;
+
 public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     private final MpvErrorMessageProvider provider;
     private final MpvPlayerEffect effect;
+    private final MpvScriptSession scripts;
     private final MpvPlayer player;
     private PlaySpec spec;
 
     public MpvPlayerEngine(int decode, Player.Listener listener) {
+        List<MpvScripts.Item> scriptItems = MpvUtil.readScripts();
         this.player = MpvUtil.buildPlayer(decode, listener);
+        this.scripts = new MpvScriptSession(player, scriptItems);
         this.provider = new MpvErrorMessageProvider();
         this.effect = new MpvPlayerEffect(player);
         this.player.setAudioOutputListener(effect::applyAudioEffect);
@@ -61,6 +68,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     @Override
     public void release() {
+        scripts.release();
         player.removeListener(this);
         player.setAudioOutputListener(null);
         player.release();
@@ -69,6 +77,22 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     @Override
     public void applySubtitleStyle() {
         MpvUtil.applySubtitleStyle(player);
+    }
+
+    public boolean runScript(MpvScripts.Item item) {
+        return scripts.run(item);
+    }
+
+    public MpvScriptSession.Status getScriptStatus(String id) {
+        return scripts.status(id);
+    }
+
+    public List<String> getScriptBindings() throws JSONException {
+        return scripts.bindings();
+    }
+
+    public void reloadScripts(boolean reloadStartupScripts, String reloadButtonId) {
+        scripts.reload(MpvUtil.readScripts(), reloadStartupScripts, reloadButtonId);
     }
 
     @Override
