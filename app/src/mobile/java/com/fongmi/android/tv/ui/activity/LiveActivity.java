@@ -96,6 +96,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     private List<Group> mHides;
     private Group mGroup;
     private Channel mChannel;
+    private Channel mRestoreChannel;
     private String mPlaybackKey;
     private boolean rotate;
     private int count;
@@ -288,7 +289,9 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
         List<Group> items = new ArrayList<>();
         for (Group group : live.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.addAll(items);
-        setPosition(LiveConfig.get().findKeepPosition(items));
+        int[] position = LiveConfig.get().findChannelPosition(mRestoreChannel, items);
+        mRestoreChannel = null;
+        setPosition(position[0] == -1 ? LiveConfig.get().findKeepPosition(items) : position);
     }
 
     private void setWidth(Live live) {
@@ -899,6 +902,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
 
     @Override
     public void setLive(Live item) {
+        if (mChannel != null) mRestoreChannel = Channel.create(mChannel);
         if (item.isSelected()) item.getGroups().clear();
         LiveConfig.get().setHome(item);
         player().reset();

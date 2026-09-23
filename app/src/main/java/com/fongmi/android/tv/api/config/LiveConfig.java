@@ -23,17 +23,24 @@ import com.github.catvod.bean.Proxy;
 import com.github.catvod.utils.Json;
 import com.google.gson.JsonObject;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class LiveConfig extends BaseConfig {
 
     private static final String TAG = LiveConfig.class.getSimpleName();
+    private static final Pattern CCTV = Pattern.compile("^CCTV\\s*[-_]?\\s*(\\d+)(\\s*\\+)?");
+    private static final Pattern CHANNEL_SEPARATOR = Pattern.compile("[^\\p{L}\\p{N}+]");
 
     private Live home;
     private List<Live> lives;
@@ -219,6 +226,42 @@ public class LiveConfig extends BaseConfig {
             }
         }
         return new int[]{1, 0};
+    }
+
+    public int[] findChannelPosition(Channel target, List<Group> items) {
+        if (target == null) return new int[]{-1, -1};
+        String id = target.getTvgId().trim();
+        int[] position = findPosition(items, channel -> !id.isEmpty() && id.equalsIgnoreCase(channel.getTvgId().trim()));
+        if (position[0] != -1) return position;
+        String name = normalizeChannelName(target.getTvgName());
+        position = name.isEmpty() ? new int[]{-1, -1} : findPosition(items, channel -> name.equals(normalizeChannelName(channel.getTvgName())));
+        if (position[0] != -1) return position;
+        String cctv = cctvKey(target.getTvgName());
+        return cctv.isEmpty() ? new int[]{-1, -1} : findPosition(items, channel -> cctv.equals(cctvKey(channel.getTvgName())));
+    }
+
+    private int[] findPosition(List<Group> items, Predicate<Channel> predicate) {
+        for (int i = 0; i < items.size(); i++) {
+            List<Channel> channels = items.get(i).getChannel();
+            for (int j = 0; j < channels.size(); j++) if (predicate.test(channels.get(j))) return new int[]{i, j};
+        }
+        return new int[]{-1, -1};
+    }
+
+    private static String normalizeChannelName(String name) {
+        String value = Normalizer.normalize(name, Normalizer.Form.NFKC).toUpperCase(Locale.ROOT);
+        return CHANNEL_SEPARATOR.matcher(value).replaceAll("");
+    }
+
+    private static String cctvKey(String name) {
+        String value = Normalizer.normalize(name, Normalizer.Form.NFKC).toUpperCase(Locale.ROOT);
+        Matcher matcher = CCTV.matcher(value);
+        if (!matcher.find()) return "";
+        String number = matcher.group(1);
+        if (matcher.group(2) != null) return "CCTV" + number + "+";
+        String suffix = normalizeChannelName(value.substring(matcher.end()));
+        if (("4".equals(number) || "8".equals(number)) && suffix.startsWith("K")) return "CCTV" + number + "K";
+        return "CCTV" + number;
     }
 
     public int[] findByChannelNumber(String number, List<Group> items) {
