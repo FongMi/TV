@@ -33,13 +33,25 @@ public class Sniffer {
     }
 
     public static boolean isVideoFormat(String url) {
-        Rule rule = getRule(UrlUtil.uri(url));
+        return isVideoFormat(url, getRule(UrlUtil.uri(url)));
+    }
+
+    static boolean isVideoFormat(String url, Rule rule) {
         for (String exclude : rule.getExclude()) if (url.contains(exclude)) return false;
-        for (String exclude : rule.getExclude()) if (Pattern.compile(exclude).matcher(url).find()) return false;
+        for (Pattern exclude : rule.getExcludePatterns()) if (exclude.matcher(url).find()) return false;
         for (String regex : rule.getRegex()) if (url.contains(regex)) return true;
-        for (String regex : rule.getRegex()) if (Pattern.compile(regex).matcher(url).find()) return true;
-        if (url.contains("url=http") || url.contains("v=http") || url.contains(".html")) return false;
-        return SNIFFER.matcher(url).find();
+        for (Pattern regex : rule.getRegexPatterns()) if (regex.matcher(url).find()) return true;
+        String path = stripQueryAndFragment(url);
+        if (url.contains("url=http") || url.contains("v=http") || path.contains(".html")) return false;
+        return SNIFFER.matcher(path).find();
+    }
+
+    private static String stripQueryAndFragment(String url) {
+        int query = url.indexOf('?');
+        int fragment = url.indexOf('#');
+        int end = query < 0 ? url.length() : query;
+        if (fragment >= 0) end = Math.min(end, fragment);
+        return url.substring(0, end);
     }
 
     public static List<String> getScript(Uri uri) {

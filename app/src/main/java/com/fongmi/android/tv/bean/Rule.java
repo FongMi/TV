@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.bean;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 
@@ -10,8 +11,11 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class Rule {
 
@@ -25,6 +29,8 @@ public class Rule {
     private List<String> script;
     @SerializedName("exclude")
     private List<String> exclude;
+    private transient volatile List<Pattern> regexPatterns;
+    private transient volatile List<Pattern> excludePatterns;
 
     public Rule(String name) {
         this.name = name;
@@ -62,6 +68,30 @@ public class Rule {
 
     public List<String> getExclude() {
         return exclude == null ? Collections.emptyList() : exclude;
+    }
+
+    public List<Pattern> getRegexPatterns() {
+        List<Pattern> result = regexPatterns;
+        if (result == null) regexPatterns = result = compile(getRegex());
+        return result;
+    }
+
+    public List<Pattern> getExcludePatterns() {
+        List<Pattern> result = excludePatterns;
+        if (result == null) excludePatterns = result = compile(getExclude());
+        return result;
+    }
+
+    private static List<Pattern> compile(List<String> expressions) {
+        List<Pattern> result = new ArrayList<>(expressions.size());
+        for (String expression : expressions) {
+            try {
+                result.add(Pattern.compile(expression));
+            } catch (PatternSyntaxException e) {
+                Log.w("Rule", "Invalid regex", e);
+            }
+        }
+        return Collections.unmodifiableList(result);
     }
 
     @Override
