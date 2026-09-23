@@ -88,6 +88,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
     private ArrayObjectAdapter mFuncAdapter;
     private ArrayObjectAdapter mAdapter;
     private HistoryPresenter mPresenter;
+    private VodPresenter mVodPresenter;
     private SiteViewModel mViewModel;
     private Intent pendingAction;
     private boolean actionReady;
@@ -289,9 +290,10 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void addGrid(List<Vod> items, Style style) {
         List<ListRow> rows = new ArrayList<>();
-        VodPresenter presenter = new VodPresenter(this, style);
+        // Leanback assigns recycled view types by presenter identity.
+        if (mVodPresenter == null || !mVodPresenter.matches(style)) mVodPresenter = new VodPresenter(this, style);
         for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) {
-            ArrayObjectAdapter adapter = new ArrayObjectAdapter(presenter);
+            ArrayObjectAdapter adapter = new ArrayObjectAdapter(mVodPresenter);
             adapter.addAll(0, part);
             rows.add(new ListRow(adapter));
         }
