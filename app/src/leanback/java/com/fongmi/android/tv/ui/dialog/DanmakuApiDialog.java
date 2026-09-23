@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.databinding.DialogSingleInputBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.DanmakuListener;
 import com.fongmi.android.tv.server.Server;
@@ -24,7 +24,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class DanmakuApiDialog extends BaseAlertDialog {
 
-    private DialogUaBinding binding;
+    private DialogSingleInputBinding binding;
 
     public static void show(FragmentActivity activity) {
         new DanmakuApiDialog().show(activity.getSupportFragmentManager(), null);
@@ -36,7 +36,7 @@ public class DanmakuApiDialog extends BaseAlertDialog {
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = DialogUaBinding.inflate(getLayoutInflater());
+        return binding = DialogSingleInputBinding.inflate(getLayoutInflater());
     }
 
     @Override
