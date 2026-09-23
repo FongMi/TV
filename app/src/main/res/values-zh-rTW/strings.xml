@@ -46,6 +46,8 @@
     <string name="play_timer">定時</string>
     <string name="play_edition">標題</string>
     <string name="play_chapter">章節</string>
+    <string name="play_disc_menu">主選單</string>
+    <string name="play_disc_menu_unavailable">光碟沒有可用選單</string>
     <string name="play_scale">原始</string>
     <string name="play_config">配置</string>
     <string name="play_change">換源</string>
@@ -159,6 +161,7 @@
     <string name="subtitle_offset">字幕偏移</string>
     <string name="subtitle_size">大小</string>
     <string name="subtitle_position">位置</string>
+    <string name="subtitle_primary_position">主字幕位置</string>
     <string name="subtitle_style">樣式</string>
     <string name="playback_font">字型</string>
     <string name="playback_font_default">系統預設</string>
@@ -187,6 +190,8 @@
     <string name="subtitle_secondary_off">關閉</string>
     <string name="subtitle_secondary_auto">自動</string>
     <string name="subtitle_secondary_select">指定</string>
+    <string name="subtitle_primary_role">主</string>
+    <string name="subtitle_secondary_role">副</string>
     <string name="subtitle_secondary_track_select">副字幕</string>
     <string name="subtitle_secondary_position">副字幕位置</string>
     <string name="subtitle_color_white">白色</string>
@@ -254,6 +259,7 @@
     <string name="parse_from">解析來自：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
+    <string name="local">本地</string>
     <string name="push">推送</string>
 
     <!-- Setting -->
@@ -343,8 +349,10 @@
     <string name="dialog_config_url">請輸入網址…</string>
 
     <!-- Error -->
+    <string name="file_export_success">檔案已導出</string>
     <string name="error_config_get">配置取得失敗</string>
     <string name="error_file_open">無法開啟檔案</string>
+    <string name="error_file_save">無法儲存檔案</string>
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">播放網址解析失敗</string>
@@ -352,6 +360,8 @@
     <string name="error_play_url">播放網址載入失敗</string>
     <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
+    <string name="bdj_preparing">正在準備 BD-J 選單</string>
+    <string name="error_bdj_prepare">ISO 選單檢查或 BD-J 準備失敗：%1$s</string>
     <string name="error_audio_effect_unsupported">目前播放方式不支援音質設定</string>
     <string name="error_audio_effect_tunnel">Tunnel 模式下不支援音質設定</string>
     <string name="error_audio_effect_passthrough">音訊直通音軌不支援音質設定</string>
@@ -428,4 +438,80 @@
         <item>選擇字幕</item>
     </string-array>
 
+    <string name="content_title">瀏覽列表</string>
+    <string name="content_search">搜尋內容</string>
+    <string name="content_search_action">搜尋</string>
+    <string name="content_current">回到目前</string>
+    <string name="content_empty">尚無已載入的內容</string>
+    <string name="content_subtitle_unsupported">此字幕軌暫不支援瀏覽</string>
+    <string name="content_subtitle_loading">正在載入字幕…</string>
+    <string name="content_subtitle_partial">目前僅有已讀取的字幕，內容會隨播放更新</string>
+    <string name="content_subtitle_truncated">字幕已達記憶體上限，目前僅能搜尋保留的內容</string>
+    <string name="content_subtitle_error">無法建立字幕文字索引</string>
+    <string name="content_subtitle_unselected">請先選擇字幕軌</string>
+    <string name="content_no_match">沒有符合的內容</string>
+    <string name="content_following">跟隨播放</string>
+    <string name="content_browsing">瀏覽中</string>
+    <string name="content_remote_hint">按右鍵移至「回到目前」</string>
+    <string name="content_image_subtitle">[圖片字幕]</string>
+    <string name="content_retry">重試字幕</string>
+    <string name="content_retry_loading">載入中…</string>
+    <string name="subtitle_offset_primary">主字幕偏移</string>
+    <string name="subtitle_offset_secondary">副字幕偏移</string>
+    <string name="subtitle_offset_both">主副字幕偏移</string>
+    <string name="subtitle_offset_link">一起偏移</string>
+    <string name="subtitle_offset_reset">重設字幕時間</string>
+    <string name="subtitle_offset_limit">字幕偏移須在正負 300 秒內。</string>
+
+    <string name="player_audio_decoder_mode">音訊解碼器</string>
+    <string name="player_video_decoder_mode">視訊解碼器</string>
+    <string name="decoder_mode_auto">自動</string>
+    <string name="decoder_mode_hardware">硬解</string>
+    <string name="decoder_mode_software">軟解</string>
+    <string name="decoder_mode_ffmpeg">FFmpeg</string>
+    <string name="track_decoder_mode">解碼器：%1$s</string>
+
+    <string name="dialog_action_search_subtitles">搜尋字幕</string>
+    <string name="dialog_action_load_subtitles">載入字幕</string>
+    <string name="dialog_action_search_danmaku">搜尋彈幕</string>
+    <string name="dialog_action_load_danmaku">載入彈幕</string>
+    <string name="dialog_action_search_settings">搜尋設定</string>
+
+    <string name="mpv_script_buttons">腳本</string>
+    <string name="mpv_script_tab_buttons">按鈕</string>
+    <string name="mpv_script_tab_automatic">自動載入</string>
+    <string name="mpv_script_add">新增</string>
+    <string name="mpv_script_add_button">新增按鈕</string>
+    <string name="mpv_script_empty">尚未建立按鈕。</string>
+    <string name="mpv_script_auto_empty">尚未匯入啟動 Lua。</string>
+    <string name="mpv_script_import">匯入 Lua</string>
+    <string name="mpv_script_delete">刪除</string>
+    <string name="mpv_script_rename">重新命名</string>
+    <string name="mpv_script_replace">替換 Lua</string>
+    <string name="mpv_script_title">名稱</string>
+    <string name="mpv_script_enable">啟用</string>
+    <string name="mpv_script_disable">停用</string>
+    <string name="mpv_script_enabled">已啟用</string>
+    <string name="mpv_script_disabled">已停用</string>
+    <string name="mpv_script_error">MPV 操作失敗</string>
+    <string name="mpv_script_timeout">腳本未回應，已取消排隊操作。</string>
+    <string name="mpv_script_unavailable">請先開始 MPV 播放。</string>
+    <string name="mpv_script_add_command">新增指令按鈕</string>
+    <string name="mpv_script_edit_command">編輯指令</string>
+    <string name="mpv_script_command">MPV 指令</string>
+    <string name="mpv_script_command_detail">輸入名稱與指令。</string>
+    <string name="mpv_script_import_detail">將 Lua 建立為播放按鈕。</string>
+    <string name="mpv_script_action">腳本動作</string>
+    <string name="mpv_script_status">執行狀態</string>
+    <string name="mpv_script_no_status">尚無執行狀態。</string>
+    <string name="mpv_script_running">執行中</string>
+    <string name="mpv_script_done">執行完成</string>
+    <string name="mpv_script_failed">執行失敗</string>
+    <string name="mpv_script_hide">隱藏按鈕</string>
+    <string name="mpv_script_show">顯示按鈕</string>
+    <string name="mpv_script_hidden">已隱藏</string>
+    <string name="mpv_script_move_earlier">往前移</string>
+    <string name="mpv_script_move_later">往後移</string>
+    <string name="mpv_script_loading">載入中</string>
+    <string name="mpv_script_loaded">已載入</string>
 </resources>

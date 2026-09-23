@@ -17,4 +17,11 @@
     <string name="push_clip">推送剪贴板内容</string>
     <string name="push_info">使用手机扫描二维码，或于浏览器访问地址\n<xliff:g name="name">%s</xliff:g></string>
 
+
+    <string name="dialog_action_site_searchable">设置可搜索站源</string>
+    <string name="dialog_action_site_changeable">设置可换源站源</string>
+    <string name="dialog_action_select_all">全选</string>
+    <string name="dialog_action_clear_all">取消全选</string>
+    <string name="dialog_action_grid">切换为网格</string>
+    <string name="dialog_action_list">切换为列表</string>
 </resources>
