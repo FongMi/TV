@@ -73,6 +73,11 @@
   <init>();
 }
 
+-dontnote androidx.media3.decoder.ffmpeg.FfmpegDolbyVisionP5Renderer
+-keepclassmembers class androidx.media3.decoder.ffmpeg.FfmpegDolbyVisionP5Renderer {
+  <init>(android.content.Context, androidx.media3.exoplayer.mediacodec.MediaCodecAdapter$Factory, androidx.media3.exoplayer.mediacodec.MediaCodecSelector, long, boolean, android.os.Handler, androidx.media3.exoplayer.video.VideoRendererEventListener, int);
+}
+
 -dontnote androidx.media3.decoder.opus.LibopusAudioRenderer
 -keepclassmembers class androidx.media3.decoder.opus.LibopusAudioRenderer {
   <init>(android.os.Handler, androidx.media3.exoplayer.audio.AudioRendererEventListener, androidx.media3.exoplayer.audio.AudioSink);
