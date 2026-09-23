@@ -5,12 +5,11 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        style="@style/PlaybackDialogFirstRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingBottom="12dp"
+        android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -19,10 +18,13 @@
             android:text="@string/danmaku_show_scroll"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showScrollSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showScrollSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -32,7 +34,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingVertical="12dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -41,10 +43,13 @@
             android:text="@string/danmaku_show_top"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showTopSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showTopSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -54,7 +59,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingVertical="12dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -63,10 +68,13 @@
             android:text="@string/danmaku_show_bottom"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showBottomSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showBottomSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -76,7 +84,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingVertical="12dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -85,10 +93,13 @@
             android:text="@string/danmaku_show_reverse"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showReverseSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showReverseSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -98,7 +109,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingVertical="12dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -107,10 +118,13 @@
             android:text="@string/danmaku_show_positioned"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showPositionedSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showPositionedSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -120,7 +134,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingVertical="12dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -129,10 +143,13 @@
             android:text="@string/danmaku_show_subtitle"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showSubtitleSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showSubtitleSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -142,7 +159,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingVertical="12dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -151,10 +168,13 @@
             android:text="@string/danmaku_show_special"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/showSpecialSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showSpecialSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>

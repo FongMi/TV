@@ -6,12 +6,10 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        style="@style/PlaybackDialogFirstRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -20,10 +18,13 @@
             android:text="@string/danmaku_text_bold"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <com.google.android.material.materialswitch.MaterialSwitch
-            android:id="@+id/textBoldSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/textBoldSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -31,7 +32,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:text="@string/playback_font"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -60,7 +62,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -95,7 +98,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -128,7 +132,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:text="@string/danmaku_style_mode"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -178,7 +183,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -216,7 +222,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -254,7 +261,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -292,7 +300,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -330,7 +339,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -365,7 +375,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp"
         android:text="@string/danmaku_color_mode"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 

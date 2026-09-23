@@ -6,12 +6,11 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        style="@style/PlaybackDialogFirstRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="4dp">
+        android:paddingBottom="4dp"
+        android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -46,7 +45,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -81,7 +81,8 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="4dp">
+        android:paddingTop="8dp"
+        android:paddingBottom="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
