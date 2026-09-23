@@ -33,6 +33,7 @@ import com.fongmi.android.tv.player.effect.audio.AudioEffectBands;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.engine.PlayerEngine.SecondarySubtitleState;
 import com.fongmi.android.tv.player.engine.PlayerEngineFactory;
+import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.player.track.TrackUtil;
@@ -149,10 +150,7 @@ public class PlayerManager implements ParseCallback {
 
     public String getMediaTitle() {
         MediaMetadata metadata = getMetadata();
-        if (metadata == null) return "";
-        CharSequence title = !TextUtils.isEmpty(metadata.displayTitle) ? metadata.displayTitle : metadata.title;
-        if (TextUtils.isEmpty(title)) title = metadata.artist;
-        return TextUtils.isEmpty(title) ? "" : title.toString();
+        return metadata == null ? "" : MediaItemFactory.getDisplayTitle(metadata);
     }
 
     public void setMetadata(@NonNull MediaMetadata metadata) {

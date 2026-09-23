@@ -72,6 +72,7 @@ import com.fongmi.android.tv.playback.vod.VodPlayRequest;
 import com.fongmi.android.tv.playback.vod.VodPlaybackController;
 import com.fongmi.android.tv.playback.vod.VodPlaybackHost;
 import com.fongmi.android.tv.playback.vod.VodPlaybackMedia;
+import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.DanmakuSetting;
@@ -712,7 +713,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     @Override
     public void renderPlaybackMetadata(MediaMetadata metadata) {
         if (service() != null && isOwner()) player().setMetadata(metadata);
-        mBinding.control.title.setText(metadata.displayTitle);
+        mBinding.control.title.setText(MediaItemFactory.getDisplayTitle(metadata));
         mBinding.control.title.setSelected(true);
     }
 

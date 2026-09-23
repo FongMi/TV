@@ -29,9 +29,13 @@ import java.util.stream.IntStream;
 public final class MediaItemFactory {
 
     public static MediaMetadata buildMetadata(String title, String artist, String artUri, String displayName) {
+        return buildMetadata(title, artist, artUri).buildUpon().setDisplayTitle(formatDisplayTitle(title, displayName)).build();
+    }
+
+    public static MediaMetadata buildMetadata(String title, String artist, String artUri) {
         title = TextUtils.isEmpty(title) ? "" : title;
         artist = TextUtils.isEmpty(artist) ? "" : artist;
-        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setDisplayTitle(formatDisplayTitle(title, displayName)).setArtworkUri(getArtworkUri(artUri)).build();
+        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setArtworkUri(getArtworkUri(artUri)).build();
     }
 
     public static Uri getArtworkUri(String artUri) {
@@ -43,6 +47,13 @@ public final class MediaItemFactory {
         if (TextUtils.isEmpty(title)) return TextUtils.isEmpty(name) ? "" : name;
         if (TextUtils.isEmpty(name) || TextUtils.equals(title, name)) return title;
         return ResUtil.getString(R.string.detail_title, title, name);
+    }
+
+    public static String getDisplayTitle(MediaMetadata metadata) {
+        if (!TextUtils.isEmpty(metadata.displayTitle)) return metadata.displayTitle.toString();
+        String title = TextUtils.isEmpty(metadata.title) ? "" : metadata.title.toString();
+        String artist = TextUtils.isEmpty(metadata.artist) ? "" : metadata.artist.toString();
+        return formatDisplayTitle(title, artist);
     }
 
     public static String getDefaultUserAgent() {
