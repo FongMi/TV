@@ -575,6 +575,12 @@ public class PlayerManager implements ParseCallback {
         notifyDanmakuSourceChanged();
     }
 
+    public void clearDanmaku() {
+        if (spec == null) return;
+        spec.clearDanmaku();
+        notifyDanmakuSourceChanged();
+    }
+
     public void toggleDanmaku(Danmaku item) {
         if (spec == null) return;
         spec.toggleDanmaku(item);

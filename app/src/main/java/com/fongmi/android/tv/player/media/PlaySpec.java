@@ -155,7 +155,7 @@ public class PlaySpec {
         else selectDanmaku(item);
     }
 
-    private void clearDanmaku() {
+    public void clearDanmaku() {
         danmakus.forEach(item -> item.setSelected(false));
     }
 
