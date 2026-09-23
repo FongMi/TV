@@ -152,7 +152,6 @@
 
     <!-- Subtitle Setting -->
     <string name="subtitle_setting">Subtitle settings</string>
-    <string name="subtitle_search_api_title">Assrt</string>
     <string name="subtitle_search_token_hint">Token</string>
     <string name="subtitle_reset">Reset</string>
     <string name="subtitle_tab_appearance">Appearance</string>

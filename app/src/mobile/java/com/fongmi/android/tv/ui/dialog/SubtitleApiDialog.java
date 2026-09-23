@@ -55,7 +55,7 @@ public class SubtitleApiDialog extends BaseAlertDialog {
 
     private SubtitleListener getListener() {
         Fragment parent = getParentFragment();
-        if (parent instanceof SubtitleListener) return (SubtitleListener) parent;
+        if (parent instanceof SubtitleListener listener) return listener;
         return (SubtitleListener) requireActivity();
     }
 }

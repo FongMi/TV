@@ -152,7 +152,6 @@
 
     <!-- Subtitle Setting -->
     <string name="subtitle_setting">字幕設定</string>
-    <string name="subtitle_search_api_title">Assrt</string>
     <string name="subtitle_search_token_hint">Token</string>
     <string name="subtitle_reset">重置</string>
     <string name="subtitle_tab_appearance">外觀</string>
