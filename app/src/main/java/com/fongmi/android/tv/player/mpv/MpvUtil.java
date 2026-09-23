@@ -15,6 +15,7 @@ import androidx.media3.mpvplayer.MpvSubtitleOptions;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
+import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
 import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
@@ -54,6 +55,7 @@ public final class MpvUtil {
 
     public static MpvPlayer buildPlayer(int decode, Player.Listener listener) {
         MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(decode == C.DECODE_SOFTWARE ? MpvDecoderMode.SOFTWARE : MpvDecoderMode.HARDWARE).setConfig(buildConfig()).build();
+        player.setSubtitleContentLoader(new SubtitleFileContent());
         setPreferredTextLanguages(player);
         player.addListener(listener);
         return player;
