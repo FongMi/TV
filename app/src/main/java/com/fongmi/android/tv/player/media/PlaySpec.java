@@ -5,6 +5,7 @@ import android.net.Uri;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.MimeTypes;
 
 import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.Drm;
@@ -90,6 +91,7 @@ public class PlaySpec {
     }
 
     public String getFormat() {
+        if ((format == null || format.isEmpty()) && url != null && url.contains("/proxy/mpd/")) return MimeTypes.APPLICATION_MPD;
         return format;
     }
 
