@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.exo;
 import androidx.annotation.NonNull;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.util.LocalClearKeyLicense;
 import androidx.media3.database.StandaloneDatabaseProvider;
 import androidx.media3.datasource.DataSource;
 import androidx.media3.datasource.DefaultDataSource;
@@ -115,12 +116,13 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
     @Override
     public MediaSource createMediaSource(@NonNull MediaItem mediaItem) {
         getHttpDataSourceFactory().setDefaultRequestProperties(ExoUtil.extractHeaders(mediaItem));
-        if (!libassPlaybackSession.isAvailable()) return defaultMediaSourceFactory.createMediaSource(mediaItem);
-        LibassPlaybackSession.MediaComponents components = libassPlaybackSession.createMediaComponents(mediaItem, createDefaultExtractorsFactory());
+        ExtractorsFactory extractorsFactory = createDefaultExtractorsFactory().setMp4ClearKeys(LocalClearKeyLicense.parse(mediaItem.localConfiguration == null ? null : mediaItem.localConfiguration.drmConfiguration));
+        if (!libassPlaybackSession.isAvailable()) return new DefaultMediaSourceFactory(getDataSourceFactory(), extractorsFactory).createMediaSource(mediaItem);
+        LibassPlaybackSession.MediaComponents components = libassPlaybackSession.createMediaComponents(mediaItem, extractorsFactory);
         return new DefaultMediaSourceFactory(getDataSourceFactory(), components.extractorsFactory).setSubtitleParserFactory(components.subtitleParserFactory).createMediaSource(mediaItem);
     }
 
-    private static ExtractorsFactory createDefaultExtractorsFactory() {
+    static DefaultExtractorsFactory createDefaultExtractorsFactory() {
         return new DefaultExtractorsFactory().setTsExtractorTimestampSearchBytes(TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES * 10);
     }
 
