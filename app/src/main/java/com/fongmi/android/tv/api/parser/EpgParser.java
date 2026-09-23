@@ -10,86 +10,131 @@ import com.fongmi.android.tv.bean.Tv;
 import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Formatters;
-import com.fongmi.android.tv.utils.UrlUtil;
+import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
 
 import org.simpleframework.xml.core.Persister;
+import org.simpleframework.xml.stream.InputNode;
+import org.simpleframework.xml.stream.NodeBuilder;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.io.StringReader;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class EpgParser {
 
     private static final String TAG = EpgParser.class.getSimpleName();
+    private static final Pattern XML_TIME = Pattern.compile("(\\d{4}(?:\\d{2}){0,5})(?:\\s*(Z|UTC|GMT|[+-]\\d{2}:?\\d{2}))?");
+    private static final DateTimeFormatter XML_DATE = DateTimeFormatter.ofPattern("uuuuMMddHHmmss", Locale.ROOT).withResolverStyle(ResolverStyle.STRICT);
 
     private static OffsetDateTime parseFull(String source, ZoneId zoneId) {
-        String s = source.trim();
         try {
-            String time = s.length() > 14 ? s.substring(0, 14) : s;
-            String offset = s.length() > 14 ? s.substring(14).trim() : "";
-            if (!offset.isEmpty()) return parseOffset(time + " " + offset);
-            return LocalDateTime.parse(time, Formatters.EPG_FULL_NO_TZ).atZone(zoneId).toOffsetDateTime();
+            Matcher matcher = XML_TIME.matcher(source.trim());
+            if (!matcher.matches()) return null;
+            String time = matcher.group(1);
+            LocalDateTime date = LocalDateTime.parse(time + "0101000000".substring(time.length() - 4), XML_DATE);
+            String offset = matcher.group(2);
+            // Keep source-zone fallback for existing feeds without an explicit offset.
+            if (offset == null) return date.atZone(zoneId).toOffsetDateTime();
+            return date.atOffset(offset.equals("UTC") || offset.equals("GMT") ? ZoneOffset.UTC : ZoneOffset.of(offset));
         } catch (Exception e) {
-            Log.w(TAG, "parseFull failed: " + s + " -> " + e.getMessage());
-            return OffsetDateTime.ofInstant(Instant.EPOCH, ZoneOffset.UTC);
+            return null;
         }
     }
 
-    private static OffsetDateTime parseOffset(String source) {
-        try {
-            return OffsetDateTime.parse(source, Formatters.EPG_FULL);
-        } catch (Exception ignored) {
-            return OffsetDateTime.parse(source, Formatters.EPG_FULL_COLON);
-        }
-    }
-
-    public static void start(Live live, String url) throws Exception {
+    public static synchronized void start(Live live, String url) throws Exception {
+        checkInterrupted();
         long t0 = System.currentTimeMillis();
-        File file = Path.epg(UrlUtil.path(url));
-        String reason = refreshReason(file);
-        boolean refresh = reason != null;
-        Log.i(TAG, "start url=" + url + " file=" + file.getName() + " refresh=" + refresh + (refresh ? " reason=" + reason : ""));
-        if (refresh) Download.create(url, file).get();
-        boolean gzip = isGzip(file);
-        if (gzip) readGzip(live, file, refresh);
-        else readXml(live, file);
+        XmlData data = loadXml(url, Path.epg(Crypto.md5(url) + ".xml"));
+        ProgrammeResult result = processProgramme(data, prepareLiveChannels(live), live.getZoneId());
+        checkInterrupted();
+        bindResultsToLive(live, result);
         Log.i(TAG, "start done elapsed=" + (System.currentTimeMillis() - t0) + "ms");
     }
 
     public static Epg getEpg(String xml, String key, ZoneId zoneId) {
+        return getEpg(xml, key, null, zoneId);
+    }
+
+    public static Epg getEpg(String xml, String key, String date, ZoneId zoneId) {
         try {
-            Tv tv = new Persister().read(Tv.class, xml, false);
-            String rawDate = tv.getDate();
-            String date = rawDate.isEmpty() ? LocalDate.now(zoneId).format(Formatters.DATE) : parseFull(rawDate, zoneId).atZoneSameInstant(zoneId).format(Formatters.DATE);
-            Epg epg = Epg.create(key, date);
-            tv.getProgramme().forEach(programme -> epg.getList().add(getEpgData(programme, zoneId)));
-            return epg;
+            XmlData data = parseXmlData(NodeBuilder.read(new StringReader(xml)));
+            Map<String, Set<String>> channels = new HashMap<>();
+            channels.put(key, Set.of(key));
+            boolean named = data.channels.values().stream().flatMap(List::stream).flatMap(channel -> channel.getDisplayName().stream()).anyMatch(name -> name.getText().equals(key));
+            Set<String> programmeIds = data.programmes.keySet();
+            if (!data.ids.contains(key) && !named && programmeIds.size() == 1) channels.put(programmeIds.iterator().next(), Set.of(key));
+            Map<String, Epg> days = processProgramme(data, channels, zoneId).epgMap.get(key);
+            if (days == null || days.isEmpty()) return new Epg();
+            return date == null ? days.values().iterator().next() : days.getOrDefault(date, new Epg());
         } catch (Exception e) {
             Log.w(TAG, "getEpg parse failed key=" + key + ": " + e.getMessage());
             return new Epg();
         }
     }
 
-    private static String refreshReason(File file) {
-        if (!Path.exists(file)) return "file-missing";
-        if (!isToday(file.lastModified())) return "not-today";
-        if (System.currentTimeMillis() - file.lastModified() > TimeUnit.HOURS.toMillis(6)) return "older-than-6h";
-        return null;
+    private static XmlData loadXml(String url, File file) throws Exception {
+        if (isFresh(file)) {
+            try {
+                return parseXmlData(file);
+            } catch (Exception e) {
+                checkInterrupted();
+                Log.w(TAG, "Invalid EPG cache; retrying download");
+            }
+        }
+        File download = File.createTempFile("epg-", ".download", Path.epg());
+        File xml = null;
+        try {
+            Download.create(url, download).get();
+            checkInterrupted();
+            File source = download;
+            if (isGzip(download)) {
+                xml = File.createTempFile("epg-", ".xml", Path.epg());
+                if (!FileUtil.gzipDecompress(download, xml)) throw new IOException("Invalid EPG gzip");
+                source = xml;
+            }
+            XmlData data = parseXmlData(source);
+            checkInterrupted();
+            Path.move(source, file);
+            return data;
+        } finally {
+            Path.clear(download);
+            Path.clear(xml);
+        }
+    }
+
+    private static void checkInterrupted() throws InterruptedIOException {
+        if (Thread.currentThread().isInterrupted()) throw new InterruptedIOException();
+    }
+
+    private static boolean isFresh(File file) {
+        return Path.exists(file) && isToday(file.lastModified()) && System.currentTimeMillis() - file.lastModified() <= TimeUnit.HOURS.toMillis(6);
     }
 
     private static boolean isGzip(File file) {
@@ -104,90 +149,79 @@ public class EpgParser {
         return LocalDate.ofInstant(Instant.ofEpochMilli(millis), ZoneId.systemDefault()).equals(LocalDate.now());
     }
 
-    private static void readGzip(Live live, File file, boolean refresh) throws Exception {
-        File xml = Path.epg(file.getName() + ".xml");
-        boolean needsDecompression = refresh || !Path.exists(xml);
-        if (needsDecompression && !FileUtil.gzipDecompress(file, xml)) Log.w(TAG, "gzip decompress failed file=" + file);
-        readXml(live, xml);
-    }
-
-    private static void readXml(Live live, File file) throws Exception {
-        ZoneId zoneId = live.getZoneId();
-        Map<String, Channel> liveChannelMap = prepareLiveChannels(live);
-        XmlData xmlData = parseXmlData(file);
-        ProgrammeResult result = processProgramme(xmlData, liveChannelMap, zoneId);
-        bindResultsToLive(live, result);
-    }
-
-    private static Map<String, Channel> prepareLiveChannels(Live live) {
-        Map<String, Channel> map = new HashMap<>();
-        live.getGroups().stream()
-                .flatMap(group -> group.getChannel().stream())
-                .forEach(channel -> {
-                    if (!channel.getTvgId().isEmpty()) map.putIfAbsent(channel.getTvgId(), channel);
-                    if (!channel.getTvgName().isEmpty()) map.putIfAbsent(channel.getTvgName(), channel);
-                    if (!channel.getName().isEmpty()) map.putIfAbsent(channel.getName(), channel);
-                });
+    private static Map<String, Set<String>> prepareLiveChannels(Live live) {
+        Map<String, Set<String>> map = new HashMap<>();
+        List<Channel> channels = live.getGroups().stream().flatMap(group -> group.getChannel().stream()).collect(Collectors.toList());
+        for (Channel channel : channels) {
+            if (!channel.getTvgId().isEmpty()) map.put(channel.getTvgId(), Set.of(channel.getTvgId()));
+        }
+        Set<String> ids = new HashSet<>(map.keySet());
+        for (Channel channel : channels) {
+            for (String alias : List.of(channel.getTvgName(), channel.getName())) {
+                if (!alias.isEmpty() && !ids.contains(alias)) map.computeIfAbsent(alias, key -> new LinkedHashSet<>()).add(channel.getTvgId());
+            }
+        }
         return map;
     }
 
     private static XmlData parseXmlData(File file) throws Exception {
-        Tv tv = new Persister().read(Tv.class, file, false);
-        Map<String, List<Tv.Channel>> map = tv.getChannel().stream().collect(Collectors.groupingBy(Tv.Channel::getId));
-        return new XmlData(tv, map);
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(file))) {
+            return parseXmlData(NodeBuilder.read(input));
+        }
     }
 
-    private static ProgrammeResult processProgramme(XmlData data, Map<String, Channel> liveChannelMap, ZoneId zoneId) {
+    private static XmlData parseXmlData(InputNode root) throws Exception {
+        if (root == null || !"tv".equals(root.getName())) throw new IOException("Invalid XMLTV root");
+        return new XmlData(new Persister().read(Tv.class, root, false));
+    }
+
+    private static ProgrammeResult processProgramme(XmlData data, Map<String, Set<String>> liveChannelMap, ZoneId zoneId) throws InterruptedIOException {
         Map<String, Map<String, Epg>> epgMap = new HashMap<>();
         Map<String, String> srcMap = new HashMap<>();
-        Map<String, Channel> channelCache = new HashMap<>();
-        Set<String> channelMiss = new HashSet<>();
-        int skipped = 0;
-        for (Tv.Programme programme : data.tv.getProgramme()) {
-            String xmlChannelId = programme.getChannel();
-            Channel targetChannel;
-            if (channelCache.containsKey(xmlChannelId)) {
-                targetChannel = channelCache.get(xmlChannelId);
-            } else if (channelMiss.contains(xmlChannelId)) {
-                targetChannel = null;
-            } else {
-                targetChannel = findTargetChannel(xmlChannelId, liveChannelMap, data.map);
-                if (targetChannel != null) channelCache.put(xmlChannelId, targetChannel);
-                else channelMiss.add(xmlChannelId);
-            }
-            if (targetChannel == null) {
-                skipped++;
-                continue;
-            }
-            OffsetDateTime startDate = parseFull(programme.getStart(), zoneId);
-            OffsetDateTime endDate = parseFull(programme.getStop(), zoneId);
-            String liveTvgId = targetChannel.getTvgId();
-            String programmeDate = startDate.atZoneSameInstant(zoneId).format(Formatters.DATE);
-            epgMap.computeIfAbsent(liveTvgId, k -> new HashMap<>())
-                    .computeIfAbsent(programmeDate, d -> Epg.create(liveTvgId, d))
-                    .getList().add(getEpgData(startDate, endDate, zoneId, programme));
-            if (!srcMap.containsKey(liveTvgId)) {
-                List<Tv.Channel> xmlChannels = data.map.get(xmlChannelId);
-                if (xmlChannels != null) {
-                    for (Tv.Channel ch : xmlChannels) {
-                        if (ch.hasSrc()) {
-                            srcMap.put(liveTvgId, ch.getSrc());
-                            break;
-                        }
+        for (String xmlId : data.ids) {
+            checkInterrupted();
+            Set<String> targets = findTargetChannels(xmlId, liveChannelMap, data);
+            if (targets.isEmpty()) continue;
+            List<EpgData> entries = getProgrammeData(data.programmes.getOrDefault(xmlId, List.of()), zoneId);
+            for (String id : targets) {
+                for (Tv.Channel channel : data.channels.getOrDefault(xmlId, List.of())) {
+                    if (channel.hasSrc()) {
+                        srcMap.putIfAbsent(id, channel.getSrc());
+                        break;
                     }
+                }
+                for (EpgData entry : entries) {
+                    String date = Instant.ofEpochMilli(entry.getStartTime()).atZone(zoneId).format(Formatters.DATE);
+                    List<EpgData> list = epgMap.computeIfAbsent(id, k -> new TreeMap<>()).computeIfAbsent(date, d -> Epg.create(id, d)).getList();
+                    boolean duplicate = list.stream().anyMatch(item -> item.getStartTime() == entry.getStartTime() && item.getEndTime() == entry.getEndTime() && item.getTitle().equals(entry.getTitle()));
+                    if (!duplicate) list.add(targets.size() == 1 ? entry : copyEntry(entry));
                 }
             }
         }
-        Log.i(TAG, "processProgramme skipped(no match)=" + skipped + " matched channels=" + epgMap.size());
+        epgMap.values().forEach(days -> days.values().forEach(epg -> epg.getList().sort(Comparator.comparingLong(EpgData::getStartTime))));
         return new ProgrammeResult(epgMap, srcMap);
     }
 
-    private static Channel findTargetChannel(String xmlChannelId, Map<String, Channel> liveChannelMap, Map<String, List<Tv.Channel>> xmlChannelIdMap) {
-        Channel targetChannel = liveChannelMap.get(xmlChannelId);
-        if (targetChannel != null) return targetChannel;
-        List<Tv.Channel> channels = xmlChannelIdMap.get(xmlChannelId);
-        if (channels == null) return null;
-        return channels.stream().flatMap(xmlChannel -> xmlChannel.getDisplayName().stream()).map(Tv.DisplayName::getText).filter(name -> !name.isEmpty()).filter(liveChannelMap::containsKey).findFirst().map(liveChannelMap::get).orElse(null);
+    private static EpgData copyEntry(EpgData entry) {
+        EpgData copy = new EpgData();
+        copy.setTitle(entry.getTitle());
+        copy.setStart(entry.getStart());
+        copy.setEnd(entry.getEnd());
+        copy.setStartTime(entry.getStartTime());
+        copy.setEndTime(entry.getEndTime());
+        return copy;
+    }
+
+    private static Set<String> findTargetChannels(String xmlId, Map<String, Set<String>> liveChannels, XmlData data) {
+        Set<String> direct = liveChannels.get(xmlId);
+        if (direct != null && direct.contains(xmlId)) return direct;
+        Set<String> targets = new LinkedHashSet<>();
+        if (direct != null) targets.addAll(direct);
+        for (Tv.Channel channel : data.channels.getOrDefault(xmlId, List.of())) {
+            for (Tv.DisplayName name : channel.getDisplayName()) targets.addAll(liveChannels.getOrDefault(name.getText(), Set.of()));
+        }
+        targets.removeIf(data.ids::contains);
+        return targets;
     }
 
     private static void bindResultsToLive(Live live, ProgrammeResult result) {
@@ -197,8 +231,9 @@ public class EpgParser {
                 .forEach(channel -> {
                     String tvgId = channel.getTvgId();
                     Map<String, Epg> dateMap = result.epgMap.get(tvgId);
-                    if (dateMap != null) {
-                        channel.setDataList(new ArrayList<>(dateMap.values()));
+                    if (dateMap != null && !channel.hasEpgOverride()) {
+                        dateMap.values().forEach(channel::setData);
+                        channel.getDataList().sort(Comparator.comparing(Epg::getDate));
                         counts[0]++;
                     } else {
                         counts[1]++;
@@ -211,46 +246,47 @@ public class EpgParser {
         Log.i(TAG, "bindResultsToLive with-epg=" + counts[0] + " without-epg=" + counts[1]);
     }
 
-    private static EpgData getEpgData(Tv.Programme programme, ZoneId zoneId) {
-        OffsetDateTime startDate = parseFull(programme.getStart(), zoneId);
-        OffsetDateTime endDate = parseFull(programme.getStop(), zoneId);
-        return getEpgData(startDate, endDate, zoneId, programme);
-    }
-
-    private static EpgData getEpgData(OffsetDateTime startDate, OffsetDateTime endDate, ZoneId zoneId, Tv.Programme programme) {
-        try {
+    private static List<EpgData> getProgrammeData(List<Tv.Programme> programmes, ZoneId zoneId) throws InterruptedIOException {
+        List<EpgData> entries = new ArrayList<>();
+        for (Tv.Programme programme : programmes) {
+            checkInterrupted();
+            OffsetDateTime start = parseFull(programme.getStart(), zoneId);
+            OffsetDateTime end = parseFull(programme.getStop(), zoneId);
+            if (start == null || (!programme.getStop().isEmpty() && (end == null || !end.isAfter(start)))) continue;
             EpgData epgData = new EpgData();
             epgData.setTitle(programme.getTitle());
-            epgData.setStart(startDate.atZoneSameInstant(zoneId).format(Formatters.TIME));
-            epgData.setEnd(endDate.atZoneSameInstant(zoneId).format(Formatters.TIME));
-            epgData.setStartTime(startDate.toInstant().toEpochMilli());
-            epgData.setEndTime(endDate.toInstant().toEpochMilli());
+            epgData.setStart(start.atZoneSameInstant(zoneId).format(Formatters.TIME));
+            epgData.setStartTime(start.toInstant().toEpochMilli());
+            if (end != null) epgData.setEndTime(end.toInstant().toEpochMilli());
             epgData.trans();
-            return epgData;
-        } catch (Exception e) {
-            return new EpgData();
+            entries.add(epgData);
         }
+        entries.sort(Comparator.comparingLong(EpgData::getStartTime));
+        long nextStart = 0;
+        for (int i = entries.size() - 1; i >= 0; i--) {
+            EpgData entry = entries.get(i);
+            if (i + 1 < entries.size() && entry.getStartTime() < entries.get(i + 1).getStartTime()) nextStart = entries.get(i + 1).getStartTime();
+            if (entry.getEndTime() == 0) entry.setEndTime(nextStart);
+            if (entry.getEndTime() > entry.getStartTime()) entry.setEnd(Instant.ofEpochMilli(entry.getEndTime()).atZone(zoneId).format(Formatters.TIME));
+        }
+        entries.removeIf(entry -> entry.getEndTime() <= entry.getStartTime());
+        return entries;
     }
 
     private static class XmlData {
 
-        Tv tv;
-        Map<String, List<Tv.Channel>> map;
+        final Map<String, List<Tv.Channel>> channels;
+        final Map<String, List<Tv.Programme>> programmes;
+        final Set<String> ids;
 
-        public XmlData(Tv tv, Map<String, List<Tv.Channel>> map) {
-            this.tv = tv;
-            this.map = map;
+        public XmlData(Tv tv) {
+            this.channels = tv.getChannel().stream().collect(Collectors.groupingBy(Tv.Channel::getId, LinkedHashMap::new, Collectors.toList()));
+            this.programmes = tv.getProgramme().stream().collect(Collectors.groupingBy(Tv.Programme::getChannel, LinkedHashMap::new, Collectors.toList()));
+            this.ids = new LinkedHashSet<>(channels.keySet());
+            this.ids.addAll(programmes.keySet());
         }
     }
 
-    private static class ProgrammeResult {
-
-        Map<String, Map<String, Epg>> epgMap;
-        Map<String, String> srcMap;
-
-        public ProgrammeResult(Map<String, Map<String, Epg>> epgMap, Map<String, String> srcMap) {
-            this.epgMap = epgMap;
-            this.srcMap = srcMap;
-        }
+    private record ProgrammeResult(Map<String, Map<String, Epg>> epgMap, Map<String, String> srcMap) {
     }
 }

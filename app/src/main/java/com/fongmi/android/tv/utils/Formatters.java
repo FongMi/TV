@@ -14,8 +14,4 @@ public final class Formatters {
     public static final DateTimeFormatter EPG_DT_SHORT = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm", Locale.ROOT);
     public static final DateTimeFormatter EPG_DT_LONG = DateTimeFormatter.ofPattern("yyyy-MM-ddHH:mm:ss", Locale.ROOT);
     public static final DateTimeFormatter EPG_RANGE = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'", Locale.ROOT).withZone(ZoneOffset.UTC);
-    public static final DateTimeFormatter EPG_FULL = DateTimeFormatter.ofPattern("yyyyMMddHHmmss Z", Locale.ROOT);
-    public static final DateTimeFormatter EPG_FULL_NO_TZ = DateTimeFormatter.ofPattern("yyyyMMddHHmmss", Locale.ROOT);
-    public static final DateTimeFormatter EPG_FULL_COLON = DateTimeFormatter.ofPattern("yyyyMMddHHmmss XXX", Locale.ROOT);
-
 }

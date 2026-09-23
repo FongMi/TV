@@ -78,7 +78,11 @@ public class EpgData {
     }
 
     public boolean isInRange() {
-        return getStartTime() <= System.currentTimeMillis() && System.currentTimeMillis() <= getEndTime();
+        return isInRange(System.currentTimeMillis());
+    }
+
+    boolean isInRange(long now) {
+        return getStartTime() <= now && now < getEndTime();
     }
 
     public boolean isFuture() {
