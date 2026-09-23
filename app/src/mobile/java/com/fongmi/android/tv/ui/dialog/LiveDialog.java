@@ -7,14 +7,18 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.databinding.DialogLiveBinding;
 import com.fongmi.android.tv.impl.LiveListener;
 import com.fongmi.android.tv.ui.adapter.LiveAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.List;
 
 public class LiveDialog extends BaseAlertDialog implements LiveAdapter.OnClickListener {
 
@@ -70,29 +74,35 @@ public class LiveDialog extends BaseAlertDialog implements LiveAdapter.OnClickLi
 
     @Override
     public void onBootClick(int position, Live item) {
-        item.boot(!item.isBoot()).save();
+        item.boot(!item.isBoot()).saveSettings();
         adapter.notifyItemChanged(position);
     }
 
     @Override
     public void onPassClick(int position, Live item) {
-        item.pass(!item.isPass()).save();
+        item.pass(!item.isPass()).saveSettings();
         adapter.notifyItemChanged(position);
     }
 
     @Override
     public boolean onBootLongClick(Live item) {
         boolean result = !item.isBoot();
-        LiveConfig.get().getLives().forEach(live -> live.boot(result).save());
+        List<Live> lives = LiveConfig.get().getLives();
+        lives.forEach(live -> live.boot(result));
+        Live.saveSettings(lives);
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        Notify.show(getString(R.string.dialog_action_bulk_result, getString(R.string.dialog_action_live_boot), getString(result ? R.string.setting_on : R.string.setting_off)));
         return true;
     }
 
     @Override
     public boolean onPassLongClick(Live item) {
         boolean result = !item.isPass();
-        LiveConfig.get().getLives().forEach(live -> live.pass(result).save());
+        List<Live> lives = LiveConfig.get().getLives();
+        lives.forEach(live -> live.pass(result));
+        Live.saveSettings(lives);
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        Notify.show(getString(R.string.dialog_action_bulk_result, getString(R.string.dialog_action_live_password), getString(result ? R.string.setting_off : R.string.setting_on)));
         return true;
     }
 
