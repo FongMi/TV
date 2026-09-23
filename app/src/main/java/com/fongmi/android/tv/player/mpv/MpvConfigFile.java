@@ -2,6 +2,9 @@ package com.fongmi.android.tv.player.mpv;
 
 import android.net.Uri;
 
+import androidx.annotation.Nullable;
+import androidx.media3.mpvplayer.MpvConfigFileInspector;
+
 import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
 
@@ -21,8 +24,17 @@ public final class MpvConfigFile {
         return Path.mpv(MPV_CONF);
     }
 
+    private static MpvConfigFileInspector inspector() {
+        return new MpvConfigFileInspector(Path.mpv());
+    }
+
     public static String read() {
         return Path.read(file());
+    }
+
+    @Nullable
+    public static File getSubtitleFontsDirectory() {
+        return inspector().readSubtitleFontsDirectory();
     }
 
     public static boolean write(String content) {

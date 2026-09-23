@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
@@ -21,6 +22,7 @@ import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
+import java.util.Objects;
 
 final class ExternalFontSelector {
 
@@ -60,7 +62,7 @@ final class ExternalFontSelector {
         loading = true;
         Task.execute(() -> {
             try {
-                List<ExternalFont.Entry> loaded = ExternalFont.getAll();
+                List<ExternalFont.Entry> loaded = ExternalFont.getAll(MpvConfigFile.getSubtitleFontsDirectory());
                 App.post(() -> onLoaded(loaded));
             } catch (RuntimeException e) {
                 App.post(() -> onLoadFailed(e));
@@ -100,12 +102,14 @@ final class ExternalFontSelector {
     private void addFontChip(ChipGroup group, @Nullable ExternalFont.Entry entry) {
         ExternalFont.Item font = entry == null ? null : entry.item();
         Chip chip = createChip(group);
-        chip.setText(font == null ? ResUtil.getString(R.string.playback_font_default) : font.displayName());
+        String label = font == null ? ResUtil.getString(R.string.playback_font_default) : font.displayName();
+        if (font != null && font.source() != null) label += font.directory().equals(ExternalFont.getMpvDirectory()) ? " (mpv/fonts)" : " (mpv.conf)";
+        chip.setText(label);
         if (entry != null && entry.typeface() != null) chip.setTypeface(entry.typeface());
         chip.setCheckable(true);
         chip.setOnClickListener(view -> select(font));
         group.addView(chip);
-        if (font == null || font.equals(selected)) group.check(chip.getId());
+        if (Objects.equals(font, selected)) group.check(chip.getId());
     }
 
     private void addImportChip(ChipGroup group) {
@@ -159,7 +163,7 @@ final class ExternalFontSelector {
     @Nullable
     private ExternalFont.Item find(List<ExternalFont.Entry> entries, @Nullable ExternalFont.Item selected) {
         if (selected == null) return null;
-        for (ExternalFont.Entry entry : entries) if (entry.item().fileName().equals(selected.fileName())) return entry.item();
+        for (ExternalFont.Entry entry : entries) if (entry.item().storageKey().equals(selected.storageKey())) return entry.item();
         return null;
     }
 
