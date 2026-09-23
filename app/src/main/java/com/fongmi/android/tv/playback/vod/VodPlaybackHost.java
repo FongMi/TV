@@ -60,6 +60,8 @@ public interface VodPlaybackHost {
 
     void replay(long position);
 
+    void seekPlayback(long position);
+
     void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata);
 
     boolean preloadPlayback(Result result, long startPositionMs, MediaMetadata metadata);

@@ -180,6 +180,13 @@ const resultPlay = `{
     "Referer": "https://example.com/"
   },
   "format": "application/x-mpegURL",
+  "skips": [
+    { "type": "opening", "start": 0, "end": 90000 },
+    { "type": "middle", "start": 600000, "end": 630000 },
+    { "type": "middle", "start": 850000, "end": 880000 },
+    { "type": "middle", "start": 1000000, "end": 1020000 },
+    { "type": "ending", "start": 1200000, "end": 1260000 }
+  ],
   "subs": [
     {
       "url": "https://example.com/subs/demo-1.vtt",
@@ -222,6 +229,7 @@ export default function SpiderPage() {
           <a href="#node">Node.js</a>
           <a href="#lifecycle">方法生命週期</a>
           <a href="#result">Result 結構</a>
+          <a href="#skips">片段跳過</a>
           <a href="#objects">資料物件</a>
           <a href="#episodes">集數格式</a>
           <a href="#proxy">Proxy 回傳</a>
@@ -366,6 +374,24 @@ export default function SpiderPage() {
             </div>
             <h3>完整 Result 欄位</h3>
             <FieldTable fields={resultFields} label="Result" />
+            <h3 id="skips">片段跳過</h3>
+            <p>
+              每集的 <code>playerContent</code> 可在 Result 頂層提供{" "}
+              <code>skips</code> 陣列，範例見上方播放類 Result。<code>start</code>
+              是開始跳過的時間，<code>end</code> 是要跳到的時間，單位都是毫秒；
+              有填 end 時，必須晚於 start。片頭一定要填 end；start 為 0 時從 end 開始播放，
+              但續播位置或 Result.position 更晚時，仍從較晚的位置播放。
+              其他片頭區間會在播放進入時跳到 end。
+            </p>
+            <p>
+              <code>middle</code> 可提供多段片中區間，每段都必須有 end；播放進入區間時跳到 end。
+              例如 start 為 600000、end 為 630000，會從 10:00 跳到 10:30。
+              片頭或片尾設為關閉時，片中區間仍會生效。有 end 的片尾跳到 end 繼續播放；片尾可在 start 大於 0 時省略 end，例如{" "}
+              <code>{'{"type":"ending","start":1200000}'}</code>
+              ，則依播放順序換集，沒有後續集數時跳到片尾。使用者手動設定的片頭或片尾會各自覆蓋來源區間；
+              設為 0 則關閉該側自動跳過。
+              缺少 skips 或其中有無效區間時，播放網址仍可正常使用。
+            </p>
             <h3>url 的多畫質寫法</h3>
             <p>
               單一 URL

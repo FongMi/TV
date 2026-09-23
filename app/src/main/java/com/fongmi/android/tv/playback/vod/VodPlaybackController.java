@@ -10,6 +10,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.SkipSegment;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.playback.PlaybackResult;
 
@@ -28,6 +29,8 @@ public class VodPlaybackController {
     private final VodFallbackPolicy fallbackPolicy;
     private final VodPreloader preloader;
     private History lastHistory;
+    private SkipSegment activeSkip;
+    private boolean manualEndingTriggered;
 
     public VodPlaybackController(VodPlaybackHost host, VodDataSource dataSource, VodPlaybackState state) {
         this.host = host;
@@ -41,6 +44,8 @@ public class VodPlaybackController {
     public void reset() {
         preloader.clear();
         state.reset();
+        activeSkip = null;
+        manualEndingTriggered = false;
     }
 
     public void checkId() {
@@ -122,6 +127,8 @@ public class VodPlaybackController {
     }
 
     private void applyPlaybackState(Result result, VodPlayRequest request) {
+        activeSkip = null;
+        manualEndingTriggered = false;
         state.setQuality(result);
         state.setPlayingRequest(request);
         state.setUseParse(result.isUseParse());
@@ -313,13 +320,46 @@ public class VodPlaybackController {
     }
 
     public void onTimeChanged(long time, long position, long duration) {
+        if (state.getPlayingRequest() == null) return;
         History history = currentHistory();
         historyPolicy.updateProgress(history, time, position, duration);
-        if (history != null && history.getEnding() > 0 && history.getEnding() + position >= duration) nextEpisode(false);
+        if (history != null && duration > 0 && history.getEnding() > 0 && history.getEnding() + position >= duration) {
+            if (!manualEndingTriggered) manualEndingTriggered = skipToEnd(history, duration);
+            return;
+        }
+        manualEndingTriggered = false;
+        SkipSegment segment = VodSkipPolicy.activeSegment(history, state.getQuality(), position);
+        if (segment == null) {
+            activeSkip = null;
+        } else if (segment != activeSkip) {
+            if (!segment.isToEnd()) {
+                activeSkip = segment;
+                host.seekPlayback(segment.getEnd());
+            } else if (skipToEnd(history, duration) && state.getPlayingRequest() != null) {
+                activeSkip = segment;
+            }
+        }
+    }
+
+    private boolean skipToEnd(History history, long duration) {
+        if (!state.hasEpisode()) return false;
+        boolean reversed = history != null && history.isRevPlay();
+        if (!state.getRelativeEpisode(reversed ? -1 : 1).isSelected()) {
+            nextEpisode(false);
+            return true;
+        }
+        if (duration <= 0) return false;
+        host.seekPlayback(duration);
+        return true;
     }
 
     public long startPositionMs() {
-        return historyPolicy.startPositionMs(state.getHistory());
+        History history = state.getHistory();
+        return VodSkipPolicy.startPositionMs(history, state.getQuality(), history == null ? C.TIME_UNSET : history.getPosition());
+    }
+
+    public long openingPositionMs() {
+        return Math.max(0, VodSkipPolicy.startPositionMs(state.getHistory(), state.getQuality(), C.TIME_UNSET));
     }
 
     private History currentHistory() {
@@ -339,10 +379,13 @@ public class VodPlaybackController {
 
     public void setOpening(long opening) {
         if (state.getHistory() != null) state.getHistory().setOpening(opening);
+        activeSkip = null;
     }
 
     public void setEnding(long ending) {
         if (state.getHistory() != null) state.getHistory().setEnding(ending);
+        activeSkip = null;
+        manualEndingTriggered = false;
     }
 
     public void setScale(int scale) {
@@ -416,6 +459,8 @@ public class VodPlaybackController {
     }
 
     private void requestPlayer(Flag flag, Episode episode) {
+        activeSkip = null;
+        manualEndingTriggered = false;
         historyPolicy.updateEpisode(state.getHistory(), flag, episode);
         VodPlayRequest request = VodPlayRequest.create(host.getVodKey(), flag, episode);
         state.setPendingRequest(request);

@@ -86,14 +86,8 @@ final class VodPreloader {
     private void start(Result result, Episode episode) {
         result.getUrl().set(state.getQualityPosition());
         MediaMetadata metadata = VodPlaybackMedia.metadata(state.getHistory(), episode);
-        if (host.preloadPlayback(result, getStartPositionMs(result), metadata)) state.completePreload(result);
+        long position = Math.max(0, VodSkipPolicy.startPositionMs(state.getHistory(), result, C.TIME_UNSET));
+        if (host.preloadPlayback(result, position, metadata)) state.completePreload(result);
         else clear();
-    }
-
-    private long getStartPositionMs(Result result) {
-        History history = state.getHistory();
-        long opening = history == null ? C.TIME_UNSET : history.getOpening();
-        long position = result.hasPosition() ? result.getPosition() : C.TIME_UNSET;
-        return Math.max(0, Math.max(opening, position));
     }
 }

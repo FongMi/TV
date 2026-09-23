@@ -522,6 +522,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    public void seekPlayback(long position) {
+        long current = player().getPosition();
+        if (current >= 0) seekTo(position - current);
+    }
+
+    @Override
     public void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata) {
         startPlayer(getHistoryKey(), result, useParse, getSite().getTimeout(), startPositionMs, metadata);
     }
@@ -628,8 +634,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void renderHistory(History history) {
         mHistory = history;
-        mBinding.control.action.opening.setText(history.getOpening() <= 0 ? getString(R.string.play_op) : Util.timeMs(history.getOpening()));
-        mBinding.control.action.ending.setText(history.getEnding() <= 0 ? getString(R.string.play_ed) : Util.timeMs(history.getEnding()));
+        mBinding.control.action.opening.setText(openingText(history.getOpening()));
+        mBinding.control.action.ending.setText(endingText(history.getEnding()));
         player().setSpeed(SpeedSetting.getPlayback());
         setScale(getScale());
         setPartAdapter();
@@ -959,13 +965,17 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private boolean onOpeningReset() {
-        setOpening(0);
+        setOpening(History.AUTO_SKIP);
         return true;
     }
 
     private void setOpening(long opening) {
         mVod.setOpening(opening);
-        mBinding.control.action.opening.setText(opening <= 0 ? getString(R.string.play_op) : Util.timeMs(mHistory.getOpening()));
+        mBinding.control.action.opening.setText(openingText(opening));
+    }
+
+    private String openingText(long opening) {
+        return opening <= 0 ? getString(R.string.play_op) : Util.timeMs(opening);
     }
 
     private void onEnding() {
@@ -983,13 +993,17 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private boolean onEndingReset() {
-        setEnding(0);
+        setEnding(History.AUTO_SKIP);
         return true;
     }
 
     private void setEnding(long ending) {
         mVod.setEnding(ending);
-        mBinding.control.action.ending.setText(ending <= 0 ? getString(R.string.play_ed) : Util.timeMs(mHistory.getEnding()));
+        mBinding.control.action.ending.setText(endingText(ending));
+    }
+
+    private String endingText(long ending) {
+        return ending <= 0 ? getString(R.string.play_ed) : Util.timeMs(ending);
     }
 
     private void onPlayer() {
@@ -1254,7 +1268,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         if (!isOwner() || !player().isVod()) return;
         long position = player().getPosition();
         long duration = player().getDuration();
-        if (position < 0 || duration <= 0) return;
+        if (position < 0) return;
         mVod.onTimeChanged(time, position, duration);
     }
 
@@ -1296,7 +1310,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void onPlay() {
-        if (mHistory != null && isEnded()) controller().seekTo(mHistory.getOpening());
+        if (mHistory != null && isEnded()) controller().seekTo(mVod.openingPositionMs());
         if (!player().isEmpty() && isIdle()) controller().prepare();
         controller().play();
     }

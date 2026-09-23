@@ -12,6 +12,7 @@ import com.fongmi.android.tv.gson.DanmakuAdapter;
 import com.fongmi.android.tv.gson.FilterAdapter;
 import com.fongmi.android.tv.gson.HeaderAdapter;
 import com.fongmi.android.tv.gson.MsgAdapter;
+import com.fongmi.android.tv.gson.SkipAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.utils.Util;
@@ -68,6 +69,9 @@ public class Result implements Parcelable {
 
     @SerializedName("subs")
     private List<Sub> subs;
+    @SerializedName("skips")
+    @JsonAdapter(SkipAdapter.class)
+    private List<SkipSegment> skipSegments;
     @SerializedName("playUrl")
     private String playUrl;
     @SerializedName("artwork")
@@ -209,6 +213,10 @@ public class Result implements Parcelable {
 
     public List<Sub> getSubs() {
         return subs == null ? new ArrayList<>() : new ArrayList<>(subs);
+    }
+
+    public List<SkipSegment> getSkipSegments() {
+        return skipSegments == null ? Collections.emptyList() : skipSegments;
     }
 
     public void setSubs(List<Sub> subs) {

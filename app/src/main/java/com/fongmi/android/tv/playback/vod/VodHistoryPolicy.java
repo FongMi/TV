@@ -95,8 +95,4 @@ public class VodHistoryPolicy {
         history.markSaveScheduled();
         return history.copy();
     }
-
-    public long startPositionMs(History history) {
-        return history == null ? C.TIME_UNSET : Math.max(history.getOpening(), history.getPosition());
-    }
 }
