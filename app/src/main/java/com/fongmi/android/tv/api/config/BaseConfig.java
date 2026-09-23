@@ -20,7 +20,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -108,10 +110,15 @@ abstract class BaseConfig {
     }
 
     protected boolean isCanceled(Throwable e) {
-        if ("Canceled".equals(e.getMessage())) return true;
-        if (e instanceof InterruptedException) return true;
-        if (e instanceof InterruptedIOException) return true;
-        return e.getCause() instanceof InterruptedIOException;
+        if (Thread.currentThread().isInterrupted()) return true;
+        boolean canceled = false;
+        boolean timedOut = false;
+        for (Throwable current = e; current != null; current = current.getCause()) {
+            if (current instanceof InterruptedException || current instanceof CancellationException) return true;
+            canceled |= current instanceof InterruptedIOException || "Canceled".equals(current.getMessage());
+            timedOut |= current instanceof SocketTimeoutException;
+        }
+        return canceled && !timedOut;
     }
 
     protected JsonArray fetchArray(JsonObject object, String key) {
