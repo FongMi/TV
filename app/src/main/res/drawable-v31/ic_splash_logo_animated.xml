@@ -1,0 +1,381 @@
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ic_splash_logo">
+
+    <target android:name="logo_motion">
+        <aapt:attr name="android:animation">
+            <set android:ordering="sequentially">
+                <set android:ordering="together">
+                    <objectAnimator
+                        android:duration="576"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="scaleX"
+                        android:valueFrom="0.72"
+                        android:valueTo="1.02"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="576"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="scaleY"
+                        android:valueFrom="0.72"
+                        android:valueTo="1.02"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="576"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="rotation"
+                        android:valueFrom="-8"
+                        android:valueTo="0"
+                        android:valueType="floatType" />
+                </set>
+                <set android:ordering="together">
+                    <objectAnimator
+                        android:duration="224"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="scaleX"
+                        android:valueFrom="1.02"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="224"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="scaleY"
+                        android:valueFrom="1.02"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                </set>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_top_motion">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="576"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="translateY"
+                android:startOffset="0"
+                android:valueFrom="-92"
+                android:valueTo="0"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_left_motion">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="translateX"
+                    android:startOffset="0"
+                    android:valueFrom="-86"
+                    android:valueTo="0"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="translateY"
+                    android:startOffset="0"
+                    android:valueFrom="52"
+                    android:valueTo="0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_right_motion">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="translateX"
+                    android:startOffset="0"
+                    android:valueFrom="86"
+                    android:valueTo="0"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="translateY"
+                    android:startOffset="0"
+                    android:valueFrom="52"
+                    android:valueTo="0"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_top_trace">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="trimPathEnd"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <set android:ordering="sequentially">
+                    <objectAnimator
+                        android:duration="80"
+                        android:interpolator="@android:interpolator/linear_out_slow_in"
+                        android:propertyName="strokeAlpha"
+                        android:startOffset="0"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="496"
+                        android:propertyName="strokeAlpha"
+                        android:valueFrom="1"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="160"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="strokeAlpha"
+                        android:valueFrom="1"
+                        android:valueTo="0"
+                        android:valueType="floatType" />
+                </set>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_left_trace">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="trimPathEnd"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <set android:ordering="sequentially">
+                    <objectAnimator
+                        android:duration="80"
+                        android:interpolator="@android:interpolator/linear_out_slow_in"
+                        android:propertyName="strokeAlpha"
+                        android:startOffset="0"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="496"
+                        android:propertyName="strokeAlpha"
+                        android:valueFrom="1"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="160"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="strokeAlpha"
+                        android:valueFrom="1"
+                        android:valueTo="0"
+                        android:valueType="floatType" />
+                </set>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_right_trace">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="trimPathEnd"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <set android:ordering="sequentially">
+                    <objectAnimator
+                        android:duration="80"
+                        android:interpolator="@android:interpolator/linear_out_slow_in"
+                        android:propertyName="strokeAlpha"
+                        android:startOffset="0"
+                        android:valueFrom="0"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="496"
+                        android:propertyName="strokeAlpha"
+                        android:valueFrom="1"
+                        android:valueTo="1"
+                        android:valueType="floatType" />
+                    <objectAnimator
+                        android:duration="160"
+                        android:interpolator="@android:interpolator/fast_out_slow_in"
+                        android:propertyName="strokeAlpha"
+                        android:valueFrom="1"
+                        android:valueTo="0"
+                        android:valueType="floatType" />
+                </set>
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_top_accent">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="352"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="fillAlpha"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="fillColor"
+                    android:startOffset="0"
+                    android:valueFrom="#A3FBE5"
+                    android:valueTo="#2DD4AA"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_top_tip">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_top_right">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_top_left">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_left_accent">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="352"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="fillAlpha"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="fillColor"
+                    android:startOffset="0"
+                    android:valueFrom="#B9E2FF"
+                    android:valueTo="#68AEF4"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_left_face">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_right_accent">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="352"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="fillAlpha"
+                    android:startOffset="0"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+                <objectAnimator
+                    android:duration="576"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="fillColor"
+                    android:startOffset="0"
+                    android:valueFrom="#FFF4CC"
+                    android:valueTo="#FFE08F"
+                    android:valueType="colorType" />
+            </set>
+        </aapt:attr>
+    </target>
+    <target android:name="logo_right_face">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_right_edge">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_right_inner">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:duration="352"
+                android:interpolator="@android:interpolator/fast_out_slow_in"
+                android:propertyName="fillAlpha"
+                android:startOffset="0"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType" />
+        </aapt:attr>
+    </target>
+    <target android:name="logo_outline">
+        <aapt:attr name="android:animation">
+            <set android:ordering="together">
+                <objectAnimator
+                    android:duration="160"
+                    android:interpolator="@android:interpolator/fast_out_slow_in"
+                    android:propertyName="strokeAlpha"
+                    android:startOffset="576"
+                    android:valueFrom="0"
+                    android:valueTo="1"
+                    android:valueType="floatType" />
+            </set>
+        </aapt:attr>
+    </target>
+</animated-vector>
