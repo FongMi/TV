@@ -358,12 +358,10 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     private void setSelected() {
         mChannelAdapter.setSelected(mChannel);
-        notifyItemChanged(mBinding.channel, mChannelAdapter);
     }
 
     private void setSelected(EpgData item) {
         mEpgDataAdapter.setSelected(item);
-        notifyItemChanged(mBinding.epgData, mEpgDataAdapter);
     }
 
     private void checkPlay() {
