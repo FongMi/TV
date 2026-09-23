@@ -87,7 +87,7 @@ public class Result implements Parcelable {
     @SerializedName("position")
     private Long position;
     @SerializedName("pagecount")
-    private Integer pagecount;
+    private Long pagecount;
     @SerializedName("parse")
     private Integer parse;
     @SerializedName("code")
@@ -289,7 +289,10 @@ public class Result implements Parcelable {
     }
 
     public Integer getPageCount() {
-        return pagecount == null ? 0 : pagecount;
+        if (pagecount == null) return 0;
+        if (pagecount > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if (pagecount < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        return pagecount.intValue();
     }
 
     public Integer getParse() {
