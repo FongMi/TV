@@ -167,7 +167,7 @@ public class BrowseTree {
         if (!TextUtils.isEmpty(subtitle)) metadata.setSubtitle(subtitle);
         if (!TextUtils.isEmpty(art)) metadata.setArtworkUri(MediaItemFactory.getArtworkUri(art));
         if (uri != null && !TextUtils.isEmpty(subtitle)) metadata.setArtist(subtitle);
-        if (uri != null) metadata.setDisplayTitle(MediaItemFactory.formatDisplayTitle(title, subtitle));
+        // Let legacy browsers show the title and episode on separate lines.
         MediaItem.Builder builder = new MediaItem.Builder().setMediaId(id).setMediaMetadata(metadata.build());
         if (uri != null) builder.setUri(uri);
         return builder.build();
