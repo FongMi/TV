@@ -1,6 +1,5 @@
 # TV
 -keep class androidx.leanback.widget.** { *; }
--keep class com.fongmi.quickjs.method.** { *; }
 -keep class com.fongmi.android.tv.bean.** { *; }
 
 # Gson
@@ -32,11 +31,6 @@
 # Kotlin
 -keeppackagenames kotlin.**
 -keep class kotlin.** { *; }
-
-# CatVod
--keep class com.github.catvod.Proxy { *; }
--keep class com.github.catvod.crawler.** { *; }
--keep class * extends com.github.catvod.crawler.Spider
 
 # Jianpian
 -keep class com.p2p.** { *; }
