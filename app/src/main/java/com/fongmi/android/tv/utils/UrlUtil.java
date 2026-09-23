@@ -10,6 +10,7 @@ import com.github.catvod.utils.UriUtil;
 import com.google.common.net.HttpHeaders;
 
 import java.io.File;
+import java.util.Locale;
 
 public class UrlUtil {
 
@@ -24,7 +25,7 @@ public class UrlUtil {
 
     public static String scheme(Uri uri) {
         String scheme = uri.getScheme();
-        return scheme == null ? "" : scheme.toLowerCase().trim();
+        return scheme == null ? "" : scheme.toLowerCase(Locale.ROOT).trim();
     }
 
     public static String host(String url) {
@@ -33,7 +34,7 @@ public class UrlUtil {
 
     public static String host(Uri uri) {
         String host = uri.getHost();
-        return host == null ? "" : host.toLowerCase().trim();
+        return host == null ? "" : host.toLowerCase(Locale.ROOT).trim();
     }
 
     public static String path(String url) {
@@ -75,7 +76,7 @@ public class UrlUtil {
     }
 
     public static String fixHeader(String key) {
-        if (HttpHeaders.USER_AGENT.equalsIgnoreCase(key)) return HttpHeaders.USER_AGENT;
+        if (HttpHeaders.USER_AGENT.equalsIgnoreCase(key) || "ua".equalsIgnoreCase(key)) return HttpHeaders.USER_AGENT;
         if (HttpHeaders.REFERER.equalsIgnoreCase(key)) return HttpHeaders.REFERER;
         if (HttpHeaders.COOKIE.equalsIgnoreCase(key)) return HttpHeaders.COOKIE;
         return key;
