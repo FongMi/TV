@@ -10,6 +10,7 @@ class AbiApkPackaging {
         def android = project.extensions.getByName('android')
         def components = project.extensions.getByName('androidComponents')
         configureAbis(android)
+        configureDebugResourceCacheKey(project, components)
         components.onVariants(components.selector().withBuildType('release')) { variant ->
             def device = configureOutputFileNames(variant)
             configureFinalizer(project, android, components, variant, apkArtifact)
@@ -27,6 +28,20 @@ class AbiApkPackaging {
             reset()
             include(*ABI_PAIRS.keySet().toList())
             universalApk = false
+        }
+    }
+
+    private static void configureDebugResourceCacheKey(Project project, def components) {
+        def injectedApi = project.providers.gradleProperty('android.injected.build.api').orElse('')
+        def injectedAbis = project.providers.gradleProperty('android.injected.build.abi').orElse('')
+        def stableIds = project.providers.gradleProperty('android.injected.enableStableIds').orElse('')
+        components.onVariants(components.selector().withBuildType('debug')) { variant ->
+            def taskName = "process${variant.name.capitalize()}Resources"
+            project.tasks.matching { it.name == taskName }.configureEach { task ->
+                task.inputs.property('androidInjectedBuildApi', injectedApi)
+                task.inputs.property('androidInjectedBuildAbis', injectedAbis)
+                task.inputs.property('androidInjectedStableIds', stableIds)
+            }
         }
     }
 
