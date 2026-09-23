@@ -3,6 +3,7 @@ package com.fongmi.quickjs.crawler;
 import android.content.Context;
 
 import com.fongmi.quickjs.bean.Res;
+import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.method.Console;
 import com.fongmi.quickjs.method.Global;
 import com.fongmi.quickjs.method.Local;
@@ -37,6 +38,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final ExecutorService executor;
     private final DexClassLoader dex;
     private final String api;
+    private final Host host;
 
     private QuickJSContext ctx;
     private JSObject jsObject;
@@ -44,9 +46,14 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private boolean cat;
 
     public Spider(String api, DexClassLoader dex) {
+        this(api, dex, Host.NONE);
+    }
+
+    public Spider(String api, DexClassLoader dex, Host host) {
         this.executor = Executors.newSingleThreadExecutor();
         this.api = api;
         this.dex = dex;
+        this.host = host;
     }
 
     private <T> Future<T> submit(Callable<T> callable) {
@@ -179,7 +186,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void createFun() {
         try {
-            global = Global.create(ctx, executor);
+            global = Global.create(ctx, executor, host);
             Class<?> clz = dex.loadClass("com.github.catvod.js.Function");
             clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx);
         } catch (Throwable ignored) {
