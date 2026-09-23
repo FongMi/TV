@@ -28,6 +28,7 @@ import com.github.catvod.utils.Path;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public final class FileChooser {
@@ -90,15 +91,22 @@ public final class FileChooser {
     }
 
     public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback) {
-        if (!isFileSource(uri)) return;
-        Task.execute(() -> resolveFileUri(uri, callback));
+        getFileUri(uri, callback, () -> {});
     }
 
-    private static void resolveFileUri(Uri uri, Consumer<Uri> callback) {
+    public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback, Runnable onFailure) {
+        if (!isFileSource(uri)) return;
+        Task.execute(() -> resolveFileUri(uri, callback, onFailure));
+    }
+
+    private static void resolveFileUri(Uri uri, Consumer<Uri> callback, Runnable onFailure) {
         try {
             deliver(callback, resolveFileUri(uri));
-        } catch (IOException | SecurityException e) {
-            App.post(() -> Notify.show(Notify.getError(R.string.error_file_open, e)));
+        } catch (IOException | SecurityException | IllegalArgumentException e) {
+            App.post(() -> {
+                Notify.show(Notify.getError(R.string.error_file_open, e));
+                onFailure.run();
+            });
         }
     }
 
@@ -223,5 +231,17 @@ public final class FileChooser {
         if (uri == null) return false;
         String scheme = uri.getScheme();
         return ContentResolver.SCHEME_CONTENT.equalsIgnoreCase(scheme) || ContentResolver.SCHEME_FILE.equalsIgnoreCase(scheme);
+    }
+
+    public static boolean isLiveSource(@Nullable Intent intent) {
+        if (intent == null || !isFileSource(intent.getData())) return false;
+        String path = UrlUtil.path(intent.getData()).toLowerCase(Locale.ROOT);
+        if (path.endsWith(".m3u")) return true;
+        if (!"text/plain".equalsIgnoreCase(intent.getType())) return false;
+        String extension = path.substring(path.lastIndexOf('.') + 1);
+        return switch (extension) {
+            case "strm", "m3u8", "mpd", "torrent", "mp4", "mkv", "flv", "mp3", "m4a", "aac", "ts", "webm", "mov", "avi", "wav", "ogg", "wmv", "iso", "m2ts" -> false;
+            default -> true;
+        };
     }
 }

@@ -223,12 +223,25 @@ public class Result implements Parcelable {
         if (getSubs().isEmpty()) this.subs = subs;
     }
 
+    public void addSub(Sub sub) {
+        if (sub == null || sub.isEmpty()) return;
+        subs = getSubs();
+        subs.remove(sub);
+        subs.add(0, sub);
+    }
+
     public Map<String, String> getHeader() {
         return header == null ? new HashMap<>() : header;
     }
 
     public void setHeader(Map<String, String> header) {
         if (getHeader().isEmpty()) this.header = header;
+    }
+
+    public void addHeaders(Map<String, String> headers) {
+        if (headers == null || headers.isEmpty()) return;
+        header = new HashMap<>(getHeader());
+        header.putAll(headers);
     }
 
     public String getPlayUrl() {

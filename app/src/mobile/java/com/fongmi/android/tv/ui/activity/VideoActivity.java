@@ -61,6 +61,7 @@ import com.fongmi.android.tv.event.CastEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.CustomTarget;
 import com.fongmi.android.tv.model.VideoViewModel;
+import com.fongmi.android.tv.playback.ExternalPlayback;
 import com.fongmi.android.tv.playback.PlaybackAction;
 import com.fongmi.android.tv.playback.PlaybackIntent;
 import com.fongmi.android.tv.playback.PlaybackOrientation;
@@ -135,10 +136,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     private Runnable mR4;
     private History mHistory;
     private boolean fullscreen;
+    private boolean externalPlaybackCompleted;
     private boolean useParse;
     private boolean rotate;
 
     public static void push(FragmentActivity activity, String text) {
+        if (TextUtils.isEmpty(text)) return;
         Uri uri = UrlUtil.uri(text);
         if (FileChooser.isFileSource(uri)) FileChooser.getFileUri(uri, fileUri -> file(activity, fileUri));
         else start(activity, Sniffer.getUrl(text));
@@ -146,7 +149,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     public static void file(FragmentActivity activity, Uri fileUri) {
         if (fileUri == null || activity.isFinishing() || activity.isDestroyed()) return;
-        start(activity, SiteApi.PUSH, fileUri.toString(), FileUtil.getDisplayName(fileUri));
+        start(activity, SiteApi.LOCAL, fileUri.toString(), FileUtil.getDisplayName(fileUri));
     }
 
     public static void cast(Activity activity, History history) {
@@ -282,6 +285,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (TextUtils.isEmpty(intent.getStringExtra("id")) || isSameVideo(intent)) return;
+        externalPlaybackCompleted = false;
         mBinding.swipeLayout.setRefreshing(true);
         saveHistory(true);
         mVod.reset();
@@ -425,6 +429,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void onDetailObserved(VodDetailResult result) {
+        ExternalPlayback.applyTitle(result.result(), getIntent());
         mVod.onDetailResult(result);
     }
 
@@ -533,6 +538,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     @Override
     public void prepareSource(Vod item) {
+        ExternalPlayback.clearOptions(getIntent());
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getId());
         mBinding.swipeLayout.setRefreshing(true);
@@ -574,6 +580,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     @Override
     public void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata) {
+        ExternalPlayback.apply(result, getIntent());
+        startPositionMs = ExternalPlayback.takePosition(getIntent(), startPositionMs);
         startPlayer(getHistoryKey(), result, useParse, getSite().getTimeout(), startPositionMs, metadata);
     }
 
@@ -1359,6 +1367,11 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
                 mClock.setCallback(this);
                 break;
             case Player.STATE_ENDED:
+                if (ExternalPlayback.returnsResult(getIntent())) {
+                    externalPlaybackCompleted = true;
+                    finish();
+                    break;
+                }
                 hideProgress();
                 setR1Callback();
                 mVod.playbackEnded();
@@ -1366,6 +1379,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
                 mClock.setCallback(null);
                 break;
         }
+    }
+
+    @Override
+    public void finish() {
+        if (ExternalPlayback.returnsResult(getIntent())) ExternalPlayback.setResult(this, externalPlaybackCompleted ? player().getDuration() : player().getPosition(), externalPlaybackCompleted);
+        super.finish();
     }
 
     @Override
