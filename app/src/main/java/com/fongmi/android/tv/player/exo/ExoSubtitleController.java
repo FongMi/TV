@@ -56,8 +56,9 @@ final class ExoSubtitleController {
 
     private void applySecondarySubtitleStyle(SubtitleView subtitleView) {
         SubtitleSetting.applyStyle(subtitleView);
-        subtitleView.setBottomPosition(0.0f);
-        subtitleView.setBottomPaddingFraction(getSecondaryBottomPositionFraction());
+        // VTT cues have line positions, so bottom padding alone cannot move them.
+        subtitleView.setBottomPaddingFraction(0.0f);
+        subtitleView.setBottomPosition(getSecondaryBottomPositionFraction());
     }
 
     private static float getSecondaryBottomPositionFraction() {
