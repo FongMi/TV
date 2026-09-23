@@ -44,6 +44,10 @@ public class Site implements Parcelable {
     private String name;
 
     @Ignore
+    @SerializedName("lang")
+    private String lang;
+
+    @Ignore
     @SerializedName("api")
     private String api;
 
@@ -116,6 +120,7 @@ public class Site implements Parcelable {
     protected Site(Parcel in) {
         this.key = in.readString();
         this.name = in.readString();
+        this.lang = in.readString();
         this.api = in.readString();
         this.ext = in.readString();
         this.jar = in.readString();
@@ -160,6 +165,10 @@ public class Site implements Parcelable {
 
     public void setKey(@NonNull String key) {
         this.key = key;
+    }
+
+    public String getLang() {
+        return lang == null ? "" : lang;
     }
 
     public String getName() {
@@ -363,6 +372,7 @@ public class Site implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.key);
         dest.writeString(this.name);
+        dest.writeString(this.lang);
         dest.writeString(this.api);
         dest.writeString(this.ext);
         dest.writeString(this.jar);
