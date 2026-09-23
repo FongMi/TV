@@ -445,7 +445,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public boolean preload(PlaySpec spec, long startPositionMs) {
-        if (!canPreloadNext() || spec == null || !PlayerEngineFactory.matches(engine, spec)) return false;
+        if (!canPreloadNext() || spec == null || !PlayerEngineFactory.canPreload(spec) || !PlayerEngineFactory.matches(engine, spec)) return false;
         pendingPreload = new PendingPreload(spec.checkUa(), Math.max(0, startPositionMs));
         startPreloadIfReady();
         return true;
