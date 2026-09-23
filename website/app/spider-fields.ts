@@ -17,7 +17,7 @@ export const methods = [
     "搜尋結果，可支援頁碼",
     "list + pagecount",
   ],
-  ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result.url"],
+  ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result.url、選填 skips"],
   ["liveContent / live", "載入直播配置", "TXT、M3U 或 Group JSON", "原始文字"],
   [
     "proxy / localProxy",
@@ -52,6 +52,12 @@ export const resultFields: Field[] = [
     name: "url",
     type: "string | string[] | Url",
     description: "播放 URL 或多畫質清單，三種寫法見下方範例。",
+  },
+  {
+    name: "skips",
+    type: "SkipSegment[]",
+    description: "每集片頭、片中、片尾的跳過區間，start / end 都用毫秒；格式錯誤的項目會忽略。",
+    default: "[]",
   },
   {
     name: "header",
@@ -216,6 +222,14 @@ export const objectGroups = [
     fields: [
       ["url", "彈幕資料位置。"],
       ["name", "選填顯示名稱。"],
+    ],
+  },
+  {
+    name: "SkipSegment",
+    fields: [
+      ["type", "opening 為片頭，middle 為片中，ending 為片尾。"],
+      ["start", "開始跳過的時間（毫秒）。"],
+      ["end", "要跳到的時間（毫秒）；須晚於 start，僅片尾且 start > 0 時可省略。"],
     ],
   },
 ];
