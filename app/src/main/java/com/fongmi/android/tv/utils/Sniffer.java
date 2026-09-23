@@ -58,6 +58,10 @@ public class Sniffer {
         return getRule(uri).getScript();
     }
 
+    public static List<String> getClick(Uri uri) {
+        return getRule(uri).getClick();
+    }
+
     private static Rule getRule(Uri uri) {
         if (uri.getHost() == null) return Rule.empty();
         String hosts = TextUtils.join(",", Arrays.asList(UrlUtil.host(uri), UrlUtil.host(uri.getQueryParameter("url"))));

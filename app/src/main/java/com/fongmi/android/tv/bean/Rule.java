@@ -27,6 +27,8 @@ public class Rule {
     private List<String> regex;
     @SerializedName("script")
     private List<String> script;
+    @SerializedName("click")
+    private List<String> click;
     @SerializedName("exclude")
     private List<String> exclude;
     private transient volatile List<Pattern> regexPatterns;
@@ -64,6 +66,10 @@ public class Rule {
 
     public List<String> getScript() {
         return script == null ? Collections.emptyList() : script;
+    }
+
+    public List<String> getClick() {
+        return click == null ? Collections.emptyList() : click;
     }
 
     public List<String> getExclude() {
