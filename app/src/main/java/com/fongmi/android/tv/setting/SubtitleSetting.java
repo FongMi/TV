@@ -322,6 +322,7 @@ public class SubtitleSetting {
     public static void resetAdjust() {
         Prefers.put("subtitle_scale", DEFAULT_SCALE);
         Prefers.put("subtitle_position", DEFAULT_POSITION);
+        Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 
     public static void resetStyle() {
@@ -340,7 +341,6 @@ public class SubtitleSetting {
 
     public static void resetAdvanced() {
         Prefers.put("subtitle_secondary_track", DEFAULT_SECONDARY_MODE);
-        Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 
     public static void reset() {
