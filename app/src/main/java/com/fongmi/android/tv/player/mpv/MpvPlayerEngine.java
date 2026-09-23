@@ -2,11 +2,13 @@ package com.fongmi.android.tv.player.mpv;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.C;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
+import androidx.media3.mpvplayer.MpvDecoderMode;
 import androidx.media3.mpvplayer.MpvPlayer;
 
 import com.fongmi.android.tv.bean.Sub;
@@ -90,7 +92,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     @Override
     public void setDecode(int decode) {
-        player.setDecode(decode);
+        player.setVideoDecoderMode(decode == C.DECODE_SOFTWARE ? MpvDecoderMode.SOFTWARE : MpvDecoderMode.HARDWARE);
     }
 
     @Override
