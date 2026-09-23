@@ -3,14 +3,18 @@ package com.fongmi.android.tv.ui.dialog;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
 import com.fongmi.android.tv.impl.SiteListener;
 import com.fongmi.android.tv.ui.adapter.SiteAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.List;
 
 public class SiteDialog extends BaseAlertDialog implements SiteAdapter.OnClickListener {
 
@@ -68,29 +72,35 @@ public class SiteDialog extends BaseAlertDialog implements SiteAdapter.OnClickLi
 
     @Override
     public void onSearchClick(int position, Site item) {
-        item.setSearchable(!item.isSearchable()).save();
+        item.setSearchable(!item.isSearchable()).saveSettings();
         adapter.notifyItemChanged(position);
     }
 
     @Override
     public void onChangeClick(int position, Site item) {
-        item.setChangeable(!item.isChangeable()).save();
+        item.setChangeable(!item.isChangeable()).saveSettings();
         adapter.notifyItemChanged(position);
     }
 
     @Override
     public boolean onSearchLongClick(Site item) {
         boolean result = !item.isSearchable();
-        adapter.getItems().forEach(site -> site.setSearchable(result).save());
+        List<Site> sites = adapter.getItems();
+        sites.forEach(site -> site.setSearchable(result));
+        Site.saveSettings(sites);
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        Notify.show(getString(R.string.dialog_action_bulk_result, getString(R.string.dialog_action_site_search), getString(result ? R.string.setting_on : R.string.setting_off)));
         return true;
     }
 
     @Override
     public boolean onChangeLongClick(Site item) {
         boolean result = !item.isChangeable();
-        adapter.getItems().forEach(site -> site.setChangeable(result).save());
+        List<Site> sites = adapter.getItems();
+        sites.forEach(site -> site.setChangeable(result));
+        Site.saveSettings(sites);
         adapter.notifyItemRangeChanged(0, adapter.getItemCount());
+        Notify.show(getString(R.string.dialog_action_bulk_result, getString(R.string.dialog_action_site_change), getString(result ? R.string.setting_on : R.string.setting_off)));
         return true;
     }
 

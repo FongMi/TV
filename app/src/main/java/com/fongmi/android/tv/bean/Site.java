@@ -16,6 +16,7 @@ import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
 import com.fongmi.android.tv.gson.HeaderAdapter;
+import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
@@ -24,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -349,6 +351,22 @@ public class Site implements Parcelable {
 
     public void save() {
         AppDatabase.get().getSiteDao().insertOrUpdate(this);
+    }
+
+    public void saveSettings() {
+        saveSettings(List.of(this));
+    }
+
+    public static void saveSettings(List<Site> items) {
+        List<Site> snapshots = new ArrayList<>(items.size());
+        for (Site item : items) {
+            Site snapshot = new Site();
+            snapshot.key = item.key;
+            snapshot.searchable = item.searchable;
+            snapshot.changeable = item.changeable;
+            snapshots.add(snapshot);
+        }
+        Task.executeSerial(() -> AppDatabase.get().getSiteDao().insertOrUpdate(snapshots));
     }
 
     @Override
