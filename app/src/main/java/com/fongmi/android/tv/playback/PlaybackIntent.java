@@ -42,7 +42,7 @@ public final class PlaybackIntent {
             });
             Uri data = url.startsWith("file://") || url.startsWith("/") ? FileUtil.getShareUri(url) : Uri.parse(url);
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setDataAndType(data, "video/*");
             intent.putExtra("title", title).putExtra("return_result", isVod);
             intent.putExtra("headers", list.toArray(String[]::new));
