@@ -3,6 +3,7 @@ package com.fongmi.android.tv.api;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.collection.ArrayMap;
 
 import com.fongmi.android.tv.App;
@@ -13,6 +14,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.player.extractor.Source;
+import com.fongmi.android.tv.player.media.LocalSubtitleScanner;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.github.catvod.crawler.Spider;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -35,6 +38,7 @@ import okhttp3.Response;
 
 public class SiteApi {
 
+    public static final String LOCAL = "local_file";
     public static final String PUSH = "push_agent";
 
     public static String call(@NonNull Site site, @NonNull ArrayMap<String, String> params) throws IOException {
@@ -112,16 +116,10 @@ public class SiteApi {
     @NonNull
     public static Result detailContent(@NonNull String key, @NonNull String id) throws Exception {
         SpiderDebug.log("detail", "key=%s,id=%s", key, id);
+        if (LOCAL.equals(key)) return directDetail(id, "", R.string.local);
         Site site = VodConfig.get().getSite(key);
         if (site.isEmpty() && PUSH.equals(key)) {
-            Vod vod = new Vod();
-            vod.setId(id);
-            vod.setName(id);
-            vod.setPlayUrl(id);
-            vod.setPlayFrom(ResUtil.getString(R.string.push));
-            vod.setPic(ResUtil.getString(R.string.push_image));
-            Source.get().parse(vod.setFlags());
-            return Result.vod(vod);
+            return directDetail(id, id, R.string.push);
         } else if (isSpider(site)) {
             String detailContent = site.recent().spider().detailContent(Arrays.asList(id));
             SpiderDebug.log("detail", detailContent);
@@ -143,8 +141,9 @@ public class SiteApi {
     @NonNull
     public static Result playerContent(@NonNull String key, @NonNull String flag, @NonNull String id) throws Exception {
         SpiderDebug.log("player", "key=%s,flag=%s,id=%s", key, flag, id);
-        Site site = VodConfig.get().getSite(key);
         Source.get().stop();
+        if (LOCAL.equals(key)) return directPlayer(key, flag, id);
+        Site site = VodConfig.get().getSite(key);
         if (site.getType() == 3) {
             String playerContent = site.recent().spider().playerContent(flag, id, VodConfig.get().getFlags());
             SpiderDebug.log("player", playerContent);
@@ -166,15 +165,8 @@ public class SiteApi {
             result.setHeader(site.getHeader());
             result.setKey(key);
             return result;
-        } else if (site.isEmpty() && "push_agent".equals(key)) {
-            Result result = new Result();
-            result.setUrl(id);
-            result.setKey(key);
-            result.setParse(0);
-            result.setFlag(flag);
-            result.setUrl(Source.get().fetch(result));
-            SpiderDebug.log("player", result.toString());
-            return result;
+        } else if (site.isEmpty() && PUSH.equals(key)) {
+            return directPlayer(key, flag, id);
         } else {
             Result result = new Result();
             result.setUrl(id);
@@ -187,6 +179,38 @@ public class SiteApi {
             SpiderDebug.log("player", result.toString());
             return result;
         }
+    }
+
+    private static Result directDetail(String id, String name, @StringRes int source) throws Exception {
+        Vod vod = new Vod();
+        vod.setId(id);
+        vod.setName(name);
+        vod.setPlayUrl(id);
+        vod.setPlayFrom(ResUtil.getString(source));
+        vod.setPic(ResUtil.getString(R.string.push_image));
+        Source.get().parse(vod.setFlags());
+        return Result.vod(vod);
+    }
+
+    private static Result directPlayer(String key, String flag, String id) throws Exception {
+        Result result = new Result();
+        result.setUrl(id);
+        result.setKey(key);
+        result.setFlag(flag);
+        result.setParse(PUSH.equals(key) && isWebPage(id) ? 1 : 0);
+        if (LOCAL.equals(key)) result.setSubs(LocalSubtitleScanner.scan(id));
+        result.setUrl(Source.get().fetch(result));
+        SpiderDebug.log("player", result.toString());
+        return result;
+    }
+
+    static boolean isWebPage(String url) {
+        int query = url.indexOf('?');
+        int fragment = url.indexOf('#');
+        int end = query < 0 ? url.length() : query;
+        if (fragment >= 0) end = Math.min(end, fragment);
+        String path = url.substring(0, end).toLowerCase(Locale.ROOT);
+        return path.endsWith(".htm") || path.endsWith(".html") || path.endsWith(".shtm") || path.endsWith(".shtml");
     }
 
     @NonNull
