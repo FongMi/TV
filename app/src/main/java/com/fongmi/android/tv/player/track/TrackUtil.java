@@ -2,6 +2,7 @@ package com.fongmi.android.tv.player.track;
 
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.Format;
 import androidx.media3.common.MimeTypes;
@@ -13,6 +14,7 @@ import androidx.media3.common.Tracks;
 
 import com.fongmi.android.tv.bean.Track;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,9 +33,9 @@ public class TrackUtil {
         if (format.containerMimeType != null) joiner.add(format.containerMimeType);
         if (format.width != C.LENGTH_UNSET) joiner.add(String.valueOf(format.width));
         if (format.height != C.LENGTH_UNSET) joiner.add(String.valueOf(format.height));
-        if (format.sampleRate != C.RATE_UNSET_INT) joiner.add(String.valueOf(format.sampleRate));
+        if (format.sampleRate != Format.NO_VALUE) joiner.add(String.valueOf(format.sampleRate));
         if (format.channelCount != C.LENGTH_UNSET) joiner.add(String.valueOf(format.channelCount));
-        if (format.averageBitrate != C.LENGTH_UNSET) joiner.add(String.valueOf(format.averageBitrate));
+        if (format.bitrate != Format.NO_VALUE) joiner.add(String.valueOf(format.bitrate));
         return joiner.toString();
     }
 
@@ -50,6 +52,37 @@ public class TrackUtil {
         return tracks.getGroups().stream().filter(trackGroup -> trackGroup.getType() == type).mapToInt(trackGroup -> trackGroup.length).sum();
     }
 
+    public static Track createTrack(int type, String name, Format format, int ordinal) {
+        Track track = new Track(type, name, describeFormat(format));
+        track.setLabel(format.label == null ? null : format.label.toString());
+        track.setLanguage(format.language);
+        track.setMimeType(format.sampleMimeType);
+        track.setOrdinal(ordinal);
+        return track;
+    }
+
+    @Nullable
+    public static Track fromSelection(Tracks tracks, TrackSelectionOverride selection, int role) {
+        if (selection.trackIndices.size() != 1) return null;
+        int selectionIndex = selection.trackIndices.get(0);
+        int ordinal = 0;
+        for (Tracks.Group group : tracks.getGroups()) {
+            if (group.getType() != selection.getType()) continue;
+            for (int i = 0; i < group.length; i++) {
+                if (group.getMediaTrackGroup().equals(selection.mediaTrackGroup) && i == selectionIndex) {
+                    Format format = group.getTrackFormat(i);
+                    String name = format.label == null ? "" : format.label.toString();
+                    Track track = createTrack(group.getType(), name, format, ordinal);
+                    track.setRole(role);
+                    track.setSelected(true);
+                    return track;
+                }
+                ordinal++;
+            }
+        }
+        return null;
+    }
+
     public static void reset(Player player) {
         player.setTrackSelectionParameters(createResetBuilder(player).build());
     }
@@ -58,42 +91,116 @@ public class TrackUtil {
         return player.getTrackSelectionParameters().buildUpon().clearOverrides().setTrackTypeDisabled(C.TRACK_TYPE_VIDEO, false).setTrackTypeDisabled(C.TRACK_TYPE_AUDIO, false).setTrackTypeDisabled(C.TRACK_TYPE_TEXT, false);
     }
 
-    private static TrackInfo find(Player player, Track track) {
-        if (track.getFormat() == null) return null;
-        Tracks currentTracks = player.getCurrentTracks();
-        for (Tracks.Group trackGroup : currentTracks.getGroups()) {
+    @Nullable
+    public static TrackSelectionOverride findSelection(Player player, Track track) {
+        return findSelection(player.getCurrentTracks(), track);
+    }
+
+    @Nullable
+    public static TrackSelectionOverride findSelection(Tracks tracks, Track track) {
+        TrackInfo info = find(tracks, track);
+        return info == null ? null : new TrackSelectionOverride(info.trackGroup.getMediaTrackGroup(), info.trackIndex);
+    }
+
+    @Nullable
+    private static TrackInfo find(Tracks tracks, Track track) {
+        TrackInfo ordinalMatch = null;
+        TrackInfo semanticMatch = null;
+        int bestScore = 0;
+        int bestDistance = Integer.MAX_VALUE;
+        int ordinal = 0;
+        for (Tracks.Group trackGroup : tracks.getGroups()) {
             if (trackGroup.getType() != track.getType()) continue;
             for (int i = 0; i < trackGroup.length; i++) {
                 Format format = trackGroup.getTrackFormat(i);
-                if (track.getFormat().equals(describeFormat(format))) {
-                    return new TrackInfo(trackGroup, i);
+                TrackInfo candidate = new TrackInfo(trackGroup, i);
+                if (track.getFormat() != null && track.getFormat().equals(describeFormat(format))) return candidate;
+                if (ordinal == track.getOrdinal()) ordinalMatch = candidate;
+                if (track.getType() == C.TRACK_TYPE_TEXT) {
+                    int score = getMatchScore(track, format);
+                    int distance = Math.abs(ordinal - track.getOrdinal());
+                    if (score > bestScore || (score == bestScore && score > 0 && distance < bestDistance)) {
+                        semanticMatch = candidate;
+                        bestScore = score;
+                        bestDistance = distance;
+                    }
                 }
+                ordinal++;
             }
+        }
+        if (semanticMatch != null) return semanticMatch;
+        if (normalize(track.getLabel()) != null || normalizeLanguage(track.getLanguage()) != null) return null;
+        return ordinalMatch;
+    }
+
+    private static int getMatchScore(Track track, Format format) {
+        String label = normalize(track.getLabel());
+        String language = normalizeLanguage(track.getLanguage());
+        String mimeType = normalize(track.getMimeType());
+        String candidateLanguage = normalizeLanguage(format.language);
+        boolean labelMatches = label != null && label.equals(normalize(format.label));
+        boolean languageMatches = language != null && language.equals(candidateLanguage);
+        if (language != null && candidateLanguage != null && !languageMatches) return 0;
+        boolean mimeTypeMatches = mimeType != null && mimeType.equals(normalize(format.sampleMimeType));
+        if (languageMatches) return 4 + (labelMatches ? 2 : 0) + (mimeTypeMatches ? 1 : 0);
+        if (labelMatches) return 2 + (mimeTypeMatches ? 1 : 0);
+        if (label == null && language == null && mimeTypeMatches) return 1;
+        return 0;
+    }
+
+    @Nullable
+    private static String normalize(@Nullable CharSequence value) {
+        if (value == null) return null;
+        String normalized = value.toString().trim();
+        return normalized.isEmpty() ? null : normalized.toLowerCase(Locale.ROOT);
+    }
+
+    @Nullable
+    private static String normalizeLanguage(@Nullable String language) {
+        String normalized = normalize(language);
+        return C.LANGUAGE_UNDETERMINED.equals(normalized) ? null : normalized;
+    }
+
+    public static boolean setTrackSelection(Player player, Track track) {
+        TrackSelectionOverride override = findRestorationOverride(player.getCurrentTracks(), track);
+        if (override == null) return false;
+        player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setOverrideForType(override).build());
+        return true;
+    }
+
+    @Nullable
+    private static TrackSelectionOverride findRestorationOverride(Tracks tracks, Track track) {
+        if (track.isSecondary()) return null;
+        TrackInfo info = find(tracks, track);
+        if (info != null) return createOverride(track, info);
+        if (track.isSelected() || track.getType() != C.TRACK_TYPE_TEXT) return null;
+        for (Tracks.Group group : tracks.getGroups()) {
+            if (group.getType() == C.TRACK_TYPE_TEXT) return new TrackSelectionOverride(group.getMediaTrackGroup(), List.of());
         }
         return null;
     }
 
-    public static void setTrackSelection(Player player, Track track) {
-        applyTrackSelection(player, player.getTrackSelectionParameters().buildUpon(), List.of(track));
+    public static List<Track> setTrackSelection(Player player, List<Track> tracks) {
+        return applyTrackSelection(player, createResetBuilder(player), tracks);
     }
 
-    public static void setTrackSelection(Player player, List<Track> tracks) {
-        applyTrackSelection(player, createResetBuilder(player), tracks);
-    }
-
-    private static void applyTrackSelection(Player player, TrackSelectionParameters.Builder builder, List<Track> tracks) {
+    private static List<Track> applyTrackSelection(Player player, TrackSelectionParameters.Builder builder, List<Track> tracks) {
         Map<Integer, TrackSelectionOverride> overridesByType = new HashMap<>();
-        tracks.forEach(track -> putOverride(player, track, overridesByType));
+        List<Track> pending = new ArrayList<>();
+        Tracks currentTracks = player.getCurrentTracks();
+        for (Track track : tracks) {
+            if (track.isSecondary()) continue;
+            TrackSelectionOverride override = findRestorationOverride(currentTracks, track);
+            if (override == null) {
+                pending.add(track);
+                continue;
+            }
+            if (track.isSelected()) overridesByType.put(override.getType(), override);
+            else overridesByType.putIfAbsent(override.getType(), override);
+        }
         overridesByType.values().forEach(builder::setOverrideForType);
         player.setTrackSelectionParameters(builder.build());
-    }
-
-    private static void putOverride(Player player, Track track, Map<Integer, TrackSelectionOverride> overridesByType) {
-        TrackInfo info = find(player, track);
-        if (info == null) return;
-        TrackSelectionOverride override = createOverride(track, info);
-        if (track.isSelected()) overridesByType.put(override.getType(), override);
-        else overridesByType.putIfAbsent(override.getType(), override);
+        return pending;
     }
 
     private static TrackSelectionOverride createOverride(Track track, TrackInfo info) {

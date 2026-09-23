@@ -49,4 +49,13 @@ public class Migrations {
             database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_Track_key_type` ON `Track` (`key`, `type`)");
         }
     };
+
+    public static final Migration MIGRATION_35_36 = new Migration(35, 36) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("DROP TABLE Track");
+            database.execSQL("CREATE TABLE Track (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` INTEGER NOT NULL, `role` INTEGER NOT NULL, `ordinal` INTEGER NOT NULL, `key` TEXT, `name` TEXT, `format` TEXT, `label` TEXT, `language` TEXT, `mimeType` TEXT, `selected` INTEGER NOT NULL)");
+            database.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS `index_Track_key_type_role` ON `Track` (`key`, `type`, `role`)");
+        }
+    };
 }
