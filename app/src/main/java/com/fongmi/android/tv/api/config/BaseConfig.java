@@ -60,7 +60,8 @@ abstract class BaseConfig {
     }
 
     public boolean needSync(String url) {
-        return sync || config == null || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
+        Config selected = getConfig();
+        return sync || selected.isEmpty() || url.equals(selected.getUrl());
     }
 
     public Config getConfig() {
