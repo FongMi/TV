@@ -77,7 +77,11 @@ public class VodPlaybackController {
     }
 
     public void updateVod(Vod item) {
-        if (preloader.isRequestPending()) return;
+        if (preloader.deferUpdate(item)) return;
+        applyVodUpdate(item);
+    }
+
+    private void applyVodUpdate(Vod item) {
         History history = state.getHistory();
         replaceVodId(history, item.getId());
         mergeFlags(item.getFlags());
@@ -183,10 +187,14 @@ public class VodPlaybackController {
     }
 
     private void playEpisode(Episode item) {
-        Result result = preloader.consume(item);
+        VodPlaybackState.PreloadEntry preload = preloader.consume(item);
         host.stopPlaybackForRefresh();
-        if (result == null) requestSelectedEpisode();
-        else applyPlaybackResult(result, VodPlayRequest.create(host.getVodKey(), state.getFlag(), item));
+        if (preload == null) {
+            requestSelectedEpisode();
+        } else {
+            if (preload.update() != null) applyVodUpdate(preload.update());
+            applyPlaybackResult(preload.result(), preload.request());
+        }
     }
 
     public void selectQuality(Result result) {

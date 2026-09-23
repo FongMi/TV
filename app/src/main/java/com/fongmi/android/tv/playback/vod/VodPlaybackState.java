@@ -23,8 +23,7 @@ public class VodPlaybackState {
     private VodPlayRequest pendingRequest;
     private VodPlayRequest playingRequest;
     private MediaMetadata playbackMetadata;
-    private VodPlayRequest preloadRequest;
-    private Result preloadResult;
+    private PreloadEntry preload;
     private Result quality;
     private History history;
     private String detailKey;
@@ -206,35 +205,32 @@ public class VodPlaybackState {
     }
 
     @Nullable
-    VodPlayRequest getPreloadRequest() {
-        return preloadRequest;
-    }
-
-    @Nullable
-    Result getPreloadResult() {
-        return preloadResult;
+    PreloadEntry getPreload() {
+        return preload;
     }
 
     void beginPreload(VodPlayRequest request) {
-        preloadRequest = request;
-        preloadResult = null;
+        preload = PreloadEntry.pending(request);
     }
 
     void completePreload(Result result) {
-        preloadResult = result;
+        if (preload != null) preload = preload.withResult(result);
+    }
+
+    void setPreloadUpdate(@Nullable Vod preloadUpdate) {
+        if (preload != null) preload = preload.withUpdate(preloadUpdate);
     }
 
     @Nullable
-    Result consumePreload(String key, Flag flag, Episode episode) {
-        if (preloadRequest == null || preloadResult == null || !preloadRequest.matches(key, flag, episode)) return null;
-        Result result = preloadResult;
+    PreloadEntry consumePreload(String key, Flag flag, Episode episode) {
+        if (preload == null || preload.isPending() || !preload.request().matches(key, flag, episode)) return null;
+        PreloadEntry result = preload;
         clearPreload();
         return result;
     }
 
     void clearPreload() {
-        preloadRequest = null;
-        preloadResult = null;
+        preload = null;
     }
 
     @Nullable
@@ -276,5 +272,24 @@ public class VodPlaybackState {
 
     void setSearchKeyword(String searchKeyword) {
         this.searchKeyword = searchKeyword == null ? "" : searchKeyword;
+    }
+
+    record PreloadEntry(VodPlayRequest request, @Nullable Result result, @Nullable Vod update) {
+
+        static PreloadEntry pending(VodPlayRequest request) {
+            return new PreloadEntry(request, null, null);
+        }
+
+        boolean isPending() {
+            return result == null;
+        }
+
+        PreloadEntry withResult(Result result) {
+            return new PreloadEntry(request, result, update);
+        }
+
+        PreloadEntry withUpdate(@Nullable Vod update) {
+            return new PreloadEntry(request, result, update);
+        }
     }
 }
