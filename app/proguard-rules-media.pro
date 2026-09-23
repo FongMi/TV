@@ -221,7 +221,7 @@
   boolean isScrubbingModeEnabled();
 }
 
--dontnote androidx.appcompat.app.AlertDialog.Builder
+-dontnote androidx.appcompat.app.AlertDialog$Builder
 -keepclassmembers class androidx.appcompat.app.AlertDialog$Builder {
   <init>(android.content.Context, int);
   public android.content.Context getContext();
