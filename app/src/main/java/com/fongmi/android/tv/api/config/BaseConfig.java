@@ -99,14 +99,13 @@ abstract class BaseConfig {
             App.post(() -> Notify.show(config.getNotice()));
             App.post(callback::success);
         } catch (Throwable e) {
-            e.printStackTrace();
             if (isCanceled(e)) return;
+            e.printStackTrace();
             if (taskId.get() != id) return;
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
-        } finally {
-            if (taskId.get() == id) postEvent();
         }
+        if (taskId.get() == id) postEvent();
     }
 
     protected boolean isCanceled(Throwable e) {
