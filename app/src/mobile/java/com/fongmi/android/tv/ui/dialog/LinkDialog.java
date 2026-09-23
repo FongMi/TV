@@ -10,6 +10,7 @@ import android.view.inputmethod.EditorInfo;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
@@ -49,6 +50,7 @@ public class LinkDialog extends BaseAlertDialog {
     @Override
     protected void initEvent() {
         binding.input.setEndIconOnClickListener(this::onChoose);
+        TooltipCompat.setTooltipText(binding.input.findViewById(com.google.android.material.R.id.text_input_end_icon), binding.input.getEndIconContentDescription());
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) onPositive(null, 0);
             return true;
