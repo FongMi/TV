@@ -132,8 +132,9 @@ final class ExoPlayerSession {
     private static LibassPlaybackSession createLibassPlaybackSession(boolean libassEnabled) {
         File fontConfig = libassEnabled ? AndroidFontConfig.prepare() : null;
         String fontConfigPath = fontConfig != null && fontConfig.length() > 0 ? fontConfig.getAbsolutePath() : null;
-        String fontFamily = libassEnabled ? SubtitleSetting.getFontFamily() : null;
-        String fontsDirectory = libassEnabled ? ExternalFont.getDirectory().getAbsolutePath() : null;
+        ExternalFont.Item font = libassEnabled ? SubtitleSetting.getFont() : null;
+        String fontFamily = font == null ? null : font.familyName();
+        String fontsDirectory = libassEnabled ? (font == null ? ExternalFont.getDirectory() : font.directory()).getAbsolutePath() : null;
         LibassConfiguration configuration = new LibassConfiguration.Builder().setFontConfig(fontConfigPath).setFontsDirectory(fontsDirectory).setDefaultFontFamily(fontFamily).setMaximumRenderPixels(LIBASS_MAX_RENDER_PIXELS).setMaximumGlyphCount(LIBASS_MAX_GLYPH_COUNT).setMaximumBitmapCacheSizeMb(LIBASS_MAX_BITMAP_CACHE_SIZE_MB).build();
         return new LibassPlaybackSession(configuration, libassEnabled);
     }
