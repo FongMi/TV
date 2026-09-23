@@ -18,6 +18,7 @@ import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -191,7 +192,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String content = Module.get().fetch(api);
         cat = content.contains("__jsEvalReturn");
         ctx.evaluateModule(content.replace(spider, global), api);
-        ctx.evaluateModule(String.format(Asset.read("js/lib/spider.js"), api));
+        ctx.evaluateModule(String.format(Asset.read("js/lib/spider.js"), JSONObject.quote(api), JSONObject.quote(siteKey)));
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), spider);
     }
 
