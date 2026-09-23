@@ -13,6 +13,7 @@ import java.security.Key;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.interfaces.RSAKey;
 import java.security.spec.MGF1ParameterSpec;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -20,6 +21,7 @@ import java.security.spec.X509EncodedKeySpec;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.OAEPParameterSpec;
 import javax.crypto.spec.PSource;
@@ -30,6 +32,7 @@ public final class Crypto {
     private static final String MD5 = "MD5";
     private static final String SHA_256 = "SHA-256";
     private static final int BUFFER_SIZE = 64 * 1024;
+    private static final int GCM_TAG_SIZE = 16;
     private static final int AES_BLOCK_SIZE = 16;
     private static final int DES_BLOCK_SIZE = 8;
     private static final int DES_EDE_TWO_KEY_SIZE = 16;
@@ -38,8 +41,7 @@ public final class Crypto {
     private static final OAEPParameterSpec OAEP_SHA1_PARAMETERS = new OAEPParameterSpec("SHA-1", "MGF1", MGF1ParameterSpec.SHA1, PSource.PSpecified.DEFAULT);
 
     public static String md5(String value) {
-        if (value == null || value.isEmpty()) return "";
-        return toHex(newDigest(MD5).digest(value.getBytes(StandardCharsets.UTF_8)));
+        return hash(value, MD5);
     }
 
     public static String md5(File file) {
@@ -58,6 +60,17 @@ public final class Crypto {
         return digest(file, newDigest(SHA_256));
     }
 
+    public static String sha256(String value) {
+        return hash(value, SHA_256);
+    }
+
+    public static String randomUrlSafe(int size) {
+        if (size <= 0 || size > 1024) return "";
+        byte[] bytes = new byte[size];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.encodeToString(bytes, Base64.URL_SAFE | Base64.NO_PADDING | Base64.NO_WRAP);
+    }
+
     public static MessageDigest newDigest(String algorithm) {
         try {
             return MessageDigest.getInstance(algorithm);
@@ -72,6 +85,7 @@ public final class Crypto {
 
     public static String aes(String mode, boolean encrypt, String input, boolean inputBase64, String key, String iv, boolean outputBase64) {
         try {
+            if (mode.contains("GCM")) return aesGcm(encrypt, input, inputBase64, key, iv, outputBase64);
             byte[] keyBytes = padParameter(key.getBytes(StandardCharsets.UTF_8), AES_BLOCK_SIZE);
             byte[] ivBytes = getIv(iv, AES_BLOCK_SIZE);
             Cipher cipher = newAesCipher(getAesTransformation(mode), encrypt, keyBytes, ivBytes);
@@ -113,8 +127,26 @@ public final class Crypto {
         }
     }
 
+    private static String hash(String value, String algorithm) {
+        if (value == null || value.isEmpty()) return "";
+        return toHex(newDigest(algorithm).digest(value.getBytes(StandardCharsets.UTF_8)));
+    }
+
     private static Cipher newAesCipher(String transformation, boolean encrypt, byte[] key, byte[] iv) throws GeneralSecurityException {
         return newCipher(transformation, "AES", encrypt, key, iv);
+    }
+
+    private static String aesGcm(boolean encrypt, String input, boolean inputBase64, String keyHex, String ivHex, boolean outputBase64) throws GeneralSecurityException {
+        byte[] data;
+        if (encrypt) data = decode(input, inputBase64);
+        else data = inputBase64 ? decode(input, true) : fromHex(input);
+        if (!encrypt && data.length < GCM_TAG_SIZE) return "";
+        Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+        SecretKeySpec key = new SecretKeySpec(fromHex(keyHex), "AES");
+        GCMParameterSpec params = new GCMParameterSpec(GCM_TAG_SIZE * Byte.SIZE, fromHex(ivHex));
+        cipher.init(encrypt ? Cipher.ENCRYPT_MODE : Cipher.DECRYPT_MODE, key, params);
+        byte[] output = cipher.doFinal(data);
+        return encrypt && !outputBase64 ? toHex(output) : encode(output, outputBase64);
     }
 
     private static Cipher newCipher(String transformation, String algorithm, boolean encrypt, byte[] key, byte[] iv) throws GeneralSecurityException {
@@ -212,6 +244,18 @@ public final class Crypto {
             result[index * 2 + 1] = HEX[value & 0x0f];
         }
         return new String(result);
+    }
+
+    private static byte[] fromHex(String value) {
+        if (value == null || (value.length() & 1) != 0) throw new IllegalArgumentException("Invalid hex");
+        byte[] result = new byte[value.length() / 2];
+        for (int i = 0; i < result.length; i++) {
+            int high = Character.digit(value.charAt(i * 2), 16);
+            int low = Character.digit(value.charAt(i * 2 + 1), 16);
+            if (high < 0 || low < 0) throw new IllegalArgumentException("Invalid hex");
+            result[i] = (byte) ((high << 4) | low);
+        }
+        return result;
     }
 
     private enum RsaMode {

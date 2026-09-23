@@ -163,6 +163,18 @@ public class Global {
 
     @Keep
     @JSMethod
+    public String sha256X(String text) {
+        return Crypto.sha256(text);
+    }
+
+    @Keep
+    @JSMethod
+    public String randomX(Integer size) {
+        return Crypto.randomUrlSafe(size == null ? 0 : size);
+    }
+
+    @Keep
+    @JSMethod
     public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
         return Crypto.aes(mode, encrypt, input, inBase64, key, iv, outBase64);
     }
