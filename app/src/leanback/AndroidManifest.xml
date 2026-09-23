@@ -249,6 +249,10 @@
             android:screenOrientation="sensorLandscape" />
 
         <activity
+            android:name=".ui.activity.WebActivity"
+            android:screenOrientation="sensorLandscape" />
+
+        <activity
             android:name=".ui.activity.SettingActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
