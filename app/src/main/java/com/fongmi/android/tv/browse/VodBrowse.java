@@ -70,7 +70,7 @@ class VodBrowse {
         String keyword = searchKey(query);
         if (TextUtils.isEmpty(keyword)) return ImmutableList.of();
         List<Site> sites = VodConfig.get().getSites().stream().filter(Site::isSearchable).toList();
-        List<ListenableFuture<List<MediaItem>>> futures = sites.stream().map(site -> Task.largeExecutor().submit(() -> searchSite(site, keyword))).toList();
+        List<ListenableFuture<List<MediaItem>>> futures = sites.stream().map(site -> Task.largeExecutor().submit(() -> searchSite(site, query.trim()))).toList();
         List<MediaItem> items = collectResults(futures);
         items.sort((a, b) -> matchScore(b, keyword) - matchScore(a, keyword));
         ImmutableList<MediaItem> results = ImmutableList.copyOf(items.subList(0, Math.min(items.size(), SEARCH_LIMIT)));
