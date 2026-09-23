@@ -5,11 +5,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.databinding.AdapterLiveBinding;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.List;
 
@@ -59,6 +62,8 @@ public class LiveAdapter extends RecyclerView.Adapter<LiveAdapter.ViewHolder> {
         holder.binding.text.setSelected(item.isSelected());
         holder.binding.boot.setImageResource(item.getBootIcon());
         holder.binding.pass.setImageResource(item.getPassIcon());
+        holder.binding.boot.setContentDescription(getActionDescription(R.string.dialog_action_live_boot, item.isBoot()));
+        holder.binding.pass.setContentDescription(getActionDescription(R.string.dialog_action_live_password, !item.isPass()));
         holder.binding.boot.setVisibility(action ? View.VISIBLE : View.GONE);
         holder.binding.pass.setVisibility(action ? View.VISIBLE : View.GONE);
         holder.binding.text.setOnClickListener(v -> listener.onItemClick(item));
@@ -66,6 +71,10 @@ public class LiveAdapter extends RecyclerView.Adapter<LiveAdapter.ViewHolder> {
         holder.binding.pass.setOnClickListener(v -> listener.onPassClick(position, item));
         holder.binding.boot.setOnLongClickListener(v -> listener.onBootLongClick(item));
         holder.binding.pass.setOnLongClickListener(v -> listener.onPassLongClick(item));
+    }
+
+    private static String getActionDescription(@StringRes int action, boolean enabled) {
+        return ResUtil.getString(R.string.dialog_action_toggle_hint, ResUtil.getString(action), ResUtil.getString(enabled ? R.string.setting_on : R.string.setting_off));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
