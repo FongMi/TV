@@ -1,0 +1,41 @@
+plugins {
+    alias libs.plugins.android.library
+}
+
+android {
+    namespace = 'com.fongmi.nodejs'
+
+    compileSdk libs.versions.compileSdk.get().toInteger()
+
+    defaultConfig {
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+        consumerProguardFiles 'consumer-rules.pro'
+        ndk { abiFilters "arm64-v8a", "armeabi-v7a" }
+        externalNativeBuild {
+            cmake {
+                cppFlags '-std=c++17'
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version = '3.22.1'
+        }
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled = true
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+}
+
+dependencies {
+    implementation project(':catvod')
+    implementation libs.annotation
+    implementation libs.nanohttpd
+    coreLibraryDesugaring libs.desugar
+}

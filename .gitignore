@@ -5,6 +5,7 @@
 *build
 *.jks
 *.properties
+/nodejs/.cxx
 lib-*.aar
 /Release
 /docs
