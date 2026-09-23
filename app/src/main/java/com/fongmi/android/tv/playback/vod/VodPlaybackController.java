@@ -470,6 +470,7 @@ public class VodPlaybackController {
         activeSkip = null;
         manualEndingTriggered = false;
         historyPolicy.updateEpisode(state.getHistory(), flag, episode);
+        VodPlaybackInfo.update(state.getHistory(), flag, episode);
         VodPlayRequest request = VodPlayRequest.create(host.getVodKey(), flag, episode);
         state.setPendingRequest(request);
         publishPlaybackMetadata(episode);

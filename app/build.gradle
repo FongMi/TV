@@ -89,6 +89,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation project(':catvod')
     implementation project(':chaquo')
+    implementation project(':nodejs')
     implementation project(':quickjs')
     implementation libs.appcompat
     implementation libs.lifecycle.service

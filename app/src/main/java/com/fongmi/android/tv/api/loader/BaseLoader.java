@@ -22,11 +22,13 @@ import dalvik.system.DexClassLoader;
 public class BaseLoader {
 
     private final JarLoader jarLoader;
+    private final NodeLoader nodeLoader;
     private final PyLoader pyLoader;
     private final JsLoader jsLoader;
 
     private BaseLoader() {
         jarLoader = new JarLoader();
+        nodeLoader = new NodeLoader();
         pyLoader = new PyLoader();
         jsLoader = new JsLoader();
     }
@@ -43,11 +45,16 @@ public class BaseLoader {
         return api.contains(".py");
     }
 
+    private static boolean isNode(String api) {
+        return api.startsWith("node:");
+    }
+
     private static boolean isCsp(String api) {
         return api.startsWith("csp_");
     }
 
     public void clear() {
+        nodeLoader.clear();
         Task.execute(() -> {
             jarLoader.clear();
             pyLoader.clear();
@@ -56,7 +63,8 @@ public class BaseLoader {
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
-        if (isPy(api)) return pyLoader.getSpider(key, api, ext);
+        if (isNode(api)) return nodeLoader.getSpider(key, api, ext);
+        else if (isPy(api)) return pyLoader.getSpider(key, api, ext);
         else if (isJs(api)) return jsLoader.getSpider(key, api, ext, jar);
         else if (isCsp(api)) return jarLoader.getSpider(key, api, ext, jar);
         else return new SpiderNull();

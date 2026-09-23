@@ -46,6 +46,9 @@ abstract class BaseConfig {
 
     protected abstract boolean isLoaded();
 
+    protected void cancelLoad() {
+    }
+
     public synchronized void ensureLoaded() {
         try {
             if (isLoaded()) return;
@@ -84,7 +87,10 @@ abstract class BaseConfig {
 
     public void load(Callback callback) {
         int id = taskId.incrementAndGet();
-        if (future != null && !future.isDone()) future.cancel(true);
+        if (future != null && !future.isDone()) {
+            cancelLoad();
+            future.cancel(true);
+        }
         future = Task.submit(() -> loadConfig(id, config, callback));
         callback.start();
     }
