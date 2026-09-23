@@ -28,8 +28,9 @@
             android:singleLine="true"
             android:textSize="14sp" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/setting"
+            android:contentDescription="@string/dialog_action_search_settings"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"

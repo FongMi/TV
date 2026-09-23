@@ -117,13 +117,17 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
         int index = Setting.getSyncMode();
         binding.mode.setImageResource(mode.getResourceId(index, 0));
         binding.mode.setTag(String.valueOf(index));
+        binding.mode.setContentDescription(getString(switch (index) {
+            case 1 -> R.string.dialog_action_sync_upload;
+            case 2 -> R.string.dialog_action_sync_download;
+            default -> R.string.dialog_action_sync_two;
+        }));
     }
 
     private void onMode() {
         int index = Setting.getSyncMode();
         Setting.putSyncMode(index = index == mode.length() - 1 ? 0 : ++index);
-        binding.mode.setImageResource(mode.getResourceId(index, 0));
-        binding.mode.setTag(String.valueOf(index));
+        setMode();
     }
 
     private void onScan() {

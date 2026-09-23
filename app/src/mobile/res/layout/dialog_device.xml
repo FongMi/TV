@@ -23,7 +23,7 @@
             android:textColor="?attr/colorOnSurface"
             android:textSize="16sp" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,16 +34,18 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/scan"
+            android:contentDescription="@string/dialog_action_scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_action_scan" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/refresh"
+            android:contentDescription="@string/live_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
