@@ -47,8 +47,8 @@ final class DanmakuSettingPanel {
         bindTabs();
         bindReset();
         showTab(0);
-        if (Util.isLeanback()) binding.tabAppearance.requestFocus();
-        binding.tabGroup.check(binding.tabAppearance.getId());
+        PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
+        PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, binding.tabAppearance);
     }
 
     void release() {

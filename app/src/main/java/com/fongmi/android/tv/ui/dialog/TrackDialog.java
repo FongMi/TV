@@ -11,6 +11,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.C;
@@ -33,6 +34,7 @@ import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,7 +79,7 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
     public void show(FragmentActivity activity) {
         if (activity.getSupportFragmentManager().isStateSaved()) return;
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof TrackDialog) return;
-        show(activity.getSupportFragmentManager(), null);
+        showNow(activity.getSupportFragmentManager(), null);
     }
 
     private boolean hasChoose() {
@@ -126,9 +128,21 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
         binding.recycler.setAdapter(adapter.addAll(getTrack()));
-        int selected = adapter.getSelected();
-        binding.recycler.post(() -> binding.recycler.scrollToPosition(selected));
         binding.recycler.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
+        if (adapter.getItemCount() == 0) return;
+        int selected = adapter.getSelected();
+        // Focus before drawing when the selected item is ready.
+        binding.recycler.getLayoutManager().scrollToPosition(selected);
+        if (Util.isLeanback()) {
+            binding.getRoot().setFocusableInTouchMode(true);
+            binding.getRoot().requestFocus();
+            OneShotPreDrawListener.add(binding.recycler, () -> {
+                View view = binding.recycler.getLayoutManager().findViewByPosition(selected);
+                if (view == null || !view.requestFocus()) binding.recycler.scrollToPosition(selected);
+                binding.getRoot().setFocusableInTouchMode(false);
+                binding.getRoot().setFocusable(false);
+            });
+        }
     }
 
     private void onSearch(View view) {

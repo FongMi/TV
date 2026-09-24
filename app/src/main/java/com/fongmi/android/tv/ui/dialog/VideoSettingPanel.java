@@ -44,8 +44,8 @@ final class VideoSettingPanel {
         bindReset();
         showTab(0);
         updateControls();
-        if (Util.isLeanback()) binding.tabPreset.requestFocus();
-        binding.tabGroup.check(binding.tabPreset.getId());
+        PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
+        PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, binding.tabPreset);
     }
 
     void release() {
@@ -323,6 +323,7 @@ final class VideoSettingPanel {
         MaterialButton[] tabs = getTabs();
         for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
         binding.reset.setNextFocusDownId(tabs[currentTab = index].getId());
+        binding.compare.setNextFocusDownId(tabs[currentTab].getId());
     }
 
     private MaterialButton[] getTabs() {
