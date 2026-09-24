@@ -55,7 +55,7 @@ import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.EpgDataAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
-import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
+import com.fongmi.android.tv.ui.custom.LiveInput;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
@@ -77,7 +77,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
+public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, LiveInput.Listener, CustomLiveListView.Callback, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
 
     private ActivityLiveBinding mBinding;
     private LiveViewModel mViewModel;
@@ -85,7 +85,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private GroupAdapter mGroupAdapter;
     private ChannelAdapter mChannelAdapter;
     private EpgDataAdapter mEpgDataAdapter;
-    private CustomKeyDownLive mKeyDown;
+    private LiveInput mInput;
     private Clock mClock;
     private View mOldView;
     private View mFocus2;
@@ -156,7 +156,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         mClock = Clock.create(mBinding.widget.clock);
-        mKeyDown = CustomKeyDownLive.create(this);
+        mInput = LiveInput.create(this, this);
         mHides = new ArrayList<>();
         mR0 = this::setSelected;
         mR1 = this::hideControl;
@@ -190,7 +190,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -927,7 +927,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void seek(long time) {
-        mKeyDown.reset();
+        mInput.reset();
         seekTo(time);
     }
 
@@ -947,7 +947,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
-        if (mKeyDown.hasEvent(event) && service() != null) mKeyDown.onKeyDown(event);
+        if (service() != null) mInput.onKeyEvent(event);
         return super.dispatchKeyEvent(event);
     }
 
@@ -957,8 +957,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
-    public boolean dispatch(boolean check) {
-        return !check || isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
+    public boolean canHandleKeyEvent() {
+        return isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
     }
 
     @Override
