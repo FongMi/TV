@@ -30,7 +30,7 @@ import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.service.DLNARendererService;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.PlayerSetting;
-import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
+import com.fongmi.android.tv.ui.custom.VodInput;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
 import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
@@ -43,12 +43,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jupnp.support.contentdirectory.DIDLParser;
 
-public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.Listener {
+public class CastActivity extends PlaybackActivity implements VodInput.Listener {
 
     private final Object mDlnaOwner = new Object();
     private ActivityCastBinding mBinding;
     private DLNARendererService mRenderer;
-    private CustomKeyDownVod mKeyDown;
+    private VodInput mInput;
     private String mPlaybackKey;
     private CastAction mAction;
     private Runnable mR1;
@@ -108,8 +108,8 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         super.initView(savedInstanceState);
         bound = bindService(new Intent(this, DLNARendererService.class), mRendererConnection, Context.BIND_AUTO_CREATE);
         mClock = Clock.create(mBinding.widget.clock);
-        mKeyDown = CustomKeyDownVod.create(this);
-        mKeyDown.setFull(true);
+        mInput = VodInput.create(this, this);
+        mInput.setFullscreen(true);
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setVideoView();
@@ -127,7 +127,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
         mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
     }
 
     private void setVideoView() {
@@ -412,7 +412,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
-        if (isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event) && service() != null) return mKeyDown.onKeyDown(event);
+        if (isGone(mBinding.control.getRoot()) && service() != null && mInput.onKeyEvent(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 
@@ -429,7 +429,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     public void onSeekEnd(long time) {
         if (player().isEmpty()) return;
-        mKeyDown.reset();
+        mInput.reset();
         seekTo(time);
     }
 
