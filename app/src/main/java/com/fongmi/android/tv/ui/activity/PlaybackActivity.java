@@ -27,7 +27,6 @@ import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.common.VideoSize;
-import androidx.media3.exoplayer.drm.FrameworkMediaDrm;
 import androidx.media3.exoplayer.iso.IsoNavigationSession;
 import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
@@ -505,7 +504,6 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private String getPlaybackError(Result result) {
         if (result.hasMsg()) return result.getMsg();
         if (result.getRealUrl().isEmpty()) return ResUtil.getString(R.string.error_play_url);
-        if (result.getDrm() != null && !FrameworkMediaDrm.isCryptoSchemeSupported(result.getDrm().getUUID())) return ResUtil.getString(R.string.error_play_drm);
         return null;
     }
 
