@@ -73,6 +73,7 @@ final class AudioSettingPanel {
     }
 
     void release() {
+        binding.tabGroup.clearOnButtonCheckedListeners();
         previewOriginal(false);
     }
 

@@ -11,47 +11,31 @@ import androidx.fragment.app.FragmentManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogAudioSettingBinding;
-import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 
 public final class AudioSettingDialog {
 
-    private PlayerManager player;
-
     public static AudioSettingDialog create() {
         return new AudioSettingDialog();
     }
 
-    private static DialogAudioSettingBinding inflate(LayoutInflater inflater, ViewGroup container) {
-        return DialogAudioSettingBinding.inflate(inflater, container, false);
-    }
-
-    public AudioSettingDialog player(PlayerManager player) {
-        this.player = player;
-        return this;
-    }
-
     public void show(FragmentActivity activity) {
         FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
         for (Fragment fragment : manager.getFragments()) if (fragment instanceof BottomSheet || fragment instanceof SideSheet) return;
-        if (Util.isFullscreenLand(activity) || Util.isLeanback()) new SideSheet(player).show(manager, null);
-        else new BottomSheet(player).show(manager, null);
+        if (Util.isFullscreenLand(activity) || Util.isLeanback()) new SideSheet().show(manager, null);
+        else new BottomSheet().show(manager, null);
     }
 
     public static final class BottomSheet extends BaseBottomSheetDialog {
 
-        private final PlayerManager player;
         private DialogAudioSettingBinding binding;
         private AudioSettingPanel panel;
 
-        BottomSheet(PlayerManager player) {
-            this.player = player;
-        }
-
         @Override
         protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-            return binding = AudioSettingDialog.inflate(inflater, container);
+            return binding = DialogAudioSettingBinding.inflate(inflater, container, false);
         }
 
         @Override
@@ -61,8 +45,13 @@ public final class AudioSettingDialog {
 
         @Override
         protected void initView() {
-            panel = new AudioSettingPanel(binding, player);
-            panel.bind();
+            PlaybackDialog.observe(this, player -> {
+                if (panel != null) panel.release();
+                panel = null;
+                if (player == null) return;
+                panel = new AudioSettingPanel(binding, player);
+                panel.bind();
+            });
         }
 
         @Override
@@ -76,13 +65,8 @@ public final class AudioSettingDialog {
 
     public static final class SideSheet extends BaseSideSheetDialog {
 
-        private final PlayerManager player;
         private DialogAudioSettingBinding binding;
         private AudioSettingPanel panel;
-
-        SideSheet(PlayerManager player) {
-            this.player = player;
-        }
 
         @Override
         protected int getWidth() {
@@ -91,13 +75,18 @@ public final class AudioSettingDialog {
 
         @Override
         protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-            return binding = AudioSettingDialog.inflate(inflater, container);
+            return binding = DialogAudioSettingBinding.inflate(inflater, container, false);
         }
 
         @Override
         protected void initView() {
-            panel = new AudioSettingPanel(binding, player);
-            panel.bind();
+            PlaybackDialog.observe(this, player -> {
+                if (panel != null) panel.release();
+                panel = null;
+                if (player == null) return;
+                panel = new AudioSettingPanel(binding, player);
+                panel.bind();
+            });
         }
 
         @Override

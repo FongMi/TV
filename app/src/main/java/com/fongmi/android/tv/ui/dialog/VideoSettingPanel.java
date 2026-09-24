@@ -49,6 +49,7 @@ final class VideoSettingPanel {
     }
 
     void release() {
+        binding.tabGroup.clearOnButtonCheckedListeners();
         previewOriginal(false);
     }
 

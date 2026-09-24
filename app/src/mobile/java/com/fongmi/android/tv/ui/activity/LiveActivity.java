@@ -406,7 +406,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().player(player()).show(this);
+        SpeedSettingDialog.create().show(this);
         hideControl();
     }
 

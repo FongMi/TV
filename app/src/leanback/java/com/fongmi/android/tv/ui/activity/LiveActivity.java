@@ -391,7 +391,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().player(player()).show(this);
+        SpeedSettingDialog.create().show(this);
         hideControl();
     }
 

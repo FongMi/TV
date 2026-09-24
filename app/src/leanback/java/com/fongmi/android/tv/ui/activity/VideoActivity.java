@@ -933,7 +933,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().player(player()).save(true).show(this);
+        SpeedSettingDialog.create().save(true).show(this);
         hideControl();
     }
 

@@ -35,9 +35,6 @@ final class SpeedSettingPanel {
         if (Util.isLeanback()) binding.speed.slider.requestFocus();
     }
 
-    void release() {
-    }
-
     private void bindSpeed() {
         ViewSettingSliderBinding item = binding.speed;
         Slider slider = item.slider;

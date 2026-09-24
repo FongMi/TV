@@ -136,8 +136,8 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
 
     private void showSetting(FragmentActivity activity) {
         switch (type) {
-            case C.TRACK_TYPE_AUDIO -> AudioSettingDialog.create().player(player).show(activity);
-            case C.TRACK_TYPE_VIDEO -> VideoSettingDialog.create().player(player).show(activity);
+            case C.TRACK_TYPE_AUDIO -> AudioSettingDialog.create().show(activity);
+            case C.TRACK_TYPE_VIDEO -> VideoSettingDialog.create().show(activity);
             case C.TRACK_TYPE_TEXT -> SubtitleSettingDialog.create().view(subtitleView).player(player).show(activity);
         }
     }
