@@ -95,6 +95,7 @@ public class PlayerManager implements ParseCallback {
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
     private boolean refreshAttempted;
+    private boolean clearKeyExoFallback;
     private boolean initTrack;
     private volatile int playbackGeneration;
     private Future<?> bdjTask;
@@ -697,6 +698,10 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void ensureEngine(PlaySpec spec) {
+        if (clearKeyExoFallback) {
+            if (engine.getType() != PlayerEngine.Type.EXO || engine.needsRebuild()) replaceEngine(PlayerEngineFactory.create(PlayerEngine.Type.EXO, listener));
+            return;
+        }
         if (PlayerEngineFactory.matches(engine, spec)) return;
         replaceEngine(PlayerEngineFactory.create(spec, listener));
     }
@@ -804,6 +809,7 @@ public class PlayerManager implements ParseCallback {
 
     private void startMediaItem(long timeout, long startPositionMs, boolean newMedia) {
         endSpeedPress();
+        if (newMedia) clearKeyExoFallback = false;
         ensureEngine(spec.checkUa());
         if (engine instanceof MpvPlayerEngine mpv) mpv.setBdjDiscMenu(isMenuInspected(spec) && inspectedMenuBdj);
         if (newMedia) engine.prepareForNewMedia();
@@ -1009,6 +1015,17 @@ public class PlayerManager implements ParseCallback {
         @Override
         public void onPlayerError(@NonNull PlaybackException e) {
             if (spec == null) return;
+            if (engine.getType() == PlayerEngine.Type.MPV
+                    && e.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED
+                    && !clearKeyExoFallback) {
+                clearKeyExoFallback = true;
+                PlaybackSnapshot snapshot = PlaybackSnapshot.capture(PlayerManager.this);
+                replaceEngine(PlayerEngineFactory.create(PlayerEngine.Type.EXO, listener));
+                engine.prepareForNewMedia();
+                engine.start(spec.checkUa(), snapshot.positionMs());
+                snapshot.restorePlayerState(PlayerManager.this);
+                return;
+            }
             PlayerEngine.ErrorAction action = engine.handleError(e);
             if (action != PlayerEngine.ErrorAction.RECOVERED) App.removeCallbacks(runnable);
             switch (action) {
