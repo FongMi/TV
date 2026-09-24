@@ -22,6 +22,7 @@ import androidx.media3.exoplayer.source.preload.MediaSourceFactorySupplier;
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy;
 import androidx.media3.extractor.DefaultExtractorsFactory;
 import androidx.media3.extractor.ExtractorsFactory;
+import androidx.media3.extractor.mkv.MatroskaExtractor;
 import androidx.media3.extractor.ts.TsExtractor;
 
 import com.fongmi.android.tv.App;
@@ -130,7 +131,7 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
     }
 
     static DefaultExtractorsFactory createDefaultExtractorsFactory() {
-        return new DefaultExtractorsFactory().setTsExtractorTimestampSearchBytes(TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES * 10);
+        return new DefaultExtractorsFactory().setTsExtractorTimestampSearchBytes(TsExtractor.DEFAULT_TIMESTAMP_SEARCH_BYTES * 10).setMatroskaExtractorFlagsForHttpSources(MatroskaExtractor.FLAG_DEFER_SEEK_FOR_CUES);
     }
 
     private DataSource.Factory getDataSourceFactory() {
