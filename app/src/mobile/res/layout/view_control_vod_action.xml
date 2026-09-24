@@ -115,5 +115,9 @@
             style="@style/Control"
             android:text="@string/play_ed" />
 
+        <com.fongmi.android.tv.ui.custom.MpvScriptButtonsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
 </HorizontalScrollView>

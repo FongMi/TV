@@ -34,4 +34,8 @@
         <item name="titleTextColor">@color/white</item>
     </style>
 
+    <style name="MpvScriptItem">
+        <item name="android:background">@drawable/shape_accent</item>
+    </style>
+
 </resources>

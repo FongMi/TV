@@ -80,6 +80,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         return mService.player();
     }
 
+    public PlayerManager getPlaybackPlayer() {
+        return mService == null ? null : player();
+    }
+
     public LiveData<PlayerManager> getPlaybackPlayerState() {
         return playbackPlayerState;
     }

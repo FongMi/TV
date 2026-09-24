@@ -46,4 +46,8 @@
         <item name="android:textSize">14sp</item>
     </style>
 
+    <style name="Control.Script" parent="Control">
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
 </resources>
