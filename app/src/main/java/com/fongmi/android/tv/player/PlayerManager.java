@@ -54,6 +54,7 @@ import com.google.common.net.HttpHeaders;
 
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,7 @@ public class PlayerManager implements ParseCallback {
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
     private boolean initTrack;
+    private final List<Track> pendingTrackRestore = new ArrayList<>();
 
     public PlayerManager(Callback callback) {
         this.callback = callback;
@@ -398,7 +400,15 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void setSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
-        if (engine != null) engine.setSecondarySubtitleSelection(selection);
+        if (engine == null) return;
+        engine.setSecondarySubtitleSelection(selection);
+        clearPendingTrackRestore(C.TRACK_TYPE_TEXT, Track.ROLE_SECONDARY);
+        if (selection == null) {
+            Track.delete(getKey(), C.TRACK_TYPE_TEXT, Track.ROLE_SECONDARY);
+            return;
+        }
+        Track track = TrackUtil.fromSelection(player.getCurrentTracks(), selection, Track.ROLE_SECONDARY);
+        if (track != null) track.key(getKey()).save();
     }
 
     public void sendDanmaku(String text) {
@@ -429,7 +439,27 @@ public class PlayerManager implements ParseCallback {
 
     public void setTrack(Track track) {
         engine.resetDecoderFallback(track.getType());
-        TrackUtil.setTrackSelection(player, track);
+        if (track.isSecondary()) {
+            TrackSelectionOverride selection = track.isSelected() ? TrackUtil.findSelection(player, track) : null;
+            if (track.isSelected() && selection == null) return;
+            engine.restoreSecondarySubtitleSelection(selection);
+        } else {
+            TrackSelectionOverride secondary = track.getType() == C.TRACK_TYPE_TEXT && !track.isSelected()
+                    ? getSubtitleSelectionState().activeSecondarySelection : null;
+            Track promoted = secondary == null ? null : TrackUtil.fromSelection(player.getCurrentTracks(), secondary, Track.ROLE_PRIMARY);
+            Track secondaryOff = secondary == null ? null : TrackUtil.fromSelection(player.getCurrentTracks(), secondary, Track.ROLE_SECONDARY);
+            if (!TrackUtil.setTrackSelection(player, track)) return;
+            if (promoted != null && secondaryOff != null) {
+                secondaryOff.setSelected(false);
+                secondaryOff.key(getKey()).save();
+                promoted.key(getKey()).save();
+                clearPendingTrackRestore(C.TRACK_TYPE_TEXT, Track.ROLE_PRIMARY);
+                clearPendingTrackRestore(C.TRACK_TYPE_TEXT, Track.ROLE_SECONDARY);
+                return;
+            }
+        }
+        track.key(getKey()).save();
+        clearPendingTrackRestore(track.getType(), track.getRole());
     }
 
     public void setVideoSetting(int preset) {
@@ -548,6 +578,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void resetTrack() {
+        pendingTrackRestore.clear();
         TrackUtil.reset(player);
     }
 
@@ -629,6 +660,7 @@ public class PlayerManager implements ParseCallback {
         if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;
         initTrack = false;
+        pendingTrackRestore.clear();
         engine.start(spec, startPositionMs);
         notifyDanmakuSourceChanged();
         App.post(runnable, timeout);
@@ -720,6 +752,44 @@ public class PlayerManager implements ParseCallback {
     private record PendingPreload(PlaySpec spec, long startPositionMs) {
     }
 
+    private void restoreTrackSelection() {
+        pendingTrackRestore.clear();
+        List<Track> tracks = Track.find(getKey());
+        Track secondary = null;
+        for (Track track : tracks) {
+            if (track.isSecondary()) {
+                secondary = track;
+                break;
+            }
+        }
+        // A saved primary may currently occupy the native secondary slot.
+        if (secondary != null) engine.restoreSecondarySubtitleSelection(null);
+        pendingTrackRestore.addAll(TrackUtil.setTrackSelection(player, tracks));
+        if (secondary != null && secondary.isSelected()) {
+            TrackSelectionOverride selection = TrackUtil.findSelection(player, secondary);
+            if (selection != null) engine.restoreSecondarySubtitleSelection(selection);
+            else pendingTrackRestore.add(secondary);
+        }
+    }
+
+    private void retryPendingTrackSelection() {
+        List<Track> pending = new ArrayList<>(pendingTrackRestore);
+        pendingTrackRestore.clear();
+        for (Track track : pending) {
+            if (!track.isSecondary() && !TrackUtil.setTrackSelection(player, track)) pendingTrackRestore.add(track);
+        }
+        for (Track track : pending) {
+            if (!track.isSecondary()) continue;
+            TrackSelectionOverride selection = TrackUtil.findSelection(player, track);
+            if (selection == null) pendingTrackRestore.add(track);
+            else engine.restoreSecondarySubtitleSelection(selection);
+        }
+    }
+
+    private void clearPendingTrackRestore(int type, int role) {
+        pendingTrackRestore.removeIf(track -> track.getType() == type && track.getRole() == role);
+    }
+
     private record PlaybackSnapshot(long positionMs, boolean playWhenReady, PlaybackParameters playbackParameters, int repeatMode, float volume, long audioOffsetMs, long textOffsetMs) {
 
         private static PlaybackSnapshot capture(Player player) {
@@ -754,10 +824,13 @@ public class PlayerManager implements ParseCallback {
 
         @Override
         public void onTracksChanged(@NonNull Tracks tracks) {
-            if (tracks.isEmpty() || initTrack) return;
-            initTrack = true;
-            TrackUtil.setTrackSelection(player, Track.find(getKey()));
-            callback.onTracksChanged();
+            if (tracks.isEmpty()) return;
+            boolean initialize = !initTrack;
+            if (initialize) {
+                initTrack = true;
+                restoreTrackSelection();
+            } else if (!pendingTrackRestore.isEmpty()) retryPendingTrackSelection();
+            if (initialize) callback.onTracksChanged();
         }
 
         @Override

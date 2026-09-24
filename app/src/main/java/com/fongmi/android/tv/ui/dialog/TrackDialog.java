@@ -12,14 +12,17 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.media3.common.C;
 import androidx.media3.common.Format;
 import androidx.media3.common.MimeTypes;
+import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.DecoderMode;
+import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.ui.DefaultTrackNameProvider;
 import androidx.media3.ui.TrackNameProvider;
 import androidx.viewbinding.ViewBinding;
@@ -254,30 +257,43 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
         }
     }
 
-    private List<Track> getTrack() {
-        List<Track> items = new ArrayList<>();
+    private List<TrackAdapter.TrackItem> getTrack() {
+        List<TrackAdapter.TrackItem> items = new ArrayList<>();
         addTrack(items);
         return items;
     }
 
-    private void addTrack(List<Track> items) {
+    private void addTrack(List<TrackAdapter.TrackItem> items) {
         List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
+        SubtitleSelectionState subtitleState = type == C.TRACK_TYPE_TEXT ? player.getSubtitleSelectionState() : SubtitleSelectionState.EMPTY;
+        int ordinal = 0;
         for (int i = 0; i < groups.size(); i++) {
             Tracks.Group trackGroup = groups.get(i);
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
                 Format format = trackGroup.getTrackFormat(j);
+                boolean selected = trackGroup.isTrackSelected(j);
                 String name = provider.getTrackName(format);
-                Track item = new Track(type, name, TrackUtil.describeFormat(format));
-                item.setSelected(trackGroup.isTrackSelected(j));
-                items.add(item);
+                Track track = TrackUtil.createTrack(type, name, format, ordinal++);
+                track.setSelected(selected);
+                int role = selected ? getSubtitleRole(subtitleState, trackGroup, j) : 0;
+                track.setRole(role == R.string.subtitle_secondary_role ? Track.ROLE_SECONDARY : Track.ROLE_PRIMARY);
+                items.add(new TrackAdapter.TrackItem(track, role));
             }
         }
     }
 
+    @StringRes
+    private static int getSubtitleRole(SubtitleSelectionState state, Tracks.Group group, int trackIndex) {
+        if (state.activeSecondarySelection == null) return 0;
+        TrackSelectionOverride selection = new TrackSelectionOverride(group.getMediaTrackGroup(), trackIndex);
+        if (state.isPrimary(selection)) return R.string.subtitle_primary_role;
+        return state.isActiveSecondary(selection) ? R.string.subtitle_secondary_role : 0;
+    }
+
     @Override
     public void onItemClick(Track item) {
-        player.setTrack(item.key(player.getKey()).save());
+        player.setTrack(item.key(player.getKey()));
         dismiss();
     }
 
