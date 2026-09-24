@@ -972,7 +972,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void onChapter() {
-        ChapterDialog.create().player(player()).show(this);
+        ChapterDialog.create().show(this);
         hideControl();
     }
 

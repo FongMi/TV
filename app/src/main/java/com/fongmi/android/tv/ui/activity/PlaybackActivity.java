@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
@@ -53,6 +54,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private final DanmakuPlayerViewController danmakuController = new DanmakuPlayerViewController();
     private final List<ServiceReadyObserver<?>> serviceReadyObservers = new ArrayList<>();
+    private final MutableLiveData<PlayerManager> playbackPlayerState = new MutableLiveData<>(null);
     private final List<Runnable> foreverObserverRemovers = new ArrayList<>();
     private ListenableFuture<MediaController> mControllerFuture;
     private MediaController mController;
@@ -75,6 +77,15 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     protected PlayerManager player() {
         return mService.player();
+    }
+
+    public LiveData<PlayerManager> getPlaybackPlayerState() {
+        return playbackPlayerState;
+    }
+
+    private void updatePlaybackPlayerState() {
+        PlayerManager current = initialized && isBindingOwner() && isOwner() && !player().isReleased() ? player() : null;
+        if (playbackPlayerState.getValue() != current) playbackPlayerState.setValue(current);
     }
 
     protected boolean isRedirect() {
@@ -369,7 +380,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void claimBinding() {
         if (mService == null) return;
-        mService.claimBinding(getNavigationCallback(), this::closePiP);
+        mService.claimBinding(getNavigationCallback(), () -> {
+            playbackPlayerState.setValue(null);
+            closePiP();
+        });
         mService.setSessionActivity(buildSessionIntent());
     }
 
@@ -387,6 +401,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         if (!isRedirect()) updateNavigationKey();
         dispatchPendingObservers();
         initService();
+        updatePlaybackPlayerState();
     }
 
     private void initService() {
@@ -436,6 +451,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void releasePlaybackService() {
+        playbackPlayerState.setValue(null);
         if (mService != null) releaseService(isOwner());
         detach();
     }
@@ -475,6 +491,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void releaseBinding() {
+        playbackPlayerState.setValue(null);
         if (!bound) return;
         bound = false;
         if (mService != null) mService.removePlayerCallback(mPlayerCallback);
@@ -498,6 +515,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         @Override
         public void onPrepare() {
             if (isOwner()) PlaybackActivity.this.onPrepare();
+            updatePlaybackPlayerState();
         }
 
         @Override
@@ -523,7 +541,9 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
         @Override
         public void onPlayerRebuild(Player player) {
-            if (isOwner()) syncPlayerView(player);
+            if (!isOwner()) return;
+            syncPlayerView(player);
+            if (initialized && isBindingOwner() && playbackPlayerState.getValue() != null) playbackPlayerState.setValue(player());
         }
 
         @Override
@@ -587,6 +607,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
+        playbackPlayerState.setValue(null);
         initialized = false;
         mService = null;
     }
@@ -603,6 +624,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         claimBinding();
         setRedirect(false);
         dispatchPendingObservers();
+        updatePlaybackPlayerState();
         resumePlayback();
     }
 

@@ -1036,7 +1036,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void onChapter() {
-        ChapterDialog.create().player(player()).show(this);
+        ChapterDialog.create().show(this);
         hideControl();
     }
 
