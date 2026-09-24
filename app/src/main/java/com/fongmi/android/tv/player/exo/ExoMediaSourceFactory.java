@@ -8,6 +8,7 @@ import androidx.media3.database.StandaloneDatabaseProvider;
 import androidx.media3.datasource.DataSource;
 import androidx.media3.datasource.DefaultDataSource;
 import androidx.media3.datasource.HttpDataSource;
+import androidx.media3.datasource.ProgressiveIsoCache;
 import androidx.media3.datasource.cache.Cache;
 import androidx.media3.datasource.cache.CacheDataSource;
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
@@ -72,11 +73,17 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
 
     static DataSource.Factory createUpstreamDataSourceFactory(Map<String, String> headers) {
         HttpDataSource.Factory factory = new OkHttpDataSource.Factory(OkHttp.player());
-        factory.setDefaultRequestProperties(headers);
+        factory.setDefaultRequestProperties(headers == null ? Map.of() : headers);
         return new DefaultDataSource.Factory(App.get(), factory);
     }
 
-    static synchronized Cache getCache() {
+    public static DataSource.Factory createDiscIsoDataSourceFactory(Map<String, String> headers) {
+        Cache sharedCache = getCache();
+        CacheDataSource.Factory factory = new CacheDataSource.Factory().setCache(sharedCache).setUpstreamDataSourceFactory(createUpstreamDataSourceFactory(headers)).setCacheWriteDataSinkFactory(null).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        return ProgressiveIsoCache.withDiskCache(factory, sharedCache);
+    }
+
+    public static synchronized Cache getCache() {
         if (cache != null) return cache;
         File dir = Path.exoCache();
         return cache = new SimpleCache(dir, new LeastRecentlyUsedCacheEvictor(getMaxCacheSize(dir)), getDatabaseProvider());
@@ -127,7 +134,7 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
     }
 
     private DataSource.Factory getDataSourceFactory() {
-        if (dataSourceFactory == null) dataSourceFactory = () -> getCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory())).createDataSource();
+        if (dataSourceFactory == null) dataSourceFactory = ProgressiveIsoCache.withDiskCache(() -> getCacheDataSource(new DefaultDataSource.Factory(App.get(), getHttpDataSourceFactory())).createDataSource(), getCache());
         return dataSourceFactory;
     }
 

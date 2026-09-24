@@ -6,6 +6,11 @@ import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
+import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.ProgressiveIsoCache;
+import androidx.media3.datasource.cache.Cache;
+import androidx.media3.datasource.cache.CacheDataSource;
+import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.mpvplayer.MpvAndroidOptions;
 import androidx.media3.mpvplayer.MpvDecoderMode;
 import androidx.media3.mpvplayer.MpvPlayer;
@@ -14,6 +19,7 @@ import androidx.media3.mpvplayer.MpvSubtitleOptions;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.player.exo.ExoMediaSourceFactory;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
@@ -23,6 +29,7 @@ import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 
 import org.json.JSONException;
@@ -85,6 +92,12 @@ public final class MpvUtil {
         return options;
     }
 
+    private static DataSource.Factory createIsoDataSourceFactory() {
+        Cache cache = ExoMediaSourceFactory.getCache();
+        CacheDataSource.Factory factory = new CacheDataSource.Factory().setCache(cache).setUpstreamDataSourceFactory(new OkHttpDataSource.Factory(OkHttp.player())).setCacheWriteDataSinkFactory(null).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        return ProgressiveIsoCache.withDiskCache(factory, cache);
+    }
+
     static MpvPlayerConfig buildConfig() {
         ExternalFont.Item font = SubtitleSetting.getFont();
         return buildConfig(font == null ? null : font.familyName(), font == null ? null : font.directory());
@@ -94,7 +107,7 @@ public final class MpvUtil {
         File cacheDir = Path.mpvCache();
         File defaultFontsDirectory = ExternalFont.getDirectory();
         AndroidFontConfig.prepare();
-        MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().setDefaultFontDirectories(defaultFontsDirectory, defaultFontsDirectory).addConfigDirectory(Path.mpv()).addAndroidDefaults(buildAndroidOptions(cacheDir));
+        MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().setDataSourceFactory(createIsoDataSourceFactory()).setDefaultFontDirectories(defaultFontsDirectory, defaultFontsDirectory).addConfigDirectory(Path.mpv()).addAndroidDefaults(buildAndroidOptions(cacheDir));
         builder.addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions(fontFamily, fontDirectory));
         addPreloadOptions(builder);
         return builder.build();
