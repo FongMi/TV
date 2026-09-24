@@ -34,10 +34,11 @@
         android:visibility="gone"
         tools:visibility="visible" />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.fongmi.android.tv.ui.custom.CustomRecyclerView
         android:id="@+id/parse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
         android:layout_marginBottom="16dp"
         android:clipChildren="false"
         android:clipToPadding="false"
