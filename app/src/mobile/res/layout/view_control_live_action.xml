@@ -34,11 +34,6 @@
             android:text="@string/player_engine" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
-            style="@style/Control"
-            android:text="@string/play_decode" />
-
-        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/speed"
             style="@style/Control"
             android:fontFeatureSettings="tnum"

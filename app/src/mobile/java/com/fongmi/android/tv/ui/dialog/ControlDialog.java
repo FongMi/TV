@@ -75,7 +75,6 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
 
     @Override
     protected void initView() {
-        binding.decode.setText(parent.control.action.decode.getText());
         binding.ending.setText(parent.control.action.ending.getText());
         binding.opening.setText(parent.control.action.opening.getText());
         binding.repeat.setSelected(parent.control.action.repeat.isSelected());
@@ -101,7 +100,6 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
         binding.edition.setOnClickListener(v -> dismiss(parent.control.action.edition));
         binding.chapter.setOnClickListener(v -> dismiss(parent.control.action.chapter));
         binding.repeat.setOnClickListener(v -> active(binding.repeat, parent.control.action.repeat));
-        binding.decode.setOnClickListener(v -> click(binding.decode, parent.control.action.decode));
         binding.ending.setOnClickListener(v -> click(binding.ending, parent.control.action.ending));
         binding.opening.setOnClickListener(v -> click(binding.opening, parent.control.action.opening));
         binding.player.setOnLongClickListener(v -> longClick(binding.player, parent.control.action.player));
@@ -163,7 +161,6 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
     public void setPlayer() {
         SliderUtil.setValue(binding.speed, player.getSpeed());
         binding.player.setText(parent.control.action.player.getText());
-        binding.decode.setVisibility(parent.control.action.decode.getVisibility());
         binding.danmaku.setVisibility(parent.control.action.danmaku.getVisibility());
     }
 

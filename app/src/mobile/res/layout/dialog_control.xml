@@ -157,16 +157,6 @@
                 tools:text="EXO" />
 
             <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/decode"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:background="@drawable/shape_accent"
-                android:textColor="@color/selector_control"
-                android:textSize="14sp"
-                tools:text="硬解" />
-
-            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/opening"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

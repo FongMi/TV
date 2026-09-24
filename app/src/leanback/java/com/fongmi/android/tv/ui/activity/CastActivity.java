@@ -90,7 +90,6 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
 
     @Override
     protected void onServiceConnected() {
-        mBinding.control.action.decode.setText(player().getDecodeText());
         setAction(getIntent());
     }
 
@@ -125,7 +124,6 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.reset.setOnClickListener(view -> onReset());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
     }
@@ -168,7 +166,6 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
 
     private void setPlaybackMode() {
         PlayerEngineDialog.setText(mBinding.control.action.player, player());
-        mBinding.control.action.decode.setText(player().getDecodeText());
     }
 
     private void setScale(int scale) {
@@ -201,12 +198,6 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     private void onPlayer() {
         PlayerEngineDialog.show(this);
         hideControl();
-    }
-
-    private void onDecode() {
-        if (player().isEmpty()) return;
-        position = player().getPosition();
-        player().toggleDecode();
     }
 
     private void onTrack(View view) {

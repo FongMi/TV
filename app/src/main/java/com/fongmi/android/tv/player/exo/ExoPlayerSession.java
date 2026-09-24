@@ -1,13 +1,17 @@
 package com.fongmi.android.tv.player.exo;
 
-import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.audio.AudioProcessor;
+import androidx.media3.exoplayer.DecoderManager;
+import androidx.media3.exoplayer.DecoderMode;
+import androidx.media3.exoplayer.ExoPlaybackException;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.libass.LibassConfiguration;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
@@ -17,7 +21,6 @@ import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
 import androidx.media3.exoplayer.source.preload.PreloadException;
 import androidx.media3.exoplayer.source.preload.PreloadManagerListener;
 import androidx.media3.exoplayer.text.SecondaryTextOutput;
-import androidx.media3.exoplayer.trackselection.DecodeTrackSelector;
 import androidx.media3.exoplayer.trackselection.SecondaryTextTrackSelector;
 import androidx.media3.exoplayer.trackselection.TrackSelector;
 
@@ -28,8 +31,6 @@ import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 final class ExoPlayerSession {
 
@@ -40,18 +41,24 @@ final class ExoPlayerSession {
     private static final int LIBASS_MAX_GLYPH_COUNT = 4096;
     private static final long PRELOAD_DURATION_MS = 10_000;
 
-    private final DecodeTrackSelectorFactory decodeTrackSelectorFactory;
+    private final DecoderManager decoderManager;
+    private final ExoDecoderFallback decoderFallback;
     private final LibassSubtitleController libassSubtitleController;
     private final LibassPlaybackSession libassPlaybackSession;
     private final DefaultPreloadManager preloadManager;
     private final boolean libassEnabled;
     private final ExoPlayer player;
+    private DecoderMode requestedAudioMode;
+    private DecoderMode requestedVideoMode;
 
     @Nullable
     private PreloadRequest preloadRequest;
 
-    ExoPlayerSession(int decode, Player.Listener listener, AudioProcessor audioProcessor) {
-        this.decodeTrackSelectorFactory = new DecodeTrackSelectorFactory(decode);
+    ExoPlayerSession(Player.Listener listener, AudioProcessor audioProcessor) {
+        this.requestedAudioMode = DecoderMode.AUTO;
+        this.requestedVideoMode = DecoderMode.AUTO;
+        this.decoderManager = new DecoderManager(requestedAudioMode, requestedVideoMode);
+        TrackSelector.Factory decodeTrackSelectorFactory = context -> ExoUtil.buildTrackSelector(decoderManager);
         SecondaryTextTrackSelector.Factory secondaryTextTrackSelectorFactory = new SecondaryTextTrackSelector.Factory(decodeTrackSelectorFactory);
         SecondaryTextOutput secondaryTextOutput = new SecondaryTextOutput();
         this.libassEnabled = PlayerSetting.isLibass();
@@ -60,6 +67,8 @@ final class ExoPlayerSession {
         this.preloadManager = builder.build();
         this.preloadManager.addListener(new PreloadListener());
         this.player = ExoUtil.buildPlayer(listener, builder);
+        this.decoderManager.attach(player);
+        this.decoderFallback = new ExoDecoderFallback(decoderManager);
         this.libassSubtitleController = new LibassSubtitleController(player, libassPlaybackSession, secondaryTextTrackSelectorFactory, secondaryTextOutput);
     }
 
@@ -79,8 +88,44 @@ final class ExoPlayerSession {
         return libassEnabled != PlayerSetting.isLibass();
     }
 
-    void setDecode(int decode) {
-        decodeTrackSelectorFactory.setDecode(decode);
+    @Nullable
+    DecoderMode decoderMode(@C.TrackType int trackType) {
+        return switch (trackType) {
+            case C.TRACK_TYPE_AUDIO -> decoderManager.getAudioMode();
+            case C.TRACK_TYPE_VIDEO -> decoderManager.getVideoMode();
+            default -> null;
+        };
+    }
+
+    void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
+        decoderFallback.reset(trackType);
+        if (trackType != C.TRACK_TYPE_AUDIO && trackType != C.TRACK_TYPE_VIDEO) return;
+        clearPreload();
+        if (trackType == C.TRACK_TYPE_AUDIO) {
+            requestedAudioMode = mode;
+            decoderManager.selectAudioDecoder(mode);
+        } else {
+            requestedVideoMode = mode;
+            decoderManager.selectVideoDecoder(mode);
+        }
+    }
+
+    boolean switchDecoderForRetry(PlaybackException exception) {
+        if (!(exception instanceof ExoPlaybackException error) || !decoderFallback.retry(error)) return false;
+        clearPreload();
+        return true;
+    }
+
+    void resetDecoderFallback(@C.TrackType int trackType) {
+        decoderFallback.reset(trackType);
+    }
+
+    void prepareForNewMedia() {
+        decoderFallback.reset(C.TRACK_TYPE_AUDIO);
+        decoderFallback.reset(C.TRACK_TYPE_VIDEO);
+        if (requestedAudioMode == decoderManager.getAudioMode() && requestedVideoMode == decoderManager.getVideoMode()) return;
+        clearPreload();
+        decoderManager.setDecoderModes(requestedAudioMode, requestedVideoMode);
     }
 
     void preload(MediaItem mediaItem, long startPositionMs) {
@@ -113,6 +158,7 @@ final class ExoPlayerSession {
         preloadRequest = null;
         libassSubtitleController.close();
         preloadManager.release();
+        decoderManager.detach();
         player.release();
         libassPlaybackSession.close();
     }
@@ -126,7 +172,7 @@ final class ExoPlayerSession {
     }
 
     private DefaultPreloadManager.Builder createPreloadManagerBuilder(AudioProcessor audioProcessor, SecondaryTextTrackSelector.Factory secondaryTextTrackSelectorFactory, SecondaryTextOutput secondaryTextOutput) {
-        return new DefaultPreloadManager.Builder(App.get(), ignored -> DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(getPreloadStartPositionMs(), PRELOAD_DURATION_MS)).setMediaSourceFactorySupplier(ExoMediaSourceFactory.supplier(libassPlaybackSession)).setRenderersFactory(ExoUtil.buildRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession)).setTrackSelectorFactory(secondaryTextTrackSelectorFactory).setLoadControl(ExoUtil.buildLoadControl(MAX_PRELOAD_BUFFER_BYTES));
+        return new DefaultPreloadManager.Builder(App.get(), ignored -> DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(getPreloadStartPositionMs(), PRELOAD_DURATION_MS)).setMediaSourceFactorySupplier(ExoMediaSourceFactory.supplier(libassPlaybackSession)).setRenderersFactory(ExoUtil.buildRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession, decoderManager)).setTrackSelectorFactory(secondaryTextTrackSelectorFactory).setLoadControl(ExoUtil.buildLoadControl(MAX_PRELOAD_BUFFER_BYTES));
     }
 
     private static LibassPlaybackSession createLibassPlaybackSession(boolean libassEnabled) {
@@ -157,27 +203,4 @@ final class ExoPlayerSession {
     private record PreloadRequest(MediaItem mediaItem, long startPositionMs) {
     }
 
-    private static final class DecodeTrackSelectorFactory implements TrackSelector.Factory {
-
-        private final List<DecodeTrackSelector> trackSelectors = new ArrayList<>(2);
-        private int decode;
-
-        private DecodeTrackSelectorFactory(int decode) {
-            this.decode = decode;
-        }
-
-        @NonNull
-        @Override
-        public TrackSelector createTrackSelector(@NonNull Context context) {
-            DecodeTrackSelector trackSelector = ExoUtil.buildTrackSelector(decode);
-            trackSelectors.add(trackSelector);
-            return trackSelector;
-        }
-
-        private void setDecode(int decode) {
-            if (this.decode == decode) return;
-            this.decode = decode;
-            for (DecodeTrackSelector trackSelector : trackSelectors) ExoUtil.setDecodePreferences(trackSelector, decode);
-        }
-    }
 }

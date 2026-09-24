@@ -317,7 +317,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.replay.setOnClickListener(view -> onReplay());
         mBinding.control.action.parse.setOnClickListener(view -> onParse());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.repeat.setOnClickListener(view -> onRepeat());
         mBinding.control.action.danmaku.setOnClickListener(view -> onDanmaku());
@@ -377,7 +376,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void setPlaybackMode() {
-        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
+        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
     private void setViewModel() {
@@ -1018,11 +1017,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     private void onPlayer() {
         PlayerEngineDialog.show(this);
         hideControl();
-    }
-
-    private void onDecode() {
-        mClock.setCallback(null);
-        player().toggleDecode();
     }
 
     private void onTrack(View view) {

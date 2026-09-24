@@ -352,7 +352,6 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
         mBinding.control.action.replay.setOnClickListener(view -> onReplay());
         mBinding.control.action.parse.setOnClickListener(view -> onParse());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.repeat.setOnClickListener(view -> onRepeat());
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
@@ -417,7 +416,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
     }
 
     private void setPlaybackMode() {
-        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
+        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
     private void setViewModel() {
@@ -1031,12 +1030,6 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
 
     private void onRefresh() {
         mVod.refresh();
-    }
-
-    private void onDecode() {
-        mClock.setCallback(null);
-        player().toggleDecode();
-        setR1Callback();
     }
 
     private void onEnding() {

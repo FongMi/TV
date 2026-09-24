@@ -16,18 +16,18 @@ import com.fongmi.android.tv.utils.UrlUtil;
 
 public final class PlayerEngineFactory {
 
-    public static PlayerEngine create(int decode, Player.Listener listener) {
-        return create(decode, resolve(), listener);
+    public static PlayerEngine create(Player.Listener listener) {
+        return create(resolve(), listener);
     }
 
-    public static PlayerEngine create(int decode, PlaySpec spec, Player.Listener listener) {
-        return create(decode, resolve(spec), listener);
+    public static PlayerEngine create(PlaySpec spec, Player.Listener listener) {
+        return create(resolve(spec), listener);
     }
 
-    public static PlayerEngine create(int decode, PlayerEngine.Type type, Player.Listener listener) {
+    public static PlayerEngine create(PlayerEngine.Type type, Player.Listener listener) {
         return switch (type) {
-            case EXO -> new ExoPlayerEngine(decode, listener);
-            case MPV -> new MpvPlayerEngine(decode, listener);
+            case EXO -> new ExoPlayerEngine(listener);
+            case MPV -> new MpvPlayerEngine(listener);
         };
     }
 

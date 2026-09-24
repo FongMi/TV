@@ -188,7 +188,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.across.setOnClickListener(view -> onAcross());
         mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
@@ -219,7 +218,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void setPlaybackMode() {
-        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
+        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
     private void setScale(int scale) {
@@ -427,10 +426,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private void onPlayer() {
         PlayerEngineDialog.show(this);
         hideControl();
-    }
-
-    private void onDecode() {
-        player().toggleDecode();
     }
 
     private void hideUI() {

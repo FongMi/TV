@@ -42,7 +42,6 @@
     <string name="play_speed_hint">Speed <xliff:g name="speed">%1$s</xliff:g></string>
     <string name="play_reset">Reset</string>
     <string name="play_replay">Replay</string>
-    <string name="play_decode">Hard</string>
     <string name="play_timer">Timer</string>
     <string name="play_edition">Title</string>
     <string name="play_chapter">Chapter</string>
@@ -396,11 +395,6 @@
     <string name="none">None</string>
     <string name="times">times</string>
     <string name="lines">lines</string>
-
-    <string-array name="select_decode">
-        <item>Soft</item>
-        <item>Hard</item>
-    </string-array>
 
     <string-array name="select_dolby_vision_output">
         <item>Auto</item>

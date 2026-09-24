@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
+import androidx.media3.common.DecoderMode;
 import androidx.media3.common.Format;
 import androidx.media3.common.MediaChapter;
 import androidx.media3.common.MediaEdition;
@@ -70,15 +71,12 @@ public class PlayerManager implements ParseCallback {
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
     private boolean initTrack;
-    private int retry;
-    private int decode;
 
     public PlayerManager(Callback callback) {
         this.callback = callback;
-        this.decode = PlayerEngine.HARD;
         this.runnable = this::onPlayTimeout;
         this.pendingStartPositionMs = C.TIME_UNSET;
-        this.engine = PlayerEngineFactory.create(decode, listener);
+        this.engine = PlayerEngineFactory.create(listener);
         this.effects = new PlayerEffectManager(() -> engine);
         this.danmakuEnabled = DanmakuSetting.isShow();
         this.player = engine.getPlayer();
@@ -259,8 +257,41 @@ public class PlayerManager implements ParseCallback {
         return (getVideoWidth() == 0 && getVideoHeight() == 0) ? "" : getVideoWidth() + " x " + getVideoHeight();
     }
 
-    public String getDecodeText() {
-        return ResUtil.getStringArray(R.array.select_decode)[decode];
+    @Nullable
+    public DecoderMode getDecoderMode(@C.TrackType int trackType) {
+        return engine == null ? null : engine.getDecoderMode(trackType);
+    }
+
+    public List<DecoderMode> getSupportedDecoderModes(@C.TrackType int trackType) {
+        return engine == null ? List.of() : engine.getSupportedDecoderModes(trackType);
+    }
+
+    public void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
+        if (getDecoderMode(trackType) == null || !getSupportedDecoderModes(trackType).contains(mode)) return;
+        changeDecoder(() -> engine.setDecoderMode(trackType, mode));
+    }
+
+    public void resetDecoderModesForNewSession() {
+        DecoderMode audioMode = getDecoderMode(C.TRACK_TYPE_AUDIO);
+        DecoderMode videoMode = getDecoderMode(C.TRACK_TYPE_VIDEO);
+        boolean resetAudio = audioMode != null && audioMode != DecoderMode.AUTO;
+        boolean resetVideo = videoMode != null && videoMode != DecoderMode.AUTO;
+        if (!resetAudio && !resetVideo) return;
+        pendingPreload = null;
+        if (resetAudio) engine.setDecoderMode(C.TRACK_TYPE_AUDIO, DecoderMode.AUTO);
+        if (resetVideo) engine.setDecoderMode(C.TRACK_TYPE_VIDEO, DecoderMode.AUTO);
+        callback.onDecodeChanged();
+    }
+
+    private void changeDecoder(Runnable change) {
+        boolean recover = player.getPlayerError() != null;
+        pendingPreload = null;
+        change.run();
+        if (recover && player.getPlaybackState() == Player.STATE_IDLE) {
+            player.prepare();
+            App.post(runnable, Constant.TIMEOUT_PLAY);
+        }
+        callback.onDecodeChanged();
     }
 
     public boolean canSetAudioSetting() {
@@ -375,6 +406,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void setTrack(Track track) {
+        engine.resetDecoderFallback(track.getType());
         TrackUtil.setTrackSelection(player, track);
     }
 
@@ -459,7 +491,6 @@ public class PlayerManager implements ParseCallback {
 
     public void reset() {
         App.removeCallbacks(runnable);
-        retry = 0;
     }
 
     public void clear() {
@@ -486,30 +517,21 @@ public class PlayerManager implements ParseCallback {
         TrackUtil.reset(player);
     }
 
-    public void toggleDecode() {
-        setDecode(isHard() ? PlayerEngine.SOFT : PlayerEngine.HARD);
+    private void retryDecode(PlaybackException e) {
+        pendingPreload = null;
+        if (!engine.switchDecoderForRetry(e)) {
+            callback.onError(engine.getErrorMessage(e));
+            return;
+        }
+        callback.onDecodeChanged();
+        restartCurrent();
     }
 
-    private void handleDecodeError(PlaybackException e) {
-        if (++retry > 1) callback.onError(engine.getErrorMessage(e));
-        else retryDecode(isHard() ? PlayerEngine.SOFT : PlayerEngine.HARD);
-    }
-
-    private void retryDecode(int decode) {
-        setDecode(decode);
+    private void restartCurrent() {
+        if (spec == null || spec.getUrl() == null) return;
         PlaybackSnapshot snapshot = PlaybackSnapshot.capture(player);
         startCurrent(snapshot.positionMs());
         snapshot.restore(player);
-    }
-
-    private void setDecode(int decode) {
-        this.decode = decode;
-        engine.setDecode(decode);
-        callback.onDecodeChanged();
-    }
-
-    private boolean isHard() {
-        return decode == PlayerEngine.HARD;
     }
 
     private void onPlayTimeout() {
@@ -519,9 +541,13 @@ public class PlayerManager implements ParseCallback {
 
     private void ensureEngine(PlaySpec spec) {
         if (PlayerEngineFactory.matches(engine, spec)) return;
+        replaceEngine(PlayerEngineFactory.create(spec, listener));
+    }
+
+    private void replaceEngine(PlayerEngine replacement) {
         PlayerEngine old = engine;
         player.removeListener(listener);
-        engine = PlayerEngineFactory.create(decode, spec, listener);
+        engine = replacement;
         setPlayer(engine.getPlayer());
         old.release();
     }
@@ -539,7 +565,7 @@ public class PlayerManager implements ParseCallback {
 
     public void start(PlaySpec spec, long timeout, long startPositionMs) {
         this.spec = spec;
-        setMediaItem(timeout, startPositionMs);
+        setMediaItem(timeout, startPositionMs, true);
     }
 
     public void parse(String key, Result result, boolean useParse, MediaMetadata metadata) {
@@ -560,8 +586,13 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void setMediaItem(long timeout, long startPositionMs) {
+        setMediaItem(timeout, startPositionMs, false);
+    }
+
+    private void setMediaItem(long timeout, long startPositionMs, boolean newMedia) {
         if (spec == null || spec.getUrl() == null) return;
         ensureEngine(spec.checkUa());
+        if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;
         initTrack = false;
         engine.start(spec, startPositionMs);
@@ -619,7 +650,7 @@ public class PlayerManager implements ParseCallback {
         if (headers != null) headers.remove(HttpHeaders.RANGE);
         if (spec != null) spec.setHeaders(headers);
         if (spec != null) spec.setUrl(url);
-        startCurrent(pendingStartPositionMs);
+        setMediaItem(Constant.TIMEOUT_PLAY, pendingStartPositionMs, true);
         pendingStartPositionMs = C.TIME_UNSET;
     }
 
@@ -711,7 +742,7 @@ public class PlayerManager implements ParseCallback {
             PlayerEngine.ErrorAction action = engine.handleError(e);
             if (action != PlayerEngine.ErrorAction.RECOVERED) App.removeCallbacks(runnable);
             switch (action) {
-                case DECODE -> handleDecodeError(e);
+                case DECODE -> retryDecode(e);
                 case RECOVERED -> notifyDanmakuSourceChanged();
                 case FATAL -> callback.onError(engine.getErrorMessage(e));
             }

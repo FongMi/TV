@@ -42,7 +42,6 @@
     <string name="play_speed_hint">倍速 <xliff:g name="speed">%1$s</xliff:g></string>
     <string name="play_reset">刷新</string>
     <string name="play_replay">重播</string>
-    <string name="play_decode">硬解</string>
     <string name="play_timer">定時</string>
     <string name="play_edition">標題</string>
     <string name="play_chapter">章節</string>
@@ -396,11 +395,6 @@
     <string name="none">無</string>
     <string name="times">倍</string>
     <string name="lines">行</string>
-
-    <string-array name="select_decode">
-        <item>軟解</item>
-        <item>硬解</item>
-    </string-array>
 
     <string-array name="select_dolby_vision_output">
         <item>自動</item>

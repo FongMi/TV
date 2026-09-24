@@ -77,6 +77,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         if (ownsBinding(owner)) return;
         if (binding != null) binding.onReplaced().run();
         binding = new ActivityBinding(owner, onReplaced);
+        player.resetDecoderModesForNewSession();
     }
 
     public boolean ownsBinding(NavigationCallback owner) {

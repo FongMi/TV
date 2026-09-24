@@ -31,11 +31,6 @@
             android:text="@string/play_exo" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
-            style="@style/Control"
-            android:text="@string/play_decode" />
-
-        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/reset"
             style="@style/Control"
             android:text="@string/play_reset" />

@@ -2,6 +2,8 @@ package com.fongmi.android.tv.player.exo;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.media3.common.C;
+import androidx.media3.common.DecoderMode;
 import androidx.media3.common.Format;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
@@ -19,6 +21,8 @@ import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 
+import java.util.List;
+
 public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
 
     private final ExoErrorMessageProvider provider;
@@ -29,11 +33,11 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     private final ExoPlayer player;
     private PlaySpec spec;
 
-    public ExoPlayerEngine(int decode, Player.Listener listener) {
+    public ExoPlayerEngine(Player.Listener listener) {
         this.effect = new ExoPlayerEffect();
         this.preload = new ExoDiskPreload();
         this.provider = new ExoErrorMessageProvider();
-        this.session = new ExoPlayerSession(decode, listener, effect.getAudioProcessor());
+        this.session = new ExoPlayerSession(listener, effect.getAudioProcessor());
         this.subtitles = new ExoSubtitleController(session);
         this.player = session.player();
         this.player.addAnalyticsListener(this);
@@ -91,8 +95,35 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     }
 
     @Override
-    public void setDecode(int decode) {
-        session.setDecode(decode);
+    public List<DecoderMode> getSupportedDecoderModes(@C.TrackType int trackType) {
+        return getDecoderMode(trackType) == null ? List.of() : List.of(DecoderMode.values());
+    }
+
+    @Override
+    @Nullable
+    public DecoderMode getDecoderMode(@C.TrackType int trackType) {
+        androidx.media3.exoplayer.DecoderMode mode = session.decoderMode(trackType);
+        return mode == null ? null : mode.toCommonDecoderMode();
+    }
+
+    @Override
+    public void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
+        session.setDecoderMode(trackType, androidx.media3.exoplayer.DecoderMode.fromCommonDecoderMode(mode));
+    }
+
+    @Override
+    public boolean switchDecoderForRetry(PlaybackException exception) {
+        return session.switchDecoderForRetry(exception);
+    }
+
+    @Override
+    public void resetDecoderFallback(@C.TrackType int trackType) {
+        session.resetDecoderFallback(trackType);
+    }
+
+    @Override
+    public void prepareForNewMedia() {
+        session.prepareForNewMedia();
     }
 
     @Override
@@ -146,7 +177,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     public ErrorAction handleError(PlaybackException e) {
         return switch (e.errorCode) {
             case PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> seekToDefaultPosition();
-            case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED, PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED, PlaybackException.ERROR_CODE_DECODING_FAILED -> ErrorAction.DECODE;
+            case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED, PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED, PlaybackException.ERROR_CODE_DECODING_FAILED, PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED -> ErrorAction.DECODE;
             case PlaybackException.ERROR_CODE_IO_UNSPECIFIED, PlaybackException.ERROR_CODE_PARSING_CONTAINER_MALFORMED, PlaybackException.ERROR_CODE_PARSING_MANIFEST_MALFORMED, PlaybackException.ERROR_CODE_PARSING_CONTAINER_UNSUPPORTED, PlaybackException.ERROR_CODE_PARSING_MANIFEST_UNSUPPORTED -> retryFormat(e.errorCode);
             default -> ErrorAction.FATAL;
         };

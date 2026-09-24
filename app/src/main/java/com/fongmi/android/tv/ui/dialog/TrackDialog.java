@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import androidx.media3.common.C;
 import androidx.media3.common.Format;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.Tracks;
+import androidx.media3.common.DecoderMode;
 import androidx.media3.ui.DefaultTrackNameProvider;
 import androidx.media3.ui.TrackNameProvider;
 import androidx.viewbinding.ViewBinding;
@@ -26,9 +28,11 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.bean.Track;
+import com.fongmi.android.tv.databinding.DialogDecoderModeBinding;
 import com.fongmi.android.tv.databinding.DialogTrackBinding;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.track.TrackUtil;
+import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.ui.adapter.TrackAdapter;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
@@ -114,6 +118,12 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
         binding.choose.setVisibility(hasChoose() ? View.VISIBLE : View.GONE);
         binding.setting.setVisibility(hasSetting() ? View.VISIBLE : View.GONE);
         binding.title.setText(ResUtil.getStringArray(R.array.select_track)[type - 1]);
+        DecoderMode mode = player.getDecoderMode(type);
+        binding.decoder.setVisibility(mode == null ? View.GONE : View.VISIBLE);
+        if (mode != null) {
+            String description = getString(R.string.track_decoder_mode, DecodeSetting.getDecoderModeText(mode));
+            binding.decoder.setContentDescription(description);
+        }
         applyPendingSubtitle();
     }
 
@@ -122,6 +132,67 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
         binding.search.setOnClickListener(this::onSearch);
         binding.choose.setOnClickListener(this::onChoose);
         binding.setting.setOnClickListener(this::onSetting);
+        binding.decoder.setOnClickListener(this::onDecoder);
+    }
+
+    private void onDecoder(View view) {
+        if (player.getDecoderMode(type) == null || player.getSupportedDecoderModes(type).isEmpty()) return;
+        if (getChildFragmentManager().findFragmentByTag("decoder") != null) return;
+        new DecoderSheet().showNow(getChildFragmentManager(), "decoder");
+    }
+
+    public static final class DecoderSheet extends BaseBottomSheetDialog {
+
+        private DialogDecoderModeBinding binding;
+
+        @Override
+        public void onStart() {
+            super.onStart();
+            ((TrackDialog) requireParentFragment()).requireDialog().hide();
+        }
+
+        @Override
+        public void onDismiss(@NonNull DialogInterface dialog) {
+            super.onDismiss(dialog);
+            if (getParentFragment() instanceof TrackDialog owner && owner.isAdded() && !owner.isRemoving() && owner.getDialog() != null) owner.requireDialog().show();
+        }
+
+        @Override
+        protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
+            return binding = DialogDecoderModeBinding.inflate(inflater, container, false);
+        }
+
+        @Override
+        protected void initView() {
+            PlaybackDialog.observe(this, player -> {
+                if (player == null) return;
+                TrackDialog owner = (TrackDialog) requireParentFragment();
+                List<DecoderMode> modes = player.getSupportedDecoderModes(owner.type);
+                DecoderMode current = player.getDecoderMode(owner.type);
+                binding.title.setText(owner.type == C.TRACK_TYPE_AUDIO ? R.string.player_audio_decoder_mode : R.string.player_video_decoder_mode);
+                bind(binding.auto, DecoderMode.AUTO, modes, current, owner);
+                bind(binding.hardware, DecoderMode.HARDWARE, modes, current, owner);
+                bind(binding.software, DecoderMode.SOFTWARE, modes, current, owner);
+                bind(binding.ffmpeg, DecoderMode.FFMPEG, modes, current, owner);
+            });
+        }
+
+        @Override
+        public void onDestroyView() {
+            binding = null;
+            super.onDestroyView();
+        }
+
+        private void bind(View view, DecoderMode mode, List<DecoderMode> modes, DecoderMode current, TrackDialog owner) {
+            view.setTag(mode);
+            view.setVisibility(modes.contains(mode) ? View.VISIBLE : View.GONE);
+            view.setSelected(mode == current);
+            view.setOnClickListener(v -> {
+                owner.player.setDecoderMode(owner.type, mode);
+                owner.dismiss();
+            });
+            if (mode == current && view.getVisibility() == View.VISIBLE) view.requestFocus();
+        }
     }
 
     private void setRecyclerView() {

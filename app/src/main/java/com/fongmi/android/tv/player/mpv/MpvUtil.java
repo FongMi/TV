@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player.mpv;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.Nullable;
-import androidx.media3.common.C;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
 import androidx.media3.datasource.DataSource;
@@ -64,8 +63,8 @@ public final class MpvUtil {
         return App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION, VULKAN_1_2);
     }
 
-    public static MpvPlayer buildPlayer(int decode, Player.Listener listener) {
-        MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(decode == C.DECODE_SOFTWARE ? MpvDecoderMode.SOFTWARE : MpvDecoderMode.HARDWARE).setConfig(buildConfig()).build();
+    public static MpvPlayer buildPlayer(Player.Listener listener) {
+        MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(MpvDecoderMode.AUTO).setConfig(buildConfig()).build();
         player.setSubtitleContentLoader(new SubtitleFileContent());
         setPreferredTextLanguages(player);
         player.addListener(listener);

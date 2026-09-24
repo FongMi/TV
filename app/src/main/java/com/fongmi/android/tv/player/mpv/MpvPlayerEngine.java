@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.mpv;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
+import androidx.media3.common.DecoderMode;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
@@ -31,9 +32,9 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvPlayer player;
     private PlaySpec spec;
 
-    public MpvPlayerEngine(int decode, Player.Listener listener) {
+    public MpvPlayerEngine(Player.Listener listener) {
         List<MpvScripts.Item> scriptItems = MpvUtil.readScripts();
-        this.player = MpvUtil.buildPlayer(decode, listener);
+        this.player = MpvUtil.buildPlayer(listener);
         this.scripts = new MpvScriptSession(player, scriptItems);
         this.provider = new MpvErrorMessageProvider();
         this.effect = new MpvPlayerEffect(player);
@@ -115,8 +116,21 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     }
 
     @Override
-    public void setDecode(int decode) {
-        player.setVideoDecoderMode(decode == C.DECODE_SOFTWARE ? MpvDecoderMode.SOFTWARE : MpvDecoderMode.HARDWARE);
+    public List<DecoderMode> getSupportedDecoderModes(@C.TrackType int trackType) {
+        return trackType == C.TRACK_TYPE_VIDEO ? List.of(DecoderMode.AUTO, DecoderMode.HARDWARE, DecoderMode.FFMPEG) : List.of();
+    }
+
+    @Override
+    @Nullable
+    public DecoderMode getDecoderMode(@C.TrackType int trackType) {
+        if (trackType != C.TRACK_TYPE_VIDEO) return null;
+        return player.getVideoDecoderMode().toCommonDecoderMode();
+    }
+
+    @Override
+    public void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
+        if (!getSupportedDecoderModes(trackType).contains(mode)) return;
+        player.setVideoDecoderMode(MpvDecoderMode.fromCommonDecoderMode(mode));
     }
 
     @Override

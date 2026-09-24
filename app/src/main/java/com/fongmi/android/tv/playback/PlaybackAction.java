@@ -13,9 +13,8 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 public final class PlaybackAction {
 
-    public static void setPlaybackMode(PlayerManager player, TextView engine, TextView decode) {
+    public static void setPlaybackMode(PlayerManager player, TextView engine) {
         setText(engine, getEngineText(player));
-        setText(decode, getDecodeText(player));
     }
 
     public static float toggleSpeed(PlayerManager player, TextView view) {
@@ -83,20 +82,16 @@ public final class PlaybackAction {
         return player.getEngine();
     }
 
-    private static String getDecodeText(PlayerManager player) {
-        return player == null ? "" : player.getDecodeText();
-    }
-
     private static boolean hasTextTrack(PlayerManager player) {
         return player != null && (player.haveTrack(C.TRACK_TYPE_TEXT) || player.isVod());
     }
 
     private static boolean hasAudioTrack(PlayerManager player) {
-        return player != null && player.haveTrack(C.TRACK_TYPE_AUDIO);
+        return player != null && (player.haveTrack(C.TRACK_TYPE_AUDIO) || player.getDecoderMode(C.TRACK_TYPE_AUDIO) != null);
     }
 
     private static boolean hasVideoTrack(PlayerManager player) {
-        return player != null && player.haveTrack(C.TRACK_TYPE_VIDEO);
+        return player != null && (player.haveTrack(C.TRACK_TYPE_VIDEO) || player.getDecoderMode(C.TRACK_TYPE_VIDEO) != null);
     }
 
     private static boolean hasSpeed(PlayerManager player) {

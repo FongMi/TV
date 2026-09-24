@@ -198,7 +198,6 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
         mBinding.control.action.across.setOnClickListener(view -> onAcross());
         mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
         mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
@@ -223,7 +222,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void setPlaybackMode() {
-        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
+        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
     private void setScale(int scale) {
@@ -437,11 +436,6 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
         setR1Callback();
         LiveSetting.putChange(!LiveSetting.isChange());
         mBinding.control.action.change.setSelected(LiveSetting.isChange());
-    }
-
-    private void onDecode() {
-        player().toggleDecode();
-        setR1Callback();
     }
 
     private void onPlayer() {

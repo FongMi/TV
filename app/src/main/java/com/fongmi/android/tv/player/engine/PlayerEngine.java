@@ -2,6 +2,7 @@ package com.fongmi.android.tv.player.engine;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
+import androidx.media3.common.DecoderMode;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.TrackSelectionOverride;
@@ -15,9 +16,6 @@ import java.util.List;
 
 public interface PlayerEngine {
 
-    int SOFT = C.DECODE_SOFTWARE;
-    int HARD = C.DECODE_HARDWARE;
-
     Type getType();
 
     default boolean needsRebuild() {
@@ -30,7 +28,29 @@ public interface PlayerEngine {
 
     void release();
 
-    void setDecode(int decode);
+    default List<DecoderMode> getSupportedDecoderModes(@C.TrackType int trackType) {
+        return List.of();
+    }
+
+    @Nullable
+    default DecoderMode getDecoderMode(@C.TrackType int trackType) {
+        return null;
+    }
+
+    default void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
+    }
+
+    default void resetDecoderFallback(@C.TrackType int trackType) {
+    }
+
+    /** Restores persistent engine policy before loading a new playback request. */
+    default void prepareForNewMedia() {
+    }
+
+    /** Selects an untried decoder; the caller restarts after a playback error. */
+    default boolean switchDecoderForRetry(PlaybackException exception) {
+        return false;
+    }
 
     default PlayerEffect getEffect() {
         return PlayerEffect.NONE;
