@@ -51,6 +51,10 @@ final class DanmakuSettingPanel {
         binding.tabGroup.check(binding.tabAppearance.getId());
     }
 
+    void release() {
+        binding.tabGroup.clearOnButtonCheckedListeners();
+    }
+
     void onFontSelected(@Nullable ExternalFont.Item font) {
         DanmakuSetting.putFont(font);
         applyConfig();

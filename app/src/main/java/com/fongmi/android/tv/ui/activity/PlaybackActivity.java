@@ -27,6 +27,7 @@ import androidx.media3.session.MediaController;
 import androidx.media3.session.SessionToken;
 import androidx.media3.ui.PlayerSeekView;
 import androidx.media3.ui.PlayerView;
+import androidx.media3.ui.SubtitleView;
 import androidx.media3.ui.TimeBar;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 import androidx.media3.ui.danmaku.DanmakuPlayerViewController;
@@ -81,6 +82,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     public LiveData<PlayerManager> getPlaybackPlayerState() {
         return playbackPlayerState;
+    }
+
+    public SubtitleView getPlaybackSubtitleView() {
+        return getPlayerView().getSubtitleView();
     }
 
     private void updatePlaybackPlayerState() {

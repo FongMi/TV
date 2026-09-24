@@ -82,6 +82,10 @@ final class SubtitleSettingPanel {
         applySubtitleStyle();
     }
 
+    void release() {
+        binding.tabGroup.clearOnButtonCheckedListeners();
+    }
+
     void onFontSelected(@Nullable ExternalFont.Item font) {
         SubtitleSetting.putFont(font);
         applySubtitleStyle();

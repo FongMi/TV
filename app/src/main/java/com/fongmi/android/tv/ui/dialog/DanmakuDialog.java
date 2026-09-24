@@ -81,7 +81,7 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
     }
 
     private void onSetting(View view) {
-        DanmakuSettingDialog.create().player(player).show(getActivity());
+        DanmakuSettingDialog.create().show(getActivity());
         dismiss();
     }
 
