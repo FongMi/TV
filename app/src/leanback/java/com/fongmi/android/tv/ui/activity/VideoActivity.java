@@ -322,6 +322,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.danmaku.setOnClickListener(view -> onDanmaku());
         mBinding.control.action.edition.setOnClickListener(view -> onEdition());
         mBinding.control.action.chapter.setOnClickListener(view -> onChapter());
+        mBinding.control.action.discMenu.setOnClickListener(view -> { openDiscMenu(); hideControl(); });
+        mBinding.control.action.discMenu.setOnLongClickListener(view -> { if (openDiscPopupMenu()) hideControl(); return true; });
         mBinding.control.action.opening.setOnClickListener(view -> onOpening());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
@@ -468,7 +470,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public boolean canTrackPlaybackProgress() {
-        return service() != null && isOwner() && player().isVod();
+        return service() != null && isOwner() && player().isVod() && !isIsoNavigationPlayback();
+    }
+
+    @Override
+    public boolean isIsoNavigationPlayback() {
+        return super.isIsoNavigationPlayback();
     }
 
     @Override
@@ -1084,6 +1091,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void showControl(View view) {
+        int discMenuVisibility = hasDiscMenu() ? View.VISIBLE : View.GONE;
+        mBinding.control.action.discMenu.setVisibility(discMenuVisibility);
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
         setR1Callback();
@@ -1209,6 +1218,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    protected void onBdjPreparing() {
+        showProgress();
+    }
+
+    @Override
     protected void onDecodeChanged() {
         setPlaybackMode();
     }
@@ -1234,10 +1248,21 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    protected void onDiscMenuOpening() {
+        hideProgress();
+    }
+
+    @Override
+    protected void onDiscMenuUnavailable() {
+        mBinding.control.action.discMenu.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void onStateChanged(int state) {
         switch (state) {
             case Player.STATE_BUFFERING:
-                showProgress();
+                if (isDiscMenuTransition()) hideProgress();
+                else showProgress();
                 mClock.setCallback(null);
                 break;
             case Player.STATE_READY:
@@ -1246,6 +1271,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
                 mClock.setCallback(this);
                 break;
             case Player.STATE_ENDED:
+                if (isIsoNavigationPlayback()) {
+                    hideProgress();
+                    if (isDiscMenuActive()) hideInfo();
+                    mClock.setCallback(null);
+                    break;
+                }
                 if (ExternalPlayback.returnsResult(getIntent())) {
                     externalPlaybackCompleted = true;
                     finish();
@@ -1266,7 +1297,9 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying) {
+        if (isDiscMenuActive()) {
+            hideInfo();
+        } else if (isPlaying) {
             hideCenter();
         } else if (isPaused()) {
             if (isFullscreen()) showInfo();
@@ -1281,7 +1314,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void onTimeChanged(long time) {
-        if (!isOwner() || !player().isVod()) return;
+        if (!canTrackPlaybackProgress()) return;
         long position = player().getPosition();
         long duration = player().getDuration();
         if (position < 0) return;
@@ -1326,7 +1359,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void onPlay() {
-        if (mHistory != null && isEnded()) controller().seekTo(mVod.openingPositionMs());
+        if (mHistory != null && isEnded() && !isDiscMenuActive()) controller().seekTo(mVod.openingPositionMs());
         if (!player().isEmpty() && isIdle()) controller().prepare();
         controller().play();
     }
@@ -1367,6 +1400,10 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
+        if (dispatchDiscMenuKey(event)) {
+            hideControl();
+            return true;
+        }
         if (isFullscreen() && KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
@@ -1421,7 +1458,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void onKeyCenter() {
-        if (player().isPlaying()) onPaused();
+        if (player().isPlaying() || (isDiscMenuActive() && controller().getPlayWhenReady())) onPaused();
         else if (player().isEmpty()) onRefresh();
         else onPlay();
         hideControl();
@@ -1455,6 +1492,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     protected void onBackInvoked() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
+        } else if (handleDiscMenuBack()) {
+            return;
         } else if (isVisible(mBinding.widget.center)) {
             hideCenter();
         } else if (isFullscreen()) {

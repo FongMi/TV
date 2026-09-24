@@ -1,7 +1,9 @@
 package com.fongmi.android.tv.player;
 
 import android.net.Uri;
+import android.os.CancellationSignal;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,6 +14,7 @@ import androidx.media3.common.MediaChapter;
 import androidx.media3.common.MediaEdition;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.PlaybackParameters;
 import androidx.media3.common.Player;
@@ -21,6 +24,8 @@ import androidx.media3.common.VideoSize;
 import androidx.media3.common.text.SubtitleContent;
 import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
+import androidx.media3.exoplayer.iso.IsoDiscPreparation;
+import androidx.media3.exoplayer.iso.IsoDiscMenuInfo;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 
@@ -34,6 +39,9 @@ import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.player.effect.PlayerEffectManager;
 import com.fongmi.android.tv.player.effect.audio.AudioEffectBands;
+import com.fongmi.android.tv.player.engine.DiscMenuController;
+import com.fongmi.android.tv.player.exo.ExoMediaSourceFactory;
+import com.fongmi.android.tv.player.exo.ExoPlayerEngine;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.engine.PlayerEngineFactory;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
@@ -57,9 +65,16 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class PlayerManager implements ParseCallback {
+
+    private static final ExecutorService BDJ_EXECUTOR = Executors.newFixedThreadPool(2, runnable -> new Thread(runnable, "BdjRuntime"));
 
     private final PlayerEffectManager effects;
     private final Runnable runnable;
@@ -69,6 +84,11 @@ public class PlayerManager implements ParseCallback {
     private VideoSize videoSize;
     private ParseJob parseJob;
     private PlaySpec spec;
+    private String inspectedMenuUrl;
+    private Map<String, String> inspectedMenuHeaders;
+    private IsoDiscMenuInfo.MenuStatus discMenuStatus;
+    private boolean inspectedMenuBdj;
+    private boolean retryMenuProbe;
     private Player player;
     private float speedBeforePress = Float.NaN;
 
@@ -76,6 +96,9 @@ public class PlayerManager implements ParseCallback {
     private boolean danmakuEnabled;
     private boolean refreshAttempted;
     private boolean initTrack;
+    private volatile int playbackGeneration;
+    private Future<?> bdjTask;
+    private CancellationSignal bdjCancellation;
     private final List<Track> pendingTrackRestore = new ArrayList<>();
 
     public PlayerManager(Callback callback) {
@@ -89,6 +112,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void release() {
+        cancelBdjPreparation();
         App.removeCallbacks(runnable);
         clearSpeedPressState();
         if (player != null) player.removeListener(listener);
@@ -99,6 +123,22 @@ public class PlayerManager implements ParseCallback {
 
     public Player getPlayer() {
         return player;
+    }
+
+    @Nullable
+    public DiscMenuController getDiscMenuController() {
+        return engine instanceof DiscMenuController menu ? menu : null;
+    }
+
+    public boolean isDiscMenuAvailable() {
+        return spec == null || !isIso(spec)
+                || (isMenuInspected(spec) && discMenuStatus != IsoDiscMenuInfo.MenuStatus.UNAVAILABLE);
+    }
+
+    private boolean isMenuInspected(PlaySpec value) {
+        return value != null && discMenuStatus != null
+                && Objects.equals(inspectedMenuUrl, value.getUrl())
+                && Objects.equals(inspectedMenuHeaders, value.getHeaders());
     }
 
     public boolean runMpvScript(MpvScripts.Item item) {
@@ -333,9 +373,7 @@ public class PlayerManager implements ParseCallback {
     public void setEngine(int targetEngine) {
         PlayerSetting.putEngine(targetEngine);
         if (isEmpty() || PlayerEngineFactory.matches(engine, spec)) return;
-        PlaybackSnapshot snapshot = PlaybackSnapshot.capture(player);
-        startCurrent(snapshot.positionMs());
-        snapshot.restore(player);
+        restartCurrent();
     }
 
     public String getPositionTime(long delta) {
@@ -358,7 +396,8 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void selectChapter(MediaChapter chapter) {
-        player.selectChapter(chapter);
+        if (engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback()) exo.seekDiscChapter(chapter.index);
+        else player.selectChapter(chapter);
     }
 
     public void selectEdition(MediaEdition edition) {
@@ -471,6 +510,7 @@ public class PlayerManager implements ParseCallback {
             Track promoted = secondary == null ? null : TrackUtil.fromSelection(player.getCurrentTracks(), secondary, Track.ROLE_PRIMARY);
             Track secondaryOff = secondary == null ? null : TrackUtil.fromSelection(player.getCurrentTracks(), secondary, Track.ROLE_SECONDARY);
             if (!TrackUtil.setTrackSelection(player, track)) return;
+            if (engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback()) exo.syncDiscTrack(track);
             if (promoted != null && secondaryOff != null) {
                 secondaryOff.setSelected(false);
                 secondaryOff.key(getKey()).save();
@@ -521,25 +561,37 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void stop() {
+        cancelBdjPreparation();
         endSpeedPress();
         engine.stop();
         stopParse();
     }
 
     public void clearMediaItems() {
+        cancelBdjPreparation();
         endSpeedPress();
         player.clearMediaItems();
     }
 
     public boolean isRepeatOne() {
+        if (engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback()) return exo.getNavigationRepeatMode() == Player.REPEAT_MODE_ONE;
         return player.getRepeatMode() == Player.REPEAT_MODE_ONE;
     }
 
     public void setRepeatOne(boolean repeat) {
+        if (engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback()) {
+            exo.setNavigationRepeatOne(repeat);
+            return;
+        }
         player.setRepeatMode(repeat ? Player.REPEAT_MODE_ONE : Player.REPEAT_MODE_OFF);
     }
 
     public void replay(long positionMs) {
+        if (positionMs == C.TIME_UNSET && engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback()) {
+            exo.seekDiscChapter(0);
+            player.play();
+            return;
+        }
         if (positionMs == C.TIME_UNSET) player.seekToDefaultPosition();
         else player.seekTo(positionMs);
         player.play();
@@ -583,6 +635,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void clear() {
+        cancelBdjPreparation();
         spec = null;
     }
 
@@ -629,9 +682,13 @@ public class PlayerManager implements ParseCallback {
     private void restartCurrent() {
         if (spec == null || spec.getUrl() == null) return;
         endSpeedPress();
-        PlaybackSnapshot snapshot = PlaybackSnapshot.capture(player);
-        startCurrent(snapshot.positionMs());
-        snapshot.restore(player);
+        PlayerEngine.Type previousType = engine.getType();
+        boolean live = player.isCurrentMediaItemLive() && player.isCurrentMediaItemDynamic();
+        PlaybackSnapshot snapshot = PlaybackSnapshot.capture(this);
+        ensureEngine(spec.checkUa());
+        // Positions in an ongoing live window cannot be transferred to another engine's window.
+        startCurrent(live && previousType != engine.getType() ? C.TIME_UNSET : snapshot.positionMs());
+        snapshot.restorePlayerState(this);
     }
 
     private void onPlayTimeout() {
@@ -673,6 +730,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void parse(String key, Result result, boolean useParse, MediaMetadata metadata, long startPositionMs) {
+        cancelBdjPreparation();
         stopParse();
         pendingStartPositionMs = startPositionMs;
         spec = PlaySpec.fromParse(result, key, metadata);
@@ -690,9 +748,64 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void setMediaItem(long timeout, long startPositionMs, boolean newMedia) {
+        cancelBdjPreparation();
         if (spec == null || spec.getUrl() == null) return;
+        int generation = playbackGeneration;
+        PlaySpec startingSpec = spec;
+        if (isIso(startingSpec) && (!isMenuInspected(startingSpec) || retryMenuProbe)) {
+            Uri isoUri = startingSpec.checkUa().getUri();
+            String isoUrl = startingSpec.getUrl();
+            Map<String, String> headers = new HashMap<>(startingSpec.getHeaders());
+            CancellationSignal cancellation = new CancellationSignal();
+            bdjCancellation = cancellation;
+            bdjTask = BDJ_EXECUTOR.submit(() -> {
+                if (playbackGeneration != generation) return;
+                IsoDiscPreparation.Result preparation = IsoDiscPreparation.prepare(
+                        App.get(), isoUri, ExoMediaSourceFactory.createDiscIsoDataSourceFactory(headers), cancellation,
+                        () -> App.post(() -> {
+                            if (playbackGeneration == generation) {
+                                callback.onBdjPreparing();
+                                Notify.show(ResUtil.getString(R.string.bdj_preparing));
+                            }
+                        }));
+                if (preparation.inspectionError != null) Log.w("PlayerManager", "Could not inspect ISO menu", preparation.inspectionError);
+                App.post(() -> {
+                    if (playbackGeneration != generation || engine == null || spec != startingSpec
+                            || !Objects.equals(startingSpec.getUrl(), isoUrl)
+                            || !Objects.equals(startingSpec.getHeaders(), headers)) return;
+                    inspectedMenuUrl = isoUrl;
+                    inspectedMenuHeaders = new HashMap<>(headers);
+                    discMenuStatus = preparation.menuStatus;
+                    inspectedMenuBdj = preparation.bdj;
+                    retryMenuProbe = preparation.shouldRetry();
+                    if (preparation.runtimeError != null) Notify.show(ResUtil.getString(R.string.error_bdj_prepare, preparation.runtimeError.getMessage()));
+                    startMediaItem(timeout, startPositionMs, newMedia);
+                });
+            });
+            return;
+        }
+        startMediaItem(timeout, startPositionMs, newMedia);
+    }
+
+    private void cancelBdjPreparation() {
+        playbackGeneration++;
+        if (bdjCancellation != null) bdjCancellation.cancel();
+        if (bdjTask != null) bdjTask.cancel(true);
+        bdjCancellation = null;
+        bdjTask = null;
+    }
+
+    private static boolean isIso(PlaySpec spec) {
+        if (MimeTypes.VIDEO_ISO.equals(spec.getFormat())) return true;
+        Uri uri = spec.getUri();
+        String path = uri != null ? uri.getPath() : null;
+        return path != null && path.toLowerCase(Locale.US).endsWith(".iso");
+    }
+
+    private void startMediaItem(long timeout, long startPositionMs, boolean newMedia) {
         endSpeedPress();
         ensureEngine(spec.checkUa());
+        if (engine instanceof MpvPlayerEngine mpv) mpv.setBdjDiscMenu(isMenuInspected(spec) && inspectedMenuBdj);
         if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;
         initTrack = false;
@@ -766,6 +879,8 @@ public class PlayerManager implements ParseCallback {
 
         void onPrepare();
 
+        default void onBdjPreparing() {}
+
         void onTracksChanged();
 
         void onDecodeChanged();
@@ -828,23 +943,30 @@ public class PlayerManager implements ParseCallback {
         pendingTrackRestore.removeIf(track -> track.getType() == type && track.getRole() == role);
     }
 
-    private record PlaybackSnapshot(long positionMs, boolean playWhenReady, PlaybackParameters playbackParameters, int repeatMode, float volume, long audioOffsetMs, long textOffsetMs) {
+    private record PlaybackSnapshot(long positionMs, boolean playWhenReady, PlaybackParameters playbackParameters, int repeatMode, float volume, long audioOffsetMs, SubtitleOffsets subtitleOffsets) {
 
-        private static PlaybackSnapshot capture(Player player) {
+        private static PlaybackSnapshot capture(PlayerManager manager) {
+            Player player = manager.player;
             float volume = player.isCommandAvailable(Player.COMMAND_GET_VOLUME) ? player.getVolume() : Float.NaN;
             long audioOffsetMs = player.isCommandAvailable(Player.COMMAND_GET_AUDIO_OFFSET) ? player.getAudioOffsetMs() : C.TIME_UNSET;
-            long textOffsetMs = player.isCommandAvailable(Player.COMMAND_GET_TEXT_OFFSET) ? player.getTextOffsetMs() : C.TIME_UNSET;
-            return new PlaybackSnapshot(player.getCurrentPosition(), player.getPlayWhenReady(), player.getPlaybackParameters(), player.getRepeatMode(), volume, audioOffsetMs, textOffsetMs);
+            SubtitleOffsets offsets = player.isCommandAvailable(Player.COMMAND_GET_TEXT_OFFSET) ? manager.getSubtitleOffsets() : null;
+            int repeatMode = manager.engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback() ? exo.getNavigationRepeatMode() : player.getRepeatMode();
+            return new PlaybackSnapshot(player.getCurrentPosition(), player.getPlayWhenReady(), player.getPlaybackParameters(), repeatMode, volume, audioOffsetMs, offsets);
         }
 
-        private void restore(Player player) {
+        private void restorePlayerState(PlayerManager manager) {
+            Player player = manager.player;
             if (player.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) player.setPlaybackParameters(playbackParameters);
             if (player.isCommandAvailable(Player.COMMAND_SET_REPEAT_MODE)) player.setRepeatMode(repeatMode);
             if (!Float.isNaN(volume) && player.isCommandAvailable(Player.COMMAND_SET_VOLUME)) player.setVolume(volume);
             if (audioOffsetMs != C.TIME_UNSET && player.isCommandAvailable(Player.COMMAND_SET_AUDIO_OFFSET)) player.setAudioOffsetMs(audioOffsetMs);
-            if (textOffsetMs != C.TIME_UNSET && player.isCommandAvailable(Player.COMMAND_SET_TEXT_OFFSET)) player.setTextOffsetMs(textOffsetMs);
+            if (subtitleOffsets != null && player.isCommandAvailable(Player.COMMAND_SET_TEXT_OFFSET)) {
+                if (manager.supportsSubtitleOffsets()) manager.setSubtitleOffsets(subtitleOffsets);
+                else player.setTextOffsetMs(subtitleOffsets.primaryMs);
+            }
             if (player.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) player.setPlayWhenReady(playWhenReady);
         }
+
     }
 
     private final Player.Listener listener = new Player.Listener() {

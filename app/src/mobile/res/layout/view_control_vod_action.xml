@@ -101,6 +101,13 @@
             tools:visibility="visible" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/disc_menu"
+            style="@style/Control"
+            android:text="@string/play_disc_menu"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/opening"
             style="@style/Control"
             android:text="@string/play_op" />

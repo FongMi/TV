@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -361,11 +362,13 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         mBinding.control.action.danmaku.setOnClickListener(view -> onDanmaku());
         mBinding.control.action.edition.setOnClickListener(view -> onEdition());
         mBinding.control.action.chapter.setOnClickListener(view -> onChapter());
+        mBinding.control.action.discMenu.setOnClickListener(view -> { openDiscMenu(); hideControl(); });
+        mBinding.control.action.discMenu.setOnLongClickListener(view -> { if (openDiscPopupMenu()) hideControl(); return true; });
         mBinding.control.action.episodes.setOnClickListener(view -> onEpisodes());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
         mBinding.control.action.ending.setOnLongClickListener(view -> onEndingReset());
         mBinding.control.action.opening.setOnLongClickListener(view -> onOpeningReset());
-        mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
+        mBinding.video.setOnTouchListener((view, event) -> dispatchDiscMenuTouch(event) || mInput.onTouchEvent(event));
         mBinding.control.action.getRoot().setOnTouchListener(this::onActionTouch);
         mBinding.swipeLayout.setOnRefreshListener(this::onSwipeRefresh);
     }
@@ -511,7 +514,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public boolean canTrackPlaybackProgress() {
-        return service() != null && isOwner() && player().isVod();
+        return service() != null && isOwner() && player().isVod() && !isIsoNavigationPlayback();
+    }
+
+    @Override
+    public boolean isIsoNavigationPlayback() {
+        return super.isIsoNavigationPlayback();
     }
 
     @Override
@@ -926,9 +934,13 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     private void checkPlay() {
         setR1Callback();
-        if (player().isPlaying()) onPaused();
+        if (isPlayingForControls()) onPaused();
         else if (player().isEmpty()) onRefresh();
         else onPlay();
+    }
+
+    private boolean isPlayingForControls() {
+        return player().isPlaying() || (isDiscMenuActive() && controller().getPlayWhenReady());
     }
 
     private void checkNext() {
@@ -1180,6 +1192,9 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     private void showControl() {
         if (service() == null || isInPictureInPictureMode()) return;
+        if (isDiscMenuActive()) updatePlayControl(isPlayingForControls());
+        int discMenuVisibility = hasDiscMenu() ? View.VISIBLE : View.GONE;
+        mBinding.control.action.discMenu.setVisibility(discMenuVisibility);
         mBinding.control.danmaku.setVisibility(isLock() || !player().haveDanmaku() ? View.GONE : View.VISIBLE);
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
@@ -1200,6 +1215,20 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     private void hideControl() {
         mBinding.control.getRoot().setVisibility(View.GONE);
         App.removeCallbacks(mR1);
+    }
+
+    @Override
+    protected void onDiscMenuLongPress() {
+        showControl();
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (dispatchDiscMenuKey(event)) {
+            hideControl();
+            return true;
+        }
+        return super.dispatchKeyEvent(event);
     }
 
     private void dismissDialogs() {
@@ -1330,6 +1359,11 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     @Override
+    protected void onBdjPreparing() {
+        showProgress();
+    }
+
+    @Override
     protected void onDecodeChanged() {
         setPlaybackMode();
     }
@@ -1355,10 +1389,21 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     @Override
+    protected void onDiscMenuOpening() {
+        hideProgress();
+    }
+
+    @Override
+    protected void onDiscMenuUnavailable() {
+        mBinding.control.action.discMenu.setVisibility(View.GONE);
+    }
+
+    @Override
     protected void onStateChanged(int state) {
         switch (state) {
             case Player.STATE_BUFFERING:
-                showProgress();
+                if (isDiscMenuTransition()) hideProgress();
+                else showProgress();
                 mClock.setCallback(null);
                 break;
             case Player.STATE_READY:
@@ -1368,6 +1413,11 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
                 mClock.setCallback(this);
                 break;
             case Player.STATE_ENDED:
+                if (isIsoNavigationPlayback()) {
+                    hideProgress();
+                    mClock.setCallback(null);
+                    break;
+                }
                 if (ExternalPlayback.returnsResult(getIntent())) {
                     externalPlaybackCompleted = true;
                     finish();
@@ -1390,7 +1440,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying || isPaused()) updatePlayControl(isPlaying);
+        boolean playing = isPlaying || (isDiscMenuActive() && controller().getPlayWhenReady());
+        if (playing || isPaused()) updatePlayControl(playing);
     }
 
     private void updatePlayControl(boolean isPlaying) {
@@ -1406,7 +1457,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public void onTimeChanged(long time) {
-        if (!isOwner() || !player().isVod()) return;
+        if (!canTrackPlaybackProgress()) return;
         long position = player().getPosition();
         long duration = player().getDuration();
         if (position < 0) return;
@@ -1471,12 +1522,14 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     private void onPaused() {
         controller().pause();
+        if (isDiscMenuActive()) updatePlayControl(isPlayingForControls());
     }
 
     private void onPlay() {
-        if (mHistory != null && isEnded()) controller().seekTo(mVod.openingPositionMs());
+        if (mHistory != null && isEnded() && !isDiscMenuActive()) controller().seekTo(mVod.openingPositionMs());
         if (!player().isEmpty() && isIdle()) controller().prepare();
         controller().play();
+        if (isDiscMenuActive()) updatePlayControl(isPlayingForControls());
     }
 
     private boolean isFullscreen() {
@@ -1594,7 +1647,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         if (isLock()) return;
         if (!isFullscreen()) {
             enterFullscreen();
-        } else if (player().isPlaying()) {
+        } else if (isPlayingForControls()) {
             showControl();
             onPaused();
         } else {
@@ -1610,7 +1663,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public boolean onSeekTap(float x) {
-        if (!isSeekTapArea(x) || !canTrackPlaybackProgress()) return false;
+        if (!isSeekTapArea(x) || !canTrackPlaybackProgress() || isDiscMenuActive()) return false;
         hideControl();
         long delta = mSeekFeedback.show(x);
         seekTo(delta);
@@ -1696,6 +1749,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     protected void onBackInvoked() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
+        } else if (handleDiscMenuBack()) {
+            return;
         } else if (isFullscreen() && !isLock()) {
             exitFullscreen();
         } else if (!isLock()) {

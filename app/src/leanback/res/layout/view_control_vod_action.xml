@@ -115,6 +115,14 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/disc_menu"
+            style="@style/Control"
+            android:layout_marginEnd="8dp"
+            android:text="@string/play_disc_menu"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
         <com.fongmi.android.tv.ui.custom.CustomUpDownView
             android:id="@+id/opening"
             style="@style/Control"

@@ -18,6 +18,7 @@ import androidx.media3.mpvplayer.MpvPlayer;
 
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.effect.PlayerEffect;
+import com.fongmi.android.tv.player.engine.DiscMenuController;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
@@ -26,8 +27,9 @@ import com.fongmi.android.tv.setting.SubtitleSetting;
 import org.json.JSONException;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
+public class MpvPlayerEngine implements PlayerEngine, DiscMenuController, Player.Listener {
 
     private final MpvErrorMessageProvider provider;
     private final MpvPlayerEffect effect;
@@ -58,6 +60,51 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     @Override
     public Player getPlayer() {
         return player;
+    }
+
+    @Override
+    public boolean hasMenu() {
+        return player.canOpenDiscMenu();
+    }
+
+    public void setBdjDiscMenu(boolean bdjDiscMenu) {
+        player.setBdjDiscMenu(bdjDiscMenu);
+    }
+
+    @Override
+    public boolean isActive() {
+        return player.isDiscMenuActive();
+    }
+
+    @Override
+    public boolean isNavigationPlayback() {
+        return player.isDiscMenuInteractionInProgress();
+    }
+
+    @Override
+    public boolean sendAction(String action) {
+        boolean openingMenu = "menu".equals(action) || "title-menu".equals(action) || "popup".equals(action);
+        return openingMenu ? player.openDiscMenu(action) : player.sendDiscNav(action);
+    }
+
+    @Override
+    public void observeOpen(String action, Consumer<OpenResult> callback) {
+        player.observeDiscMenuOpen(action, result -> callback.accept(switch (result) {
+            case OPENED -> OpenResult.OPENED;
+            case UNAVAILABLE -> OpenResult.UNAVAILABLE;
+            case TIMED_OUT -> OpenResult.TIMED_OUT;
+            case CANCELLED -> OpenResult.CANCELLED;
+        }));
+    }
+
+    @Override
+    public boolean supportsPointer() {
+        return true;
+    }
+
+    @Override
+    public boolean sendPointer(float x, float y, boolean activate) {
+        return player.sendDiscNavPointer(x, y, activate);
     }
 
     @Override
@@ -202,10 +249,6 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
         effect.applyVideoEffect();
         effect.clearAudioEffect();
         player.setMediaItem(MediaItemFactory.from(spec), startPositionMs);
-        prepareAndPlay();
-    }
-
-    private void prepareAndPlay() {
         player.prepare();
         player.play();
     }

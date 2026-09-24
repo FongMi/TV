@@ -480,6 +480,11 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     @Override
+    public void onBdjPreparing() {
+        playerCallbacks.forEach(PlayerCallback::onBdjPreparing);
+    }
+
+    @Override
     public void onTracksChanged() {
         playerCallbacks.forEach(PlayerCallback::onTracksChanged);
     }
@@ -600,6 +605,9 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     public interface PlayerCallback {
 
         default void onPrepare() {
+        }
+
+        default void onBdjPreparing() {
         }
 
         default void onTracksChanged() {

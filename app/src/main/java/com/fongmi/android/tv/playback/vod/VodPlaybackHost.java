@@ -42,6 +42,10 @@ public interface VodPlaybackHost {
 
     boolean canTrackPlaybackProgress();
 
+    default boolean isIsoNavigationPlayback() {
+        return false;
+    }
+
     boolean canPreloadNext();
 
     long getPlayerPosition();

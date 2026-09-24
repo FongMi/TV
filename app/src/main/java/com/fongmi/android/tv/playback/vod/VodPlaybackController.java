@@ -324,6 +324,7 @@ public class VodPlaybackController {
     public void saveHistory(boolean exit, long time, long position, long duration) {
         History history = exit ? historyForExit() : currentHistory();
         if (host.isLivePlayback()) historyPolicy.saveVisit(history, exit, time);
+        else if (host.isIsoNavigationPlayback()) historyPolicy.saveDiscVisit(history, exit, time);
         else historyPolicy.saveProgress(history, exit, time, position, duration);
     }
 
