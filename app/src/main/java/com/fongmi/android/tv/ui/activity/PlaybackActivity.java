@@ -29,6 +29,7 @@ import androidx.media3.ui.PlayerSeekView;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 import androidx.media3.ui.TimeBar;
+import androidx.media3.ui.danmaku.Danmaku;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 import androidx.media3.ui.danmaku.DanmakuPlayerViewController;
 
@@ -78,6 +79,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     protected PlayerManager player() {
         return mService.player();
+    }
+
+    public List<Danmaku> getDanmakuItems() {
+        return danmakuController.getItems();
     }
 
     public PlayerManager getPlaybackPlayer() {

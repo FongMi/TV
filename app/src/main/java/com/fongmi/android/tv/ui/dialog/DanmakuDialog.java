@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.bean.Danmaku;
@@ -36,9 +37,10 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
     }
 
     public void show(FragmentActivity activity) {
-        if (activity.getSupportFragmentManager().isStateSaved()) return;
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof DanmakuDialog) return;
-        show(activity.getSupportFragmentManager(), null);
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof DanmakuDialog) return;
+        show(manager, null);
     }
 
     @Override
@@ -80,11 +82,18 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
         binding.search.setOnClickListener(this::onSearch);
         binding.choose.setOnClickListener(this::onChoose);
         binding.setting.setOnClickListener(this::onSetting);
+        binding.content.setOnClickListener(this::onContent);
     }
 
     private void onSearch(View view) {
         DanmakuSearchDialog.create().show(requireActivity());
         dismiss();
+    }
+
+    private void onContent(View view) {
+        FragmentActivity activity = requireActivity();
+        dismissNow();
+        PlaybackContentDialog.create().type(PlaybackContentDialog.DANMAKU).show(activity);
     }
 
     private void onChoose(View view) {
