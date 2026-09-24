@@ -31,6 +31,7 @@ public class Source {
         extractors.add(new Thunder());
         extractors.add(new TVBus());
         extractors.add(new Video());
+        extractors.add(new WebView());
         extractors.add(new YouTube());
     }
 

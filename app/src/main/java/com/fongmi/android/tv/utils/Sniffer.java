@@ -26,7 +26,7 @@ public class Sniffer {
     public static final Pattern SNIFFER = Pattern.compile("https?://[^\\s]{12,}\\.(?:m3u8|mp4|mkv|flv|mp3|m4a|aac|mpd)(?:\\?.*)?|https?://.*?video/tos[^\\s]*|rtmp:[^\\s]+");
 
     public static String getUrl(String text) {
-        if (Json.isObj(text) || text.contains("$")) return text;
+        if (UrlUtil.isWebView(text) || Json.isObj(text) || text.contains("$")) return text;
         Matcher m = AI_PUSH.matcher(text);
         if (m.find()) return m.group(0);
         return text;

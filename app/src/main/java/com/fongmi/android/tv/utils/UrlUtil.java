@@ -14,6 +14,8 @@ import java.util.Locale;
 
 public class UrlUtil {
 
+    private static final String WEBVIEW_PREFIX = "webview://";
+
     public static Uri uri(String url) {
         url = url.trim().replace("\\", "");
         return url.startsWith("/") ? Uri.fromFile(new File(url)) : Uri.parse(url);
@@ -26,6 +28,14 @@ public class UrlUtil {
     public static String scheme(Uri uri) {
         String scheme = uri.getScheme();
         return scheme == null ? "" : scheme.toLowerCase(Locale.ROOT).trim();
+    }
+
+    public static boolean isWebView(String url) {
+        return url != null && url.regionMatches(true, 0, WEBVIEW_PREFIX, 0, WEBVIEW_PREFIX.length());
+    }
+
+    public static String unwrapWebView(String url) {
+        return isWebView(url) ? url.substring(WEBVIEW_PREFIX.length()) : "";
     }
 
     public static String host(String url) {
