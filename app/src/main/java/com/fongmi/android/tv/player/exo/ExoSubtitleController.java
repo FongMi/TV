@@ -2,13 +2,13 @@ package com.fongmi.android.tv.player.exo;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.TrackSelectionOverride;
+import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.libass.LibassSubtitleController;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 import androidx.media3.ui.libass.LibassPlayerViewController;
 
-import com.fongmi.android.tv.player.engine.PlayerEngine.SecondarySubtitleState;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
 final class ExoSubtitleController {
@@ -41,13 +41,22 @@ final class ExoSubtitleController {
         playerViewController.setSecondarySubtitleViewConfigurator(this::applySecondarySubtitleStyle);
     }
 
-    SecondarySubtitleState getSecondarySubtitleState() {
-        return new SecondarySubtitleState(libassSubtitleController.getPrimaryTextTrackSelectionOverride(), libassSubtitleController.getSecondaryTextTrackSelectionOverride(), libassSubtitleController.getSecondaryTextTrackSelectionOverrides(), libassSubtitleController.isSecondaryTextTrackSuppressed());
+    SubtitleSelectionState getSubtitleSelectionState() {
+        return libassSubtitleController.getSubtitleSelectionState();
     }
 
     void setSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
         applySecondarySubtitleMode();
         libassSubtitleController.setSecondaryTextTrackSelectionOverride(selection);
+    }
+
+    void restoreSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
+        libassSubtitleController.setSecondaryTextTrackAutoSelectionEnabled(false);
+        libassSubtitleController.setSecondaryTextTrackSelectionOverride(selection);
+    }
+
+    void prepareForNewMedia() {
+        applySecondarySubtitleMode();
     }
 
     private void applySecondarySubtitleMode() {

@@ -97,8 +97,4 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <include
-        android:id="@+id/secondaryPosition"
-        layout="@layout/view_setting_slider" />
-
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -4,18 +4,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.DecoderMode;
+import androidx.media3.common.Format;
 import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
+import androidx.media3.common.text.SubtitleContent;
+import androidx.media3.common.text.SubtitleOffsets;
+import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.mpvplayer.MpvDecoderMode;
 import androidx.media3.mpvplayer.MpvPlayer;
 
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.effect.PlayerEffect;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
-import com.fongmi.android.tv.player.engine.PlayerEngine.SecondarySubtitleState;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.setting.SubtitleSetting;
@@ -97,8 +100,48 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     }
 
     @Override
-    public SecondarySubtitleState getSecondarySubtitleState() {
-        return new SecondarySubtitleState(player.getPrimaryTextTrackSelectionOverride(), player.getSecondaryTextTrackSelectionOverride(), player.getSecondaryTextTrackSelectionOverrides(), player.isSecondaryTextTrackSuppressed());
+    public SubtitleSelectionState getSubtitleSelectionState() {
+        return player.getSubtitleSelectionState();
+    }
+
+    @Override
+    public SubtitleContent getSubtitleContent(TrackSelectionOverride selection) {
+        return player.getSubtitleContentForSelection(selection);
+    }
+
+    @Override
+    public SubtitleOffsets getSubtitleOffsets() {
+        return player.getSubtitleOffsets();
+    }
+
+    @Override
+    public void setSubtitleOffsets(SubtitleOffsets offsets) {
+        player.setSubtitleOffsets(offsets);
+    }
+
+    @Override
+    public boolean supportsSubtitleOffsets() {
+        return true;
+    }
+
+    @Override
+    public void setSubtitleContentEnabled(boolean enabled) {
+        player.setSubtitleContentEnabled(enabled);
+    }
+
+    @Override
+    public boolean supportsSubtitleTranscript() {
+        return true;
+    }
+
+    @Override
+    public boolean canRetrySubtitleContent(Format format) {
+        return player.canRetrySubtitleContent(format);
+    }
+
+    @Override
+    public void retrySubtitleContent(Format format) {
+        player.retrySubtitleContent(format);
     }
 
     @Override
@@ -106,6 +149,17 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
         int mode = SubtitleSetting.getSecondaryMode();
         applySecondarySubtitleMode(mode);
         if (mode != SubtitleSetting.SECONDARY_MODE_DEFAULT) player.setSecondaryTextTrackSelectionOverride(selection);
+    }
+
+    @Override
+    public void restoreSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
+        player.setSecondaryTextTrackAutoSelectionEnabled(false);
+        player.setSecondaryTextTrackSelectionOverride(selection);
+    }
+
+    @Override
+    public void prepareForNewMedia() {
+        applySecondarySubtitleMode(SubtitleSetting.getSecondaryMode());
     }
 
     @Override

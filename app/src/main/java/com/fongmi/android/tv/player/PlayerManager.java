@@ -18,6 +18,9 @@ import androidx.media3.common.Player;
 import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.VideoSize;
+import androidx.media3.common.text.SubtitleContent;
+import androidx.media3.common.text.SubtitleOffsets;
+import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 
@@ -32,7 +35,6 @@ import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.player.effect.PlayerEffectManager;
 import com.fongmi.android.tv.player.effect.audio.AudioEffectBands;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
-import com.fongmi.android.tv.player.engine.PlayerEngine.SecondarySubtitleState;
 import com.fongmi.android.tv.player.engine.PlayerEngineFactory;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
@@ -371,8 +373,28 @@ public class PlayerManager implements ParseCallback {
         if (engine != null) engine.applySubtitleStyle();
     }
 
-    public SecondarySubtitleState getSecondarySubtitleState() {
-        return engine == null ? SecondarySubtitleState.EMPTY : engine.getSecondarySubtitleState();
+    public SubtitleSelectionState getSubtitleSelectionState() {
+        return engine == null ? SubtitleSelectionState.EMPTY : engine.getSubtitleSelectionState();
+    }
+
+    public SubtitleContent getSubtitleContent(TrackSelectionOverride selection) {
+        return engine == null ? SubtitleContent.UNSUPPORTED : engine.getSubtitleContent(selection);
+    }
+
+    public boolean canRetrySubtitleContent(Format format) {
+        return engine != null && engine.canRetrySubtitleContent(format);
+    }
+
+    public void retrySubtitleContent(Format format) {
+        if (engine != null) engine.retrySubtitleContent(format);
+    }
+
+    public void setSubtitleContentEnabled(boolean enabled) {
+        if (engine != null) engine.setSubtitleContentEnabled(enabled);
+    }
+
+    public boolean supportsSubtitleTranscript() {
+        return engine != null && engine.supportsSubtitleTranscript();
     }
 
     public void setSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
@@ -479,6 +501,18 @@ public class PlayerManager implements ParseCallback {
 
     public void setTextOffsetMs(long offsetMs) {
         if (player.isCommandAvailable(Player.COMMAND_SET_TEXT_OFFSET)) player.setTextOffsetMs(offsetMs);
+    }
+
+    public SubtitleOffsets getSubtitleOffsets() {
+        return engine == null ? SubtitleOffsets.ZERO : engine.getSubtitleOffsets();
+    }
+
+    public void setSubtitleOffsets(SubtitleOffsets offsets) {
+        if (engine != null && engine.supportsSubtitleOffsets()) engine.setSubtitleOffsets(offsets);
+    }
+
+    public boolean supportsSubtitleOffsets() {
+        return engine != null && engine.supportsSubtitleOffsets();
     }
 
     public long getAudioOffsetMs() {

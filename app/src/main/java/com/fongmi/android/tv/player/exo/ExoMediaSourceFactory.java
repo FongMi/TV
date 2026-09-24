@@ -19,6 +19,9 @@ import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.exoplayer.source.preload.MediaSourceFactorySupplier;
+import androidx.media3.exoplayer.text.SubtitleTranscript;
+import androidx.media3.exoplayer.text.SubtitleTranscriptParserFactory;
+import androidx.media3.exoplayer.text.SubtitleTranscriptSession;
 import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy;
 import androidx.media3.extractor.DefaultExtractorsFactory;
 import androidx.media3.extractor.ExtractorsFactory;
@@ -42,16 +45,18 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
 
     private final DefaultMediaSourceFactory defaultMediaSourceFactory;
     private final LibassPlaybackSession libassPlaybackSession;
+    private final SubtitleTranscriptSession subtitleTranscriptSession;
 
     private HttpDataSource.Factory httpDataSourceFactory;
     private DataSource.Factory dataSourceFactory;
 
-    private ExoMediaSourceFactory(LibassPlaybackSession libassPlaybackSession) {
+    private ExoMediaSourceFactory(LibassPlaybackSession libassPlaybackSession, SubtitleTranscriptSession subtitleTranscriptSession) {
         this.libassPlaybackSession = libassPlaybackSession;
+        this.subtitleTranscriptSession = subtitleTranscriptSession;
         this.defaultMediaSourceFactory = new DefaultMediaSourceFactory(getDataSourceFactory(), createDefaultExtractorsFactory());
     }
 
-    static MediaSourceFactorySupplier supplier(LibassPlaybackSession libassPlaybackSession) {
+    static MediaSourceFactorySupplier supplier(LibassPlaybackSession libassPlaybackSession, SubtitleTranscriptSession subtitleTranscriptSession) {
         return new MediaSourceFactorySupplier() {
             @NonNull
             @Override
@@ -67,7 +72,7 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
 
             @Override
             public MediaSource.Factory get() {
-                return new ExoMediaSourceFactory(libassPlaybackSession);
+                return new ExoMediaSourceFactory(libassPlaybackSession, subtitleTranscriptSession);
             }
         };
     }
@@ -124,9 +129,11 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
     @Override
     public MediaSource createMediaSource(@NonNull MediaItem mediaItem) {
         getHttpDataSourceFactory().setDefaultRequestProperties(ExoUtil.extractHeaders(mediaItem));
-        ExtractorsFactory extractorsFactory = createDefaultExtractorsFactory().setMp4ClearKeys(LocalClearKeyLicense.parse(mediaItem.localConfiguration == null ? null : mediaItem.localConfiguration.drmConfiguration));
-        if (!libassPlaybackSession.isAvailable()) return new DefaultMediaSourceFactory(getDataSourceFactory(), extractorsFactory).createMediaSource(mediaItem);
-        LibassPlaybackSession.MediaComponents components = libassPlaybackSession.createMediaComponents(mediaItem, extractorsFactory);
+        SubtitleTranscript transcript = subtitleTranscriptSession.forMediaItem(mediaItem);
+        ExtractorsFactory extractorsFactory = createDefaultExtractorsFactory().setMp4ClearKeys(
+                LocalClearKeyLicense.parse(mediaItem.localConfiguration == null ? null : mediaItem.localConfiguration.drmConfiguration));
+        if (!libassPlaybackSession.isAvailable()) return new DefaultMediaSourceFactory(getDataSourceFactory(), extractorsFactory).setSubtitleParserFactory(new SubtitleTranscriptParserFactory(transcript)).createMediaSource(mediaItem);
+        LibassPlaybackSession.MediaComponents components = libassPlaybackSession.createMediaComponents(mediaItem, extractorsFactory, transcript);
         return new DefaultMediaSourceFactory(getDataSourceFactory(), components.extractorsFactory).setSubtitleParserFactory(components.subtitleParserFactory).createMediaSource(mediaItem);
     }
 

@@ -10,6 +10,9 @@ import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
+import androidx.media3.common.text.SubtitleContent;
+import androidx.media3.common.text.SubtitleOffsets;
+import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.audio.AudioSink;
@@ -124,6 +127,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public void prepareForNewMedia() {
         session.prepareForNewMedia();
+        subtitles.prepareForNewMedia();
     }
 
     @Override
@@ -153,13 +157,63 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     }
 
     @Override
-    public SecondarySubtitleState getSecondarySubtitleState() {
-        return subtitles.getSecondarySubtitleState();
+    public SubtitleSelectionState getSubtitleSelectionState() {
+        return subtitles.getSubtitleSelectionState();
+    }
+
+    @Override
+    public SubtitleContent getSubtitleContent(TrackSelectionOverride selection) {
+        SubtitleSelectionState state = subtitles.getSubtitleSelectionState();
+        boolean isPrimary = state.isPrimary(selection);
+        if (!isPrimary && !state.isActiveSecondary(selection)) return SubtitleContent.UNSUPPORTED;
+        Format format = selection.mediaTrackGroup.getFormat(selection.trackIndices.get(0));
+        SubtitleOffsets offsets = getSubtitleOffsets();
+        return session.subtitleTranscriptSession().getContent(format, isPrimary ? offsets.primaryMs : offsets.secondaryMs);
+    }
+
+    @Override
+    public SubtitleOffsets getSubtitleOffsets() {
+        return player.getSubtitleOffsets();
+    }
+
+    @Override
+    public void setSubtitleOffsets(SubtitleOffsets offsets) {
+        player.setSubtitleOffsets(offsets);
+    }
+
+    @Override
+    public boolean supportsSubtitleOffsets() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsSubtitleTranscript() {
+        return true;
+    }
+
+    @Override
+    public void setSubtitleContentEnabled(boolean enabled) {
+        session.subtitleTranscriptSession().setContentEnabled(enabled);
+    }
+
+    @Override
+    public boolean canRetrySubtitleContent(Format format) {
+        return session.subtitleTranscriptSession().canRetryContent(format);
+    }
+
+    @Override
+    public void retrySubtitleContent(Format format) {
+        session.subtitleTranscriptSession().retryContent(format);
     }
 
     @Override
     public void setSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
         subtitles.setSecondarySubtitleSelection(selection);
+    }
+
+    @Override
+    public void restoreSecondarySubtitleSelection(@Nullable TrackSelectionOverride selection) {
+        subtitles.restoreSecondarySubtitleSelection(selection);
     }
 
     @Override

@@ -8,4 +8,34 @@
         android:id="@+id/timeOffset"
         layout="@layout/view_setting_slider" />
 
+    <include
+        android:id="@+id/secondaryOffset"
+        layout="@layout/view_setting_slider" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/linkOffsetsRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/subtitle_offset_link"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/linkOffsets"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
 </androidx.appcompat.widget.LinearLayoutCompat>
