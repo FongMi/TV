@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.dialog;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,26 +26,31 @@ import com.fongmi.android.tv.utils.FileUtil;
 
 public final class DanmakuDialog extends BaseBottomSheetDialog implements DanmakuAdapter.OnClickListener {
 
-    private final DanmakuAdapter adapter;
+    private DanmakuAdapter adapter;
     private DialogDanmakuBinding binding;
     private PlayerManager player;
-
-    public DanmakuDialog() {
-        this.adapter = new DanmakuAdapter(this);
-    }
+    private Uri pendingDanmaku;
 
     public static DanmakuDialog create() {
         return new DanmakuDialog();
     }
 
-    public DanmakuDialog player(PlayerManager player) {
-        this.player = player;
-        return this;
-    }
-
     public void show(FragmentActivity activity) {
+        if (activity.getSupportFragmentManager().isStateSaved()) return;
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof DanmakuDialog) return;
         show(activity.getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) pendingDanmaku = savedInstanceState.getParcelable("danmaku");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("danmaku", pendingDanmaku);
     }
 
     @Override
@@ -56,11 +62,17 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
     protected void initView() {
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(true);
-        binding.recycler.setAdapter(adapter.addAll(player.getDanmakus()));
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        binding.recycler.post(() -> binding.recycler.scrollToPosition(adapter.getSelected()));
-        binding.recycler.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
-        binding.search.setVisibility(player.getMetadata() == null || DanmakuSetting.getEffectiveApiUrl().isEmpty() ? View.GONE : View.VISIBLE);
+        PlaybackDialog.observe(this, player -> {
+            this.player = player;
+            if (player == null) return;
+            adapter = new DanmakuAdapter(this);
+            binding.recycler.setAdapter(adapter.addAll(player.getDanmakus()));
+            binding.recycler.scrollToPosition(adapter.getSelected());
+            binding.recycler.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
+            binding.search.setVisibility(player.getMetadata() == null || DanmakuSetting.getEffectiveApiUrl().isEmpty() ? View.GONE : View.VISIBLE);
+            applyPendingDanmaku();
+        });
     }
 
     @Override
@@ -71,7 +83,7 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
     }
 
     private void onSearch(View view) {
-        DanmakuSearchDialog.create().show(getActivity());
+        DanmakuSearchDialog.create().show(requireActivity());
         dismiss();
     }
 
@@ -95,7 +107,23 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
 
     private void setDanmaku(Uri uri) {
         if (!isAdded()) return;
+        pendingDanmaku = uri;
+        applyPendingDanmaku();
+    }
+
+    private void applyPendingDanmaku() {
+        if (pendingDanmaku == null || !PlaybackDialog.isCurrentPlayer(this, player)) return;
+        Uri uri = pendingDanmaku;
+        pendingDanmaku = null;
         player.setDanmaku(Danmaku.from(FileUtil.getDisplayName(uri), uri.toString()));
         dismiss();
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        adapter = null;
+        player = null;
+        super.onDestroyView();
     }
 }
