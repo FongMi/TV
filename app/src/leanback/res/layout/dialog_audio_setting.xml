@@ -1,60 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<com.fongmi.android.tv.ui.custom.CustomTabLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <androidx.appcompat.widget.LinearLayoutCompat
+        style="@style/PlaybackDialogHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingStart="24dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="24dp"
-        android:paddingBottom="8dp">
+        android:orientation="horizontal">
 
         <com.google.android.material.textview.MaterialTextView
+            style="@style/PlaybackDialogTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/audio_setting"
-            android:textAppearance="?attr/textAppearanceHeadlineSmall"
-            android:textColor="?attr/colorOnSurface" />
+            android:text="@string/audio_setting" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/compare"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/PlaybackDialogAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:text="@string/audio_effect_compare"
-            android:textColor="?attr/colorPrimary" />
+            android:layout_marginEnd="@dimen/playback_dialog_spacing"
+            android:text="@string/audio_effect_compare" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/reset"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/PlaybackDialogAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/audio_effect_reset"
-            android:textColor="?attr/colorPrimary" />
+            android:text="@string/audio_effect_reset" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
     <com.google.android.material.button.MaterialButtonToggleGroup
         android:id="@+id/tabGroup"
+        style="@style/PlaybackDialogTabs"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="8dp"
-        app:selectionRequired="true"
-        app:singleSelection="true">
+        android:layout_height="wrap_content">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tabPreset"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/PlaybackDialogTab"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -62,7 +52,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tabEqualizer"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/PlaybackDialogTab"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -70,7 +60,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tabOffset"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/PlaybackDialogTab"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -78,7 +68,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/tabAdvanced"
-            style="@style/Widget.Material3.Button.OutlinedButton"
+            style="@style/PlaybackDialogTab"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -90,9 +80,10 @@
         android:id="@+id/unsupported"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="@dimen/playback_dialog_inset"
+        android:layout_marginTop="@dimen/playback_dialog_spacing"
+        android:layout_marginEnd="@dimen/playback_dialog_inset"
+        android:layout_marginBottom="@dimen/playback_dialog_tab_content_spacing"
         android:text="@string/error_audio_effect_unsupported"
         android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="?attr/colorError"
@@ -105,10 +96,10 @@
         android:overScrollMode="never">
 
         <androidx.appcompat.widget.LinearLayoutCompat
+            style="@style/PlaybackDialogBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:paddingBottom="24dp">
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/presetSection"
@@ -122,6 +113,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="24dp"
                     android:paddingTop="8dp"
+                    android:paddingBottom="4dp"
                     android:text="@string/setting_effect_basic"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -154,6 +146,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="24dp"
                     android:paddingTop="8dp"
+                    android:paddingBottom="4dp"
                     android:text="@string/audio_effect_category_tone"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -200,6 +193,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="24dp"
                     android:paddingTop="8dp"
+                    android:paddingBottom="4dp"
                     android:text="@string/audio_effect_category_genre"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -267,6 +261,7 @@
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="24dp"
                     android:paddingTop="8dp"
+                    android:paddingBottom="4dp"
                     android:text="@string/setting_effect_custom"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -330,23 +325,48 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <com.google.android.material.materialswitch.MaterialSwitch
-                        android:id="@+id/loudness"
+                    <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="24dp"
-                        android:minHeight="48dp"
-                        android:text="@string/audio_effect_loudness"
-                        android:textAppearance="?attr/textAppearanceBodyLarge" />
+                        android:paddingTop="8dp"
+                        android:paddingBottom="8dp">
 
-                    <com.google.android.material.textview.MaterialTextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:alpha="0.7"
-                        android:paddingHorizontal="24dp"
-                        android:paddingBottom="8dp"
-                        android:text="@string/audio_effect_loudness_summary"
-                        android:textAppearance="?attr/textAppearanceBodySmall" />
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:importantForAccessibility="no"
+                            android:orientation="vertical"
+                            android:paddingStart="0dp"
+                            android:paddingEnd="64dp">
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="@string/audio_effect_loudness"
+                                android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                            <com.google.android.material.textview.MaterialTextView
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.7"
+                                android:text="@string/audio_effect_loudness_summary"
+                                android:textAppearance="?attr/textAppearanceBodySmall" />
+
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+
+                        <FrameLayout
+                            style="@style/PlaybackDialogSwitchContainer"
+                            android:layout_gravity="end|center_vertical">
+
+                            <com.google.android.material.materialswitch.MaterialSwitch
+                                android:id="@+id/loudness"
+                                style="@style/PlaybackDialogSwitch"
+                                android:contentDescription="@string/audio_effect_loudness" />
+
+                        </FrameLayout>
+
+                    </FrameLayout>
 
                     <include
                         android:id="@+id/stability"
@@ -384,6 +404,7 @@
                             android:layout_height="wrap_content"
                             android:paddingHorizontal="24dp"
                             android:paddingTop="8dp"
+                            android:paddingBottom="4dp"
                             android:text="@string/audio_channel_mode"
                             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -442,4 +463,4 @@
 
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>
-</androidx.appcompat.widget.LinearLayoutCompat>
+</com.fongmi.android.tv.ui.custom.CustomTabLayout>
