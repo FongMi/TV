@@ -24,6 +24,7 @@
         android:inputType="textMultiLine|textNoSuggestions"
         android:maxLines="5"
         android:minLines="5"
+        android:nextFocusDown="@id/positive"
         android:textSize="18sp" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
