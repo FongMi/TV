@@ -17,22 +17,26 @@ final class SpeedSettingPanel {
     private final DialogSpeedSettingBinding binding;
     private final PlayerManager player;
     private final boolean save;
+    private final float[] presets;
+    private final TextView[] presetViews;
     private float speed;
 
     SpeedSettingPanel(DialogSpeedSettingBinding binding, PlayerManager player, boolean save) {
         this.binding = binding;
         this.player = player;
         this.save = save;
+        this.presets = SpeedSetting.getPresets();
+        this.presetViews = new TextView[]{binding.preset01, binding.preset02, binding.preset03, binding.preset04, binding.preset05, binding.preset06, binding.preset07, binding.preset08};
     }
 
     void bind() {
         bindSpeed();
         bindLongPressSpeed();
         bindPreset();
-        bindSkipSilence();
         bindReset();
         syncControls();
-        if (Util.isLeanback()) binding.speed.slider.requestFocus();
+        updateLongPressSpeedNextFocus();
+        PlaybackDialogFocus.request(binding.getRoot(), binding.speed.slider);
     }
 
     private void bindSpeed() {
@@ -60,22 +64,11 @@ final class SpeedSettingPanel {
     }
 
     private void bindPreset() {
-        float[] presets = SpeedSetting.getPresets();
-        TextView[] views = getPresetViews();
-        for (int i = 0; i < views.length; i++) {
-            bindPreset(views[i], presets, i);
-        }
-    }
-
-    private void bindSkipSilence() {
-        binding.skipSilenceRow.setOnClickListener(view -> {
-            if (binding.skipSilenceSwitch.isEnabled()) binding.skipSilenceSwitch.performClick();
-        });
+        for (int i = 0; i < presetViews.length; i++) bindPreset(presetViews[i], i);
     }
 
     private void bindReset() {
         binding.reset.setOnClickListener(this::onReset);
-        binding.reset.setNextFocusDownId(binding.speed.slider.getId());
     }
 
     private void onReset(View view) {
@@ -88,7 +81,7 @@ final class SpeedSettingPanel {
         setSpeedAndSync(SpeedSetting.NORMAL);
     }
 
-    private void bindPreset(TextView view, float[] presets, int index) {
+    private void bindPreset(TextView view, int index) {
         boolean visible = index < presets.length;
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
         if (visible) setSpeedOnClick(view, presets[index]);
@@ -108,6 +101,7 @@ final class SpeedSettingPanel {
         speed = SpeedSetting.clamp(speed);
         this.speed = player.setSpeed(speed);
         updateSpeedValue();
+        updateLongPressSpeedNextFocus();
         saveSpeed();
         return true;
     }
@@ -150,8 +144,15 @@ final class SpeedSettingPanel {
         return SpeedSetting.clamp(player.getSpeed());
     }
 
-    private TextView[] getPresetViews() {
-        return new TextView[]{binding.preset01, binding.preset02, binding.preset03, binding.preset04, binding.preset05, binding.preset06, binding.preset07, binding.preset08, binding.preset09, binding.preset10, binding.preset11, binding.preset12};
+    private void updateLongPressSpeedNextFocus() {
+        if (!Util.isLeanback()) return;
+        int count = Math.min(presets.length, presetViews.length);
+        if (count == 0) return;
+        int nearest = 0;
+        for (int i = 1; i < count; i++) {
+            if (Math.abs(presets[i] - speed) < Math.abs(presets[nearest] - speed)) nearest = i;
+        }
+        binding.longPressSpeed.slider.setNextFocusDownId(presetViews[nearest].getId());
     }
 
     private void updateSkipSilenceSwitch() {

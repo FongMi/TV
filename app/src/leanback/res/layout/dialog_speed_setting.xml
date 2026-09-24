@@ -25,9 +25,10 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/reset"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/PlaybackDialogAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:nextFocusDown="@id/slider"
             android:text="@string/speed_setting_reset"
             android:textColor="?attr/colorPrimary" />
 
@@ -58,135 +59,132 @@
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="24dp"
                 android:paddingTop="8dp"
+                android:paddingBottom="4dp"
                 android:text="@string/speed_setting_quick"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-            <com.google.android.material.chip.ChipGroup
+            <com.google.android.flexbox.FlexboxLayout
                 android:id="@+id/presetGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="24dp"
-                app:chipSpacingVertical="0dp">
+                android:paddingHorizontal="20dp"
+                app:alignItems="center"
+                app:flexWrap="wrap">
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset01"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="0.1" />
+                    android:text="@string/speed_value_05"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset02"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="0.5" />
+                    android:text="@string/speed_value_08"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset03"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="0.8" />
+                    android:text="@string/speed_value_10"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset04"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="1.0" />
+                    android:text="@string/speed_value_12"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset05"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="1.2" />
+                    android:text="@string/speed_value_15"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset06"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="1.5" />
+                    android:text="@string/speed_value_20"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset07"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="2.0" />
+                    android:text="@string/speed_value_30"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/preset08"
                     style="@style/Widget.Material3.Chip.Filter"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="4dp"
                     android:checkable="false"
                     android:fontFeatureSettings="tnum"
-                    android:text="2.5" />
+                    android:text="@string/speed_value_50"
+                    android:textAlignment="center"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
 
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/preset09"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="false"
-                    android:fontFeatureSettings="tnum"
-                    android:text="3.0" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/preset10"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="false"
-                    android:fontFeatureSettings="tnum"
-                    android:text="3.5" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/preset11"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="false"
-                    android:fontFeatureSettings="tnum"
-                    android:text="4.0" />
-
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/preset12"
-                    style="@style/Widget.Material3.Chip.Filter"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checkable="false"
-                    android:fontFeatureSettings="tnum"
-                    android:text="5.0" />
-
-            </com.google.android.material.chip.ChipGroup>
+            </com.google.android.flexbox.FlexboxLayout>
 
             <androidx.appcompat.widget.LinearLayoutCompat
                 android:id="@+id/skipSilenceRow"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="?attr/selectableItemBackground"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingHorizontal="24dp"
-                android:paddingVertical="4dp">
+                android:paddingVertical="12dp">
 
                 <com.google.android.material.textview.MaterialTextView
                     android:layout_width="0dp"
@@ -195,10 +193,13 @@
                     android:text="@string/speed_setting_skip_silence"
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-                <com.google.android.material.materialswitch.MaterialSwitch
-                    android:id="@+id/skipSilenceSwitch"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+                    <com.google.android.material.materialswitch.MaterialSwitch
+                        android:id="@+id/skipSilenceSwitch"
+                        style="@style/PlaybackDialogSwitch" />
+
+                </FrameLayout>
 
             </androidx.appcompat.widget.LinearLayoutCompat>
         </androidx.appcompat.widget.LinearLayoutCompat>
