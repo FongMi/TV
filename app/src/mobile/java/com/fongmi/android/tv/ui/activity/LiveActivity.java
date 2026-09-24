@@ -445,7 +445,7 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     private void onPlayer() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
+        PlayerEngineDialog.show(this);
         hideControl();
     }
 

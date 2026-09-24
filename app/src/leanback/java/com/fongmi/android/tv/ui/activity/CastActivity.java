@@ -199,7 +199,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void onPlayer() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
+        PlayerEngineDialog.show(this);
         hideControl();
     }
 

@@ -425,7 +425,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onPlayer() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
+        PlayerEngineDialog.show(this);
         hideControl();
     }
 
