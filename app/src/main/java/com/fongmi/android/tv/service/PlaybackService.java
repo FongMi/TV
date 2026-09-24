@@ -141,14 +141,20 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     private void handleAction(String action) {
-        if (ActionEvent.PLAY.equals(action)) player.play();
-        else if (ActionEvent.PAUSE.equals(action)) player.pause();
+        if (ActionEvent.PLAY.equals(action)) dispatchPlayPause(true);
+        else if (ActionEvent.PAUSE.equals(action)) dispatchPlayPause(false);
         else if (ActionEvent.PREV.equals(action)) dispatchPrev();
         else if (ActionEvent.NEXT.equals(action)) dispatchNext();
         else if (ActionEvent.STOP.equals(action)) dispatchStop();
         else if (ActionEvent.AUDIO.equals(action)) dispatchAudio();
         else if (ActionEvent.REPEAT.equals(action)) dispatchRepeat();
         else if (ActionEvent.REPLAY.equals(action)) dispatchReplay();
+    }
+
+    private void dispatchPlayPause(boolean play) {
+        if (hasExternalPlayback()) dispatch(play ? NavigationCallback::onPlay : NavigationCallback::onPause);
+        else if (play) player.play();
+        else player.pause();
     }
 
     private boolean isLocalBind(Intent intent) {
@@ -334,13 +340,19 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     private void dispatchNavigate(Consumer<NavigationCallback> action, int delta) {
-        if (hasNavigationCallback() && isNavigationOwner()) dispatch(action);
+        if (hasNavigationCallback() && (hasExternalPlayback() || isNavigationOwner())) dispatch(action);
         else navigateItem(delta);
     }
 
+    private boolean hasExternalPlayback() {
+        NavigationCallback callback = navigationCallback;
+        return callback != null && callback.isExternalPlaybackActive();
+    }
+
     public void dispatchStop() {
-        if (player.getPlaybackState() == Player.STATE_IDLE) return;
-        if (hasNavigationCallback() && isNavigationOwner()) dispatch(NavigationCallback::onStop);
+        if (hasExternalPlayback()) dispatch(NavigationCallback::onStop);
+        else if (player.getPlaybackState() == Player.STATE_IDLE) return;
+        else if (hasNavigationCallback() && isNavigationOwner()) dispatch(NavigationCallback::onStop);
         else {
             saveProgress();
             stopAndClear();
@@ -352,7 +364,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     public void dispatchReplay() {
-        if (hasNavigationCallback() && isNavigationOwner()) dispatch(NavigationCallback::onReplay);
+        if (hasNavigationCallback() && (hasExternalPlayback() || isNavigationOwner())) dispatch(NavigationCallback::onReplay);
         else {
             player.seekTo(0);
             player.play();
@@ -643,6 +655,16 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     public interface NavigationCallback {
+
+        default boolean isExternalPlaybackActive() {
+            return false;
+        }
+
+        default void onPlay() {
+        }
+
+        default void onPause() {
+        }
 
         default void onPrev() {
         }

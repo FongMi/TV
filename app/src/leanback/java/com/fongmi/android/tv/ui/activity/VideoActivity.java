@@ -126,6 +126,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     private Runnable mR4;
     private History mHistory;
     private boolean fullscreen;
+    private boolean webFullscreen;
     private boolean externalPlaybackCompleted;
     private boolean useParse;
 
@@ -378,6 +379,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void setPlaybackMode() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
@@ -450,12 +452,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public boolean isPlayerEmpty() {
-        return player().isEmpty();
+        return !isWebPlaybackActive() && player().isEmpty();
     }
 
     @Override
     public boolean hasPlaybackSession() {
-        return service() != null && isOwner() && player().hasPlaySpec();
+        return hasActivePlaybackSession();
     }
 
     @Override
@@ -470,7 +472,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public boolean canTrackPlaybackProgress() {
-        return service() != null && isOwner() && player().isVod() && !isIsoNavigationPlayback();
+        return isWebPlaybackActive() ? canTrackActivePlaybackProgress() : service() != null && isOwner() && player().isVod() && !isIsoNavigationPlayback();
     }
 
     @Override
@@ -485,12 +487,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public long getPlayerPosition() {
-        return player().getPosition();
+        return getActivePlaybackPosition();
     }
 
     @Override
     public long getPlayerDuration() {
-        return player().getDuration();
+        return getActivePlaybackDuration();
     }
 
     @Override
@@ -518,6 +520,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void stopPlaybackForRefresh() {
+        stopWebPlayback();
         player().stop();
         player().clear();
         mClock.setCallback(null);
@@ -531,12 +534,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void replay(long position) {
+        if (replayWebPlayback(position)) return;
         player().replay(position);
     }
 
     @Override
     public void seekPlayback(long position) {
-        long current = player().getPosition();
+        long current = getPlayerPosition();
         if (current >= 0) seekTo(position - current);
     }
 
@@ -544,12 +548,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     public void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata) {
         ExternalPlayback.apply(result, getIntent());
         startPositionMs = ExternalPlayback.takePosition(getIntent(), startPositionMs);
+        if (startWebPlayback(mBinding.video, result)) return;
         startPlayer(getHistoryKey(), result, useParse, getSite().getTimeout(), startPositionMs, metadata);
     }
 
     @Override
     public boolean preloadPlayback(Result result, long startPositionMs, MediaMetadata metadata) {
-        return player().preload(PlaySpec.from(result, getHistoryKey(), metadata), startPositionMs);
+        return !isWebPlayback(result) && player().preload(PlaySpec.from(result, getHistoryKey(), metadata), startPositionMs);
     }
 
     @Override
@@ -1154,10 +1159,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void saveHistory(boolean exit) {
-        PlaybackService service = service();
-        boolean owner = service != null && getPlaybackKey().equals(service.player().getKey());
-        long position = owner ? service.player().getPosition() : C.TIME_UNSET;
-        long duration = owner ? service.player().getDuration() : C.TIME_UNSET;
+        long position = getActivePlaybackPosition();
+        long duration = getActivePlaybackDuration();
         if (mVod != null) mVod.saveHistory(exit, System.currentTimeMillis(), position, duration);
     }
 
@@ -1186,6 +1189,21 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
+        @Override
+        public boolean isExternalPlaybackActive() {
+            return isWebPlaybackActive();
+        }
+
+        @Override
+        public void onPlay() {
+            VideoActivity.this.onPlay();
+        }
+
+        @Override
+        public void onPause() {
+            VideoActivity.this.onPaused();
+        }
+
         @Override
         public void onNext() {
             checkNext();
@@ -1291,7 +1309,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void finish() {
-        if (ExternalPlayback.returnsResult(getIntent())) ExternalPlayback.setResult(this, externalPlaybackCompleted ? player().getDuration() : player().getPosition(), externalPlaybackCompleted);
+        if (ExternalPlayback.returnsResult(getIntent())) ExternalPlayback.setResult(this, externalPlaybackCompleted ? getActivePlaybackDuration() : getActivePlaybackPosition(), externalPlaybackCompleted);
         super.finish();
     }
 
@@ -1301,7 +1319,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
             hideInfo();
         } else if (isPlaying) {
             hideCenter();
-        } else if (isPaused()) {
+        } else if (isPaused() || isWebPlaybackActive()) {
             if (isFullscreen()) showInfo();
             else hideInfo();
         }
@@ -1315,8 +1333,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void onTimeChanged(long time) {
         if (!canTrackPlaybackProgress()) return;
-        long position = player().getPosition();
-        long duration = player().getDuration();
+        long position = getPlayerPosition();
+        long duration = getPlayerDuration();
         if (position < 0) return;
         mVod.onTimeChanged(time, position, duration);
     }
@@ -1336,11 +1354,40 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         return mVod == null ? C.TIME_UNSET : mVod.startPositionMs();
     }
 
+    @Override
+    protected boolean supportsWebSeek() {
+        return true;
+    }
+
+    @Override
+    protected void onWebPlaybackChanged(boolean active) {
+        PlaybackAction.setWebPlaybackMode(active, mBinding.control.action.player, mBinding.control.action.reset, mBinding.control.action.replay, mBinding.control.action.repeat, mBinding.control.action.speed, mBinding.control.action.scale, mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video, mBinding.control.action.danmaku, mBinding.control.action.edition, mBinding.control.action.chapter, mBinding.control.action.opening, mBinding.control.action.ending);
+        if (!active) {
+            setPlaybackMode();
+            setTrackVisible();
+            setMediaOptionVisible();
+            mBinding.control.action.danmaku.setVisibility(DanmakuSetting.isLoad() ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    @Override
+    protected void onWebFullscreenChanged(boolean fullscreen) {
+        if (fullscreen) {
+            webFullscreen = !isFullscreen();
+            if (webFullscreen) enterFullscreen();
+        } else if (webFullscreen) {
+            webFullscreen = false;
+            if (isFullscreen()) exitFullscreen();
+        }
+    }
+
     private void setTrackVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setTracks(player(), mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video);
     }
 
     private void setMediaOptionVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setMediaOptions(player(), mBinding.control.action.edition, mBinding.control.action.chapter);
     }
 
@@ -1355,13 +1402,20 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void onPaused() {
+        if (pauseWebPlayback()) return;
         controller().pause();
     }
 
     private void onPlay() {
+        if (resumeWebPlayback()) return;
         if (mHistory != null && isEnded() && !isDiscMenuActive()) controller().seekTo(mVod.openingPositionMs());
         if (!player().isEmpty() && isIdle()) controller().prepare();
         controller().play();
+    }
+
+    private boolean isPlayingForControls() {
+        if (isWebPlaybackActive()) return isWebPlaybackPlaying();
+        return player().isPlaying() || (isDiscMenuActive() && controller().getPlayWhenReady());
     }
 
     private boolean onSeekBack() {
@@ -1395,7 +1449,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private View getFocus2() {
-        return mFocus2 == null || mFocus2.getVisibility() != View.VISIBLE || mFocus2 == mBinding.control.action.opening || mFocus2 == mBinding.control.action.ending ? mBinding.control.action.next : mFocus2;
+        return mFocus2 == null || !mFocus2.isAttachedToWindow() || mFocus2.getVisibility() != View.VISIBLE || mFocus2 == mBinding.control.action.opening || mFocus2 == mBinding.control.action.ending ? mBinding.control.action.next : mFocus2;
     }
 
     @Override
@@ -1458,7 +1512,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void onKeyCenter() {
-        if (player().isPlaying() || (isDiscMenuActive() && controller().getPlayWhenReady())) onPaused();
+        if (isPlayingForControls()) onPaused();
+        else if (isWebPlaybackActive()) onPlay();
         else if (player().isEmpty()) onRefresh();
         else onPlay();
         hideControl();
@@ -1490,7 +1545,9 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onBackInvoked() {
-        if (isVisible(mBinding.control.getRoot())) {
+        if (handleWebViewNavigation()) {
+            return;
+        } else if (isVisible(mBinding.control.getRoot())) {
             hideControl();
         } else if (handleDiscMenuBack()) {
             return;

@@ -79,6 +79,10 @@ public final class PlaybackAction {
         setVisible(chapter, hasChapter(player));
     }
 
+    public static void setWebPlaybackMode(boolean active, View... nativeOnlyViews) {
+        for (View view : nativeOnlyViews) setVisible(view, !active);
+    }
+
     public static String getEngineText(PlayerManager player) {
         return ResUtil.getStringArray(R.array.select_engine)[getEngine(player)];
     }

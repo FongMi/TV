@@ -140,6 +140,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     private Runnable mR4;
     private History mHistory;
     private boolean fullscreen;
+    private boolean webFullscreen;
     private boolean externalPlaybackCompleted;
     private boolean useParse;
     private boolean rotate;
@@ -422,6 +423,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     private void setPlaybackMode() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
@@ -494,12 +496,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public boolean isPlayerEmpty() {
-        return player().isEmpty();
+        return !isWebPlaybackActive() && player().isEmpty();
     }
 
     @Override
     public boolean hasPlaybackSession() {
-        return service() != null && isOwner() && player().hasPlaySpec();
+        return hasActivePlaybackSession();
     }
 
     @Override
@@ -514,7 +516,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public boolean canTrackPlaybackProgress() {
-        return service() != null && isOwner() && player().isVod() && !isIsoNavigationPlayback();
+        return isWebPlaybackActive() ? canTrackActivePlaybackProgress() : service() != null && isOwner() && player().isVod() && !isIsoNavigationPlayback();
     }
 
     @Override
@@ -529,12 +531,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public long getPlayerPosition() {
-        return player().getPosition();
+        return getActivePlaybackPosition();
     }
 
     @Override
     public long getPlayerDuration() {
-        return player().getDuration();
+        return getActivePlaybackDuration();
     }
 
     @Override
@@ -565,6 +567,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public void stopPlaybackForRefresh() {
+        stopWebPlayback();
         player().stop();
         player().clear();
         mClock.setCallback(null);
@@ -580,12 +583,13 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public void replay(long position) {
+        if (replayWebPlayback(position)) return;
         player().replay(position);
     }
 
     @Override
     public void seekPlayback(long position) {
-        long current = player().getPosition();
+        long current = getPlayerPosition();
         if (current >= 0) seekTo(position - current);
     }
 
@@ -593,12 +597,13 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     public void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata) {
         ExternalPlayback.apply(result, getIntent());
         startPositionMs = ExternalPlayback.takePosition(getIntent(), startPositionMs);
+        if (startWebPlayback(mBinding.video, result)) return;
         startPlayer(getHistoryKey(), result, useParse, getSite().getTimeout(), startPositionMs, metadata);
     }
 
     @Override
     public boolean preloadPlayback(Result result, long startPositionMs, MediaMetadata metadata) {
-        return player().preload(PlaySpec.from(result, getHistoryKey(), metadata), startPositionMs);
+        return !isWebPlayback(result) && player().preload(PlaySpec.from(result, getHistoryKey(), metadata), startPositionMs);
     }
 
     @Override
@@ -935,11 +940,13 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     private void checkPlay() {
         setR1Callback();
         if (isPlayingForControls()) onPaused();
+        else if (isWebPlaybackActive()) onPlay();
         else if (player().isEmpty()) onRefresh();
         else onPlay();
     }
 
     private boolean isPlayingForControls() {
+        if (isWebPlaybackActive()) return isWebPlaybackPlaying();
         return player().isPlaying() || (isDiscMenuActive() && controller().getPlayWhenReady());
     }
 
@@ -1276,10 +1283,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     private void saveHistory(boolean exit) {
-        PlaybackService service = service();
-        boolean owner = service != null && getPlaybackKey().equals(service.player().getKey());
-        long position = owner ? service.player().getPosition() : C.TIME_UNSET;
-        long duration = owner ? service.player().getDuration() : C.TIME_UNSET;
+        long position = getActivePlaybackPosition();
+        long duration = getActivePlaybackDuration();
         if (mVod != null) mVod.saveHistory(exit, System.currentTimeMillis(), position, duration);
     }
 
@@ -1320,6 +1325,21 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
+        @Override
+        public boolean isExternalPlaybackActive() {
+            return isWebPlaybackActive();
+        }
+
+        @Override
+        public void onPlay() {
+            VideoActivity.this.onPlay();
+        }
+
+        @Override
+        public void onPause() {
+            VideoActivity.this.onPaused();
+        }
+
         @Override
         public void onNext() {
             checkNext();
@@ -1434,14 +1454,14 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public void finish() {
-        if (ExternalPlayback.returnsResult(getIntent())) ExternalPlayback.setResult(this, externalPlaybackCompleted ? player().getDuration() : player().getPosition(), externalPlaybackCompleted);
+        if (ExternalPlayback.returnsResult(getIntent())) ExternalPlayback.setResult(this, externalPlaybackCompleted ? getActivePlaybackDuration() : getActivePlaybackPosition(), externalPlaybackCompleted);
         super.finish();
     }
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        boolean playing = isPlaying || (isDiscMenuActive() && controller().getPlayWhenReady());
-        if (playing || isPaused()) updatePlayControl(playing);
+        boolean playingForControls = isPlaying || (!isWebPlaybackActive() && isDiscMenuActive() && controller().getPlayWhenReady());
+        if (playingForControls || isPaused() || isWebPlaybackActive()) updatePlayControl(playingForControls);
     }
 
     private void updatePlayControl(boolean isPlaying) {
@@ -1458,8 +1478,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     @Override
     public void onTimeChanged(long time) {
         if (!canTrackPlaybackProgress()) return;
-        long position = player().getPosition();
-        long duration = player().getDuration();
+        long position = getPlayerPosition();
+        long duration = getPlayerDuration();
         if (position < 0) return;
         mVod.onTimeChanged(time, position, duration);
     }
@@ -1512,20 +1532,51 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         mAnimator.start();
     }
 
+    @Override
+    protected boolean supportsWebSeek() {
+        return true;
+    }
+
+    @Override
+    protected void onWebPlaybackChanged(boolean active) {
+        PlaybackAction.setWebPlaybackMode(active, mBinding.control.action.player, mBinding.control.action.reset, mBinding.control.action.replay, mBinding.control.action.repeat, mBinding.control.action.speed, mBinding.control.action.scale, mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video, mBinding.control.action.danmaku, mBinding.control.action.edition, mBinding.control.action.chapter, mBinding.control.action.opening, mBinding.control.action.ending);
+        if (!active) {
+            setPlaybackMode();
+            setTrackVisible();
+            setMediaOptionVisible();
+            mBinding.control.action.danmaku.setVisibility(DanmakuSetting.isLoad() ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    @Override
+    protected void onWebFullscreenChanged(boolean fullscreen) {
+        if (fullscreen) {
+            webFullscreen = !isFullscreen();
+            if (webFullscreen) enterFullscreen();
+        } else if (webFullscreen) {
+            webFullscreen = false;
+            if (isFullscreen()) exitFullscreen();
+        }
+    }
+
     private void setTrackVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setTracks(player(), mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video);
     }
 
     private void setMediaOptionVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setMediaOptions(player(), mBinding.control.action.edition, mBinding.control.action.chapter);
     }
 
     private void onPaused() {
+        if (pauseWebPlayback()) return;
         controller().pause();
         if (isDiscMenuActive()) updatePlayControl(isPlayingForControls());
     }
 
     private void onPlay() {
+        if (resumeWebPlayback()) return;
         if (mHistory != null && isEnded() && !isDiscMenuActive()) controller().seekTo(mVod.openingPositionMs());
         if (!player().isEmpty() && isIdle()) controller().prepare();
         controller().play();
@@ -1663,7 +1714,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public boolean onSeekTap(float x) {
-        if (!isSeekTapArea(x) || !canTrackPlaybackProgress() || isDiscMenuActive()) return false;
+        if (!isSeekTapArea(x) || !canTrackActivePlaybackProgress() || isDiscMenuActive()) return false;
         hideControl();
         long delta = mSeekFeedback.show(x);
         seekTo(delta);
@@ -1689,7 +1740,9 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         super.onUserLeaveHint();
         if (isRedirect()) return;
         if (isLock()) App.post(this::onLock, 500);
-        if (service() != null && player().haveTrack(C.TRACK_TYPE_VIDEO)) mPiP.enter(this, player().getVideoWidth(), player().getVideoHeight(), getScale());
+        if (service() == null) return;
+        if (hasWebMediaTarget()) mPiP.enter(this, getWebVideoWidth(), getWebVideoHeight(), 0);
+        else if (!isWebPlaybackActive() && player().haveTrack(C.TRACK_TYPE_VIDEO)) mPiP.enter(this, player().getVideoWidth(), player().getVideoHeight(), getScale());
     }
 
     @Override
@@ -1716,6 +1769,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     @Override
     public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (isWebPlaybackActive()) return;
         if (isAutoRotate() && isPort() && newConfig.orientation == Configuration.ORIENTATION_PORTRAIT && !isRotate() && !isLock()) exitFullscreen();
         if (isAutoRotate() && isPort() && newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) enterFullscreen();
         if (isFullscreen()) Util.hideSystemUI(this);
@@ -1747,7 +1801,9 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     protected void onBackInvoked() {
-        if (isVisible(mBinding.control.getRoot())) {
+        if (handleWebViewNavigation()) {
+            return;
+        } else if (isVisible(mBinding.control.getRoot())) {
             hideControl();
         } else if (handleDiscMenuBack()) {
             return;

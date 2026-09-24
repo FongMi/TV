@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.activity;
 
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +26,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.media3.common.C;
+import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
 import androidx.media3.common.VideoSize;
@@ -38,6 +41,7 @@ import androidx.media3.ui.danmaku.Danmaku;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 import androidx.media3.ui.danmaku.DanmakuPlayerViewController;
 
+import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.playback.PlaybackIntent;
@@ -49,16 +53,22 @@ import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.ui.custom.BrowserWebView;
 import com.fongmi.android.tv.ui.custom.DiscMenuOverlayView;
+import com.fongmi.android.tv.ui.dialog.CloudflareDialog;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.UrlUtil;
+import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.net.OkHttp;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public abstract class PlaybackActivity extends BaseActivity implements MediaController.Listener, Player.Listener, ServiceConnection {
 
@@ -72,7 +82,15 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private ListenableFuture<MediaController> mControllerFuture;
     private MediaController mController;
     private PlaybackService mService;
+    private PlaybackResume pendingResume;
+    @Nullable private BrowserWebView webView;
     @Nullable private DiscMenuOverlayView discMenuOverlay;
+    @Nullable private CloudflareDialog webChallengeDialog;
+    @Nullable private ViewGroup webChallengeParent;
+    @Nullable private ViewGroup.LayoutParams webChallengeParams;
+    private int webChallengeIndex;
+    private boolean resumeWebPlaybackOnResume;
+    private int webPlaybackState;
     private boolean initialized;
     private boolean audioOnly;
     private boolean scrubbing;
@@ -97,7 +115,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     @Nullable
     private DiscMenuController discMenu() {
-        if (mService == null || !isOwner()) return null;
+        if (mService == null || !isOwner() || isWebPlaybackActive()) return null;
         return player().getDiscMenuController();
     }
 
@@ -266,6 +284,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void updateDiscMenuOverlay() {
         DiscMenuOverlayView overlayView = discMenuOverlay;
+        if (isWebPlaybackActive()) return;
         DiscMenuController menu = discMenu();
         updateKeepScreenOn(mController != null && mController.isPlaying());
         if (menu != null && menu.isActive()) {
@@ -470,6 +489,17 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     protected void onDiscMenuUnavailable() {
     }
+
+    protected void onWebPlaybackChanged(boolean active) {
+    }
+
+    protected void onWebFullscreenChanged(boolean fullscreen) {
+    }
+
+    protected boolean supportsWebSeek() {
+        return false;
+    }
+
     protected void onSizeChanged(VideoSize size) {
     }
 
@@ -481,6 +511,16 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     protected boolean seekTo(long deltaMs) {
+        if (isWebPlaybackActive()) {
+            long positionMs = getActivePlaybackPosition();
+            long durationMs = getActivePlaybackDuration();
+            if (positionMs < 0 || durationMs <= 0) return false;
+            long targetMs = Math.max(0, positionMs + deltaMs);
+            boolean seekToEnd = targetMs >= durationMs;
+            webView.seekVideo(seekToEnd ? durationMs : targetMs);
+            if (!seekToEnd) webView.resumeVideo();
+            return seekToEnd;
+        }
         PlayerManager player = player();
         long targetMs = Math.max(0, player.getPosition() + deltaMs);
         long durationMs = player.getDuration();
@@ -498,6 +538,136 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         String error = getPlaybackError(result);
         if (error != null) onError(error);
         else startPlayerInternal(key, result, useParse, timeout, startPositionMs, metadata);
+    }
+
+    protected boolean startWebPlayback(ViewGroup parent, Result result) {
+        return startWebPlayback(parent, result, null);
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    protected boolean startWebPlayback(ViewGroup parent, Result result, @Nullable Consumer<MotionEvent> touchObserver) {
+        String value = result.getRealUrl();
+        if (!UrlUtil.isWebView(value) || result.hasMsg()) {
+            releaseWebView();
+            return false;
+        }
+        String url = UrlUtil.unwrapWebView(value);
+        String scheme = UrlUtil.scheme(url);
+        if (!"http".equals(scheme) && !"https".equals(scheme)) {
+            releaseWebView();
+            onError(ResUtil.getString(R.string.error_play_url));
+            return true;
+        }
+        invalidateDiscMenuOpenRequest();
+        PlayerManager player = player();
+        player.reset();
+        player.stop();
+        player.clear();
+        hidePlayerViewForWebPlayback();
+        if (webView == null) {
+            webView = BrowserWebView.createPlayback(this, webViewListener);
+            addWebView(parent);
+        } else if (webView.getParent() != parent) {
+            if (webView.getParent() instanceof ViewGroup oldParent) oldParent.removeView(webView);
+            addWebView(parent);
+        }
+        webView.setOnTouchListener(touchObserver == null ? null : (view, event) -> {
+            touchObserver.accept(event);
+            return false;
+        });
+        resumeWebPlaybackOnResume = false;
+        webPlaybackState = Player.STATE_BUFFERING;
+        getSeekView().setPlayer(null);
+        getSeekView().setVisibility(View.GONE);
+        webView.loadPlayback(url, result.getHeader(), result.getClick());
+        onWebPlaybackChanged(true);
+        onStateChanged(Player.STATE_BUFFERING);
+        webView.requestFocus();
+        return true;
+    }
+
+    private void addWebView(ViewGroup parent) {
+        int playerIndex = parent.indexOfChild(getPlayerView());
+        parent.addView(webView, playerIndex < 0 ? 0 : playerIndex + 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    }
+
+    protected boolean isWebPlayback(Result result) {
+        return UrlUtil.isWebView(result.getRealUrl());
+    }
+
+    protected boolean isWebPlaybackActive() {
+        return webView != null && webView.isPlaybackActive();
+    }
+
+    protected boolean isWebPlaybackPlaying() {
+        return webView != null && webView.isVideoPlaying();
+    }
+
+    protected boolean hasActivePlaybackSession() {
+        return isWebPlaybackActive() || (mService != null && isOwner() && player().hasPlaySpec());
+    }
+
+    protected long getActivePlaybackPosition() {
+        if (!isWebPlaybackActive()) return mService != null && isOwner() ? player().getPosition() : C.TIME_UNSET;
+        long position = webView.getVideoPosition();
+        return position < 0 ? C.TIME_UNSET : position;
+    }
+
+    protected long getActivePlaybackDuration() {
+        if (!isWebPlaybackActive()) return mService != null && isOwner() ? player().getDuration() : C.TIME_UNSET;
+        long duration = webView.getVideoDuration();
+        return duration <= 0 ? C.TIME_UNSET : duration;
+    }
+
+    protected boolean canTrackActivePlaybackProgress() {
+        return getActivePlaybackPosition() >= 0 && getActivePlaybackDuration() > 0;
+    }
+
+    protected boolean replayWebPlayback(long position) {
+        if (!isWebPlaybackActive()) return false;
+        webView.seekVideo(Math.max(0, position));
+        webView.resumeVideo();
+        return true;
+    }
+
+    protected boolean pauseWebPlayback() {
+        if (!isWebPlaybackActive()) return false;
+        resumeWebPlaybackOnResume = false;
+        webView.pauseVideo();
+        return true;
+    }
+
+    protected boolean stopWebPlayback() {
+        if (!isWebPlaybackActive()) return false;
+        webView.stopPlayback();
+        resumeWebPlaybackOnResume = false;
+        webPlaybackState = Player.STATE_IDLE;
+        syncSeekPlayer();
+        getSeekView().setVisibility(View.VISIBLE);
+        onWebPlaybackChanged(false);
+        return true;
+    }
+
+    protected boolean resumeWebPlayback() {
+        if (!isWebPlaybackActive()) return false;
+        webView.resumeVideo();
+        return true;
+    }
+
+    protected int getWebVideoWidth() {
+        return webView == null ? 0 : webView.getVideoWidth();
+    }
+
+    protected int getWebVideoHeight() {
+        return webView == null ? 0 : webView.getVideoHeight();
+    }
+
+    protected boolean hasWebMediaTarget() {
+        return webView != null && webView.hasMediaTarget();
+    }
+
+    protected boolean handleWebViewNavigation() {
+        return webView != null && webView.handleBackNavigation();
     }
 
     @Nullable
@@ -531,7 +701,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private void onControllerConnected() {
         try {
             mController = mControllerFuture.get();
-            getSeekView().setPlayer(mController);
+            syncSeekPlayer();
             mController.addListener(this);
             updateKeyIncrement();
         } catch (Exception ignored) {
@@ -539,7 +709,8 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void addSeekListener() {
-        getSeekView().getTimeBar().addListener(new TimeBar.OnScrubListener() {
+        TimeBar timeBar = getSeekView().getTimeBar();
+        timeBar.addListener(new TimeBar.OnScrubListener() {
             @Override
             public void onScrubStart(@NonNull TimeBar timeBar, long position) {
                 PlaybackActivity.this.setScrubbing(true);
@@ -552,7 +723,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
             @Override
             public void onScrubStop(@NonNull TimeBar timeBar, long position, boolean canceled) {
-                PlaybackActivity.this.onScrubStop(canceled);
+                PlaybackActivity.this.onScrubStop(position, canceled);
             }
         });
     }
@@ -561,9 +732,16 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         return scrubbing;
     }
 
-    protected void onScrubStop(boolean canceled) {
-        if (!canceled && mController != null && mController.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) mController.play();
+    protected void onScrubStop(long position, boolean canceled) {
+        if (!canceled) {
+            if (isWebPlaybackActive()) webView.seekVideo(position);
+            else if (mController != null && mController.isCommandAvailable(Player.COMMAND_PLAY_PAUSE)) mController.setPlayWhenReady(true);
+        }
         setScrubbing(false);
+    }
+
+    private void syncSeekPlayer() {
+        getSeekView().setPlayer(isWebPlaybackActive() ? null : mController);
     }
 
     private void setScrubbing(boolean scrubbing) {
@@ -583,6 +761,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private long getKeyTimeIncrementMs(long durationMs) {
+        if (Util.isLeanback()) return Constant.INTERVAL_SEEK;
         if (durationMs > TimeUnit.HOURS.toMillis(3)) {
             return TimeUnit.MINUTES.toMillis(5);
         } else if (durationMs > TimeUnit.MINUTES.toMillis(30)) {
@@ -606,8 +785,17 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void resumePlayback() {
+        PlaybackResume resume = pendingResume;
+        pendingResume = null;
         if (shouldReclaim()) reclaimPlayback();
-        else attachPlayerView();
+        else {
+            attachPlayerView();
+            if (resume == null || mService == null || isFinishing() || isInPictureInPictureMode() || !isOwner() || !isBindingOwner()) return;
+            Player current = player().getPlayer();
+            Player target = mController != null ? mController : current;
+            if (!resume.matches(current) || target.getPlayWhenReady() || !canResume(current)) return;
+            target.play();
+        }
     }
 
     private void reclaimPlayback() {
@@ -619,6 +807,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         if (mService == null) return;
         mService.claimBinding(getNavigationCallback(), () -> {
             playbackPlayerState.setValue(null);
+            pendingResume = null;
             closePiP();
         });
         mService.setSessionActivity(buildSessionIntent());
@@ -643,8 +832,8 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void initService() {
         if (initialized) return;
-        initialized = true;
         onServiceConnected();
+        initialized = true;
     }
 
     private void closePiP() {
@@ -654,11 +843,26 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void attachPlayerView() {
+        getPlayerView().setVisibility(View.VISIBLE);
         if (mService != null) syncPlayerView(player().getPlayer());
     }
 
     private void detachPlayerView() {
         getPlayerView().setPlayer(null);
+    }
+
+    private void hidePlayerViewForWebPlayback() {
+        PlayerView playerView = getPlayerView();
+        playerView.removeCallbacks(discMenuOverlayUpdate);
+        if (discMenuOverlay != null) {
+            discMenuOverlay.clear();
+            discMenuOverlay.setVisibility(View.GONE);
+        }
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        View shutter = playerView.findViewById(androidx.media3.ui.R.id.exo_shutter);
+        if (shutter != null) shutter.setVisibility(View.VISIBLE);
+        playerView.setPlayer(null);
+        playerView.setVisibility(View.INVISIBLE);
     }
 
     private void syncPlayerView(Player player) {
@@ -716,8 +920,35 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void pausePlayback() {
+        if (isWebPlaybackActive()) {
+            resumeWebPlaybackOnResume = !isFinishing() && (resumeWebPlaybackOnResume || !webView.isPlaybackPaused());
+            webView.pauseVideo();
+            return;
+        }
+        if (mService == null || !isOwner() || !isBindingOwner() || (isInPictureInPictureMode() && !isFinishing())) {
+            pendingResume = null;
+            return;
+        }
+        Player current = player().getPlayer();
+        Player target = mController != null ? mController : current;
+        if (isFinishing() || (pendingResume != null && !pendingResume.matches(current))) pendingResume = null;
+        if (!isFinishing() && current != null && target.getPlayWhenReady() && canResume(current) && current.getCurrentMediaItem() != null) {
+            pendingResume = new PlaybackResume(current, current.getCurrentMediaItem());
+        }
         if (mController != null) mController.pause();
         else if (mService != null) player().pause();
+    }
+
+    private static boolean canResume(Player player) {
+        return player.getPlaybackState() == Player.STATE_READY || player.getPlaybackState() == Player.STATE_BUFFERING;
+    }
+
+    private record PlaybackResume(Player player, MediaItem item) {
+        boolean matches(Player current) {
+            if (player != current) return false;
+            MediaItem mediaItem = current.getCurrentMediaItem();
+            return mediaItem != null && item.mediaId.equals(mediaItem.mediaId) && Objects.equals(item.localConfiguration, mediaItem.localConfiguration);
+        }
     }
 
     private void releaseController() {
@@ -828,7 +1059,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     @Override
     public void onEvents(@NonNull Player player, @NonNull Player.Events events) {
-        if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) invalidateDiscMenuOpenRequest();
+        if (events.contains(Player.EVENT_MEDIA_ITEM_TRANSITION)) {
+            invalidateDiscMenuOpenRequest();
+            if (pendingResume != null && (mService == null || !pendingResume.matches(player().getPlayer()))) pendingResume = null;
+        }
         if (events.containsAny(Player.EVENT_TIMELINE_CHANGED, Player.EVENT_POSITION_DISCONTINUITY, Player.EVENT_MEDIA_ITEM_TRANSITION, Player.EVENT_PLAYBACK_STATE_CHANGED, Player.EVENT_AVAILABLE_COMMANDS_CHANGED)) updateKeyIncrement();
     }
 
@@ -869,6 +1103,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     @Override
     public void onServiceDisconnected(ComponentName name) {
         playbackPlayerState.setValue(null);
+        pendingResume = null;
         initialized = false;
         mService = null;
     }
@@ -887,11 +1122,18 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         dispatchPendingObservers();
         updatePlaybackPlayerState();
         startDiscMenuOverlay();
-        resumePlayback();
+        if (webView != null) webView.onResume();
+        if (!isWebPlaybackActive()) resumePlayback();
+        else {
+            pendingResume = null;
+            if (resumeWebPlaybackOnResume) webView.resumeVideo();
+            resumeWebPlaybackOnResume = false;
+        }
     }
 
     @Override
     protected void onPause() {
+        if (webView != null && !isInPictureInPictureMode()) webView.onPause();
         super.onPause();
         if (isRedirect()) pausePlayback();
     }
@@ -900,7 +1142,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     protected void onStop() {
         super.onStop();
         getPlayerView().removeCallbacks(discMenuOverlayUpdate);
-        if (isOwner() && (isFinishing() || PlayerSetting.isBackgroundOff())) pausePlayback();
+        if ((isWebPlaybackActive() || isOwner()) && (isFinishing() || PlayerSetting.isBackgroundOff())) pausePlayback();
         if (!isInPictureInPictureMode()) detachPlayerView();
     }
 
@@ -908,11 +1150,122 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     protected void onDestroy() {
         getPlayerView().removeCallbacks(discMenuOverlayUpdate);
         if (discMenuOverlay != null) discMenuOverlay.clear();
+        pendingResume = null;
+        releaseWebView();
         clearObservers();
         detachPlayerView();
         danmakuController.close();
         super.onDestroy();
         releasePlaybackService();
+    }
+
+    private void releaseWebView() {
+        releaseWebView(true);
+    }
+
+    private void releaseWebView(boolean destroy) {
+        if (webView == null) return;
+        BrowserWebView current = webView;
+        current.pauseVideo();
+        current.hideCustomView();
+        hideWebChallenge(current);
+        webView = null;
+        resumeWebPlaybackOnResume = false;
+        webPlaybackState = Player.STATE_IDLE;
+        if (current.getParent() instanceof ViewGroup parent) parent.removeView(current);
+        if (destroy) current.release();
+        syncSeekPlayer();
+        getSeekView().setVisibility(View.VISIBLE);
+        onWebPlaybackChanged(false);
+    }
+
+    private final BrowserWebView.PlaybackListener webViewListener = new BrowserWebView.PlaybackListener() {
+        @Override
+        public void onPlayingChanged(@NonNull BrowserWebView view, boolean isPlaying) {
+            if (webView != view) return;
+            if (isPlaying) getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            else getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+            PlaybackActivity.this.onPlayingChanged(isPlaying);
+        }
+
+        @Override
+        public void onStateChanged(@NonNull BrowserWebView view, @NonNull BrowserWebView.PlaybackState state) {
+            if (webView != view) return;
+            updateWebSeek(state);
+            int playerState = state.ended() ? Player.STATE_ENDED : state.buffering() ? Player.STATE_BUFFERING : Player.STATE_READY;
+            if (webPlaybackState == playerState) return;
+            webPlaybackState = playerState;
+            PlaybackActivity.this.onStateChanged(playerState);
+        }
+
+        @Override
+        public void onFailure(@NonNull BrowserWebView view, boolean rendererGone) {
+            if (webView != view) return;
+            releaseWebView(!rendererGone);
+            onError(ResUtil.getString(R.string.error_play_url));
+        }
+
+        @Override
+        public void onFullscreenChanged(@NonNull BrowserWebView view, boolean fullscreen) {
+            if (webView == view) onWebFullscreenChanged(fullscreen);
+        }
+
+        @Override
+        public void onChallengeChanged(@NonNull BrowserWebView view, boolean visible) {
+            if (webView != view) return;
+            if (visible) showWebChallenge(view);
+            else hideWebChallenge(view);
+        }
+    };
+
+    private void showWebChallenge(@NonNull BrowserWebView view) {
+        if (webChallengeDialog != null) return;
+        view.hideCustomView();
+        if (!(view.getParent() instanceof ViewGroup parent)) return;
+        webChallengeParent = parent;
+        webChallengeIndex = parent.indexOfChild(view);
+        webChallengeParams = view.getLayoutParams();
+        parent.removeView(view);
+        webChallengeDialog = CloudflareDialog.create(this, view, ignored -> onWebChallengeDismissed(view)).show();
+    }
+
+    private void hideWebChallenge(@NonNull BrowserWebView view) {
+        CloudflareDialog dialog = webChallengeDialog;
+        webChallengeDialog = null;
+        if (dialog != null) dialog.dismiss();
+        restoreWebChallenge(view);
+    }
+
+    private void onWebChallengeDismissed(@NonNull BrowserWebView view) {
+        webChallengeDialog = null;
+        restoreWebChallenge(view);
+    }
+
+    private void restoreWebChallenge(@NonNull BrowserWebView view) {
+        ViewGroup parent = webChallengeParent;
+        ViewGroup.LayoutParams params = webChallengeParams;
+        webChallengeParent = null;
+        webChallengeParams = null;
+        if (webView != view || parent == null || view.getParent() != null) return;
+        if (params == null) params = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        parent.addView(view, Math.min(Math.max(0, webChallengeIndex), parent.getChildCount()), params);
+        view.requestFocus();
+    }
+
+    private void updateWebSeek(@NonNull BrowserWebView.PlaybackState state) {
+        if (!supportsWebSeek()) return;
+        PlayerSeekView seekView = getSeekView();
+        seekView.setVisibility(state.isSeekable() ? View.VISIBLE : View.GONE);
+        if (!state.isSeekable() || scrubbing) return;
+        TimeBar timeBar = seekView.getTimeBar();
+        timeBar.setKeyTimeIncrement(getKeyTimeIncrementMs(state.durationMs()));
+        timeBar.setDuration(state.durationMs());
+        timeBar.setPosition(state.positionMs());
+        timeBar.setBufferedPosition(state.positionMs());
+        TextView position = seekView.findViewById(androidx.media3.ui.R.id.exo_position);
+        TextView duration = seekView.findViewById(androidx.media3.ui.R.id.exo_duration);
+        if (position != null) position.setText(Util.timeMs(state.positionMs()));
+        if (duration != null) duration.setText(Util.timeMs(state.durationMs()));
     }
 
     private final class ServiceReadyObserver<T> implements Observer<T> {

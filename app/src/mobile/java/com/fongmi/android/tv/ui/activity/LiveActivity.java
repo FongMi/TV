@@ -222,6 +222,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private void setPlaybackMode() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
@@ -377,7 +378,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private void checkPlay() {
-        if (player().isPlaying()) onPaused();
+        if (isWebPlaybackPlaying() || player().isPlaying()) onPaused();
         else onPlay();
     }
 
@@ -683,7 +684,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     public boolean hasPlaybackSession() {
-        return mPlaybackKey != null && service() != null && isOwner() && player().hasPlaySpec();
+        return mPlaybackKey != null && hasActivePlaybackSession();
     }
 
     @Override
@@ -699,7 +700,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     public long getPlayerPosition() {
-        return player().getPosition();
+        return getActivePlaybackPosition();
     }
 
     @Override
@@ -714,12 +715,18 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     public void stopPlaybackForRefresh() {
+        stopWebPlayback();
         stopPlayer();
     }
 
     @Override
     public void startPlayback(Result result, long position, MediaMetadata metadata) {
-        startPlayer(mPlaybackKey = result.getRealUrl(), result, false, getHome().getTimeout(), position, metadata);
+        mPlaybackKey = result.getRealUrl();
+        if (startWebPlayback(mBinding.video, result, mInput::onTouchEvent)) {
+            updateNavigationKey(mPlaybackKey);
+            return;
+        }
+        startPlayer(mPlaybackKey, result, false, getHome().getTimeout(), position, metadata);
     }
 
     @Override
@@ -791,6 +798,21 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
+        @Override
+        public boolean isExternalPlaybackActive() {
+            return isWebPlaybackActive();
+        }
+
+        @Override
+        public void onPlay() {
+            LiveActivity.this.onPlay();
+        }
+
+        @Override
+        public void onPause() {
+            LiveActivity.this.onPaused();
+        }
+
         @Override
         public void onNext() {
             mLive.nextChannel();
@@ -865,7 +887,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying || isPaused()) updatePlayControl(isPlaying);
+        if (isPlaying || isPaused() || isWebPlaybackActive()) updatePlayControl(isPlaying);
     }
 
     private void updatePlayControl(boolean isPlaying) {
@@ -945,7 +967,17 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
         }
     }
 
+    @Override
+    protected void onWebPlaybackChanged(boolean active) {
+        PlaybackAction.setWebPlaybackMode(active, mBinding.control.action.player, mBinding.control.action.speed, mBinding.control.action.scale, mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video);
+        if (!active) {
+            setPlaybackMode();
+            setTrackVisible();
+        }
+    }
+
     private void setTrackVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setTracks(player(), mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video, mBinding.control.action.speed);
     }
 
@@ -962,10 +994,12 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private void onPaused() {
+        if (pauseWebPlayback()) return;
         controller().pause();
     }
 
     private void onPlay() {
+        if (resumeWebPlayback()) return;
         controller().play();
     }
 
@@ -1075,7 +1109,9 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
         super.onUserLeaveHint();
         if (isRedirect()) return;
         if (isLock()) App.post(this::onLock, 500);
-        if (service() != null && player().haveTrack(C.TRACK_TYPE_VIDEO)) mPiP.enter(this, player().getVideoWidth(), player().getVideoHeight(), LiveSetting.getScale());
+        if (service() == null) return;
+        if (hasWebMediaTarget()) mPiP.enter(this, getWebVideoWidth(), getWebVideoHeight(), 0);
+        else if (!isWebPlaybackActive() && player().haveTrack(C.TRACK_TYPE_VIDEO)) mPiP.enter(this, player().getVideoWidth(), player().getVideoHeight(), LiveSetting.getScale());
     }
 
     @Override
@@ -1124,6 +1160,8 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
+        } else if (handleWebViewNavigation()) {
+            return;
         } else if (!isLock()) {
             if (isTaskRoot()) startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
             super.onBackInvoked();

@@ -218,6 +218,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void setPlaybackMode() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
@@ -364,7 +365,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void checkPlay() {
-        if (player().isPlaying()) onPaused();
+        if (isWebPlaybackPlaying() || player().isPlaying()) onPaused();
         else onPlay();
     }
 
@@ -445,6 +446,21 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
         @Override
+        public boolean isExternalPlaybackActive() {
+            return isWebPlaybackActive();
+        }
+
+        @Override
+        public void onPlay() {
+            LiveActivity.this.onPlay();
+        }
+
+        @Override
+        public void onPause() {
+            LiveActivity.this.onPaused();
+        }
+
+        @Override
         public void onNext() {
             mLive.nextChannel();
         }
@@ -510,7 +526,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying || isPaused()) updatePlayControl(isPlaying);
+        if (isPlaying || isPaused() || isWebPlaybackActive()) updatePlayControl(isPlaying);
     }
 
     private void updatePlayControl(boolean isPlaying) {
@@ -739,7 +755,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public boolean hasPlaybackSession() {
-        return mPlaybackKey != null && service() != null && isOwner() && player().hasPlaySpec();
+        return mPlaybackKey != null && hasActivePlaybackSession();
     }
 
     @Override
@@ -755,7 +771,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public long getPlayerPosition() {
-        return player().getPosition();
+        return getActivePlaybackPosition();
     }
 
     @Override
@@ -770,12 +786,18 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void stopPlaybackForRefresh() {
+        stopWebPlayback();
         stopPlayer();
     }
 
     @Override
     public void startPlayback(Result result, long position, MediaMetadata metadata) {
-        startPlayer(mPlaybackKey = result.getRealUrl(), result, false, getHome().getTimeout(), position, metadata);
+        mPlaybackKey = result.getRealUrl();
+        if (startWebPlayback(mBinding.video, result, mInput::onTouchEvent)) {
+            updateNavigationKey(mPlaybackKey);
+            return;
+        }
+        startPlayer(mPlaybackKey, result, false, getHome().getTimeout(), position, metadata);
     }
 
     @Override
@@ -907,7 +929,17 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         }
     }
 
+    @Override
+    protected void onWebPlaybackChanged(boolean active) {
+        PlaybackAction.setWebPlaybackMode(active, mBinding.control.action.player, mBinding.control.action.speed, mBinding.control.action.scale, mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video);
+        if (!active) {
+            setPlaybackMode();
+            setTrackVisible();
+        }
+    }
+
     private void setTrackVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setTracks(player(), mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video, mBinding.control.action.speed);
     }
 
@@ -932,10 +964,12 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onPaused() {
+        if (pauseWebPlayback()) return;
         controller().pause();
     }
 
     private void onPlay() {
+        if (resumeWebPlayback()) return;
         controller().play();
     }
 
@@ -1043,6 +1077,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
+        } else if (handleWebViewNavigation()) {
+            return;
         } else {
             if (isTaskRoot()) startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
             super.onBackInvoked();
