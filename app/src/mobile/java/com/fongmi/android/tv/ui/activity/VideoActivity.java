@@ -84,6 +84,7 @@ import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.adapter.QuickAdapter;
 import com.fongmi.android.tv.ui.base.ViewType;
 import com.fongmi.android.tv.ui.custom.TouchInput;
+import com.fongmi.android.tv.ui.custom.TapSeekFeedback;
 import com.fongmi.android.tv.ui.custom.CustomMovement;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.ui.dialog.CastDialog;
@@ -129,6 +130,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     private ViewGroup.LayoutParams mFrameParams;
     private ValueAnimator mAnimator;
     private TouchInput mInput;
+    private TapSeekFeedback mSeekFeedback;
     private Clock mClock;
     private PiP mPiP;
     private Runnable mR1;
@@ -302,6 +304,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         super.initView(savedInstanceState);
         ViewCompat.setOnApplyWindowInsetsListener(mBinding.getRoot(), (v, insets) -> setStatusBar(insets));
         mInput = TouchInput.create(this, mBinding.player, this);
+        mSeekFeedback = new TapSeekFeedback(mBinding.video, mInput::cancelSeekTaps);
         mFrameParams = mBinding.video.getLayoutParams();
         mBinding.progressLayout.showProgress();
         mBinding.swipeLayout.setEnabled(false);
@@ -1119,6 +1122,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     private void exitFullscreen() {
         if (!isFullscreen()) return;
         setFullscreen(false);
+        mInput.cancelSeekTaps();
+        mSeekFeedback.clear();
         if (isLand() && !player().isPortrait()) setTransition();
         setRequestedOrientation(PlaybackOrientation.getExitFullscreenOrientation(isPort()));
         mBinding.episode.postDelayed(() -> mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition()), 100);
@@ -1599,6 +1604,20 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     @Override
+    public boolean isSeekTapArea(float x) {
+        return isFullscreen() && !isLock() && mSeekFeedback.directionAt(x) != 0;
+    }
+
+    @Override
+    public boolean onSeekTap(float x) {
+        if (!isSeekTapArea(x) || !canTrackPlaybackProgress()) return false;
+        hideControl();
+        long delta = mSeekFeedback.show(x);
+        seekTo(delta);
+        return true;
+    }
+
+    @Override
     public void onTouchEnd() {
         mBinding.widget.seek.setVisibility(View.GONE);
         mBinding.widget.bright.setVisibility(View.GONE);
@@ -1666,6 +1685,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     @Override
     protected void onStop() {
         super.onStop();
+        mInput.cancelSeekTaps();
+        mSeekFeedback.clear();
         saveHistory(false);
         if (PlayerSetting.isBackgroundOff()) mClock.stop();
         if (!isAudioOnly()) setStop(true);
