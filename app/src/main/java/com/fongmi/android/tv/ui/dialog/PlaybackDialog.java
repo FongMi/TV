@@ -22,4 +22,9 @@ final class PlaybackDialog {
             observer.onChanged(player);
         });
     }
+
+    static boolean isCurrentPlayer(Fragment fragment, PlayerManager player) {
+        return player != null && fragment.isAdded()
+                && ((PlaybackActivity) fragment.requireActivity()).getPlaybackPlayerState().getValue() == player;
+    }
 }

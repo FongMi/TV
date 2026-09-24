@@ -71,7 +71,7 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
     }
 
     private void onSearch(View view) {
-        DanmakuSearchDialog.create().player(player).show(getActivity());
+        DanmakuSearchDialog.create().show(getActivity());
         dismiss();
     }
 

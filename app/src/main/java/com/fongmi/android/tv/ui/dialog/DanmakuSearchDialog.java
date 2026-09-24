@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.dialog;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,6 +38,7 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
     private final DanmakuAdapter adapter;
     private DialogDanmakuSearchBinding binding;
     private PlayerManager player;
+    private boolean keywordInitialized;
 
     public DanmakuSearchDialog() {
         this.adapter = new DanmakuAdapter(this);
@@ -46,14 +48,22 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
         return new DanmakuSearchDialog();
     }
 
-    public DanmakuSearchDialog player(PlayerManager player) {
-        this.player = player;
-        return this;
-    }
-
     public void show(FragmentActivity activity) {
+        if (activity.getSupportFragmentManager().isStateSaved()) return;
         for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof DanmakuSearchDialog) return;
         show(activity.getSupportFragmentManager(), null);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        keywordInitialized = savedInstanceState != null && savedInstanceState.getBoolean("keywordInitialized");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("keywordInitialized", keywordInitialized);
     }
 
     @Override
@@ -67,8 +77,17 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
         binding.recycler.setItemAnimator(null);
         binding.recycler.setHasFixedSize(false);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        Util.showKeyboard(binding.keyword);
-        setKeyword(getTitle());
+        PlaybackDialog.observe(this, player -> {
+            if (this.player != null && player == null) {
+                DanmakuApi.cancel();
+                showResults(adapter.getItemCount() == 0);
+            }
+            this.player = player;
+            if (player == null || keywordInitialized) return;
+            setKeyword(getTitle());
+            keywordInitialized = true;
+            Util.showKeyboard(binding.keyword);
+        });
     }
 
     @Override
@@ -86,6 +105,7 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
 
     @Override
     public void onItemClick(Danmaku item) {
+        if (!PlaybackDialog.isCurrentPlayer(this, player)) return;
         player.setDanmaku(item);
         dismiss();
     }
@@ -127,6 +147,7 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
     }
 
     private void search() {
+        if (!PlaybackDialog.isCurrentPlayer(this, player)) return;
         showProgress();
         adapter.clear();
         Util.hideKeyboard(binding.keyword);
@@ -153,6 +174,7 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
     @Override
     public void onDestroyView() {
         binding = null;
+        player = null;
         DanmakuApi.cancel();
         super.onDestroyView();
     }

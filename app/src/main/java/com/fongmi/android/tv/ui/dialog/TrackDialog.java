@@ -120,7 +120,7 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
     private void onSearch(View view) {
         FragmentActivity activity = requireActivity();
         dismissNow();
-        SubtitleSearchDialog.create().player(player).show(activity);
+        SubtitleSearchDialog.create().show(activity);
     }
 
     private void onChoose(View view) {
