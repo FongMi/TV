@@ -20,7 +20,7 @@ public final class NodeConfigMapper {
             for (JsonElement element : result.getAsJsonArray("sites")) {
                 if (!element.isJsonObject()) continue;
                 JsonObject site = element.getAsJsonObject().deepCopy();
-                if (!isEnabled(site)) continue;
+                if (!isEnabled(site, "enable")) continue;
                 String route = route(site);
                 if (route.isEmpty()) continue;
                 site.addProperty("type", 3);
@@ -44,7 +44,7 @@ public final class NodeConfigMapper {
                 if (!api.startsWith("node:")) continue;
                 Probe probe = new Probe(api, extension(site));
                 if (fallback.api().isEmpty()) fallback = probe;
-                if (isIndexed(site)) return probe;
+                if (isEnabled(site, "indexs")) return probe;
             }
             return fallback;
         } catch (Exception e) {
@@ -56,24 +56,18 @@ public final class NodeConfigMapper {
         return firstProbe(json).api();
     }
 
-    private static boolean isIndexed(JsonObject site) {
-        if (!site.has("indexs") || !site.get("indexs").isJsonPrimitive()) return true;
-        if (site.getAsJsonPrimitive("indexs").isBoolean()) return site.get("indexs").getAsBoolean();
-        if (site.getAsJsonPrimitive("indexs").isNumber()) return site.get("indexs").getAsInt() != 0;
-        String value = site.get("indexs").getAsString();
-        return !"false".equalsIgnoreCase(value) && !"0".equals(value);
-    }
-
-    private static boolean isEnabled(JsonObject site) {
-        if (!site.has("enable") || !site.get("enable").isJsonPrimitive()) return true;
-        if (site.getAsJsonPrimitive("enable").isBoolean()) return site.get("enable").getAsBoolean();
-        if (site.getAsJsonPrimitive("enable").isNumber()) return site.get("enable").getAsInt() != 0;
-        return !"false".equalsIgnoreCase(site.get("enable").getAsString()) && !"0".equals(site.get("enable").getAsString());
+    private static boolean isEnabled(JsonObject site, String name) {
+        JsonElement value = site.get(name);
+        if (value == null || !value.isJsonPrimitive()) return true;
+        if (value.getAsJsonPrimitive().isBoolean()) return value.getAsBoolean();
+        if (value.getAsJsonPrimitive().isNumber()) return value.getAsInt() != 0;
+        String text = value.getAsString();
+        return !"false".equalsIgnoreCase(text) && !"0".equals(text);
     }
 
     private static String extension(JsonObject site) {
-        if (!site.has("ext") || site.get("ext").isJsonNull()) return "";
         JsonElement ext = site.get("ext");
+        if (ext == null || ext.isJsonNull()) return "";
         return ext.isJsonPrimitive() ? ext.getAsString() : ext.toString();
     }
 

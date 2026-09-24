@@ -86,6 +86,7 @@ public final class NodeClient {
     private volatile String nodeArch = "";
     private volatile String lastEndpoint = "";
     private volatile String lastError = "";
+    private String loadWarning = "";
     private volatile NodeConnection connection;
     private NodeBridge bridge;
 
@@ -99,10 +100,12 @@ public final class NodeClient {
         session++;
         cancelRequests();
         initializations.clear();
+        loadWarning = "";
         loadCancellation = new AtomicBoolean();
         try {
             NodeBundle prepared = NodeBundle.prepare(context, source);
             checkLoadCanceled();
+            loadWarning = prepared.warning();
             try {
                 return loadPrepared(prepared);
             } catch (Exception primary) {
@@ -114,6 +117,7 @@ public final class NodeClient {
                 try {
                     String result = loadPrepared(fallback);
                     SpiderDebug.log("NodeRuntime", "Previous Node bundle restored successfully");
+                    loadWarning = primary.getMessage() == null || primary.getMessage().isEmpty() ? primary.toString() : primary.getMessage();
                     return result;
                 } catch (Exception secondary) {
                     primary.addSuppressed(secondary);
@@ -129,7 +133,7 @@ public final class NodeClient {
     }
 
     public synchronized LoadedConfig loadConfig(String source) throws Exception {
-        return new LoadedConfig(load(source), session);
+        return new LoadedConfig(load(source), session, loadWarning);
     }
 
     private String loadPrepared(NodeBundle prepared) throws Exception {
@@ -832,7 +836,7 @@ public final class NodeClient {
         T execute(RequestState state) throws Exception;
     }
 
-    public record LoadedConfig(String json, long session) {
+    public record LoadedConfig(String json, long session, String warning) {
     }
 
     public interface Callback {

@@ -5,9 +5,7 @@ import com.github.catvod.utils.Json;
 import com.google.gson.JsonObject;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.MessageDigest;
@@ -89,13 +87,7 @@ final class NodeManifest {
     }
 
     static String sha256(File file) throws IOException {
-        MessageDigest digest = Crypto.newDigest("SHA-256");
-        try (InputStream input = new FileInputStream(file)) {
-            byte[] buffer = new byte[64 * 1024];
-            int count;
-            while ((count = input.read(buffer)) != -1) digest.update(buffer, 0, count);
-        }
-        return hex(digest.digest());
+        return hex(Crypto.sha256(file));
     }
 
     private static String digest(JsonObject object, String name) throws IOException {

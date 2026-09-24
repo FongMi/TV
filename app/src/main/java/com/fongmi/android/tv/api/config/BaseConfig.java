@@ -102,7 +102,10 @@ abstract class BaseConfig {
             load(config);
             if (taskId.get() != id) return;
             if (config.equals(this.config)) config.update();
-            App.post(() -> Notify.show(config.getNotice()));
+            String notice = config.getNotice();
+            App.post(() -> {
+                if (taskId.get() == id) Notify.show(notice);
+            });
             App.post(callback::success);
         } catch (Throwable e) {
             if (isCanceled(e)) return;

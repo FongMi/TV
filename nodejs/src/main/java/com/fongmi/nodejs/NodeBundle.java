@@ -17,7 +17,6 @@ import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.Base64;
 import java.util.HashSet;
 import java.util.Locale;
@@ -58,6 +57,7 @@ public final class NodeBundle {
     private final String configMd5;
     private final String signingKey;
     private boolean pending;
+    private String warning = "";
 
     NodeBundle(File root, String indexMd5, String configMd5) {
         this(root, indexMd5, configMd5, false, "");
@@ -91,7 +91,7 @@ public final class NodeBundle {
         try {
             if (!isConfig(source)) throw new IOException("Node config must end with index.js.md5");
             validateSource(source);
-            String key = sha256(source);
+            String key = Crypto.sha256(source);
             synchronized (SOURCE_LOCKS.computeIfAbsent(key, ignored -> new Object())) {
                 session.check();
                 return prepare(context, source, key, session);
@@ -125,6 +125,7 @@ public final class NodeBundle {
             if (stored != null && isRejected(sourceRoot, indexMd5, configMd5, System.currentTimeMillis())) {
                 session.check();
                 SpiderDebug.log("NodeBundle", "Skipped previously rejected Node bundle version");
+                stored.warning = "Previously rejected Node bundle version";
                 return stored;
             }
             File staging = new File(sourceRoot, "staging-" + UUID.randomUUID());
@@ -155,6 +156,7 @@ public final class NodeBundle {
             NodeBundle stored = readStored(active);
             if (stored == null) throw e;
             SpiderDebug.log("NodeBundle", "Update failed, using last known good bundle: %s", e.getMessage());
+            stored.warning = e.getMessage() == null || e.getMessage().isEmpty() ? e.toString() : e.getMessage();
             return stored;
         }
     }
@@ -177,16 +179,16 @@ public final class NodeBundle {
     }
 
     private static String fetchMd5(String location, LoadSession session) throws IOException {
-        try (Resource resource = open(location, session)) {
-            return parseMd5(readLimited(resource.input, MAX_MD5_BYTES, session));
+        try (Resource resource = open(location, session, false)) {
+            return parseMd5(readLimited(resource.input, MAX_MD5_BYTES, session, "MD5 sidecar"));
         }
     }
 
     private static String fetchOptional(String location, int limit, LoadSession session) throws IOException {
-        Resource resource = openOptional(location, session);
+        Resource resource = open(location, session, true);
         if (resource == null) return null;
         try (resource) {
-            return readLimited(resource.input, limit, session);
+            return readLimited(resource.input, limit, session, "Node manifest");
         }
     }
 
@@ -204,7 +206,7 @@ public final class NodeBundle {
         return matcher.group(1).toLowerCase(Locale.ROOT);
     }
 
-    private static String readLimited(InputStream input, int limit, LoadSession session) throws IOException {
+    private static String readLimited(InputStream input, int limit, LoadSession session, String name) throws IOException {
         try (InputStream stream = input; ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[512];
             int total = 0;
@@ -212,7 +214,7 @@ public final class NodeBundle {
             while ((count = stream.read(buffer)) != -1) {
                 session.check();
                 total += count;
-                if (total > limit) throw new IOException("MD5 sidecar is too large");
+                if (total > limit) throw new IOException(name + " is too large");
                 output.write(buffer, 0, count);
             }
             return output.toString(StandardCharsets.UTF_8.name());
@@ -220,7 +222,7 @@ public final class NodeBundle {
     }
 
     private static File copy(String location, File target, long maxBytes, LoadSession session) throws IOException {
-        try (Resource resource = open(location, session)) {
+        try (Resource resource = open(location, session, false)) {
             if (resource.length > maxBytes) throw new IOException("Node bundle file is too large");
             File parent = target.getParentFile();
             if (parent == null || (!parent.isDirectory() && !parent.mkdirs() && !parent.isDirectory())) throw new IOException("Unable to create Node staging directory");
@@ -245,7 +247,7 @@ public final class NodeBundle {
         }
     }
 
-    private static Resource open(String location, LoadSession session) throws IOException {
+    private static Resource open(String location, LoadSession session, boolean optional) throws IOException {
         session.check();
         if (isRemote(location)) {
             Call call = CLIENT.newCall(new Request.Builder().url(location).build());
@@ -254,35 +256,7 @@ public final class NodeBundle {
             try {
                 response = call.execute();
                 session.check();
-                ResponseBody body = response.body();
-                if (!response.isSuccessful() || body == null) {
-                    int code = response.code();
-                    String url = response.request().url().redact();
-                    throw new IOException("HTTP " + code + " for " + url);
-                }
-                return new Resource(body.byteStream(), body.contentLength(), response, session, call);
-            } catch (IOException e) {
-                if (response != null) response.close();
-                session.detach(call);
-                session.check(e);
-                throw e;
-            }
-        }
-        File file = localFile(location);
-        if (!file.isFile() || !file.canRead()) throw new IOException("Unable to read Node file: " + file);
-        return new Resource(new FileInputStream(file), file.length(), null, null, null);
-    }
-
-    private static Resource openOptional(String location, LoadSession session) throws IOException {
-        session.check();
-        if (isRemote(location)) {
-            Call call = CLIENT.newCall(new Request.Builder().url(location).build());
-            session.attach(call);
-            Response response = null;
-            try {
-                response = call.execute();
-                session.check();
-                if (response.code() == 404 || response.code() == 410) {
+                if (optional && (response.code() == 404 || response.code() == 410)) {
                     response.close();
                     session.detach(call);
                     return null;
@@ -302,7 +276,9 @@ public final class NodeBundle {
             }
         }
         File file = localFile(location);
-        return file.isFile() && file.canRead() ? new Resource(new FileInputStream(file), file.length(), null, null, null) : null;
+        if (file.isFile() && file.canRead()) return new Resource(new FileInputStream(file), file.length(), null, null, null);
+        if (optional) return null;
+        throw new IOException("Unable to read Node file: " + file);
     }
 
     static File localFile(String location) throws IOException {
@@ -466,7 +442,7 @@ public final class NodeBundle {
     }
 
     private static void addSource(Set<String> keep, String source) {
-        if (isConfig(source)) keep.add(sha256(source));
+        if (isConfig(source)) keep.add(Crypto.sha256(source));
     }
 
     static void pruneRoots(File bundles, Set<String> keep) {
@@ -509,14 +485,6 @@ public final class NodeBundle {
         File sourceRoot = directory.getParentFile();
         keep.add(new File(sourceRoot, dataDirectoryName(indexMd5, configMd5)));
         keep.add(dataDirectory(sourceRoot, indexMd5, configMd5));
-    }
-
-    private static String sha256(String value) {
-        MessageDigest digest = Crypto.newDigest("SHA-256");
-        byte[] bytes = digest.digest(value.getBytes(StandardCharsets.UTF_8));
-        StringBuilder builder = new StringBuilder(bytes.length * 2);
-        for (byte item : bytes) builder.append(String.format("%02x", item & 0xff));
-        return builder.toString();
     }
 
     private static void writeAtomically(byte[] data, File target) throws IOException {
@@ -633,7 +601,7 @@ public final class NodeBundle {
     }
 
     static String dataDirectoryName(String indexMd5, String configMd5) {
-        return "data-" + sha256(version(indexMd5, configMd5));
+        return "data-" + Crypto.sha256(version(indexMd5, configMd5));
     }
 
     boolean isSameVersion(NodeBundle other) {
@@ -646,6 +614,10 @@ public final class NodeBundle {
 
     boolean isPending() {
         return pending;
+    }
+
+    String warning() {
+        return warning;
     }
 
     private static String withoutSuffix(String source) {

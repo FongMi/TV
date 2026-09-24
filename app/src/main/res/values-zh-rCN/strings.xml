@@ -350,6 +350,7 @@
     <!-- Error -->
     <string name="file_export_success">文件已导出</string>
     <string name="error_config_get">配置取得失败</string>
+    <string name="error_node_fallback">新版 Node 配置加载失败：%1$s。已使用旧版。</string>
     <string name="error_file_open">无法打开文件</string>
     <string name="error_file_save">无法保存文件</string>
     <string name="error_play_next">已经是最后一集了！</string>
