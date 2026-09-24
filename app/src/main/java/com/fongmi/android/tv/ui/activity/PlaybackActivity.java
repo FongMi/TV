@@ -241,6 +241,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     protected void onError(String msg) {
     }
 
+    protected boolean onRefresh() {
+        return false;
+    }
+
     protected void onPlayingChanged(boolean isPlaying) {
     }
 
@@ -551,6 +555,14 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         @Override
         public void onError(String msg) {
             if (isOwner()) PlaybackActivity.this.onError(msg);
+        }
+
+        @Override
+        public boolean onRefresh() {
+            if (!isOwner()) return false;
+            boolean handled = PlaybackActivity.this.onRefresh();
+            updatePlaybackPlayerState();
+            return handled;
         }
 
         @Override

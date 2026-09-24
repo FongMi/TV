@@ -954,8 +954,10 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mVod.replay();
     }
 
-    private void onRefresh() {
+    @Override
+    protected boolean onRefresh() {
         mVod.refresh();
+        return true;
     }
 
     private void onOpening() {

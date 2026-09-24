@@ -126,6 +126,7 @@ public interface PlayerEngine {
     enum ErrorAction {
         RECOVERED,
         DECODE,
+        REFRESH,
         FATAL
     }
 

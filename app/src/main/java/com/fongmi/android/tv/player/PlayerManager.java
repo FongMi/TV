@@ -73,6 +73,7 @@ public class PlayerManager implements ParseCallback {
 
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
+    private boolean refreshAttempted;
     private boolean initTrack;
     private final List<Track> pendingTrackRestore = new ArrayList<>();
 
@@ -555,6 +556,7 @@ public class PlayerManager implements ParseCallback {
 
     public void reset() {
         App.removeCallbacks(runnable);
+        refreshAttempted = false;
     }
 
     public void clear() {
@@ -580,6 +582,15 @@ public class PlayerManager implements ParseCallback {
     public void resetTrack() {
         pendingTrackRestore.clear();
         TrackUtil.reset(player);
+    }
+
+    private void handleRefreshError(PlaybackException e) {
+        if (refreshAttempted) {
+            callback.onError(engine.getErrorMessage(e));
+            return;
+        }
+        refreshAttempted = true;
+        if (!callback.onRefresh()) callback.onError(engine.getErrorMessage(e));
     }
 
     private void retryDecode(PlaybackException e) {
@@ -738,6 +749,8 @@ public class PlayerManager implements ParseCallback {
 
         void onError(String msg);
 
+        boolean onRefresh();
+
         void onPlayerRebuild(Player newPlayer);
 
         void onDanmakuSourceChanged(@Nullable Uri uri);
@@ -814,7 +827,10 @@ public class PlayerManager implements ParseCallback {
         @Override
         public void onPlaybackStateChanged(int state) {
             if (state == Player.STATE_READY || state == Player.STATE_ENDED) App.removeCallbacks(runnable);
-            if (state == Player.STATE_READY) startPreloadIfReady();
+            if (state == Player.STATE_READY) {
+                refreshAttempted = false;
+                startPreloadIfReady();
+            }
         }
 
         @Override
@@ -850,6 +866,7 @@ public class PlayerManager implements ParseCallback {
             if (action != PlayerEngine.ErrorAction.RECOVERED) App.removeCallbacks(runnable);
             switch (action) {
                 case DECODE -> retryDecode(e);
+                case REFRESH -> handleRefreshError(e);
                 case RECOVERED -> notifyDanmakuSourceChanged();
                 case FATAL -> callback.onError(engine.getErrorMessage(e));
             }

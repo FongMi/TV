@@ -1028,8 +1028,10 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, C
         mVod.replay();
     }
 
-    private void onRefresh() {
+    @Override
+    protected boolean onRefresh() {
         mVod.refresh();
+        return true;
     }
 
     private void onEnding() {

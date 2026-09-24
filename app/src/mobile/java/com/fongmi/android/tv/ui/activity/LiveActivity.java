@@ -835,6 +835,12 @@ public class LiveActivity extends PlaybackActivity implements CustomKeyDown.List
     }
 
     @Override
+    protected boolean onRefresh() {
+        mLive.refresh();
+        return true;
+    }
+
+    @Override
     protected void onReclaim() {
         mLive.refresh();
     }

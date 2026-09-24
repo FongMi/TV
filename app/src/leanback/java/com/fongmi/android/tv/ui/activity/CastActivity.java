@@ -354,6 +354,12 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     }
 
     @Override
+    protected boolean onRefresh() {
+        onReset();
+        return true;
+    }
+
+    @Override
     protected void onStateChanged(int state) {
         switch (state) {
             case Player.STATE_BUFFERING:

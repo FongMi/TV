@@ -481,6 +481,12 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
+    protected boolean onRefresh() {
+        mLive.refresh();
+        return true;
+    }
+
+    @Override
     protected void onReclaim() {
         mLive.refresh();
     }

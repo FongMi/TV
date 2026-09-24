@@ -500,6 +500,13 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     @Override
+    public boolean onRefresh() {
+        boolean handled = false;
+        for (PlayerCallback callback : playerCallbacks) handled |= callback.onRefresh();
+        return handled;
+    }
+
+    @Override
     public void onPlayerRebuild(Player newPlayer) {
         sessionPlayer.removeListener(listener);
         sessionPlayer = newPlayer;
@@ -605,6 +612,10 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         }
 
         default void onError(String msg) {
+        }
+
+        default boolean onRefresh() {
+            return false;
         }
 
         default void onPlayerRebuild(Player player) {
