@@ -1388,19 +1388,17 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void onSeekEnd(long time) {
         if (seekTo(time)) hideCenter();
-        mInput.reset();
     }
 
     @Override
-    public void onSpeedUp() {
-        if (!player().isPlaying()) return;
-        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
+    public boolean onSpeedPressStart() {
+        if (!player().isPlaying()) return false;
+        return PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
-    public void onSpeedEnd() {
-        PlaybackAction.hideSpeedHint(mBinding.widget.message);
-        player().setSpeed(SpeedSetting.getPlayback());
+    public void onSpeedPressEnd() {
+        PlaybackAction.endSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
@@ -1432,11 +1430,6 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public void onSingleTap() {
         if (isFullscreen()) onToggle();
-    }
-
-    @Override
-    public void onDoubleTap() {
-        if (isFullscreen()) onKeyCenter();
     }
 
     @Override

@@ -426,20 +426,18 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     @Override
     public void onSeekEnd(long time) {
         if (player().isEmpty()) return;
-        mInput.reset();
         seekTo(time);
     }
 
     @Override
-    public void onSpeedUp() {
-        if (!player().isPlaying()) return;
-        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
+    public boolean onSpeedPressStart() {
+        if (!player().isPlaying()) return false;
+        return PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
-    public void onSpeedEnd() {
-        PlaybackAction.hideSpeedHint(mBinding.widget.message);
-        player().setSpeed(1.0f);
+    public void onSpeedPressEnd() {
+        PlaybackAction.endSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
@@ -462,11 +460,6 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     @Override
     public void onSingleTap() {
         onToggle();
-    }
-
-    @Override
-    public void onDoubleTap() {
-        onKeyCenter();
     }
 
     @Override

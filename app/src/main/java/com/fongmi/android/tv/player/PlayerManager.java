@@ -70,6 +70,7 @@ public class PlayerManager implements ParseCallback {
     private ParseJob parseJob;
     private PlaySpec spec;
     private Player player;
+    private float speedBeforePress = Float.NaN;
 
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
@@ -89,6 +90,7 @@ public class PlayerManager implements ParseCallback {
 
     public void release() {
         App.removeCallbacks(runnable);
+        clearSpeedPressState();
         if (player != null) player.removeListener(listener);
         if (engine != null) engine.release();
         engine = null;
@@ -117,6 +119,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void setPlayer(Player player) {
+        clearSpeedPressState();
         this.player = player;
         callback.onPlayerRebuild(player);
     }
@@ -422,6 +425,24 @@ public class PlayerManager implements ParseCallback {
         return getSpeed();
     }
 
+    public boolean startSpeedPress(float speed) {
+        if (!player.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) return false;
+        if (Float.isNaN(speedBeforePress)) speedBeforePress = getSpeed();
+        setSpeed(speed);
+        return true;
+    }
+
+    public void endSpeedPress() {
+        if (Float.isNaN(speedBeforePress)) return;
+        float speed = speedBeforePress;
+        clearSpeedPressState();
+        setSpeed(speed);
+    }
+
+    private void clearSpeedPressState() {
+        speedBeforePress = Float.NaN;
+    }
+
     public float toggleSpeed() {
         return setSpeed(getSpeed() == 1 ? SpeedSetting.getLongPress() : 1);
     }
@@ -500,11 +521,13 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void stop() {
+        endSpeedPress();
         engine.stop();
         stopParse();
     }
 
     public void clearMediaItems() {
+        endSpeedPress();
         player.clearMediaItems();
     }
 
@@ -605,6 +628,7 @@ public class PlayerManager implements ParseCallback {
 
     private void restartCurrent() {
         if (spec == null || spec.getUrl() == null) return;
+        endSpeedPress();
         PlaybackSnapshot snapshot = PlaybackSnapshot.capture(player);
         startCurrent(snapshot.positionMs());
         snapshot.restore(player);
@@ -667,6 +691,7 @@ public class PlayerManager implements ParseCallback {
 
     private void setMediaItem(long timeout, long startPositionMs, boolean newMedia) {
         if (spec == null || spec.getUrl() == null) return;
+        endSpeedPress();
         ensureEngine(spec.checkUa());
         if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;

@@ -26,7 +26,7 @@ public final class LiveInput extends BaseInput<LiveInput.Listener> {
     }
 
     private LiveInput(Context context, Listener listener) {
-        super(context, listener);
+        super(context, listener, false);
         this.channelNumber = new StringBuilder();
     }
 
@@ -50,9 +50,9 @@ public final class LiveInput extends BaseInput<LiveInput.Listener> {
         } else if (KeyUtil.isActionDown(event) && KeyUtil.isDownKey(event)) {
             listener.onKeyDown();
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isLeftKey(event)) {
-            listener.onKeyLeft(getSeekTime());
+            listener.onKeyLeft(consumeSeekTime());
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isRightKey(event)) {
-            listener.onKeyRight(getSeekTime());
+            listener.onKeyRight(consumeSeekTime());
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isDigitKey(event)) {
             appendChannelDigit(event.getKeyCode());
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isEnterKey(event)) {
@@ -73,14 +73,7 @@ public final class LiveInput extends BaseInput<LiveInput.Listener> {
         return keyCode >= KeyEvent.KEYCODE_NUMPAD_0 ? keyCode - KeyEvent.KEYCODE_NUMPAD_0 : keyCode - KeyEvent.KEYCODE_0;
     }
 
-    public void reset() {
-        resetSeekTime();
-    }
-
     public interface Listener extends BaseInput.Listener {
-
-        @Override
-        void onDoubleTap();
 
         boolean canHandleKeyEvent();
 

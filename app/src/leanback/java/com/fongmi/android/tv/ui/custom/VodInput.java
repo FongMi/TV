@@ -10,7 +10,8 @@ import com.fongmi.android.tv.utils.KeyUtil;
 
 public final class VodInput extends BaseInput<VodInput.Listener> {
 
-    private boolean changeSpeed;
+    private static final int SEEK_COMMIT_DELAY_MS = 250;
+
     private boolean fullscreen;
 
     public static VodInput create(Context context, Listener listener) {
@@ -18,16 +19,21 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
     }
 
     private VodInput(Context context, Listener listener) {
-        super(context, listener);
+        super(context, listener, false);
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        return fullscreen && super.onTouchEvent(event);
+    public boolean onTouchEvent(MotionEvent e) {
+        if (!fullscreen) return false;
+        return super.onTouchEvent(e);
     }
 
     public void setFullscreen(boolean fullscreen) {
         this.fullscreen = fullscreen;
+    }
+
+    private boolean isSupportedKey(KeyEvent event) {
+        return KeyUtil.isEnterKey(event) || KeyUtil.isUpKey(event) || KeyUtil.isDownKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event);
     }
 
     public boolean onKeyEvent(KeyEvent event) {
@@ -36,33 +42,34 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
         return true;
     }
 
-    private boolean isSupportedKey(KeyEvent event) {
-        return KeyUtil.isEnterKey(event) || KeyUtil.isUpKey(event) || KeyUtil.isDownKey(event) || KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event);
-    }
-
     private void handleKeyEvent(KeyEvent event) {
         if (KeyUtil.isActionDown(event) && KeyUtil.isLeftKey(event)) {
             listener.onSeeking(offsetSeekTime(-Constant.INTERVAL_SEEK));
         } else if (KeyUtil.isActionDown(event) && KeyUtil.isRightKey(event)) {
             listener.onSeeking(offsetSeekTime(Constant.INTERVAL_SEEK));
         } else if (KeyUtil.isActionUp(event) && (KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event))) {
-            App.post(() -> listener.onSeekEnd(getSeekTime()), 250);
+            long time = consumeSeekTime();
+            App.post(() -> listener.onSeekEnd(time), SEEK_COMMIT_DELAY_MS);
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isUpKey(event)) {
-            if (changeSpeed) listener.onSpeedEnd();
+            if (isSpeedPressActive()) finishSpeedPress();
             else listener.onKeyUp();
-            changeSpeed = false;
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isDownKey(event)) {
             listener.onKeyDown();
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isEnterKey(event)) {
             listener.onKeyCenter();
         } else if (event.isLongPress() && KeyUtil.isUpKey(event)) {
-            listener.onSpeedUp();
-            changeSpeed = true;
+            beginSpeedPress();
         }
     }
 
-    public void reset() {
-        resetSeekTime();
+    @Override
+    protected boolean onSpeedPressBegin() {
+        return listener.onSpeedPressStart();
+    }
+
+    @Override
+    protected void onSpeedPressFinish() {
+        listener.onSpeedPressEnd();
     }
 
     public interface Listener extends BaseInput.Listener {
@@ -71,9 +78,9 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
 
         void onSeekEnd(long time);
 
-        void onSpeedUp();
+        boolean onSpeedPressStart();
 
-        void onSpeedEnd();
+        void onSpeedPressEnd();
 
         void onKeyUp();
 

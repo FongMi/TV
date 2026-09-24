@@ -928,7 +928,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void seek(long time) {
-        mInput.reset();
         seekTo(time);
     }
 
@@ -948,7 +947,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
-        if (service() != null) mInput.onKeyEvent(event);
+        if (service() != null && mInput.onKeyEvent(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 
@@ -1022,13 +1021,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     @Override
     public void onSingleTap() {
         onToggle();
-    }
-
-    @Override
-    public void onDoubleTap() {
-        if (isVisible(mBinding.recycler)) hideUI();
-        else if (isVisible(mBinding.control.getRoot())) hideControl();
-        else onMenu();
     }
 
     @Override
