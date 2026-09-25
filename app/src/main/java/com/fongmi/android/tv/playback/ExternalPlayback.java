@@ -43,31 +43,28 @@ public final class ExternalPlayback {
 
     public static void open(FragmentActivity activity, Intent source, Consumer<String> onLive) {
         Uri uri = getSourceUri(source);
-        if (uri != null) {
-            if (FileChooser.isFileSource(uri)) {
-                Runnable openFile = () -> FileChooser.getFileUri(uri, file -> {
-                    if (FileChooser.isLiveSource(new Intent(source).setDataAndType(file, source.getType()))) {
-                        onLive.accept(UrlUtil.toLocalUrl(file));
-                    } else {
-                        start(activity, SiteApi.LOCAL, file.toString(), FileUtil.getDisplayName(file), source);
-                    }
-                }, () -> {
-                    if (source.getBooleanExtra(FORWARD_RESULT, false)) activity.finish();
-                });
-                if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) PermissionUtil.requestFile(activity, granted -> openFile.run());
-                else openFile.run();
-            } else {
-                openText(activity, uri.toString(), source);
+        if (uri == null) {
+            CharSequence text = source.getCharSequenceExtra(Intent.EXTRA_TEXT);
+            if (TextUtils.isEmpty(text) && source.getClipData() != null && source.getClipData().getItemCount() > 0) text = source.getClipData().getItemAt(0).getText();
+            if (!TextUtils.isEmpty(text)) openText(activity, text.toString(), source);
+            else {
+                Notify.show(R.string.error_play_url);
+                if (source.getBooleanExtra(FORWARD_RESULT, false)) activity.finish();
             }
             return;
         }
-        CharSequence text = source.getCharSequenceExtra(Intent.EXTRA_TEXT);
-        if (TextUtils.isEmpty(text) && source.getClipData() != null && source.getClipData().getItemCount() > 0) text = source.getClipData().getItemAt(0).getText();
-        if (!TextUtils.isEmpty(text)) openText(activity, text.toString(), source);
-        else {
-            Notify.show(R.string.error_play_url);
-            if (source.getBooleanExtra(FORWARD_RESULT, false)) activity.finish();
+        if (!FileChooser.isFileSource(uri)) {
+            openText(activity, uri.toString(), source);
+            return;
         }
+        Runnable openFile = () -> FileChooser.getFileUri(uri, file -> {
+            if (FileChooser.isLiveSource(new Intent(source).setDataAndType(file, source.getType()))) onLive.accept(UrlUtil.toLocalUrl(file));
+            else start(activity, SiteApi.LOCAL, file.toString(), FileUtil.getDisplayName(file), source);
+        }, () -> {
+            if (source.getBooleanExtra(FORWARD_RESULT, false)) activity.finish();
+        });
+        if (ContentResolver.SCHEME_FILE.equalsIgnoreCase(uri.getScheme())) PermissionUtil.requestFile(activity, granted -> openFile.run());
+        else openFile.run();
     }
 
     private static void openText(FragmentActivity activity, String text, Intent source) {
@@ -103,7 +100,7 @@ public final class ExternalPlayback {
     public static Uri getSourceUri(Intent source) {
         if (Intent.ACTION_VIEW.equals(source.getAction()) && source.getData() != null) return source.getData();
         Object stream = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU ? source.getParcelableExtra(Intent.EXTRA_STREAM, Uri.class) : source.getParcelableExtra(Intent.EXTRA_STREAM);
-        if (stream instanceof Uri) return (Uri) stream;
+        if (stream instanceof Uri uri) return uri;
         if (source.getData() != null) return source.getData();
         ClipData clip = source.getClipData();
         return clip == null || clip.getItemCount() == 0 ? null : clip.getItemAt(0).getUri();
@@ -131,7 +128,7 @@ public final class ExternalPlayback {
     private static long getPosition(Intent source) {
         Bundle extras = source.getExtras();
         Object value = extras == null ? null : extras.get("position");
-        long position = value instanceof Number ? ((Number) value).longValue() : C.TIME_UNSET;
+        long position = value instanceof Number number ? number.longValue() : C.TIME_UNSET;
         return position >= 0 ? position : C.TIME_UNSET;
     }
 

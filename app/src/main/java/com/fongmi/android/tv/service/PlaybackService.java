@@ -340,8 +340,12 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     private void dispatchNavigate(Consumer<NavigationCallback> action, int delta) {
-        if (hasNavigationCallback() && (hasExternalPlayback() || isNavigationOwner())) dispatch(action);
+        if (canDispatchNavigation()) dispatch(action);
         else navigateItem(delta);
+    }
+
+    private boolean canDispatchNavigation() {
+        return hasNavigationCallback() && (hasExternalPlayback() || isNavigationOwner());
     }
 
     private boolean hasExternalPlayback() {
@@ -352,7 +356,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     public void dispatchStop() {
         if (hasExternalPlayback()) dispatch(NavigationCallback::onStop);
         else if (player.getPlaybackState() == Player.STATE_IDLE) return;
-        else if (hasNavigationCallback() && isNavigationOwner()) dispatch(NavigationCallback::onStop);
+        else if (canDispatchNavigation()) dispatch(NavigationCallback::onStop);
         else {
             saveProgress();
             stopAndClear();
@@ -364,7 +368,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     public void dispatchReplay() {
-        if (hasNavigationCallback() && (hasExternalPlayback() || isNavigationOwner())) dispatch(NavigationCallback::onReplay);
+        if (canDispatchNavigation()) dispatch(NavigationCallback::onReplay);
         else {
             player.seekTo(0);
             player.play();
@@ -413,6 +417,29 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     private ForwardingPlayer wrap(Player base) {
         return new ForwardingPlayer(base) {
+            @Override
+            public void prepare() {
+                if (!hasExternalPlayback()) super.prepare();
+            }
+
+            @Override
+            public void play() {
+                if (hasExternalPlayback()) dispatchPlayPause(true);
+                else super.play();
+            }
+
+            @Override
+            public void pause() {
+                if (hasExternalPlayback()) dispatchPlayPause(false);
+                else super.pause();
+            }
+
+            @Override
+            public void setPlayWhenReady(boolean playWhenReady) {
+                if (hasExternalPlayback()) dispatchPlayPause(playWhenReady);
+                else super.setPlayWhenReady(playWhenReady);
+            }
+
             @Override
             public void setMediaItem(@NonNull MediaItem item) {
                 interceptItem(item, C.TIME_UNSET);
