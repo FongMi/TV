@@ -62,10 +62,6 @@ public final class MediaItemFactory {
     }
 
     public static MediaItem from(PlaySpec spec) {
-        return buildUpon(spec).build();
-    }
-
-    private static MediaItem.Builder buildUpon(PlaySpec spec) {
         return new MediaItem.Builder().setUri(spec.getUri())
                 .setSubtitleConfigurations(buildSubtitleConfigs(spec.getSubs()))
                 .setDrmConfiguration(buildDrmConfig(spec.getDrm()))
@@ -74,7 +70,7 @@ public final class MediaItemFactory {
                 .setAdblock(Setting.isAdblock())
                 .setMimeType(spec.getFormat())
                 .setImageDurationMs(15000)
-                .setMediaId(spec.getKey());
+                .setMediaId(spec.getKey()).build();
     }
 
     private static MediaItem.RequestMetadata buildRequestMetadata(PlaySpec spec) {
@@ -129,14 +125,9 @@ public final class MediaItemFactory {
 
         static SubtitleFlags create(List<Sub> subs) {
             if (subs.size() == 1) return new SubtitleFlags(false, C.INDEX_UNSET);
-            if (hasExplicitFlags(subs)) return new SubtitleFlags(true, C.INDEX_UNSET);
+            for (Sub sub : subs) if (sub.getRawFlag() != 0) return new SubtitleFlags(true, C.INDEX_UNSET);
             int preferredIndex = findPreferredSubtitleIndex(subs);
             return new SubtitleFlags(false, preferredIndex == C.INDEX_UNSET ? 0 : preferredIndex);
-        }
-
-        private static boolean hasExplicitFlags(List<Sub> subs) {
-            for (Sub sub : subs) if (sub.getRawFlag() != 0) return true;
-            return false;
         }
 
         int get(Sub sub, int index) {

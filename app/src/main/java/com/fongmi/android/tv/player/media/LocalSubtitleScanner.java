@@ -34,14 +34,10 @@ public final class LocalSubtitleScanner {
         File[] files = parent == null ? null : parent.listFiles();
         if (files == null) return List.of();
         String videoName = removeExtension(video.getName());
-        List<File> subtitles = Arrays.stream(files)
-                .filter(File::isFile)
-                .filter(LocalSubtitleScanner::isSubtitle)
-                .toList();
+        List<File> subtitles = Arrays.stream(files).filter(File::isFile).filter(LocalSubtitleScanner::isSubtitle).toList();
         List<File> matching = subtitles.stream().filter(file -> matches(videoName, file.getName())).toList();
         List<File> selected = matching.isEmpty() ? subtitles : matching;
-        Comparator<File> comparator = Comparator.comparingInt(file -> getMatchRank(videoName, file.getName()));
-        return selected.stream().sorted(comparator.thenComparing(File::getName, String.CASE_INSENSITIVE_ORDER)).toList();
+        return selected.stream().sorted(Comparator.comparingInt((File file) -> removeExtension(file.getName()).equalsIgnoreCase(videoName) ? 0 : 1).thenComparing(File::getName, String.CASE_INSENSITIVE_ORDER)).toList();
     }
 
     private static File getLocalFile(String url) {
@@ -62,10 +58,6 @@ public final class LocalSubtitleScanner {
         String video = videoName.toLowerCase(Locale.ROOT);
         String subtitle = removeExtension(subtitleName).toLowerCase(Locale.ROOT);
         return subtitle.equals(video) || subtitle.startsWith(video + ".");
-    }
-
-    private static int getMatchRank(String videoName, String subtitleName) {
-        return removeExtension(subtitleName).equalsIgnoreCase(videoName) ? 0 : 1;
     }
 
     private static String getExtension(String name) {

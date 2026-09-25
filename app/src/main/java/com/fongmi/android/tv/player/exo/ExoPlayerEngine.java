@@ -371,17 +371,14 @@ public class ExoPlayerEngine implements PlayerEngine, DiscMenuController, Analyt
         else player.setMediaSource(source, position);
         closeDiscMenu();
         preload.start(player, item);
-        prepareAndPlay();
+        player.prepare();
+        player.play();
     }
 
     private boolean openDiscMenu(String action) {
         if (!hasMenu()) return false;
         session.clearPreload();
-        int initialMenuAction = switch (action) {
-            case "title-menu" -> IsoNavigationSession.ACTION_TITLE_MENU;
-            case "popup" -> IsoNavigationSession.ACTION_POPUP;
-            default -> IsoNavigationSession.ACTION_TOP_MENU;
-        };
+        int initialMenuAction = mapDiscAction(action);
         IsoNavigationMediaSource source = new IsoNavigationMediaSource(MediaItemFactory.from(spec), ExoMediaSourceFactory.createDiscIsoDataSourceFactory(spec.getHeaders()), initialMenuAction);
         navigation.start(source);
         return true;
@@ -397,11 +394,6 @@ public class ExoPlayerEngine implements PlayerEngine, DiscMenuController, Analyt
         Uri uri = spec.getUri();
         String path = uri != null ? uri.getPath() : null;
         return path != null && path.toLowerCase(Locale.US).endsWith(".iso");
-    }
-
-    private void prepareAndPlay() {
-        player.prepare();
-        player.play();
     }
 
     private ErrorAction seekToDefaultPosition() {

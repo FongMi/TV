@@ -26,6 +26,7 @@ import androidx.media3.exoplayer.upstream.LoadErrorHandlingPolicy;
 import androidx.media3.extractor.DefaultExtractorsFactory;
 import androidx.media3.extractor.ExtractorsFactory;
 import androidx.media3.extractor.mkv.MatroskaExtractor;
+import androidx.media3.extractor.text.SubtitleParser;
 import androidx.media3.extractor.ts.TsExtractor;
 
 import com.fongmi.android.tv.App;
@@ -132,9 +133,13 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
         SubtitleTranscript transcript = subtitleTranscriptSession.forMediaItem(mediaItem);
         ExtractorsFactory extractorsFactory = createDefaultExtractorsFactory().setMp4ClearKeys(
                 LocalClearKeyLicense.parse(mediaItem.localConfiguration == null ? null : mediaItem.localConfiguration.drmConfiguration));
-        if (!libassPlaybackSession.isAvailable()) return new DefaultMediaSourceFactory(getDataSourceFactory(), extractorsFactory).setSubtitleParserFactory(new SubtitleTranscriptParserFactory(transcript)).createMediaSource(mediaItem);
-        LibassPlaybackSession.MediaComponents components = libassPlaybackSession.createMediaComponents(mediaItem, extractorsFactory, transcript);
-        return new DefaultMediaSourceFactory(getDataSourceFactory(), components.extractorsFactory).setSubtitleParserFactory(components.subtitleParserFactory).createMediaSource(mediaItem);
+        SubtitleParser.Factory subtitleParserFactory;
+        if (libassPlaybackSession.isAvailable()) {
+            LibassPlaybackSession.MediaComponents components = libassPlaybackSession.createMediaComponents(mediaItem, extractorsFactory, transcript);
+            extractorsFactory = components.extractorsFactory;
+            subtitleParserFactory = components.subtitleParserFactory;
+        } else subtitleParserFactory = new SubtitleTranscriptParserFactory(transcript);
+        return new DefaultMediaSourceFactory(getDataSourceFactory(), extractorsFactory).setSubtitleParserFactory(subtitleParserFactory).createMediaSource(mediaItem);
     }
 
     static DefaultExtractorsFactory createDefaultExtractorsFactory() {
