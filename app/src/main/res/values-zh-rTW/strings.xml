@@ -349,7 +349,6 @@
     <!-- Error -->
     <string name="file_export_success">檔案已導出</string>
     <string name="error_config_get">配置取得失敗</string>
-    <string name="error_node_fallback">新版 Node 設定載入失敗：%1$s。已使用舊版。</string>
     <string name="error_file_open">無法開啟檔案</string>
     <string name="error_file_save">無法儲存檔案</string>
     <string name="error_play_next">已經是最後一集了！</string>

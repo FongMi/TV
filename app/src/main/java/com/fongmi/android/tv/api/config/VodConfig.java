@@ -3,7 +3,6 @@ package com.fongmi.android.tv.api.config;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.Decoder;
 import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.api.node.NodeRuntime;
@@ -15,7 +14,6 @@ import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.event.ConfigEvent;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.nodejs.NodeBundle;
 import com.fongmi.nodejs.NodeClient;
@@ -130,9 +128,8 @@ public class VodConfig extends BaseConfig {
             String json = node ? loaded.json() : Decoder.getJson(UrlUtil.convert(config.getUrl()), TAG);
             runtime.prune(loaded, Config.getAll(VOD).stream().map(Config::getUrl).toList(), config.getUrl());
             checkJson(config, Json.parse(json).getAsJsonObject(), loaded);
-            if (loaded != null && !loaded.warning().isEmpty()) config.setNotice(ResUtil.getString(R.string.error_node_fallback, loaded.warning()));
         } catch (Throwable e) {
-            if (node) runtime.rejectPending(loaded);
+            if (node) runtime.fail(loaded);
             throw e;
         }
     }

@@ -42,9 +42,7 @@ public final class NodeBundle {
     private static final long MAX_CONFIG_BYTES = 2L * 1024 * 1024;
     private static final int MAX_MD5_BYTES = 1024;
     private static final int MAX_MANIFEST_BYTES = 32 * 1024;
-    private static final long REJECT_TTL_MILLIS = TimeUnit.MINUTES.toMillis(30);
     private static final String PENDING = ".pending";
-    private static final String REJECTED = "rejected";
     private static final String TRUSTED_KEY = "trusted-key.sha256";
     private static final OkHttpClient CLIENT = OkHttp.client().newBuilder().connectTimeout(30, TimeUnit.SECONDS).readTimeout(60, TimeUnit.SECONDS).writeTimeout(30, TimeUnit.SECONDS).followSslRedirects(false).build();
     private static final Map<String, Object> SOURCE_LOCKS = new ConcurrentHashMap<>();
@@ -57,7 +55,6 @@ public final class NodeBundle {
     private final String configMd5;
     private final String signingKey;
     private boolean pending;
-    private String warning = "";
 
     NodeBundle(File root, String indexMd5, String configMd5) {
         this(root, indexMd5, configMd5, false, "");
@@ -104,60 +101,44 @@ public final class NodeBundle {
     private static NodeBundle prepare(Context context, String source, String key, LoadSession session) throws Exception {
         File sourceRoot = new File(context.getFilesDir(), "nodejs/bundles/" + key);
         File active = new File(sourceRoot, "active");
-        restorePrevious(active);
+        NodeBundle stored = restorePrevious(active);
         pruneSourceRoot(sourceRoot);
         String indexLocation = companion(source, "index.js");
         String configLocation = companion(source, "index.config.js");
         String configMd5Location = companion(source, "index.config.js.md5");
         String manifestLocation = companion(source, NodeManifest.FILE_NAME);
-        try {
-            String indexMd5 = fetchMd5(source, session);
-            String configMd5 = fetchMd5(configMd5Location, session);
-            String manifestText = fetchOptional(manifestLocation, MAX_MANIFEST_BYTES, session);
-            String trustedKey = readTrustedKey(sourceRoot);
-            if (manifestText == null && !trustedKey.isEmpty()) throw new IOException("Signed Node bundle cannot downgrade to unsigned");
-            NodeManifest manifest = manifestText == null ? null : NodeManifest.parse(manifestText);
-            NodeBundle stored = readStored(active);
-            if (stored != null && stored.matches(indexMd5, configMd5) && verifyStoredManifest(stored, manifest, trustedKey)) {
-                session.check();
-                return stored;
-            }
-            if (stored != null && isRejected(sourceRoot, indexMd5, configMd5, System.currentTimeMillis())) {
-                session.check();
-                SpiderDebug.log("NodeBundle", "Skipped previously rejected Node bundle version");
-                stored.warning = "Previously rejected Node bundle version";
-                return stored;
-            }
-            File staging = new File(sourceRoot, "staging-" + UUID.randomUUID());
-            try {
-                if (!staging.mkdirs() && !staging.isDirectory()) throw new IOException("Unable to create Node staging directory");
-                File index = copy(indexLocation, new File(staging, "index.js"), MAX_INDEX_BYTES, session);
-                File config = copy(configLocation, new File(staging, "index.config.js"), MAX_CONFIG_BYTES, session);
-                if (!Crypto.equals(index, indexMd5)) throw new IOException("index.js MD5 mismatch");
-                if (!Crypto.equals(config, configMd5)) throw new IOException("index.config.js MD5 mismatch");
-                String signingKey = "";
-                if (manifest != null) {
-                    manifest.verify(index, config, trustedKey);
-                    signingKey = manifest.fingerprint();
-                    writeAtomically(manifest.raw().getBytes(StandardCharsets.UTF_8), new File(staging, NodeManifest.FILE_NAME));
-                }
-                writeAtomically((indexMd5 + "\n").getBytes(StandardCharsets.US_ASCII), new File(staging, "index.js.md5"));
-                writeAtomically((configMd5 + "\n").getBytes(StandardCharsets.US_ASCII), new File(staging, "index.config.js.md5"));
-                writeAtomically(version(indexMd5, configMd5).getBytes(StandardCharsets.US_ASCII), new File(staging, PENDING));
-                session.check();
-                commit(active, staging);
-                session.check();
-                return new NodeBundle(active, indexMd5, configMd5, true, signingKey);
-            } finally {
-                Path.clear(staging);
-            }
-        } catch (Exception e) {
-            session.check(e);
-            NodeBundle stored = readStored(active);
-            if (stored == null) throw e;
-            SpiderDebug.log("NodeBundle", "Update failed, using last known good bundle: %s", e.getMessage());
-            stored.warning = e.getMessage() == null || e.getMessage().isEmpty() ? e.toString() : e.getMessage();
+        String indexMd5 = fetchMd5(source, session);
+        String configMd5 = fetchMd5(configMd5Location, session);
+        String manifestText = fetchOptional(manifestLocation, MAX_MANIFEST_BYTES, session);
+        String trustedKey = readTrustedKey(sourceRoot);
+        if (manifestText == null && !trustedKey.isEmpty()) throw new IOException("Signed Node bundle cannot downgrade to unsigned");
+        NodeManifest manifest = manifestText == null ? null : NodeManifest.parse(manifestText);
+        if (stored != null && stored.matches(indexMd5, configMd5) && verifyStoredManifest(stored, manifest, trustedKey)) {
+            session.check();
             return stored;
+        }
+        File staging = new File(sourceRoot, "staging-" + UUID.randomUUID());
+        try {
+            if (!staging.mkdirs() && !staging.isDirectory()) throw new IOException("Unable to create Node staging directory");
+            File index = copy(indexLocation, new File(staging, "index.js"), MAX_INDEX_BYTES, session);
+            File config = copy(configLocation, new File(staging, "index.config.js"), MAX_CONFIG_BYTES, session);
+            if (!Crypto.equals(index, indexMd5)) throw new IOException("index.js MD5 mismatch");
+            if (!Crypto.equals(config, configMd5)) throw new IOException("index.config.js MD5 mismatch");
+            String signingKey = "";
+            if (manifest != null) {
+                manifest.verify(index, config, trustedKey);
+                signingKey = manifest.fingerprint();
+                writeAtomically(manifest.raw().getBytes(StandardCharsets.UTF_8), new File(staging, NodeManifest.FILE_NAME));
+            }
+            writeAtomically((indexMd5 + "\n").getBytes(StandardCharsets.US_ASCII), new File(staging, "index.js.md5"));
+            writeAtomically((configMd5 + "\n").getBytes(StandardCharsets.US_ASCII), new File(staging, "index.config.js.md5"));
+            writeAtomically(version(indexMd5, configMd5).getBytes(StandardCharsets.US_ASCII), new File(staging, PENDING));
+            session.check();
+            commit(active, staging);
+            session.check();
+            return new NodeBundle(active, indexMd5, configMd5, true, signingKey);
+        } finally {
+            Path.clear(staging);
         }
     }
 
@@ -335,41 +316,21 @@ public final class NodeBundle {
         return value.matches("[a-f0-9]{64}") ? value : "";
     }
 
-    private static boolean isRejected(File sourceRoot, String indexMd5, String configMd5, long now) {
-        return isRejectedText(Path.read(new File(sourceRoot, REJECTED)), indexMd5, configMd5, now);
-    }
-
-    static boolean isRejectedText(String text, String indexMd5, String configMd5, long now) {
-        if (text == null || !text.startsWith(version(indexMd5, configMd5))) return false;
-        String marker = "rejectedAt=";
-        int start = text.indexOf(marker, version(indexMd5, configMd5).length());
-        if (start < 0) return false;
-        int end = text.indexOf('\n', start);
-        try {
-            long timestamp = Long.parseLong(text.substring(start + marker.length(), end < 0 ? text.length() : end).trim());
-            return timestamp <= now && now - timestamp < REJECT_TTL_MILLIS;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
     static String version(String indexMd5, String configMd5) {
         return indexMd5 + "\n" + configMd5 + "\n";
     }
 
-    static String rejection(String indexMd5, String configMd5, long timestamp) {
-        return version(indexMd5, configMd5) + "rejectedAt=" + timestamp + "\n";
-    }
-
-    private static void restorePrevious(File active) throws IOException {
-        if (readStored(active) != null) return;
+    private static NodeBundle restorePrevious(File active) throws IOException {
+        NodeBundle stored = readStored(active);
+        if (stored != null) return stored;
         File parent = active.getParentFile();
-        if (parent == null) return;
+        if (parent == null) return null;
         File previous = new File(parent, "previous");
-        if (readStored(previous) == null) return;
+        if (readStored(previous) == null) return null;
         Path.clear(active);
         Path.move(previous, active);
         SpiderDebug.log("NodeBundle", "Restored previous bundle after interrupted update");
+        return readStored(active);
     }
 
     private static void commit(File active, File staging) throws IOException {
@@ -387,34 +348,6 @@ public final class NodeBundle {
         }
     }
 
-    synchronized NodeBundle rollback() throws IOException {
-        if (!pending) return null;
-        File parent = root.getParentFile();
-        if (parent == null) return null;
-        File previous = new File(parent, "previous");
-        if (readStored(previous) == null) return null;
-        File failed = new File(parent, "failed-" + UUID.randomUUID());
-        Path.move(root, failed);
-        try {
-            Path.move(previous, root);
-            NodeBundle fallback = readStored(root);
-            if (fallback == null) throw new IOException("Rolled back Node bundle is invalid");
-            try {
-                writeAtomically(rejection(indexMd5, configMd5, System.currentTimeMillis()).getBytes(StandardCharsets.US_ASCII), new File(parent, REJECTED));
-            } catch (IOException e) {
-                SpiderDebug.log("NodeBundle", "Unable to quarantine rejected Node bundle: %s", e.getMessage());
-            }
-            pruneSourceRoot(parent);
-            return fallback;
-        } catch (IOException e) {
-            Path.clear(root);
-            if (failed.exists()) Path.move(failed, root);
-            throw e;
-        } finally {
-            Path.clear(failed);
-        }
-    }
-
     synchronized void accept() throws IOException {
         if (!pending) return;
         File parent = root.getParentFile();
@@ -428,7 +361,6 @@ public final class NodeBundle {
         pending = marker.exists();
         if (pending) return;
         if (parent != null) {
-            Path.clear(new File(parent, REJECTED));
             pruneSourceRoot(parent);
         }
     }
@@ -614,10 +546,6 @@ public final class NodeBundle {
 
     boolean isPending() {
         return pending;
-    }
-
-    String warning() {
-        return warning;
     }
 
     private static String withoutSuffix(String source) {

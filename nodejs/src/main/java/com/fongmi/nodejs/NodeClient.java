@@ -12,7 +12,6 @@ import androidx.annotation.Nullable;
 
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Json;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -86,7 +85,6 @@ public final class NodeClient {
     private volatile String nodeArch = "";
     private volatile String lastEndpoint = "";
     private volatile String lastError = "";
-    private String loadWarning = "";
     private volatile NodeConnection connection;
     private NodeBridge bridge;
 
@@ -100,30 +98,15 @@ public final class NodeClient {
         session++;
         cancelRequests();
         initializations.clear();
-        loadWarning = "";
         loadCancellation = new AtomicBoolean();
         try {
             NodeBundle prepared = NodeBundle.prepare(context, source);
             checkLoadCanceled();
-            loadWarning = prepared.warning();
-            try {
-                return loadPrepared(prepared);
-            } catch (Exception primary) {
-                if (isInterrupted(primary) || !prepared.isPending()) throw primary;
-                stopService();
-                NodeBundle fallback = prepared.rollback();
-                if (fallback == null) throw primary;
-                SpiderDebug.log("NodeRuntime", "New Node bundle failed, rolling back: %s", primary.getMessage());
-                try {
-                    String result = loadPrepared(fallback);
-                    SpiderDebug.log("NodeRuntime", "Previous Node bundle restored successfully");
-                    loadWarning = primary.getMessage() == null || primary.getMessage().isEmpty() ? primary.toString() : primary.getMessage();
-                    return result;
-                } catch (Exception secondary) {
-                    primary.addSuppressed(secondary);
-                    throw primary;
-                }
-            }
+            if (!canReuse(prepared)) start(prepared);
+            String result = NodeConfigMapper.transform(get("/config"));
+            checkLoadCanceled();
+            recordSuccess(session, "/config", 0);
+            return result;
         } catch (Exception e) {
             clear();
             throw e;
@@ -133,32 +116,7 @@ public final class NodeClient {
     }
 
     public synchronized LoadedConfig loadConfig(String source) throws Exception {
-        return new LoadedConfig(load(source), session, loadWarning);
-    }
-
-    private String loadPrepared(NodeBundle prepared) throws Exception {
-        if (!canReuse(prepared)) start(prepared);
-        return validate(prepared);
-    }
-
-    private String validate(NodeBundle prepared) throws Exception {
-        String result = NodeConfigMapper.transform(get("/config"));
-        if (prepared.isPending()) {
-            NodeConfigMapper.Probe probe = NodeConfigMapper.firstProbe(result);
-            if (!probe.api().isEmpty()) {
-                JsonObject init = new JsonObject();
-                init.addProperty("ext", probe.ext());
-                init.addProperty("extend", probe.ext());
-                executePost(snapshot(), NodeRoute.append(probe.api(), "/init"), init);
-                JsonObject home = new JsonObject();
-                home.addProperty("filter", false);
-                JsonElement value = JsonParser.parseString(executePost(snapshot(), NodeRoute.append(probe.api(), "/home"), home));
-                if (!value.isJsonObject()) throw new IOException("Node /home response is not an object");
-            }
-        }
-        checkLoadCanceled();
-        recordSuccess(session, "/config", 0);
-        return result;
+        return new LoadedConfig(load(source), session);
     }
 
     static boolean isInterrupted(Throwable error) {
@@ -210,14 +168,10 @@ public final class NodeClient {
         lastError = "";
     }
 
-    public synchronized void accept() throws IOException {
-        NodeBundle current = bundle;
-        if (current != null) current.accept();
-    }
-
     public synchronized void accept(LoadedConfig loaded) throws IOException {
         if (loaded == null || loaded.session() != session) throw new IOException("Node config load was superseded");
-        accept();
+        NodeBundle current = bundle;
+        if (current != null) current.accept();
     }
 
     public synchronized void prune(LoadedConfig loaded, Iterable<String> sources, String currentSource) throws IOException {
@@ -225,20 +179,10 @@ public final class NodeClient {
         NodeBundle.prune(context, sources, currentSource);
     }
 
-    public synchronized void rejectPending() {
-        NodeBundle current = bundle;
-        if (current == null || !current.isPending()) return;
-        stopService();
-        try {
-            current.rollback();
-        } catch (IOException e) {
-            SpiderDebug.log("NodeRuntime", "Unable to roll back rejected Node bundle: %s", e.getMessage());
-        }
+    public synchronized boolean fail(LoadedConfig loaded) {
+        if (loaded == null || loaded.session() != session) return false;
         clear();
-    }
-
-    public synchronized void rejectPending(LoadedConfig loaded) {
-        if (loaded != null && loaded.session() == session) rejectPending();
+        return true;
     }
 
     public void cancelLoad() {
@@ -836,7 +780,7 @@ public final class NodeClient {
         T execute(RequestState state) throws Exception;
     }
 
-    public record LoadedConfig(String json, long session, String warning) {
+    public record LoadedConfig(String json, long session) {
     }
 
     public interface Callback {

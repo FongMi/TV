@@ -32,6 +32,9 @@ import java.util.concurrent.TimeUnit;
 
 public final class NodeRuntime {
 
+    private static final String SUCCESS_RESPONSE = "{\"success\":true,\"code\":0}";
+    private static final String FAILURE_RESPONSE = "{\"success\":false,\"code\":-1}";
+
     private final Object profileLock = new Object();
     private final NodeClient client;
     private volatile PlayInfo playInfo = PlayInfo.empty();
@@ -74,8 +77,8 @@ public final class NodeRuntime {
         client.prune(loaded, sources, currentSource);
     }
 
-    public void rejectPending(NodeClient.LoadedConfig loaded) {
-        client.rejectPending(loaded);
+    public void fail(NodeClient.LoadedConfig loaded) {
+        if (client.fail(loaded)) playInfo = PlayInfo.empty();
     }
 
     public void clear() {
@@ -105,18 +108,18 @@ public final class NodeRuntime {
                 case "queryProfile" -> readProfile().toString();
                 case "saveProfile" -> saveProfile(options);
                 case "openInternalWebview" -> openInternalWebView(options);
-                default -> failure();
+                default -> FAILURE_RESPONSE;
             };
         } catch (Exception e) {
             SpiderDebug.log(e);
-            return failure();
+            return FAILURE_RESPONSE;
         }
     }
 
     private String onToast(JsonObject options) {
         String message = Json.safeString(options, "message");
         if (!message.isEmpty()) App.post(() -> Notify.show(message));
-        return success();
+        return SUCCESS_RESPONSE;
     }
 
     private String getPlayInfo() {
@@ -154,7 +157,7 @@ public final class NodeRuntime {
 
     private String openInternalWebView(JsonObject options) {
         String url = NodeClient.normalizeInternalUrl(Json.safeString(options, "url"), client.getAddress());
-        return WebActivity.open(url) ? success() : failure();
+        return WebActivity.open(url) ? SUCCESS_RESPONSE : FAILURE_RESPONSE;
     }
 
     private static long[] getPlaybackTimes(PlayerManager player) {
@@ -190,14 +193,14 @@ public final class NodeRuntime {
         String url = Json.safeString(options, "url");
         if (url.isEmpty()) return clearDanmaku();
         App.post(() -> RefreshEvent.danmaku(url));
-        return success();
+        return SUCCESS_RESPONSE;
     }
 
     private String clearDanmaku() {
         PlaybackService service = Server.get().getService();
-        if (service == null || service.player() == null) return failure();
+        if (service == null || service.player() == null) return FAILURE_RESPONSE;
         App.post(() -> service.player().clearDanmaku());
-        return success();
+        return SUCCESS_RESPONSE;
     }
 
     private JsonElement readProfile() {
@@ -215,13 +218,13 @@ public final class NodeRuntime {
     private String saveProfile(JsonObject profile) {
         synchronized (profileLock) {
             File file = client.getProfileFile();
-            if (file == null) return failure();
+            if (file == null) return FAILURE_RESPONSE;
             try {
                 FileUtil.writeAtomically(profile.toString().getBytes(StandardCharsets.UTF_8), file);
-                return success();
+                return SUCCESS_RESPONSE;
             } catch (IOException e) {
                 SpiderDebug.log(e);
-                return failure();
+                return FAILURE_RESPONSE;
             }
         }
     }
@@ -238,14 +241,6 @@ public final class NodeRuntime {
 
     private static String text(CharSequence value) {
         return value == null ? "" : value.toString();
-    }
-
-    private static String success() {
-        return "{\"success\":true,\"code\":0}";
-    }
-
-    private static String failure() {
-        return "{\"success\":false,\"code\":-1}";
     }
 
     private record PlayInfo(String title, String episodeName, String fileName, String flag, String id) {

@@ -350,7 +350,6 @@
     <!-- Error -->
     <string name="file_export_success">File exported</string>
     <string name="error_config_get">Configuration get failed</string>
-    <string name="error_node_fallback">New Node bundle failed: %1$s. Using the previous version.</string>
     <string name="error_file_open">Unable to open file</string>
     <string name="error_file_save">Unable to save file</string>
     <string name="error_play_next">It\'s the last episode!</string>
