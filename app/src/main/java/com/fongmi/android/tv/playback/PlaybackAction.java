@@ -14,7 +14,7 @@ import com.fongmi.android.tv.utils.ResUtil;
 public final class PlaybackAction {
 
     public static void setPlaybackMode(PlayerManager player, TextView engine) {
-        setText(engine, getEngineText(player));
+        if (engine != null) engine.setText(getEngineText(player));
     }
 
     public static float toggleSpeed(PlayerManager player, TextView view) {
@@ -64,19 +64,19 @@ public final class PlaybackAction {
     }
 
     public static void setTracks(PlayerManager player, View text, View audio, View video) {
-        setVisible(text, hasTextTrack(player));
-        setVisible(audio, hasAudioTrack(player));
-        setVisible(video, hasVideoTrack(player));
+        setVisible(text, player != null && (player.haveTrack(C.TRACK_TYPE_TEXT) || player.isVod()));
+        setVisible(audio, player != null && (player.haveTrack(C.TRACK_TYPE_AUDIO) || player.getDecoderMode(C.TRACK_TYPE_AUDIO) != null));
+        setVisible(video, player != null && (player.haveTrack(C.TRACK_TYPE_VIDEO) || player.getDecoderMode(C.TRACK_TYPE_VIDEO) != null));
     }
 
     public static void setTracks(PlayerManager player, View text, View audio, View video, View speed) {
         setTracks(player, text, audio, video);
-        setVisible(speed, hasSpeed(player));
+        setVisible(speed, player != null && player.isVod());
     }
 
     public static void setMediaOptions(PlayerManager player, View edition, View chapter) {
-        setVisible(edition, hasEdition(player));
-        setVisible(chapter, hasChapter(player));
+        setVisible(edition, player != null && player.haveEdition());
+        setVisible(chapter, player != null && player.haveChapter());
     }
 
     public static void setWebPlaybackMode(boolean active, View... nativeOnlyViews) {
@@ -90,34 +90,6 @@ public final class PlaybackAction {
     public static int getEngine(PlayerManager player) {
         if (player == null || player.isReleased()) return PlayerSetting.getEngine();
         return player.getEngine();
-    }
-
-    private static boolean hasTextTrack(PlayerManager player) {
-        return player != null && (player.haveTrack(C.TRACK_TYPE_TEXT) || player.isVod());
-    }
-
-    private static boolean hasAudioTrack(PlayerManager player) {
-        return player != null && (player.haveTrack(C.TRACK_TYPE_AUDIO) || player.getDecoderMode(C.TRACK_TYPE_AUDIO) != null);
-    }
-
-    private static boolean hasVideoTrack(PlayerManager player) {
-        return player != null && (player.haveTrack(C.TRACK_TYPE_VIDEO) || player.getDecoderMode(C.TRACK_TYPE_VIDEO) != null);
-    }
-
-    private static boolean hasSpeed(PlayerManager player) {
-        return player != null && player.isVod();
-    }
-
-    private static boolean hasEdition(PlayerManager player) {
-        return player != null && player.haveEdition();
-    }
-
-    private static boolean hasChapter(PlayerManager player) {
-        return player != null && player.haveChapter();
-    }
-
-    private static void setText(TextView view, CharSequence text) {
-        if (view != null) view.setText(text);
     }
 
     private static void setVisible(View view, boolean visible) {

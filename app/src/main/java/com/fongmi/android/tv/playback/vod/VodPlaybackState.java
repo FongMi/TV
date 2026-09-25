@@ -12,7 +12,6 @@ import com.fongmi.android.tv.bean.Vod;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public class VodPlaybackState {
@@ -120,27 +119,34 @@ public class VodPlaybackState {
     }
 
     Episode getRelativeEpisode(int offset) {
-        List<Episode> episodes = getFlag().getEpisodes();
-        int position = Math.clamp(getFlag().getPosition() + offset, 0, episodes.size() - 1);
+        Flag flag = getFlag();
+        List<Episode> episodes = flag.getEpisodes();
+        int position = Math.clamp(flag.getPosition() + offset, 0, episodes.size() - 1);
         return episodes.get(position);
     }
 
     @Nullable
     Episode findEpisode(String key, VodPlayRequest request) {
         if (request == null) return null;
-        return flags.stream().map(flag -> findEpisode(key, flag, request)).filter(Objects::nonNull).findFirst().orElse(null);
+        for (Flag flag : flags) {
+            Episode episode = findEpisode(key, flag, request);
+            if (episode != null) return episode;
+        }
+        return null;
     }
 
     @Nullable
     Episode findEpisode(String key, Flag flag, VodPlayRequest request) {
         if (flag == null || request == null) return null;
-        return flag.getEpisodes().stream().filter(episode -> request.matches(key, flag, episode)).findFirst().orElse(null);
+        for (Episode episode : flag.getEpisodes()) if (request.matches(key, flag, episode)) return episode;
+        return null;
     }
 
     @Nullable
     Flag findFlag(String key, VodPlayRequest request) {
         if (request == null) return null;
-        return flags.stream().filter(flag -> findEpisode(key, flag, request) != null).findFirst().orElse(null);
+        for (Flag flag : flags) if (findEpisode(key, flag, request) != null) return flag;
+        return null;
     }
 
     Result getQuality() {
@@ -210,15 +216,15 @@ public class VodPlaybackState {
     }
 
     void beginPreload(VodPlayRequest request) {
-        preload = PreloadEntry.pending(request);
+        preload = new PreloadEntry(request, null, null);
     }
 
     void completePreload(Result result) {
-        if (preload != null) preload = preload.withResult(result);
+        if (preload != null) preload = new PreloadEntry(preload.request(), result, preload.update());
     }
 
     void setPreloadUpdate(@Nullable Vod preloadUpdate) {
-        if (preload != null) preload = preload.withUpdate(preloadUpdate);
+        if (preload != null) preload = new PreloadEntry(preload.request(), preload.result(), preloadUpdate);
     }
 
     @Nullable
@@ -267,7 +273,7 @@ public class VodPlaybackState {
     }
 
     String getSearchKeyword() {
-        return searchKeyword == null ? "" : searchKeyword;
+        return searchKeyword;
     }
 
     void setSearchKeyword(String searchKeyword) {
@@ -276,20 +282,8 @@ public class VodPlaybackState {
 
     record PreloadEntry(VodPlayRequest request, @Nullable Result result, @Nullable Vod update) {
 
-        static PreloadEntry pending(VodPlayRequest request) {
-            return new PreloadEntry(request, null, null);
-        }
-
         boolean isPending() {
             return result == null;
-        }
-
-        PreloadEntry withResult(Result result) {
-            return new PreloadEntry(request, result, update);
-        }
-
-        PreloadEntry withUpdate(@Nullable Vod update) {
-            return new PreloadEntry(request, result, update);
         }
     }
 }
