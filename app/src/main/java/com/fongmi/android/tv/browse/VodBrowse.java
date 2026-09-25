@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 class VodBrowse {
 
@@ -69,8 +68,9 @@ class VodBrowse {
         VodConfig.get().ensureLoaded();
         String keyword = searchKey(query);
         if (TextUtils.isEmpty(keyword)) return ImmutableList.of();
+        String search = query.trim();
         List<Site> sites = VodConfig.get().getSites().stream().filter(Site::isSearchable).toList();
-        List<ListenableFuture<List<MediaItem>>> futures = sites.stream().map(site -> Task.largeExecutor().submit(() -> searchSite(site, query.trim()))).toList();
+        List<ListenableFuture<List<MediaItem>>> futures = sites.stream().map(site -> Task.largeExecutor().submit(() -> searchSite(site, search))).toList();
         List<MediaItem> items = collectResults(futures);
         items.sort((a, b) -> matchScore(b, keyword) - matchScore(a, keyword));
         ImmutableList<MediaItem> results = ImmutableList.copyOf(items.subList(0, Math.min(items.size(), SEARCH_LIMIT)));
@@ -106,7 +106,7 @@ class VodBrowse {
     static MediaItem getItem(@NonNull String mediaId) {
         if (mediaId.startsWith(VOD_EP)) return getEpisodeItem(mediaId);
         if (mediaId.startsWith(VOD_PLAY)) return getHistoryItem(mediaId);
-        if (mediaId.startsWith(VOD_SEARCH)) return getSearchItem(mediaId);
+        if (mediaId.startsWith(VOD_SEARCH)) return searchItemMap.get(mediaId);
         return null;
     }
 
@@ -214,7 +214,7 @@ class VodBrowse {
         String flagName = flag.getFlag();
         List<Episode> episodes = flag.getEpisodes();
         epCountMap.put(epCountKey(historyKey, flagName), episodes.size());
-        IntStream.range(0, episodes.size()).forEach(i -> indexEpisode(historyKey, flagName, i, history));
+        for (int i = 0; i < episodes.size(); i++) indexEpisode(historyKey, flagName, i, history);
         return findCurrentIndex(flag, history);
     }
 
@@ -229,7 +229,8 @@ class VodBrowse {
         String currentUrl = history.getEpisode() != null ? history.getEpisode().getUrl() : null;
         if (TextUtils.isEmpty(currentUrl)) return 0;
         List<Episode> episodes = flag.getEpisodes();
-        return IntStream.range(0, episodes.size()).filter(i -> episodes.get(i).getUrl().equals(currentUrl)).findFirst().orElse(0);
+        for (int i = 0; i < episodes.size(); i++) if (episodes.get(i).getUrl().equals(currentUrl)) return i;
+        return 0;
     }
 
     @Nullable
@@ -286,11 +287,6 @@ class VodBrowse {
     }
 
     @Nullable
-    private static MediaItem getSearchItem(@NonNull String mediaId) {
-        return searchItemMap.get(mediaId);
-    }
-
-    @Nullable
     private static MediaItem getEpisodeItem(@NonNull String mediaId) {
         EpEntry entry = epEntries.get(mediaId);
         if (entry == null) return null;
@@ -330,7 +326,7 @@ class VodBrowse {
     @Nullable
     private static Flag findFlag(@NonNull Vod vod, @Nullable String name) {
         if (vod.getFlags().isEmpty()) return null;
-        if (!TextUtils.isEmpty(name)) return vod.getFlags().stream().filter(flag -> flag.getFlag().equals(name)).findFirst().orElse(vod.getFlags().get(0));
+        if (!TextUtils.isEmpty(name)) for (Flag flag : vod.getFlags()) if (flag.getFlag().equals(name)) return flag;
         return vod.getFlags().get(0);
     }
 
