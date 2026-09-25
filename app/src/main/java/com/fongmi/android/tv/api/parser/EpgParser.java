@@ -5,6 +5,7 @@ import android.util.Log;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.EpgData;
+import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Tv;
 import com.fongmi.android.tv.utils.Download;
@@ -151,7 +152,7 @@ public class EpgParser {
 
     private static Map<String, Set<String>> prepareLiveChannels(Live live) {
         Map<String, Set<String>> map = new HashMap<>();
-        List<Channel> channels = live.getGroups().stream().flatMap(group -> group.getChannel().stream()).collect(Collectors.toList());
+        List<Channel> channels = live.getGroups().stream().flatMap(group -> group.getChannel().stream()).toList();
         for (Channel channel : channels) {
             if (!channel.getTvgId().isEmpty()) map.put(channel.getTvgId(), Set.of(channel.getTvgId()));
         }
@@ -183,13 +184,14 @@ public class EpgParser {
             Set<String> targets = findTargetChannels(xmlId, liveChannelMap, data);
             if (targets.isEmpty()) continue;
             List<EpgData> entries = getProgrammeData(data.programmes.getOrDefault(xmlId, List.of()), zoneId);
+            String src = "";
+            for (Tv.Channel channel : data.channels.getOrDefault(xmlId, List.of())) {
+                if (!channel.hasSrc()) continue;
+                src = channel.getSrc();
+                break;
+            }
             for (String id : targets) {
-                for (Tv.Channel channel : data.channels.getOrDefault(xmlId, List.of())) {
-                    if (channel.hasSrc()) {
-                        srcMap.putIfAbsent(id, channel.getSrc());
-                        break;
-                    }
-                }
+                if (!src.isEmpty()) srcMap.putIfAbsent(id, src);
                 for (EpgData entry : entries) {
                     String date = Instant.ofEpochMilli(entry.getStartTime()).atZone(zoneId).format(Formatters.DATE);
                     List<EpgData> list = epgMap.computeIfAbsent(id, k -> new TreeMap<>()).computeIfAbsent(date, d -> Epg.create(id, d)).getList();
@@ -225,25 +227,26 @@ public class EpgParser {
     }
 
     private static void bindResultsToLive(Live live, ProgrammeResult result) {
-        int[] counts = {0, 0};
-        live.getGroups().stream()
-                .flatMap(group -> group.getChannel().stream())
-                .forEach(channel -> {
-                    String tvgId = channel.getTvgId();
-                    Map<String, Epg> dateMap = result.epgMap.get(tvgId);
-                    if (dateMap != null && !channel.hasEpgOverride()) {
-                        dateMap.values().forEach(channel::setData);
-                        channel.getDataList().sort(Comparator.comparing(Epg::getDate));
-                        counts[0]++;
-                    } else {
-                        counts[1]++;
-                    }
-                    if (channel.getLogo().isEmpty()) {
-                        String src = result.srcMap.get(tvgId);
-                        if (src != null) channel.setLogo(src);
-                    }
-                });
-        Log.i(TAG, "bindResultsToLive with-epg=" + counts[0] + " without-epg=" + counts[1]);
+        int withEpg = 0;
+        int withoutEpg = 0;
+        for (Group group : live.getGroups()) {
+            for (Channel channel : group.getChannel()) {
+                String tvgId = channel.getTvgId();
+                Map<String, Epg> dateMap = result.epgMap.get(tvgId);
+                if (dateMap != null && !channel.hasEpgOverride()) {
+                    dateMap.values().forEach(channel::setData);
+                    channel.getDataList().sort(Comparator.comparing(Epg::getDate));
+                    withEpg++;
+                } else {
+                    withoutEpg++;
+                }
+                if (channel.getLogo().isEmpty()) {
+                    String src = result.srcMap.get(tvgId);
+                    if (src != null) channel.setLogo(src);
+                }
+            }
+        }
+        Log.i(TAG, "bindResultsToLive with-epg=" + withEpg + " without-epg=" + withoutEpg);
     }
 
     private static List<EpgData> getProgrammeData(List<Tv.Programme> programmes, ZoneId zoneId) throws InterruptedIOException {
@@ -287,6 +290,5 @@ public class EpgParser {
         }
     }
 
-    private record ProgrammeResult(Map<String, Map<String, Epg>> epgMap, Map<String, String> srcMap) {
-    }
+    private record ProgrammeResult(Map<String, Map<String, Epg>> epgMap, Map<String, String> srcMap) {}
 }
