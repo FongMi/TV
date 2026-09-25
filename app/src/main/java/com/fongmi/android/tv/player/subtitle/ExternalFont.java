@@ -86,7 +86,7 @@ public final class ExternalFont {
         if (files == null) return;
         Arrays.stream(files)
                 .sorted((first, second) -> first.getName().compareToIgnoreCase(second.getName()))
-                .map(file -> additional ? getAdditionalEntry(file) : getEntry(file))
+                .map(file -> getEntry(file, additional))
                 .filter(Objects::nonNull)
                 .forEach(entries::add);
     }
@@ -144,17 +144,9 @@ public final class ExternalFont {
     }
 
     @Nullable
-    private static Entry getEntry(File file) {
+    private static Entry getEntry(File file, boolean additional) {
         synchronized (CACHE_LOCK) {
-            Item item = getItemLocked(file);
-            return item == null ? null : new Entry(item, getTypefaceLocked(item));
-        }
-    }
-
-    @Nullable
-    private static Entry getAdditionalEntry(File file) {
-        synchronized (CACHE_LOCK) {
-            Item item = getItemLocked(file, true);
+            Item item = getItemLocked(file, additional);
             return item == null ? null : new Entry(item, getTypefaceLocked(item));
         }
     }
@@ -236,11 +228,6 @@ public final class ExternalFont {
         synchronized (CACHE_LOCK) {
             return getItemLocked(file, additional);
         }
-    }
-
-    @Nullable
-    private static Item getItemLocked(File file) {
-        return getItemLocked(file, false);
     }
 
     @Nullable
@@ -326,21 +313,13 @@ public final class ExternalFont {
 
     private static File nextAvailableFile(File directory, String fileName) {
         File target = new File(directory, fileName);
-        return target.exists() ? findAvailableFile(directory, fileName) : target;
-    }
-
-    private static File findAvailableFile(File directory, String fileName) {
+        if (!target.exists()) return target;
         int extensionStart = fileName.lastIndexOf('.');
         String baseName = fileName.substring(0, extensionStart);
         String extension = fileName.substring(extensionStart);
         int suffix = 2;
-        File target = getSuffixedFile(directory, baseName, extension, suffix);
-        while (target.exists()) target = getSuffixedFile(directory, baseName, extension, ++suffix);
+        while (target.exists()) target = new File(directory, baseName + " (" + suffix++ + ")" + extension);
         return target;
-    }
-
-    private static File getSuffixedFile(File directory, String baseName, String extension, int suffix) {
-        return new File(directory, baseName + " (" + suffix + ")" + extension);
     }
 
     private static String sanitizeFileName(String displayName) {

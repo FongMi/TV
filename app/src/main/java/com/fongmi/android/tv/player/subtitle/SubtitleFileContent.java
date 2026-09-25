@@ -18,20 +18,17 @@ import com.github.catvod.net.OkHttp;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
+import java.util.Set;
 
 public final class SubtitleFileContent implements MpvSubtitleContentLoader {
+
+    private static final Set<String> SUPPORTED_SCHEMES = Set.of("file", "content", "http", "https");
 
     @Override
     public SubtitleContent load(MediaItem item, Uri uri, Format format) throws IOException {
         if (Thread.currentThread().isInterrupted()) throw new InterruptedIOException();
-        switch (UrlUtil.scheme(uri)) {
-            case "file", "content", "http", "https" -> {
-                DataSource.Factory factory = new DefaultDataSource.Factory(App.get(), new OkHttpDataSource.Factory(OkHttp.player()).setDefaultRequestProperties(ExoUtil.extractHeaders(item)));
-                return new DefaultSubtitleContentLoader(factory).load(item, uri, format);
-            }
-            default -> {
-                return SubtitleContent.UNSUPPORTED;
-            }
-        }
+        if (!SUPPORTED_SCHEMES.contains(UrlUtil.scheme(uri))) return SubtitleContent.UNSUPPORTED;
+        DataSource.Factory factory = new DefaultDataSource.Factory(App.get(), new OkHttpDataSource.Factory(OkHttp.player()).setDefaultRequestProperties(ExoUtil.extractHeaders(item)));
+        return new DefaultSubtitleContentLoader(factory).load(item, uri, format);
     }
 }
