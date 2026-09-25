@@ -40,7 +40,6 @@ public final class MpvScriptSession {
     private final Map<String, Runner> runners = new HashMap<>();
     private final Map<String, Status> statuses = new HashMap<>();
     private final Map<String, MpvScripts.Item> startupScripts = new HashMap<>();
-    private final Map<String, String> startupGenerations = new HashMap<>();
     private final MpvPlayer player;
     private final Handler handler;
     private long actionGeneration;
@@ -73,7 +72,6 @@ public final class MpvScriptSession {
         runners.clear();
         statuses.clear();
         startupScripts.clear();
-        startupGenerations.clear();
         player.setLogListener(LOG_LEVEL_ERROR, null);
     }
 
@@ -81,9 +79,9 @@ public final class MpvScriptSession {
         Set<String> activeIds = new HashSet<>();
         Map<String, MpvScripts.Item> buttons = new HashMap<>();
         for (MpvScripts.Item item : items) {
-            if (!item.enabled || item.automatic) continue;
+            if (!item.enabled) continue;
             activeIds.add(item.id);
-            buttons.put(item.id, item);
+            if (!item.automatic) buttons.put(item.id, item);
         }
         for (String id : new ArrayList<>(runners.keySet())) {
             Runner runner = runners.get(id);
@@ -93,22 +91,17 @@ public final class MpvScriptSession {
             statuses.remove(id);
             if (runner != null) runner.release(true);
         }
-        for (MpvScripts.Item item : items) {
-            if (item.enabled && item.automatic) activeIds.add(item.id);
-        }
         statuses.keySet().retainAll(activeIds);
         if (!reloadStartupScripts) return;
 
         String generation = Long.toString(++startupGeneration);
         List<File> scripts = new ArrayList<>(items.size());
         startupScripts.clear();
-        startupGenerations.clear();
         for (MpvScripts.Item item : items) {
             if (!item.automatic || !item.enabled) continue;
             try {
                 scripts.add(MpvScripts.prepareStartup(item, generation));
                 startupScripts.put(item.id, item);
-                startupGenerations.put(item.id, generation);
                 updateStatus(item, State.LOADING, "");
             } catch (IOException e) {
                 updateStatus(item, State.ERROR, e.getMessage());
@@ -189,7 +182,7 @@ public final class MpvScriptSession {
         if (value == null) return null;
         try {
             JSONObject data = new JSONObject(value);
-            return data.optString("generation").equals(startupGenerations.get(item.id)) ? data : null;
+            return data.optString("generation").equals(Long.toString(startupGeneration)) ? data : null;
         } catch (JSONException e) {
             updateStatus(item, State.ERROR, e.getMessage());
             return null;

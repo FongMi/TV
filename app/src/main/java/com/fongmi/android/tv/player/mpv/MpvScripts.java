@@ -171,21 +171,20 @@ public final class MpvScripts {
     }
 
     private static File writeRunner(Item item, String asset, File file, String generation) throws IOException {
-        try (InputStream input = App.get().getAssets().open("mpv/" + asset)) {
-            String header = "local source = " + quote(item.source().getAbsolutePath()) + "\nlocal directory = " + quote(item.source().getParentFile().getAbsolutePath()) + "\nlocal status = " + quote("user-data/" + item.statusKey()) + "\n";
-            header += "local generation = " + quote(generation) + "\n";
-            FileUtil.writeAtomically((header + readText(input)).getBytes(StandardCharsets.UTF_8), file);
-        }
-        return file;
+        String header = "local source = " + quote(item.source().getAbsolutePath()) + "\nlocal directory = " + quote(item.source().getParentFile().getAbsolutePath()) + "\nlocal status = " + quote("user-data/" + item.statusKey()) + "\n";
+        return writeRunner(asset, file, header + "local generation = " + quote(generation) + "\n");
     }
 
     private static File writeCommandRunner(Item item, String generation) throws IOException {
-        try (InputStream input = App.get().getAssets().open("mpv/command-button.lua")) {
-            String header = "local command = " + quote(item.command) + "\nlocal status = " + quote("user-data/" + item.statusKey()) + "\nlocal generation = " + quote(generation) + "\n";
-            File file = item.runner();
+        String header = "local command = " + quote(item.command) + "\nlocal status = " + quote("user-data/" + item.statusKey()) + "\nlocal generation = " + quote(generation) + "\n";
+        return writeRunner("command-button.lua", item.runner(), header);
+    }
+
+    private static File writeRunner(String asset, File file, String header) throws IOException {
+        try (InputStream input = App.get().getAssets().open("mpv/" + asset)) {
             FileUtil.writeAtomically((header + readText(input)).getBytes(StandardCharsets.UTF_8), file);
-            return file;
         }
+        return file;
     }
 
     private static String quote(String value) {

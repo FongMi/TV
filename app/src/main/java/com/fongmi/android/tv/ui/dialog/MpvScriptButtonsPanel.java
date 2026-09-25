@@ -30,6 +30,7 @@ import com.fongmi.android.tv.databinding.DialogMpvScriptButtonBinding;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.mpv.MpvScriptSession;
 import com.fongmi.android.tv.player.mpv.MpvScripts;
+import com.fongmi.android.tv.player.mpv.MpvUtil;
 import com.fongmi.android.tv.ui.activity.PlaybackActivity;
 import com.fongmi.android.tv.ui.custom.SpaceItemDecoration;
 import com.fongmi.android.tv.utils.FileChooser;
@@ -53,7 +54,7 @@ final class MpvScriptButtonsPanel {
     private SpaceItemDecoration itemDecoration;
     private ItemAdapter adapter;
     private Operations operations;
-    private List<MpvScripts.Item> items = new ArrayList<>();
+    private List<MpvScripts.Item> items = List.of();
     private MpvScripts.Item selected;
     private boolean automatic;
     private String replaceId;
@@ -62,7 +63,7 @@ final class MpvScriptButtonsPanel {
     private int listPosition;
     private int editPosition;
     private final List<Integer> commands = new ArrayList<>();
-    private List<String> scriptActions = new ArrayList<>();
+    private List<String> scriptActions = List.of();
     private final OnBackPressedCallback backCallback = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
@@ -104,15 +105,11 @@ final class MpvScriptButtonsPanel {
         replaceId = state.getString("replace");
         listPosition = state.getInt("listPosition");
         editPosition = state.getInt("editPosition");
-        try {
-            String id = state.getString("selected");
-            for (MpvScripts.Item item : MpvScripts.read()) if (item.id.equals(id)) selected = item;
-            if (selected != null && savedInstanceState == null) {
-                automatic = selected.automatic;
-                page = EDIT;
-            }
-        } catch (JSONException e) {
-            Notify.show(Notify.getError(R.string.mpv_script_error, e));
+        String id = state.getString("selected");
+        for (MpvScripts.Item item : MpvUtil.readScripts()) if (item.id.equals(id)) selected = item;
+        if (selected != null && savedInstanceState == null) {
+            automatic = selected.automatic;
+            page = EDIT;
         }
         if (selected == null && (page == EDIT || page == RENAME || page == STATUS)) page = LIST;
         binding.title.setText(state.getString("draft", selected == null ? "" : selected.title));
@@ -123,13 +120,7 @@ final class MpvScriptButtonsPanel {
             if (result.error != null) Notify.show(Notify.getError(R.string.mpv_script_error, result.error));
             else {
                 page = LIST;
-                if (result.id != null) {
-                    try {
-                        for (MpvScripts.Item item : MpvScripts.read()) if (item.id.equals(result.id)) selected = item;
-                    } catch (JSONException e) {
-                        Notify.show(Notify.getError(R.string.mpv_script_error, e));
-                    }
-                }
+                if (result.id != null) for (MpvScripts.Item item : MpvUtil.readScripts()) if (item.id.equals(result.id)) selected = item;
                 if (result.applyError != null) Notify.show(Notify.getError(R.string.mpv_script_error, result.applyError));
             }
             render(true);
@@ -157,19 +148,23 @@ final class MpvScriptButtonsPanel {
             String title = binding.title.getText().toString();
             MpvScripts.Item item = selected;
             work(() -> { MpvScripts.rename(item.id, title); return item.id; }, false, false);
-        } else if (page == COMMAND) {
+            return;
+        }
+        if (page == COMMAND) {
             String title = binding.title.getText().toString();
             String command = binding.command.getText().toString();
             MpvScripts.Item item = selected;
             if (item == null) work(() -> MpvScripts.addCommand(title, command).id, false, false);
             else work(() -> { MpvScripts.updateCommand(item.id, title, command); return item.id; }, true, false);
-        } else if (automatic) {
-            pick(null);
-        } else {
-            selected = null;
-            page = ADD;
-            render(true);
+            return;
         }
+        if (automatic) {
+            pick(null);
+            return;
+        }
+        selected = null;
+        page = ADD;
+        render(true);
     }
 
     private boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
@@ -187,16 +182,11 @@ final class MpvScriptButtonsPanel {
     }
 
     private void bindTabs() {
-        MaterialButton[] tabs = {binding.tabButtons, binding.tabAutomatic};
-        for (MaterialButton tab : tabs) {
-            if (Util.isLeanback()) tab.setOnFocusChangeListener((view, focused) -> {
-                if (focused) binding.tabGroup.check(tab.getId());
-            });
-        }
-        binding.tabGroup.addOnButtonCheckedListener((group, id, checked) -> {
-            if (!checked || operations.running || selectedTab().getId() == id) return;
+        SettingPanelViews.bindTabs(binding.tabGroup, new MaterialButton[]{binding.tabButtons, binding.tabAutomatic}, tab -> {
+            boolean automatic = tab == 1;
+            if (operations.running || this.automatic == automatic) return;
             page = LIST;
-            automatic = id == binding.tabAutomatic.getId();
+            this.automatic = automatic;
             selected = null;
             listPosition = 0;
             render(false);
@@ -215,6 +205,10 @@ final class MpvScriptButtonsPanel {
 
     private PlayerManager player() {
         return owner.getActivity() instanceof PlaybackActivity activity ? activity.getPlaybackPlayer() : null;
+    }
+
+    private static List<MpvScripts.Item> readItems(boolean automatic) {
+        return MpvUtil.readScripts().stream().filter(item -> item.automatic == automatic).toList();
     }
 
     private String getString(int id) {
@@ -253,48 +247,7 @@ final class MpvScriptButtonsPanel {
         binding.commandInput.setVisibility(page == COMMAND ? View.VISIBLE : View.GONE);
         binding.statusScroll.setVisibility(page == STATUS ? View.VISIBLE : View.GONE);
         binding.items.setVisibility(editing || page == STATUS ? View.GONE : View.VISIBLE);
-        List<Row> rows = new ArrayList<>();
-        commands.clear();
-        if (page == LIST) {
-            try {
-                items = new ArrayList<>();
-                for (MpvScripts.Item item : MpvScripts.read()) if (item.automatic == automatic) items.add(item);
-                PlayerManager player = player();
-                for (int i = 0; i < items.size(); i++) {
-                    MpvScripts.Item item = items.get(i);
-                    if (selected != null && item.id.equals(selected.id)) listPosition = i;
-                    String suffix = getString(item.enabled ? R.string.mpv_script_enabled : R.string.mpv_script_disabled);
-                    if (!automatic && item.hidden) suffix += " · " + getString(R.string.mpv_script_hidden);
-                    if (item.isCommand()) suffix += " · " + getString(R.string.mpv_script_command);
-                    MpvScriptSession.Status status = automatic && player != null ? player.getMpvScriptStatus(item.id) : null;
-                    if (status != null && status.state() == MpvScriptSession.State.ERROR) suffix += " · " + getString(R.string.mpv_script_failed);
-                    rows.add(new Row(item.title, suffix));
-                }
-            } catch (JSONException e) {
-                Notify.show(Notify.getError(R.string.mpv_script_error, e));
-            }
-        } else if (page == EDIT) {
-            commands.add(R.string.mpv_script_status);
-            if (selected.isCommand()) commands.add(R.string.mpv_script_edit_command);
-            else {
-                commands.add(R.string.mpv_script_rename);
-                commands.add(R.string.mpv_script_replace);
-            }
-            if (!automatic) addButtonCommands();
-            commands.add(selected.enabled ? R.string.mpv_script_disable : R.string.mpv_script_enable);
-            commands.add(R.string.mpv_script_delete);
-            for (int command : commands) rows.add(new Row(getString(command), ""));
-        } else if (page == ADD) {
-            rows.add(new Row(getString(R.string.mpv_script_import), getString(R.string.mpv_script_import_detail)));
-            rows.add(new Row(getString(R.string.mpv_script_command), getString(R.string.mpv_script_command_detail)));
-            try {
-                PlayerManager player = player();
-                scriptActions = player == null ? new ArrayList<>() : player.getMpvScriptBindings();
-                for (String action : scriptActions) rows.add(new Row(action, getString(R.string.mpv_script_action)));
-            } catch (JSONException e) {
-                Notify.show(Notify.getError(R.string.mpv_script_error, e));
-            }
-        }
+        List<Row> rows = buildRows();
         binding.empty.setVisibility(isRoot() && rows.isEmpty() ? View.VISIBLE : View.GONE);
         binding.empty.setText(automatic ? R.string.mpv_script_auto_empty : R.string.mpv_script_empty);
         adapter.replaceRows(rows);
@@ -320,6 +273,47 @@ final class MpvScriptButtonsPanel {
         renderStatus();
     }
 
+    private List<Row> buildRows() {
+        List<Row> rows = new ArrayList<>();
+        commands.clear();
+        if (page == LIST) {
+            items = readItems(automatic);
+            PlayerManager player = player();
+            for (int i = 0; i < items.size(); i++) {
+                MpvScripts.Item item = items.get(i);
+                if (selected != null && item.id.equals(selected.id)) listPosition = i;
+                String suffix = getString(item.enabled ? R.string.mpv_script_enabled : R.string.mpv_script_disabled);
+                if (!automatic && item.hidden) suffix += " · " + getString(R.string.mpv_script_hidden);
+                if (item.isCommand()) suffix += " · " + getString(R.string.mpv_script_command);
+                MpvScriptSession.Status status = automatic && player != null ? player.getMpvScriptStatus(item.id) : null;
+                if (status != null && status.state() == MpvScriptSession.State.ERROR) suffix += " · " + getString(R.string.mpv_script_failed);
+                rows.add(new Row(item.title, suffix));
+            }
+        } else if (page == EDIT) {
+            commands.add(R.string.mpv_script_status);
+            if (selected.isCommand()) commands.add(R.string.mpv_script_edit_command);
+            else {
+                commands.add(R.string.mpv_script_rename);
+                commands.add(R.string.mpv_script_replace);
+            }
+            if (!automatic) addButtonCommands();
+            commands.add(selected.enabled ? R.string.mpv_script_disable : R.string.mpv_script_enable);
+            commands.add(R.string.mpv_script_delete);
+            for (int command : commands) rows.add(new Row(getString(command), ""));
+        } else if (page == ADD) {
+            rows.add(new Row(getString(R.string.mpv_script_import), getString(R.string.mpv_script_import_detail)));
+            rows.add(new Row(getString(R.string.mpv_script_command), getString(R.string.mpv_script_command_detail)));
+            try {
+                PlayerManager player = player();
+                scriptActions = player == null ? List.of() : player.getMpvScriptBindings();
+                for (String action : scriptActions) rows.add(new Row(action, getString(R.string.mpv_script_action)));
+            } catch (JSONException e) {
+                Notify.show(Notify.getError(R.string.mpv_script_error, e));
+            }
+        }
+        return rows;
+    }
+
     private void updateItemSpacing() {
         int spacing = owner.getResources().getInteger(page == EDIT ? R.integer.mpv_script_action_spacing : R.integer.mpv_script_item_spacing);
         if (itemSpacing == spacing) return;
@@ -335,17 +329,12 @@ final class MpvScriptButtonsPanel {
 
     private void addButtonCommands() {
         commands.add(selected.hidden ? R.string.mpv_script_show : R.string.mpv_script_hide);
-        try {
-            List<MpvScripts.Item> buttons = new ArrayList<>();
-            for (MpvScripts.Item item : MpvScripts.read()) if (!item.automatic) buttons.add(item);
-            for (int i = 0; i < buttons.size(); i++) {
-                if (!buttons.get(i).id.equals(selected.id)) continue;
-                if (i > 0) commands.add(R.string.mpv_script_move_earlier);
-                if (i + 1 < buttons.size()) commands.add(R.string.mpv_script_move_later);
-                break;
-            }
-        } catch (JSONException e) {
-            Notify.show(Notify.getError(R.string.mpv_script_error, e));
+        List<MpvScripts.Item> buttons = readItems(false);
+        for (int i = 0; i < buttons.size(); i++) {
+            if (!buttons.get(i).id.equals(selected.id)) continue;
+            if (i > 0) commands.add(R.string.mpv_script_move_earlier);
+            if (i + 1 < buttons.size()) commands.add(R.string.mpv_script_move_later);
+            break;
         }
     }
 
@@ -382,27 +371,31 @@ final class MpvScriptButtonsPanel {
             render(true);
         } else if (page == EDIT) {
             editPosition = position;
-            MpvScripts.Item item = selected;
-            int command = commands.get(position);
-            if (command == R.string.mpv_script_edit_command) {
-                editCommand(item.title, item.command);
-            } else if (command == R.string.mpv_script_rename) {
-                page = RENAME;
-                binding.title.setText(item.title);
-                render(true);
-            } else if (command == R.string.mpv_script_replace) pick(item.id);
-            else if (command == R.string.mpv_script_delete) work(() -> { MpvScripts.delete(item.id); return null; }, true, item.automatic);
-            else if (command == R.string.mpv_script_status) { page = STATUS; render(true); }
-            else if (command == R.string.mpv_script_hide || command == R.string.mpv_script_show) work(() -> { MpvScripts.setHidden(item.id, !item.hidden); return item.id; }, false, false);
-            else if (command == R.string.mpv_script_move_earlier || command == R.string.mpv_script_move_later) work(() -> { MpvScripts.move(item.id, command == R.string.mpv_script_move_earlier); return item.id; }, false, false);
-            else work(() -> { MpvScripts.setEnabled(item.id, !item.enabled); return item.id; }, true, item.automatic);
-        } else if (page == ADD) {
-            if (position == 0) pick(null);
-            else if (position == 1) editCommand("", "");
-            else {
-                String action = scriptActions.get(position - 2);
-                editCommand(action.substring(action.indexOf('/') + 1), "script-binding " + action);
-            }
+            selectCommand(commands.get(position));
+        } else if (page == ADD) selectAdd(position);
+    }
+
+    private void selectCommand(int command) {
+        MpvScripts.Item item = selected;
+        if (command == R.string.mpv_script_edit_command) editCommand(item.title, item.command);
+        else if (command == R.string.mpv_script_rename) {
+            page = RENAME;
+            binding.title.setText(item.title);
+            render(true);
+        } else if (command == R.string.mpv_script_replace) pick(item.id);
+        else if (command == R.string.mpv_script_delete) work(() -> { MpvScripts.delete(item.id); return null; }, true, item.automatic);
+        else if (command == R.string.mpv_script_status) { page = STATUS; render(true); }
+        else if (command == R.string.mpv_script_hide || command == R.string.mpv_script_show) work(() -> { MpvScripts.setHidden(item.id, !item.hidden); return item.id; }, false, false);
+        else if (command == R.string.mpv_script_move_earlier || command == R.string.mpv_script_move_later) work(() -> { MpvScripts.move(item.id, command == R.string.mpv_script_move_earlier); return item.id; }, false, false);
+        else work(() -> { MpvScripts.setEnabled(item.id, !item.enabled); return item.id; }, true, item.automatic);
+    }
+
+    private void selectAdd(int position) {
+        if (position == 0) pick(null);
+        else if (position == 1) editCommand("", "");
+        else {
+            String action = scriptActions.get(position - 2);
+            editCommand(action.substring(action.indexOf('/') + 1), "script-binding " + action);
         }
     }
 
@@ -414,8 +407,7 @@ final class MpvScriptButtonsPanel {
         });
     }
 
-    private record Row(String title, String detail) {
-    }
+    private record Row(String title, String detail) {}
 
     private final class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.Holder> {
         private List<Row> rows = new ArrayList<>();
@@ -545,8 +537,7 @@ final class MpvScriptButtonsPanel {
         }
     }
 
-    private record Result(Exception error, RuntimeException applyError, String id) {
-    }
+    private record Result(Exception error, RuntimeException applyError, String id) {}
 
     private interface Operation {
         String run() throws Exception;
