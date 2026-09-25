@@ -91,13 +91,20 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
         this.focusListener = this::onFocusChanged;
     }
 
-    void bind() {
+    @Nullable
+    private PlayerManager player() {
         PlayerManager player = activity.getPlaybackPlayer();
-        if (player != null && !player.isReleased()) state.prepare(player);
+        return player == null || player.isReleased() ? null : player;
+    }
+
+    void bind() {
+        PlayerManager player = player();
+        if (player != null) state.prepare(player);
         binding.recycler.setItemAnimator(null);
         binding.recycler.setAdapter(adapter);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
-        bindTabs();
+        SettingPanelViews.bindTabs(binding.tabs, new MaterialButton[]{binding.subtitles, binding.danmaku}, this::showTab);
+        updateTabNavigation();
         bindKeyword(!state.keyword[state.tab].isEmpty());
         binding.search.setOnClickListener(this::onSearch);
         binding.current.setOnClickListener(this::onCurrent);
@@ -117,9 +124,7 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (updating) {
-                    return;
-                }
+                if (updating) return;
                 cancelFocusList();
                 state.keyword[state.tab] = s.toString();
                 setFollow(false);
@@ -149,27 +154,10 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
         else binding.tabs.check(tab.getId());
     }
 
-    private void bindTabs() {
-        MaterialButton[] tabs = {binding.subtitles, binding.danmaku};
-        for (MaterialButton tab : tabs) checkOnFocus(tab);
-        binding.tabs.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) showTab(i);
-        });
-        updateTabNavigation();
-    }
-
     private void updateTabNavigation() {
         int tabId = state.tab == PlaybackContentDialog.SUBTITLE ? R.id.subtitles : R.id.danmaku;
         binding.search.setNextFocusDownId(tabId);
         binding.current.setNextFocusDownId(tabId);
-    }
-
-    private void checkOnFocus(MaterialButton button) {
-        if (!Util.isLeanback()) return;
-        button.setOnFocusChangeListener((v, focused) -> {
-            if (focused) binding.tabs.check(button.getId());
-        });
     }
 
     void start() {
@@ -188,8 +176,8 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
         generation++;
         cancelFocusList();
         locateCurrent = false;
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player != null && !player.isReleased()) player.setSubtitleContentEnabled(false);
+        PlayerManager player = player();
+        if (player != null) player.setSubtitleContentEnabled(false);
         App.removeCallbacks(runnable, search);
         saveScroll();
     }
@@ -203,8 +191,8 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
 
     private void update() {
         if (!running) return;
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player != null && !player.isReleased()) {
+        PlayerManager player = player();
+        if (player != null) {
             String media = state.media;
             state.prepare(player);
             if (!Objects.equals(media, state.media)) {
@@ -232,8 +220,8 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
     }
 
     private void refresh(boolean force) {
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player == null || player.isReleased()) return;
+        PlayerManager player = player();
+        if (player == null) return;
         boolean isSubtitle = state.tab == PlaybackContentDialog.SUBTITLE;
         SubtitleSelections selections = isSubtitle ? getSelectedSelections(player) : SubtitleSelections.EMPTY;
         player.setSubtitleContentEnabled(running && isSubtitle);
@@ -313,17 +301,15 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
             restorePending = false;
             restoreScroll();
         }
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player != null && !player.isReleased()) adapter.setPosition(player.getPosition());
+        PlayerManager player = player();
+        if (player != null) adapter.setPosition(player.getPosition());
         if (locateCurrent || state.follow[state.tab]) scrollToCurrent(locateCurrent);
         locateCurrent = false;
         if (focusList && !items.isEmpty()) {
             cancelFocusList();
             pendingFocus = OneShotPreDrawListener.add(binding.recycler, () -> {
                 pendingFocus = null;
-                if (binding.keyword.hasFocus()) {
-                    binding.recycler.requestFocus();
-                }
+                if (binding.keyword.hasFocus()) binding.recycler.requestFocus();
             });
         }
         focusList = false;
@@ -359,8 +345,8 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
     }
 
     private boolean isCurrent(ContentContext context) {
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (context == null || player == null || player.isReleased() || context.source() != player.getPlayer() || context.tab() != state.tab || !context.media().equals(player.getKey() + "\n" + player.getUrl())) return false;
+        PlayerManager player = player();
+        if (context == null || player == null || context.source() != player.getPlayer() || context.tab() != state.tab || !context.media().equals(player.getKey() + "\n" + player.getUrl())) return false;
         if (context.source() != null && !Objects.equals(context.timeline(), context.source().getCurrentTimeline())) return false;
         return state.tab == PlaybackContentDialog.SUBTITLE ? context.offsets().equals(player.getSubtitleOffsets()) && context.selections().equals(getSelectedSelections(player)) : context.offset() == DanmakuSetting.getConfig().timeOffsetMs;
     }
@@ -418,8 +404,7 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
             if (!retrying) retry();
             return;
         }
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player == null || player.isReleased()) return;
+        if (player() == null) return;
         binding.keyword.setText("");
         App.removeCallbacks(search);
         setFollow(true);
@@ -428,9 +413,7 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
     }
 
     private void onFocusChanged(View oldFocus, View newFocus) {
-        if (oldFocus == binding.keyword) {
-            cancelFocusList();
-        }
+        if (oldFocus == binding.keyword) cancelFocusList();
         if (newFocus == null || newFocus.getParent() != binding.recycler) return;
         setFollow(false);
         if (Util.isLeanback() && !newFocus.isInTouchMode() && !state.hintShown) {
@@ -456,17 +439,12 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
     }
 
     private void saveScroll() {
-        if (!restorePending) {
-            state.scroll[state.tab] = layout().onSaveInstanceState();
-        }
+        if (!restorePending) state.scroll[state.tab] = layout().onSaveInstanceState();
     }
 
     private void restoreScroll() {
-        if (state.scroll[state.tab] != null) {
-            layout().onRestoreInstanceState(state.scroll[state.tab]);
-        } else {
-            layout().scrollToPositionWithOffset(0, 0);
-        }
+        if (state.scroll[state.tab] != null) layout().onRestoreInstanceState(state.scroll[state.tab]);
+        else layout().scrollToPositionWithOffset(0, 0);
     }
 
     private void scrollToCurrent(boolean force) {
@@ -477,24 +455,24 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
 
     @Override
     public void onItemClick(PlaybackContent item) {
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player == null || player.isReleased() || !isCurrent(renderedContext)) return;
+        PlayerManager player = player();
+        if (player == null || !isCurrent(renderedContext)) return;
         if (!player.getPlayer().isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) || !player.getPlayer().isCurrentMediaItemSeekable()) return;
         player.seekTo(item.getPosition());
         adapter.setPosition(item.getPosition());
     }
 
     private boolean canRetry() {
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (state.tab != PlaybackContentDialog.SUBTITLE || player == null || player.isReleased() || !isCurrent(renderedContext)) return false;
+        PlayerManager player = player();
+        if (state.tab != PlaybackContentDialog.SUBTITLE || player == null || !isCurrent(renderedContext)) return false;
         SubtitleSelections selections = renderedContext.selections();
         return canRetry(player, selections.primary()) || canRetry(player, selections.secondary());
     }
 
     private void retry() {
         if (!canRetry()) return;
-        PlayerManager player = activity.getPlaybackPlayer();
-        if (player == null || player.isReleased() || renderedContext == null) return;
+        PlayerManager player = player();
+        if (player == null || renderedContext == null) return;
         SubtitleSelections selections = renderedContext.selections();
         retry(player, selections.primary());
         retry(player, selections.secondary());

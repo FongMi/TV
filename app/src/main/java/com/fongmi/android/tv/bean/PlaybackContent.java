@@ -118,22 +118,20 @@ public record PlaybackContent(long primaryStartTimeUs, long primaryEndTimeUs, St
         List<PlaybackContent> result = new ArrayList<>(primary.size() + secondary.size());
         int i = 0;
         int j = 0;
-        while (i < primary.size() || j < secondary.size()) {
-            if (i == primary.size()) result.add(secondary.get(j++));
-            else if (j == secondary.size()) result.add(primary.get(i++));
-            else {
-                PlaybackContent first = primary.get(i);
-                PlaybackContent second = secondary.get(j);
-                // Pair at the displayed millisecond precision without changing either interval.
-                int order = Long.compare(Math.floorDiv(first.startTimeUs(), 1000), Math.floorDiv(second.startTimeUs(), 1000));
-                if (order == 0) {
-                    result.add(new PlaybackContent(first.primaryStartTimeUs, first.primaryEndTimeUs, first.primary, second.secondaryStartTimeUs, second.secondaryEndTimeUs, second.secondary, false));
-                    i++;
-                    j++;
-                } else if (order <= 0) result.add(primary.get(i++));
-                else result.add(secondary.get(j++));
-            }
+        while (i < primary.size() && j < secondary.size()) {
+            PlaybackContent first = primary.get(i);
+            PlaybackContent second = secondary.get(j);
+            // Pair at the displayed millisecond precision without changing either interval.
+            int order = Long.compare(Math.floorDiv(first.startTimeUs(), 1000), Math.floorDiv(second.startTimeUs(), 1000));
+            if (order == 0) {
+                result.add(new PlaybackContent(first.primaryStartTimeUs, first.primaryEndTimeUs, first.primary, second.secondaryStartTimeUs, second.secondaryEndTimeUs, second.secondary, false));
+                i++;
+                j++;
+            } else if (order <= 0) result.add(primary.get(i++));
+            else result.add(secondary.get(j++));
         }
+        result.addAll(primary.subList(i, primary.size()));
+        result.addAll(secondary.subList(j, secondary.size()));
         result.sort(BY_TIME);
         return result;
     }

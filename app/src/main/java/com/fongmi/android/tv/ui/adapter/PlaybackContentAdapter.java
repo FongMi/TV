@@ -47,8 +47,9 @@ public class PlaybackContentAdapter extends RecyclerView.Adapter<PlaybackContent
     }
 
     public void setItems(List<PlaybackContent> items, String keyword) {
-        if (mItems.equals(items) && this.keyword.equals(keyword.trim())) return;
-        this.keyword = keyword.trim();
+        String query = keyword.trim();
+        if (mItems.equals(items) && this.keyword.equals(query)) return;
+        this.keyword = query;
         mItems.clear();
         mItems.addAll(items);
         timeWidthSample = "00:00";
@@ -58,10 +59,11 @@ public class PlaybackContentAdapter extends RecyclerView.Adapter<PlaybackContent
         active = RecyclerView.NO_POSITION;
         for (int i = 0; i < items.size(); i++) {
             PlaybackContent item = items.get(i);
+            long itemPosition = item.getPosition();
             danmakuOnly &= item.danmaku();
             if (!item.danmaku() && item.isActive(position)) active = i;
-            maximum = Math.max(maximum, item.getPosition());
-            milliseconds |= !item.danmaku() && item.getPosition() % 1000 != 0;
+            maximum = Math.max(maximum, itemPosition);
+            milliseconds |= !item.danmaku() && itemPosition % 1000 != 0;
         }
         if (maximum >= 3_600_000) timeWidthSample = maximum / 3_600_000 + ":00:00";
         if (milliseconds) timeWidthSample += ".000";
@@ -91,8 +93,9 @@ public class PlaybackContentAdapter extends RecyclerView.Adapter<PlaybackContent
         }
         for (int i = 0; i < mItems.size(); i++) {
             PlaybackContent item = mItems.get(i);
-            if (!item.danmaku() && item.isActive(position)) active = i;
-            if (isActive(item, previous) != isActive(item, position) || item.isPrimaryActive(previous) != item.isPrimaryActive(position) || item.isSecondaryActive(previous) != item.isSecondaryActive(position)) notifyItemChanged(i, Boolean.TRUE);
+            boolean activeNow = isActive(item, position);
+            if (!item.danmaku() && activeNow) active = i;
+            if (isActive(item, previous) != activeNow || item.isPrimaryActive(previous) != item.isPrimaryActive(position) || item.isSecondaryActive(previous) != item.isSecondaryActive(position)) notifyItemChanged(i, Boolean.TRUE);
         }
     }
 
@@ -139,6 +142,8 @@ public class PlaybackContentAdapter extends RecyclerView.Adapter<PlaybackContent
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         PlaybackContent item = mItems.get(position);
+        String primary = item.primary();
+        String secondary = item.secondary();
         holder.binding.time.setText(item.getTime());
         ViewGroup.LayoutParams params = holder.binding.time.getLayoutParams();
         int width = Math.max(ResUtil.dp2px(40), (int) Math.ceil(holder.binding.time.getPaint().measureText(timeWidthSample)));
@@ -146,20 +151,20 @@ public class PlaybackContentAdapter extends RecyclerView.Adapter<PlaybackContent
             params.width = width;
             holder.binding.time.setLayoutParams(params);
         }
-        holder.binding.primary.setText(highlight(item.primary(), holder.itemView));
-        holder.binding.secondary.setText(highlight(item.secondary(), holder.itemView));
-        holder.binding.primaryRow.setVisibility(item.primary().isEmpty() ? View.GONE : View.VISIBLE);
-        holder.binding.secondaryRow.setVisibility(item.secondary().isEmpty() ? View.GONE : View.VISIBLE);
+        holder.binding.primary.setText(highlight(primary, holder.itemView));
+        holder.binding.secondary.setText(highlight(secondary, holder.itemView));
+        holder.binding.primaryRow.setVisibility(primary.isEmpty() ? View.GONE : View.VISIBLE);
+        holder.binding.secondaryRow.setVisibility(secondary.isEmpty() ? View.GONE : View.VISIBLE);
         holder.binding.primaryRole.setVisibility(item.danmaku() ? View.GONE : View.VISIBLE);
         holder.binding.getRoot().setGravity(item.danmaku() ? Gravity.CENTER_VERTICAL : Gravity.TOP);
         ViewGroup.MarginLayoutParams secondaryParams = (ViewGroup.MarginLayoutParams) holder.binding.secondaryRow.getLayoutParams();
-        int margin = item.primary().isEmpty() ? 0 : ResUtil.dp2px(4);
+        int margin = primary.isEmpty() ? 0 : ResUtil.dp2px(4);
         if (secondaryParams.topMargin != margin) {
             secondaryParams.topMargin = margin;
             holder.binding.secondaryRow.setLayoutParams(secondaryParams);
         }
-        holder.primaryDescription = item.primary().isEmpty() ? "" : (item.danmaku() ? item.getTimeRange() : ResUtil.getString(R.string.subtitle_primary_role) + ": " + item.getPrimaryTimeRange()) + ", " + item.primary();
-        holder.secondaryDescription = item.secondary().isEmpty() ? "" : ResUtil.getString(R.string.subtitle_secondary_role) + ": " + item.getSecondaryTimeRange() + ", " + item.secondary();
+        holder.primaryDescription = primary.isEmpty() ? "" : (item.danmaku() ? item.getTimeRange() : ResUtil.getString(R.string.subtitle_primary_role) + ": " + item.getPrimaryTimeRange()) + ", " + primary;
+        holder.secondaryDescription = secondary.isEmpty() ? "" : ResUtil.getString(R.string.subtitle_secondary_role) + ": " + item.getSecondaryTimeRange() + ", " + secondary;
         bindState(holder, item);
     }
 
@@ -185,14 +190,18 @@ public class PlaybackContentAdapter extends RecyclerView.Adapter<PlaybackContent
 
     private CharSequence highlight(String text, View view) {
         if (keyword.isEmpty()) return text;
-        SpannableString result = null;
-        for (int start = PlaybackContent.indexOf(text, keyword, 0); start >= 0; start = PlaybackContent.indexOf(text, keyword, start + keyword.length())) {
-            if (result == null) result = new SpannableString(text);
+        int start = PlaybackContent.indexOf(text, keyword, 0);
+        if (start < 0) return text;
+        SpannableString result = new SpannableString(text);
+        int background = MaterialColors.getColor(view, com.google.android.material.R.attr.colorSecondaryContainer);
+        int foreground = MaterialColors.getColor(view, com.google.android.material.R.attr.colorOnSecondaryContainer);
+        do {
             int end = start + keyword.length();
-            result.setSpan(new BackgroundColorSpan(MaterialColors.getColor(view, com.google.android.material.R.attr.colorSecondaryContainer)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            result.setSpan(new ForegroundColorSpan(MaterialColors.getColor(view, com.google.android.material.R.attr.colorOnSecondaryContainer)), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        }
-        return result == null ? text : result;
+            result.setSpan(new BackgroundColorSpan(background), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            result.setSpan(new ForegroundColorSpan(foreground), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            start = PlaybackContent.indexOf(text, keyword, end);
+        } while (start >= 0);
+        return result;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
