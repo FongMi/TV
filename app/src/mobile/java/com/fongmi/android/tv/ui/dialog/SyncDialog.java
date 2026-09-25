@@ -126,7 +126,7 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
 
     private void onMode() {
         int index = Setting.getSyncMode();
-        Setting.putSyncMode(index = index == mode.length() - 1 ? 0 : ++index);
+        Setting.putSyncMode(index == mode.length() - 1 ? 0 : index + 1);
         setMode();
     }
 
@@ -140,10 +140,6 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
             scanTask.start();
             binding.recycler.setVisibility(View.GONE);
         });
-    }
-
-    private void onSuccess() {
-        dismiss();
     }
 
     @Override
@@ -173,27 +169,23 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
     }
 
     private FormBody buildBody() {
+        FormBody.Builder body = new FormBody.Builder().add("device", Device.get().toString());
         if (type.equals("history")) {
             Config config = Config.vod();
-            FormBody.Builder body = new FormBody.Builder();
-            body.add("device", Device.get().toString());
             body.add("config", config.toString());
             body.add("targets", App.gson().toJson(History.get(config.getId())));
-            return body.build();
         } else {
-            FormBody.Builder body = new FormBody.Builder();
-            body.add("device", Device.get().toString());
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            return body.build();
         }
+        return body.build();
     }
 
     private Callback getCallback() {
         return new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
-                App.post(() -> onSuccess());
+                App.post(SyncDialog.this::dismiss);
             }
 
             @Override
