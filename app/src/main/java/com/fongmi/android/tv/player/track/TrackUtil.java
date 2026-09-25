@@ -104,6 +104,7 @@ public class TrackUtil {
 
     @Nullable
     private static TrackInfo find(Tracks tracks, Track track) {
+        TrackInfo exactMatch = null;
         TrackInfo ordinalMatch = null;
         TrackInfo semanticMatch = null;
         int bestScore = 0;
@@ -114,7 +115,10 @@ public class TrackUtil {
             for (int i = 0; i < trackGroup.length; i++) {
                 Format format = trackGroup.getTrackFormat(i);
                 TrackInfo candidate = new TrackInfo(trackGroup, i);
-                if (track.getFormat() != null && track.getFormat().equals(describeFormat(format))) return candidate;
+                if (track.getFormat() != null && track.getFormat().equals(describeFormat(format))) {
+                    if (ordinal == track.getOrdinal()) return candidate;
+                    if (exactMatch == null) exactMatch = candidate;
+                }
                 if (ordinal == track.getOrdinal()) ordinalMatch = candidate;
                 if (track.getType() == C.TRACK_TYPE_TEXT) {
                     int score = getMatchScore(track, format);
@@ -128,6 +132,7 @@ public class TrackUtil {
                 ordinal++;
             }
         }
+        if (exactMatch != null) return exactMatch;
         if (semanticMatch != null) return semanticMatch;
         if (normalize(track.getLabel()) != null || normalizeLanguage(track.getLanguage()) != null) return null;
         return ordinalMatch;
@@ -181,10 +186,7 @@ public class TrackUtil {
     }
 
     public static List<Track> setTrackSelection(Player player, List<Track> tracks) {
-        return applyTrackSelection(player, createResetBuilder(player), tracks);
-    }
-
-    private static List<Track> applyTrackSelection(Player player, TrackSelectionParameters.Builder builder, List<Track> tracks) {
+        TrackSelectionParameters.Builder builder = createResetBuilder(player);
         Map<Integer, TrackSelectionOverride> overridesByType = new HashMap<>();
         List<Track> pending = new ArrayList<>();
         Tracks currentTracks = player.getCurrentTracks();

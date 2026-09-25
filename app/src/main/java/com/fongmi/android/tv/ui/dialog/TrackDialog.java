@@ -16,6 +16,7 @@ import androidx.annotation.StringRes;
 import androidx.core.view.OneShotPreDrawListener;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.media3.common.C;
 import androidx.media3.common.Format;
 import androidx.media3.common.MimeTypes;
@@ -84,17 +85,10 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
     }
 
     public void show(FragmentActivity activity) {
-        if (activity.getSupportFragmentManager().isStateSaved()) return;
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof TrackDialog) return;
-        showNow(activity.getSupportFragmentManager(), null);
-    }
-
-    private boolean hasChoose() {
-        return type == C.TRACK_TYPE_TEXT && player.isVod();
-    }
-
-    private boolean hasSearch() {
-        return type == C.TRACK_TYPE_TEXT && player.isVod();
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof TrackDialog) return;
+        showNow(manager, null);
     }
 
     private boolean hasSetting() {
@@ -117,8 +111,9 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
         if (player == null) return;
         adapter = new TrackAdapter(this);
         setRecyclerView();
-        binding.search.setVisibility(hasSearch() ? View.VISIBLE : View.GONE);
-        binding.choose.setVisibility(hasChoose() ? View.VISIBLE : View.GONE);
+        int actionVisibility = type == C.TRACK_TYPE_TEXT && player.isVod() ? View.VISIBLE : View.GONE;
+        binding.search.setVisibility(actionVisibility);
+        binding.choose.setVisibility(actionVisibility);
         binding.setting.setVisibility(hasSetting() ? View.VISIBLE : View.GONE);
         binding.setting.setContentDescription(getString(switch (type) {
             case C.TRACK_TYPE_AUDIO -> R.string.audio_setting;
@@ -194,7 +189,6 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
         }
 
         private void bind(View view, DecoderMode mode, List<DecoderMode> modes, DecoderMode current, TrackDialog owner) {
-            view.setTag(mode);
             view.setVisibility(modes.contains(mode) ? View.VISIBLE : View.GONE);
             view.setSelected(mode == current);
             view.setOnClickListener(v -> {
@@ -259,16 +253,9 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
 
     private List<TrackAdapter.TrackItem> getTrack() {
         List<TrackAdapter.TrackItem> items = new ArrayList<>();
-        addTrack(items);
-        return items;
-    }
-
-    private void addTrack(List<TrackAdapter.TrackItem> items) {
-        List<Tracks.Group> groups = player.getCurrentTracks().getGroups();
         SubtitleSelectionState subtitleState = type == C.TRACK_TYPE_TEXT ? player.getSubtitleSelectionState() : SubtitleSelectionState.EMPTY;
         int ordinal = 0;
-        for (int i = 0; i < groups.size(); i++) {
-            Tracks.Group trackGroup = groups.get(i);
+        for (Tracks.Group trackGroup : player.getCurrentTracks().getGroups()) {
             if (trackGroup.getType() != type) continue;
             for (int j = 0; j < trackGroup.length; j++) {
                 Format format = trackGroup.getTrackFormat(j);
@@ -281,6 +268,7 @@ public final class TrackDialog extends BaseBottomSheetDialog implements TrackAda
                 items.add(new TrackAdapter.TrackItem(track, role));
             }
         }
+        return items;
     }
 
     @StringRes
