@@ -56,6 +56,14 @@ public class UrlUtil {
         return path == null ? "" : path.trim();
     }
 
+    public static String stripQueryAndFragment(String url) {
+        int query = url.indexOf('?');
+        int fragment = url.indexOf('#');
+        int end = query < 0 ? url.length() : query;
+        if (fragment >= 0) end = Math.min(end, fragment);
+        return url.substring(0, end);
+    }
+
     public static String toLocalUrl(Uri uri) {
         String path = uri.getPath();
         String root = Path.rootPath();

@@ -21,23 +21,14 @@ final class WebViewClicker {
     private static final long UP_DELAY_MS = 50;
 
     static void click(WebView view, List<String> selectors, BooleanSupplier current) {
-        click(view, selectors, current, () -> {
-        });
+        click(view, selectors, 0, 0, current);
     }
 
-    static void click(WebView view, List<String> selectors, BooleanSupplier current, Runnable complete) {
-        click(view, selectors, 0, 0, current, complete);
-    }
-
-    private static void click(WebView view, List<String> selectors, int index, int attempt, BooleanSupplier current, Runnable complete) {
-        if (!current.getAsBoolean()) return;
-        if (index >= selectors.size()) {
-            complete.run();
-            return;
-        }
+    private static void click(WebView view, List<String> selectors, int index, int attempt, BooleanSupplier current) {
+        if (!current.getAsBoolean() || index >= selectors.size()) return;
         String selector = selectors.get(index);
         if (selector == null || selector.isEmpty()) {
-            click(view, selectors, index + 1, 0, current, complete);
+            click(view, selectors, index + 1, 0, current);
             return;
         }
         String js = "(function(){var e=document.querySelector(" + App.gson().toJson(selector) + ");"
@@ -45,18 +36,17 @@ final class WebViewClicker {
                 + "var r=e.getBoundingClientRect(),s=getComputedStyle(e);"
                 + "if(r.width<=0||r.height<=0||s.display==='none'||s.visibility==='hidden')return null;"
                 + "return JSON.stringify([r.left+r.width/2,r.top+r.height/2,window.innerWidth,window.innerHeight]);})()";
-        view.evaluateJavascript(js, value -> onTarget(view, selectors, index, attempt, current, complete, decodePoint(value)));
+        view.evaluateJavascript(js, value -> onTarget(view, selectors, index, attempt, current, decodePoint(value)));
     }
 
-    private static void onTarget(WebView view, List<String> selectors, int index, int attempt, BooleanSupplier current, Runnable complete, float[] point) {
+    private static void onTarget(WebView view, List<String> selectors, int index, int attempt, BooleanSupplier current, float[] point) {
         if (!current.getAsBoolean()) return;
         if (point == null) {
-            if (attempt + 1 < MAX_ATTEMPTS) App.post(() -> click(view, selectors, index, attempt + 1, current, complete), RETRY_DELAY_MS);
-            else complete.run();
+            if (attempt + 1 < MAX_ATTEMPTS) App.post(() -> click(view, selectors, index, attempt + 1, current), RETRY_DELAY_MS);
             return;
         }
         dispatchClick(view, point, current);
-        App.post(() -> click(view, selectors, index + 1, 0, current, complete), RETRY_DELAY_MS);
+        App.post(() -> click(view, selectors, index + 1, 0, current), RETRY_DELAY_MS);
     }
 
     private static float[] decodePoint(String value) {

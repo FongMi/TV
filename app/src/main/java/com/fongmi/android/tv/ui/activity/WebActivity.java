@@ -191,9 +191,9 @@ public final class WebActivity extends BaseActivity implements BrowserWebView.Br
         if (uris != null) {
             for (Uri uri : uris) {
                 if (FileChooser.isFileSource(uri)) continue;
-                uris = null;
                 Notify.show(R.string.error_file_open);
-                break;
+                completeFileChooser(null);
+                return;
             }
         }
         completeFileChooser(uris);

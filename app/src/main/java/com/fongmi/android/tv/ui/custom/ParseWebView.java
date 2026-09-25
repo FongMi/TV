@@ -91,7 +91,7 @@ public final class ParseWebView extends WebView implements DialogInterface.OnDis
         setting.setMediaPlaybackRequiresUserGesture(false);
         setting.setJavaScriptCanOpenWindowsAutomatically(false);
         setting.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        setWebViewClient(webViewClient());
+        setWebViewClient(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? new OreoClient() : new Client());
     }
 
     public ParseWebView start(String key, String from, Map<String, String> headers, String url, String click, ParseCallback callback, boolean detect) {
@@ -103,32 +103,20 @@ public final class ParseWebView extends WebView implements DialogInterface.OnDis
         this.from = from;
         this.key = key;
         this.url = url;
-        start(headers);
-        return this;
-    }
-
-    private void start(Map<String, String> headers) {
         Map<String, String> safeHeaders = headers == null ? Collections.emptyMap() : headers;
         WebViewClicker.ensureViewport(this);
         CookieManager manager = CookieManager.getInstance();
         manager.setAcceptCookie(true);
         manager.setAcceptThirdPartyCookies(this, true);
-        checkHeader(url, safeHeaders);
-        loadUrl(url, safeHeaders);
-    }
-
-    private void checkHeader(String url, Map<String, String> headers) {
-        for (String key : headers.keySet()) {
-            if (HttpHeaders.USER_AGENT.equalsIgnoreCase(UrlUtil.fixHeader(key))) {
-                userAgent = headers.get(key);
+        for (Map.Entry<String, String> entry : safeHeaders.entrySet()) {
+            String name = entry.getKey();
+            if (HttpHeaders.USER_AGENT.equalsIgnoreCase(UrlUtil.fixHeader(name))) {
+                userAgent = entry.getValue();
                 getSettings().setUserAgentString(userAgent);
-            }
-            else if (HttpHeaders.COOKIE.equalsIgnoreCase(key)) WebViewCookies.set(this, url, headers.get(key));
+            } else if (HttpHeaders.COOKIE.equalsIgnoreCase(name)) WebViewCookies.set(this, url, entry.getValue());
         }
-    }
-
-    private WebViewClient webViewClient() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? new OreoClient() : new Client();
+        loadUrl(url, safeHeaders);
+        return this;
     }
 
     private class Client extends WebViewClient {
@@ -252,17 +240,12 @@ public final class ParseWebView extends WebView implements DialogInterface.OnDis
     private void onParseSuccess(Map<String, String> headers, String url) {
         Uri uri = Uri.parse(url);
         SpiderDebug.log(TAG, "success=%s://%s%s", uri.getScheme(), uri.getHost(), uri.getPath());
-        Map<String, String> result = getHeaders(headers, url);
-        ParseCallback cb = callbackRef.getAndSet(null);
-        if (cb != null) cb.onParseSuccess(result, url, from);
-        post(() -> stop(false));
-    }
-
-    private Map<String, String> getHeaders(Map<String, String> headers, String url) {
         Map<String, String> result = new LinkedHashMap<>(headers == null ? Collections.emptyMap() : headers);
         putHeader(result, HttpHeaders.COOKIE, CookieManager.getInstance().getCookie(url));
         putHeader(result, HttpHeaders.USER_AGENT, userAgent);
-        return result;
+        ParseCallback cb = callbackRef.getAndSet(null);
+        if (cb != null) cb.onParseSuccess(result, url, from);
+        post(() -> stop(false));
     }
 
     private static void putHeader(Map<String, String> headers, String name, String value) {
@@ -309,9 +292,5 @@ public final class ParseWebView extends WebView implements DialogInterface.OnDis
         if (destroyed) return;
         destroyed = true;
         destroy();
-    }
-
-    boolean isChallengeVisible() {
-        return dialog != null;
     }
 }

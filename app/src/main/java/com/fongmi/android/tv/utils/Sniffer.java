@@ -23,7 +23,7 @@ public class Sniffer {
 
     public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
     public static final Pattern AI_PUSH = Pattern.compile("(https?|thunder|magnet|ed2k|video):\\S+");
-    public static final Pattern SNIFFER = Pattern.compile("https?://[^\\s]{12,}\\.(?:m3u8|mp4|mkv|flv|mp3|m4a|aac|mpd)(?:\\?.*)?|https?://.*?video/tos[^\\s]*|rtmp:[^\\s]+");
+    public static final Pattern SNIFFER = Pattern.compile("https?://[^\\s]{12,}\\.(?:m3u8|mp4|mkv|flv|mp3|m4a|aac|mpd)|https?://.*?video/tos[^\\s]*|rtmp:[^\\s]+");
 
     public static String getUrl(String text) {
         if (UrlUtil.isWebView(text) || Json.isObj(text) || text.contains("$")) return text;
@@ -41,17 +41,9 @@ public class Sniffer {
         for (Pattern exclude : rule.getExcludePatterns()) if (exclude.matcher(url).find()) return false;
         for (String regex : rule.getRegex()) if (url.contains(regex)) return true;
         for (Pattern regex : rule.getRegexPatterns()) if (regex.matcher(url).find()) return true;
-        String path = stripQueryAndFragment(url);
+        String path = UrlUtil.stripQueryAndFragment(url);
         if (url.contains("url=http") || url.contains("v=http") || path.contains(".html")) return false;
         return SNIFFER.matcher(path).find();
-    }
-
-    private static String stripQueryAndFragment(String url) {
-        int query = url.indexOf('?');
-        int fragment = url.indexOf('#');
-        int end = query < 0 ? url.length() : query;
-        if (fragment >= 0) end = Math.min(end, fragment);
-        return url.substring(0, end);
     }
 
     public static List<String> getScript(Uri uri) {

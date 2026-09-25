@@ -567,10 +567,6 @@ public final class BrowserWebView extends WebView {
         }
     }
 
-    public void loadPlayback(String url, @Nullable Map<String, String> headers) {
-        loadPlayback(url, headers, "");
-    }
-
     public void loadPlayback(String url, @Nullable Map<String, String> headers, @Nullable String clickScript) {
         if (released || !isPlayback()) return;
         hideCustomView();
@@ -739,11 +735,6 @@ public final class BrowserWebView extends WebView {
         view.requestFocus();
     }
 
-    @Override
-    public boolean performClick() {
-        return super.performClick();
-    }
-
     private boolean isCurrentLoad(int generation) {
         return !released && !failureReported && generation == loadGeneration;
     }
@@ -888,11 +879,7 @@ public final class BrowserWebView extends WebView {
         }
         int generation = ++downloadGeneration;
         try {
-            String normalizedMimeType = normalizeDownloadMimeType(mimeType);
-            if (normalizedMimeType == null) throw new JSONException("Unsupported download type");
-            byte[] data = decodeDownloadData(encoded);
-            downloadGeneration++;
-            browserListener.onDownload(new Download(sanitizeFileName(fileName), normalizedMimeType, data));
+            deliverDownload(fileName, mimeType, encoded);
         } catch (JSONException e) {
             reportDownloadError(generation, null, "bridge-" + e.getMessage());
         }
@@ -935,14 +922,18 @@ public final class BrowserWebView extends WebView {
             if (!"done".equals(result.optString("state"))) throw new JSONException("Download read failed");
             String mimeType = result.optString("type");
             if (mimeType.isEmpty()) mimeType = reportedMimeType;
-            String normalizedMimeType = normalizeDownloadMimeType(mimeType);
-            if (normalizedMimeType == null) throw new JSONException("Unsupported download type");
-            byte[] data = decodeDownloadData(result.getString("data"));
-            downloadGeneration++;
-            browserListener.onDownload(new Download(fileName, normalizedMimeType, data));
+            deliverDownload(fileName, mimeType, result.getString("data"));
         } catch (JSONException e) {
             reportDownloadError(generation, key, "native-" + e.getMessage());
         }
+    }
+
+    private void deliverDownload(String fileName, String mimeType, String encoded) throws JSONException {
+        String normalized = normalizeDownloadMimeType(mimeType);
+        if (normalized == null) throw new JSONException("Unsupported download type");
+        byte[] data = decodeDownloadData(encoded);
+        downloadGeneration++;
+        browserListener.onDownload(new Download(sanitizeFileName(fileName), normalized, data));
     }
 
     static byte[] decodeDownloadData(@NonNull String encoded) throws JSONException {
@@ -1164,10 +1155,6 @@ public final class BrowserWebView extends WebView {
         if (challengeVisible == visible) return;
         challengeVisible = visible;
         if (listener != null) listener.onChallengeChanged(this, visible);
-    }
-
-    boolean isChallengeVisible() {
-        return challengeVisible;
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
