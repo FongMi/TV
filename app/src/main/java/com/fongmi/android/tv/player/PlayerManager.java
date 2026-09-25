@@ -95,7 +95,7 @@ public class PlayerManager implements ParseCallback {
     private long pendingStartPositionMs;
     private boolean danmakuEnabled;
     private boolean refreshAttempted;
-    private boolean clearKeyExoFallback;
+    private boolean mpvDrmExoFallback;
     private boolean initTrack;
     private volatile int playbackGeneration;
     private Future<?> bdjTask;
@@ -662,12 +662,11 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void handleRefreshError(PlaybackException e) {
-        if (refreshAttempted) {
-            callback.onError(engine.getErrorMessage(e));
-            return;
+        if (!refreshAttempted) {
+            refreshAttempted = true;
+            if (callback.onRefresh()) return;
         }
-        refreshAttempted = true;
-        if (!callback.onRefresh()) callback.onError(engine.getErrorMessage(e));
+        callback.onError(engine.getErrorMessage(e));
     }
 
     private void retryDecode(PlaybackException e) {
@@ -698,7 +697,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void ensureEngine(PlaySpec spec) {
-        if (clearKeyExoFallback) {
+        if (mpvDrmExoFallback) {
             if (engine.getType() != PlayerEngine.Type.EXO || engine.needsRebuild()) replaceEngine(PlayerEngineFactory.create(PlayerEngine.Type.EXO, listener));
             return;
         }
@@ -809,7 +808,7 @@ public class PlayerManager implements ParseCallback {
 
     private void startMediaItem(long timeout, long startPositionMs, boolean newMedia) {
         endSpeedPress();
-        if (newMedia) clearKeyExoFallback = false;
+        if (newMedia) mpvDrmExoFallback = false;
         ensureEngine(spec.checkUa());
         if (engine instanceof MpvPlayerEngine mpv) mpv.setBdjDiscMenu(isMenuInspected(spec) && inspectedMenuBdj);
         if (newMedia) engine.prepareForNewMedia();
@@ -1017,8 +1016,8 @@ public class PlayerManager implements ParseCallback {
             if (spec == null) return;
             if (engine.getType() == PlayerEngine.Type.MPV
                     && e.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED
-                    && !clearKeyExoFallback) {
-                clearKeyExoFallback = true;
+                    && !mpvDrmExoFallback) {
+                mpvDrmExoFallback = true;
                 PlaybackSnapshot snapshot = PlaybackSnapshot.capture(PlayerManager.this);
                 replaceEngine(PlayerEngineFactory.create(PlayerEngine.Type.EXO, listener));
                 engine.prepareForNewMedia();

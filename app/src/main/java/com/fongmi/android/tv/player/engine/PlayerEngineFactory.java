@@ -40,9 +40,7 @@ public final class PlayerEngineFactory {
     }
 
     private static PlayerEngine.Type resolve(PlaySpec spec) {
-        if (requiresExo(spec)) return EXO;
-        if (!isMpvReady()) return EXO;
-        return MPV;
+        return requiresExo(spec) ? EXO : resolve();
     }
 
     private static PlayerEngine.Type resolve() {
