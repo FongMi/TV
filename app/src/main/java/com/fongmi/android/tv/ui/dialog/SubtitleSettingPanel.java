@@ -1,12 +1,13 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import static com.fongmi.android.tv.ui.dialog.SettingPanelViews.applyEnabled;
+
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.Format;
@@ -26,7 +27,6 @@ import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.fongmi.android.tv.utils.SliderUtil;
-import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -62,7 +62,7 @@ final class SubtitleSettingPanel implements Player.Listener {
         this.binding = binding;
         this.subtitleView = subtitleView;
         this.player = player;
-        this.source = player == null ? null : player.getPlayer();
+        this.source = player.getPlayer();
         this.fontSelector = fontSelector;
         this.offsetPanel = new SubtitleOffsetPanel(binding.offset, player);
     }
@@ -72,7 +72,7 @@ final class SubtitleSettingPanel implements Player.Listener {
         bindAdjust();
         bindOffset();
         bindAdvanced();
-        bindTabs();
+        SettingPanelViews.bindTabs(binding.tabGroup, getTabs(), this::showTab);
         bindReset();
         showTab(0);
         PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
@@ -108,7 +108,7 @@ final class SubtitleSettingPanel implements Player.Listener {
         var appearance = binding.appearance;
         bindSystemSetting();
         bindStyle();
-        bindFont();
+        fontSelector.bind(appearance.fontGroup, SubtitleSetting.getFont());
         setupChip(appearance.textColorGroup, SubtitleSetting.getTextBaseColor(), this::chipForTextColor, this::textColorForChip, SubtitleSetting::putTextColor);
         setupTransparency(appearance.textOpacity, R.string.subtitle_text_opacity, SubtitleSetting.getTextOpacity(), SubtitleSetting::putTextOpacity);
         setupChip(appearance.edgeGroup, SubtitleSetting.getEdgeType(), this::chipForEdgeType, this::edgeTypeForChip, value -> {
@@ -125,10 +125,6 @@ final class SubtitleSettingPanel implements Player.Listener {
         });
         setupTransparency(appearance.backgroundOpacity, R.string.subtitle_background_opacity, SubtitleSetting.getBackgroundOpacity(), SubtitleSetting::putBackgroundOpacity);
         updateStyleEnabled();
-    }
-
-    private void bindFont() {
-        fontSelector.bind(binding.appearance.fontGroup, SubtitleSetting.getFont());
     }
 
     private void bindAdjust() {
@@ -162,7 +158,7 @@ final class SubtitleSettingPanel implements Player.Listener {
 
     private void applySecondaryMode(SecondarySubtitleUiState state, int mode) {
         boolean selectTrack = mode == SECONDARY_UI_MODE_SELECT;
-        SecondaryTrackOption selectedOption = selectTrack ? getFirstSecondaryTrackOption(state.options()) : null;
+        SecondaryTrackOption selectedOption = selectTrack && !state.options().isEmpty() ? state.options().get(0) : null;
         SubtitleSetting.putSecondaryMode(selectTrack ? SubtitleSetting.SECONDARY_MODE_AUTO : mode);
         SecondarySubtitleUiState next = state.withSelection(mode, selectedOption);
         setSecondarySubtitleSelection(selectedOption == null ? null : selectedOption.selection());
@@ -238,22 +234,6 @@ final class SubtitleSettingPanel implements Player.Listener {
         applySubtitleStyle();
     }
 
-    private void bindTabs() {
-        MaterialButton[] tabs = getTabs();
-        for (MaterialButton tab : tabs) checkOnFocus(tab);
-        binding.tabGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) showTab(i);
-        });
-    }
-
-    private void checkOnFocus(MaterialButton button) {
-        if (!Util.isLeanback()) return;
-        button.setOnFocusChangeListener((view, focused) -> {
-            if (focused) binding.tabGroup.check(button.getId());
-        });
-    }
-
     private void bindReset() {
         binding.reset.setOnClickListener(this::onReset);
         binding.reset.setOnLongClickListener(view -> {
@@ -266,7 +246,7 @@ final class SubtitleSettingPanel implements Player.Listener {
         switch (currentTab) {
             case 0 -> resetAppearance();
             case 1 -> resetAdjust();
-            case 2 -> resetOffset();
+            case 2 -> offsetPanel.reset();
             case 3 -> resetAdvanced();
         }
     }
@@ -281,10 +261,6 @@ final class SubtitleSettingPanel implements Player.Listener {
         SubtitleSetting.resetAdjust();
         bindAdjust();
         applySubtitleStyle();
-    }
-
-    private void resetOffset() {
-        offsetPanel.reset();
     }
 
     private void resetAdvanced() {
@@ -310,7 +286,8 @@ final class SubtitleSettingPanel implements Player.Listener {
         View[] roots = {binding.appearance.getRoot(), binding.adjust.getRoot(), binding.offset.getRoot(), binding.advanced.getRoot()};
         MaterialButton[] tabs = getTabs();
         for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
-        binding.reset.setNextFocusDownId(tabs[currentTab = index].getId());
+        currentTab = index;
+        binding.reset.setNextFocusDownId(tabs[index].getId());
     }
 
     private MaterialButton[] getTabs() {
@@ -420,11 +397,6 @@ final class SubtitleSettingPanel implements Player.Listener {
         return tag instanceof SecondaryTrackOption option ? option : null;
     }
 
-    @Nullable
-    private SecondaryTrackOption getFirstSecondaryTrackOption(List<SecondaryTrackOption> options) {
-        return options.isEmpty() ? null : options.get(0);
-    }
-
     private void updateStyleEnabled() {
         boolean textStyle = canApplyTextStyle();
         boolean custom = textStyle && SubtitleSetting.isCustomStyle();
@@ -487,16 +459,6 @@ final class SubtitleSettingPanel implements Player.Listener {
     private void updateSystemSettingVisibility() {
         boolean visible = canApplyTextStyle() && hasSystemCaptionSettings() && SubtitleSetting.isSystemStyle();
         binding.appearance.systemSetting.setVisibility(visible ? View.VISIBLE : View.GONE);
-    }
-
-    private void applyEnabled(View view, boolean enabled) {
-        view.setAlpha(enabled ? 1.0f : 0.38f);
-        setEnabledRecursive(view, enabled);
-    }
-
-    private void setEnabledRecursive(View view, boolean enabled) {
-        view.setEnabled(enabled);
-        if (view instanceof ViewGroup group) for (int i = 0; i < group.getChildCount(); i++) setEnabledRecursive(group.getChildAt(i), enabled);
     }
 
     private void applySubtitleStyle() {
@@ -649,7 +611,7 @@ final class SubtitleSettingPanel implements Player.Listener {
     }
 
     private boolean isPlayerAvailable() {
-        return player != null && !player.isReleased();
+        return !player.isReleased();
     }
 
     private record SecondarySubtitleUiState(int mode, @Nullable SecondaryTrackOption selectedOption, List<SecondaryTrackOption> options) {

@@ -32,8 +32,8 @@ final class SpeedSettingPanel {
     void bind() {
         bindSpeed();
         bindLongPressSpeed();
-        bindPreset();
-        bindReset();
+        for (int i = 0; i < presetViews.length; i++) bindPreset(presetViews[i], i);
+        binding.reset.setOnClickListener(view -> resetAll());
         syncControls();
         updateLongPressSpeedNextFocus();
         PlaybackDialogFocus.request(binding.getRoot(), binding.speed.slider);
@@ -63,20 +63,9 @@ final class SpeedSettingPanel {
         });
     }
 
-    private void bindPreset() {
-        for (int i = 0; i < presetViews.length; i++) bindPreset(presetViews[i], i);
-    }
-
-    private void bindReset() {
-        binding.reset.setOnClickListener(this::onReset);
-    }
-
-    private void onReset(View view) {
-        resetAll();
-    }
-
     private void resetAll() {
-        setLongPressSpeedAndSync();
+        setLongPressSpeed(SpeedSetting.LONG_PRESS);
+        syncLongPressSpeedSlider();
         setSkipSilenceEnabled(false);
         setSpeedAndSync(SpeedSetting.NORMAL);
     }
@@ -84,10 +73,8 @@ final class SpeedSettingPanel {
     private void bindPreset(TextView view, int index) {
         boolean visible = index < presets.length;
         view.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if (visible) setSpeedOnClick(view, presets[index]);
-    }
-
-    private void setSpeedOnClick(TextView view, float speed) {
+        if (!visible) return;
+        float speed = presets[index];
         view.setText(SpeedSetting.formatValue(speed));
         view.setOnClickListener(v -> setSpeedAndSync(speed));
     }
@@ -97,12 +84,12 @@ final class SpeedSettingPanel {
     }
 
     private boolean setSpeed(float speed) {
-        if (player == null || player.isReleased()) return false;
+        if (player.isReleased()) return false;
         speed = SpeedSetting.clamp(speed);
         this.speed = player.setSpeed(speed);
         updateSpeedValue();
         updateLongPressSpeedNextFocus();
-        saveSpeed();
+        if (save) SpeedSetting.putPlayback(this.speed);
         return true;
     }
 
@@ -128,11 +115,6 @@ final class SpeedSettingPanel {
         binding.speed.value.setText(SpeedSetting.format(speed));
     }
 
-    private void setLongPressSpeedAndSync() {
-        setLongPressSpeed(SpeedSetting.LONG_PRESS);
-        syncLongPressSpeedSlider();
-    }
-
     private void setLongPressSpeed(float speed) {
         speed = SpeedSetting.clampLongPress(speed);
         if (Float.compare(speed, SpeedSetting.getLongPress()) != 0) SpeedSetting.putLongPress(speed);
@@ -140,7 +122,7 @@ final class SpeedSettingPanel {
     }
 
     private float getSpeed() {
-        if (player == null || player.isReleased()) return SpeedSetting.NORMAL;
+        if (player.isReleased()) return SpeedSetting.NORMAL;
         return SpeedSetting.clamp(player.getSpeed());
     }
 
@@ -156,30 +138,19 @@ final class SpeedSettingPanel {
     }
 
     private void updateSkipSilenceSwitch() {
-        boolean supported = canSkipSilence();
+        boolean supported = !player.isReleased() && player.supportsSkipSilence();
         binding.skipSilenceSwitch.setOnCheckedChangeListener(null);
-        binding.skipSilenceSwitch.setChecked(supported && isSkipSilence());
+        binding.skipSilenceSwitch.setChecked(supported && player.isSkipSilence());
         binding.skipSilenceSwitch.setEnabled(supported);
         binding.skipSilenceRow.setEnabled(supported);
         binding.skipSilenceRow.setAlpha(supported ? 1.0f : 0.38f);
         binding.skipSilenceSwitch.setOnCheckedChangeListener((button, checked) -> setSkipSilenceEnabled(checked));
     }
 
-    private boolean canSkipSilence() {
-        return player != null && !player.isReleased() && player.supportsSkipSilence();
-    }
-
-    private boolean isSkipSilence() {
-        return player != null && !player.isReleased() && player.isSkipSilence();
-    }
-
     private void setSkipSilenceEnabled(boolean enabled) {
-        if (player == null || player.isReleased()) return;
+        if (player.isReleased()) return;
         player.setSkipSilenceEnabled(enabled);
         updateSkipSilenceSwitch();
     }
 
-    private void saveSpeed() {
-        if (save) SpeedSetting.putPlayback(speed);
-    }
 }

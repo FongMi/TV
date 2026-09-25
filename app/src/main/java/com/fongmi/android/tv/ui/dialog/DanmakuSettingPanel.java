@@ -13,7 +13,6 @@ import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.utils.SliderUtil;
-import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.Slider;
@@ -44,7 +43,7 @@ final class DanmakuSettingPanel {
         bindTiming();
         bindDensity();
         bindDisplay();
-        bindTabs();
+        SettingPanelViews.bindTabs(binding.tabGroup, getTabs(), this::showTab);
         bindReset();
         showTab(0);
         PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
@@ -62,7 +61,7 @@ final class DanmakuSettingPanel {
 
     private void bindAppearance() {
         var appearance = binding.appearance;
-        bindFont();
+        fontSelector.bind(appearance.fontGroup, DanmakuSetting.getFont());
         setupSwitch(appearance.textBoldSwitch, DanmakuSetting.isTextBold(), DanmakuSetting::putTextBold);
         setupFloat(appearance.textSizeSlider, appearance.textSizeValue, DanmakuSetting.getTextScale(), "%.1f", DanmakuSetting::putTextScale);
         setupFloat(appearance.alphaSlider, appearance.alphaValue, DanmakuSetting.getTransparency(), "%.2f", DanmakuSetting::putTransparency);
@@ -75,14 +74,6 @@ final class DanmakuSettingPanel {
         setupChip(appearance.colorChipGroup, DanmakuSetting.getColorMode(), this::colorChipForMode, this::colorModeForChip, this::onColorModeChanged);
         updateStyleSubSettings(DanmakuSetting.getStyleMode());
         updateColorOverrideHint(DanmakuSetting.getColorMode());
-    }
-
-    private void bindFont() {
-        fontSelector.bind(binding.appearance.fontGroup, DanmakuSetting.getFont());
-    }
-
-    private boolean isPlayerAvailable() {
-        return player != null && !player.isReleased();
     }
 
     private void bindTiming() {
@@ -113,22 +104,6 @@ final class DanmakuSettingPanel {
         setupSwitch(display.showPositionedSwitch, DanmakuSetting.isShowPositioned(), DanmakuSetting::putShowPositioned, null);
         setupSwitch(display.showSubtitleSwitch, DanmakuSetting.isShowSubtitle(), DanmakuSetting::putShowSubtitle, null);
         setupSwitch(display.showSpecialSwitch, DanmakuSetting.isShowSpecial(), DanmakuSetting::putShowSpecial, null);
-    }
-
-    private void bindTabs() {
-        MaterialButton[] tabs = {binding.tabAppearance, binding.tabTiming, binding.tabDensity, binding.tabDisplay};
-        for (MaterialButton tab : tabs) checkOnFocus(tab);
-        binding.tabGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) showTab(i);
-        });
-    }
-
-    private void checkOnFocus(MaterialButton button) {
-        if (!Util.isLeanback()) return;
-        button.setOnFocusChangeListener((v, focused) -> {
-            if (focused) binding.tabGroup.check(button.getId());
-        });
     }
 
     private void bindReset() {
@@ -167,9 +142,13 @@ final class DanmakuSettingPanel {
 
     private void showTab(int index) {
         View[] roots = {binding.appearance.getRoot(), binding.timing.getRoot(), binding.density.getRoot(), binding.display.getRoot()};
-        MaterialButton[] tabs = {binding.tabAppearance, binding.tabTiming, binding.tabDensity, binding.tabDisplay};
-        for (int i = 0; i < roots.length; i++) roots[i].setVisibility(visibleIf(index == i));
+        MaterialButton[] tabs = getTabs();
+        for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
         binding.reset.setNextFocusDownId(tabs[currentTab = index].getId());
+    }
+
+    private MaterialButton[] getTabs() {
+        return new MaterialButton[]{binding.tabAppearance, binding.tabTiming, binding.tabDensity, binding.tabDisplay};
     }
 
     private void resetAll() {
@@ -193,12 +172,12 @@ final class DanmakuSettingPanel {
     }
 
     private void applyVisible(boolean visible, View... views) {
-        int visibility = visibleIf(visible);
+        int visibility = visible ? View.VISIBLE : View.GONE;
         for (View view : views) view.setVisibility(visibility);
     }
 
     private void updateColorOverrideHint(int mode) {
-        binding.appearance.colorOverrideHint.setVisibility(visibleIf(mode != DanmakuConfig.COLOR_MODE_DEFAULT));
+        binding.appearance.colorOverrideHint.setVisibility(mode != DanmakuConfig.COLOR_MODE_DEFAULT ? View.VISIBLE : View.GONE);
     }
 
     private void onStyleModeChanged(int mode) {
@@ -224,7 +203,7 @@ final class DanmakuSettingPanel {
     }
 
     private void applyConfig() {
-        if (isPlayerAvailable()) player.setDanmakuConfig(DanmakuSetting.getConfig());
+        if (!player.isReleased()) player.setDanmakuConfig(DanmakuSetting.getConfig());
     }
 
     private int styleChipForMode(int mode) {
@@ -257,8 +236,8 @@ final class DanmakuSettingPanel {
         return DanmakuConfig.COLOR_MODE_DEFAULT;
     }
 
-    private void setupFloat(Slider slider, TextView label, float value, String format, FloatSetter setter) {
-        setupSlider(slider, label, value, sliderValue -> String.format(Locale.getDefault(), format, sliderValue), setter::set);
+    private void setupFloat(Slider slider, TextView label, float value, String format, Consumer<Float> setter) {
+        setupSlider(slider, label, value, sliderValue -> String.format(Locale.getDefault(), format, sliderValue), setter);
     }
 
     private void setupInt(Slider slider, TextView label, int value, IntFunction<String> formatter, IntConsumer setter) {
@@ -312,12 +291,4 @@ final class DanmakuSettingPanel {
         return value == 0 ? binding.getRoot().getContext().getString(R.string.danmaku_auto) : String.valueOf(value);
     }
 
-    private int visibleIf(boolean condition) {
-        return condition ? View.VISIBLE : View.GONE;
-    }
-
-    @FunctionalInterface
-    private interface FloatSetter {
-        void set(float value);
-    }
 }

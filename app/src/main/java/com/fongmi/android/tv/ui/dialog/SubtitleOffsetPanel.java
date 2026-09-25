@@ -131,6 +131,6 @@ final class SubtitleOffsetPanel {
     }
 
     private boolean isAvailable() {
-        return player != null && !player.isReleased() && player.supportsSubtitleOffsets();
+        return !player.isReleased() && player.supportsSubtitleOffsets();
     }
 }
