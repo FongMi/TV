@@ -96,8 +96,8 @@ public final class TapSeekFeedback extends LinearLayout {
     }
 
     public int directionAt(float x) {
-        float third = video.getWidth() / 3f;
-        return x < third ? -1 : x >= third * 2 ? 1 : 0;
+        float fifth = video.getWidth() / 5f;
+        return x < fifth ? -1 : x >= fifth * 4 ? 1 : 0;
     }
 
     public long show(float x) {
