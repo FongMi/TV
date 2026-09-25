@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.media3.common.MediaMetadata;
 import androidx.viewbinding.ViewBinding;
 
@@ -49,9 +50,10 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
     }
 
     public void show(FragmentActivity activity) {
-        if (activity.getSupportFragmentManager().isStateSaved()) return;
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof DanmakuSearchDialog) return;
-        show(activity.getSupportFragmentManager(), null);
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof DanmakuSearchDialog) return;
+        show(manager, null);
     }
 
     @Override
@@ -127,8 +129,7 @@ public final class DanmakuSearchDialog extends BaseBottomSheetDialog implements 
     }
 
     private String getKeyword() {
-        CharSequence text = binding.keyword.getText();
-        return text == null ? "" : text.toString().trim();
+        return binding.keyword.getText().toString().trim();
     }
 
     private void onSetting(View view) {

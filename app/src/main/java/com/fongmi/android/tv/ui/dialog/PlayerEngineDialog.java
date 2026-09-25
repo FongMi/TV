@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogPlayerEngineBinding;
@@ -28,13 +29,14 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
 
     public static void setText(TextView view, PlayerManager player) {
         if (view == null) return;
-        view.setText(PlaybackAction.getEngineText(player));
+        PlaybackAction.setPlaybackMode(player, view);
     }
 
     public static void show(FragmentActivity activity) {
-        if (activity.getSupportFragmentManager().isStateSaved()) return;
-        for (Fragment fragment : activity.getSupportFragmentManager().getFragments()) if (fragment instanceof PlayerEngineDialog) return;
-        new PlayerEngineDialog().show(activity.getSupportFragmentManager(), null);
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof PlayerEngineDialog) return;
+        new PlayerEngineDialog().show(manager, null);
     }
 
     @Override
@@ -47,8 +49,10 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
         PlaybackDialog.observe(this, player -> {
             this.player = player;
             if (player == null) return;
-            setSelected();
-            getSelectedView().requestFocus();
+            int engine = PlaybackAction.getEngine(player);
+            binding.exo.setSelected(engine == PlayerSetting.ENGINE_EXO);
+            binding.mpv.setSelected(engine == PlayerSetting.ENGINE_MPV);
+            (engine == PlayerSetting.ENGINE_MPV ? binding.mpv : binding.exo).requestFocus();
         });
     }
 
@@ -83,16 +87,6 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
         binding = null;
         player = null;
         super.onDestroyView();
-    }
-
-    private void setSelected() {
-        int engine = PlaybackAction.getEngine(player);
-        binding.exo.setSelected(engine == PlayerSetting.ENGINE_EXO);
-        binding.mpv.setSelected(engine == PlayerSetting.ENGINE_MPV);
-    }
-
-    private View getSelectedView() {
-        return PlaybackAction.getEngine(player) == PlayerSetting.ENGINE_MPV ? binding.mpv : binding.exo;
     }
 
     private PlaybackActivity getPlaybackActivity() {

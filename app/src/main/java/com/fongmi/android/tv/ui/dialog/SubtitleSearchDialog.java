@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.media3.common.MediaMetadata;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -61,9 +62,10 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     }
 
     public void show(FragmentActivity activity) {
-        if (activity.getSupportFragmentManager().isStateSaved()) return;
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof SubtitleSearchDialog) return;
-        show(activity.getSupportFragmentManager(), null);
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof SubtitleSearchDialog) return;
+        show(manager, null);
     }
 
     @Override
@@ -134,8 +136,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     }
 
     private String getKeyword() {
-        CharSequence text = binding.keyword.getText();
-        return text == null ? "" : text.toString().trim();
+        return binding.keyword.getText().toString().trim();
     }
 
     private void setKeyword(CharSequence text) {
@@ -275,12 +276,10 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
             SubtitleApi.cancel();
             showResults(false);
             return true;
-        } else if (!states.isEmpty()) {
-            restore(states.pop());
-            return true;
-        } else {
-            return false;
         }
+        if (states.isEmpty()) return false;
+        restore(states.pop());
+        return true;
     }
 
     private void restore(State state) {
