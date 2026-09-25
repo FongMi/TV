@@ -20,12 +20,4 @@ public class Push implements Source.Extractor {
         SystemClock.sleep(500);
         return "";
     }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void exit() {
-    }
 }

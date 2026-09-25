@@ -23,16 +23,7 @@ public class Source {
     private final List<Extractor> extractors;
 
     public Source() {
-        extractors = new ArrayList<>();
-        extractors.add(new Force());
-        extractors.add(new JianPian());
-        extractors.add(new Push());
-        extractors.add(new Strm());
-        extractors.add(new Thunder());
-        extractors.add(new TVBus());
-        extractors.add(new Video());
-        extractors.add(new WebView());
-        extractors.add(new YouTube());
+        extractors = List.of(new Force(), new JianPian(), new Push(), new Strm(), new Thunder(), new TVBus(), new Video(), new WebView(), new YouTube());
     }
 
     public static Source get() {
@@ -80,12 +71,10 @@ public class Source {
     }
 
     public void stop() {
-        if (extractors == null) return;
         extractors.forEach(Extractor::stop);
     }
 
     public void exit() {
-        if (extractors == null) return;
         Task.execute(() -> extractors.forEach(Extractor::exit));
     }
 
@@ -99,9 +88,9 @@ public class Source {
 
         boolean match(Uri uri);
 
-        void stop();
+        default void stop() {}
 
-        void exit();
+        default void exit() {}
     }
 
     private static class Loader {

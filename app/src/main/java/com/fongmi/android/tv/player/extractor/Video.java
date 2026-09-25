@@ -15,12 +15,4 @@ public class Video implements Source.Extractor {
     public String fetch(String url) throws Exception {
         return url.substring(8);
     }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void exit() {
-    }
 }

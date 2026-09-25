@@ -15,12 +15,4 @@ public class WebView implements Source.Extractor {
     public String fetch(String url) {
         return url;
     }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void exit() {
-    }
 }

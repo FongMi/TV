@@ -45,10 +45,6 @@ public class Force implements Source.Extractor, ServiceConnection {
     }
 
     @Override
-    public void stop() {
-    }
-
-    @Override
     public void exit() {
         try {
             if (!set.isEmpty()) App.get().unbindService(this);
