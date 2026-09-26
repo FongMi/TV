@@ -22,27 +22,14 @@ import java.io.File;
 
 public class Updater implements Download.Callback, UpdateListener {
 
-    private final Download download;
+    private Download download;
     private UpdateDialog dialog;
 
     private Updater() {
-        this.download = Download.create(getApk(), getFile());
     }
 
     public static Updater create() {
         return new Updater();
-    }
-
-    private File getFile() {
-        return Path.cache("update.apk");
-    }
-
-    private String getJson() {
-        return Github.getJson(BuildConfig.FLAVOR);
-    }
-
-    private String getApk() {
-        return Github.getApk(BuildConfig.FLAVOR + "-" + (android.os.Process.is64Bit() ? "arm64_v8a" : "armeabi_v7a"));
     }
 
     public Updater force() {
@@ -58,19 +45,34 @@ public class Updater implements Download.Callback, UpdateListener {
 
     private void doInBackground(FragmentActivity activity) {
         try {
-            JSONObject object = new JSONObject(OkHttp.string(getJson()));
-            String name = object.optString("name");
-            String desc = object.optString("desc");
-            int code = object.optInt("code");
-            if (code <= BuildConfig.VERSION_CODE) return;
-            App.post(() -> show(activity, name, desc));
+            JSONObject release = new JSONObject(OkHttp.string(Github.getRelease()));
+            String tag = release.optString("tag_name");
+            String name = tag.startsWith("v") ? tag.substring(1) : tag;
+            String desc = release.optString("body");
+            if (!isNewer(name)) return;
+            String abi = android.os.Process.is64Bit() ? "arm64_v8a" : "armeabi_v7a";
+            String apk = Github.getApk(release, BuildConfig.FLAVOR + "-" + abi + ".apk");
+            if (apk.isEmpty()) throw new IllegalStateException("Update APK not found");
+            App.post(() -> show(activity, name, desc, apk));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void show(FragmentActivity activity, String version, String desc) {
+    private boolean isNewer(String name) {
+        String[] current = BuildConfig.VERSION_NAME.split("\\.");
+        String[] latest = name.split("\\.");
+        if (current.length != latest.length) return false;
+        for (int i = 0; i < current.length; i++) {
+            int diff = Integer.compare(Integer.parseInt(latest[i]), Integer.parseInt(current[i]));
+            if (diff != 0) return diff > 0;
+        }
+        return false;
+    }
+
+    private void show(FragmentActivity activity, String version, String desc, String apk) {
         dismiss();
+        download = Download.create(apk, Path.cache("update.apk"));
         dialog = UpdateDialog.create().title(ResUtil.getString(R.string.update_version, version)).desc(desc).listener(this).show(activity);
     }
 
