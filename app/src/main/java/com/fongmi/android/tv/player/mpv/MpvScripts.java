@@ -73,14 +73,13 @@ public final class MpvScripts {
         if (!name.toLowerCase(Locale.ROOT).endsWith(".lua")) throw new IOException("Please select a .lua file");
         name = name.substring(0, name.length() - 4).replaceAll("[\\\\/:*?\"<>|\\p{Cntrl}]", "_") + ".lua";
         String source;
-        try (InputStream input = App.get().getContentResolver().openInputStream(uri)) {
+        try (InputStream input = Path.open(uri, "Unable to open Lua file")) {
             source = readText(input);
         }
         return install(name, source, automatic, replaceId);
     }
 
     private static String readText(InputStream input) throws IOException {
-        if (input == null) throw new IOException("Unable to open Lua file");
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         byte[] buffer = new byte[8192];
         int count;
@@ -99,7 +98,7 @@ public final class MpvScripts {
         if (item.isCommand()) throw new JSONException("A command button has no Lua file");
         try {
             if (!added) migrate(item);
-            FileUtil.writeAtomically(source.getBytes(StandardCharsets.UTF_8), item.source());
+            Path.writeAtomically(item.source(), source.getBytes(StandardCharsets.UTF_8));
             if (added) items.add(item);
             write(items);
         } catch (IOException | JSONException e) {
@@ -160,7 +159,7 @@ public final class MpvScripts {
             File destination = new File(target, file.getName());
             if (file.isDirectory()) migrateDirectory(file, destination, null);
             else {
-                if (!destination.exists()) FileUtil.copyAtomically(file, destination);
+                if (!destination.exists()) Path.writeAtomically(destination, file);
                 else if (!Arrays.equals(Crypto.sha256(file), Crypto.sha256(destination))) throw new IOException("Different script file already exists: " + file.getName());
                 deleteFile(file);
             }
@@ -171,18 +170,21 @@ public final class MpvScripts {
     }
 
     private static File writeRunner(Item item, String asset, File file, String generation) throws IOException {
-        String header = "local source = " + quote(item.source().getAbsolutePath()) + "\nlocal directory = " + quote(item.source().getParentFile().getAbsolutePath()) + "\nlocal status = " + quote("user-data/" + item.statusKey()) + "\n";
-        return writeRunner(asset, file, header + "local generation = " + quote(generation) + "\n");
+        String header = "local source = " + quote(item.source().getAbsolutePath()) + "\nlocal directory = " + quote(item.source().getParentFile().getAbsolutePath()) + "\n";
+        return writeRunner(asset, file, header + runnerHeader(item, generation));
     }
 
     private static File writeCommandRunner(Item item, String generation) throws IOException {
-        String header = "local command = " + quote(item.command) + "\nlocal status = " + quote("user-data/" + item.statusKey()) + "\nlocal generation = " + quote(generation) + "\n";
-        return writeRunner("command-button.lua", item.runner(), header);
+        return writeRunner("command-button.lua", item.runner(), "local command = " + quote(item.command) + "\n" + runnerHeader(item, generation));
+    }
+
+    private static String runnerHeader(Item item, String generation) {
+        return "local status = " + quote("user-data/" + item.statusKey()) + "\nlocal generation = " + quote(generation) + "\n";
     }
 
     private static File writeRunner(String asset, File file, String header) throws IOException {
         try (InputStream input = App.get().getAssets().open("mpv/" + asset)) {
-            FileUtil.writeAtomically((header + readText(input)).getBytes(StandardCharsets.UTF_8), file);
+            Path.writeAtomically(file, (header + readText(input)).getBytes(StandardCharsets.UTF_8));
         }
         return file;
     }

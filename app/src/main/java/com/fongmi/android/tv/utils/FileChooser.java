@@ -211,7 +211,7 @@ public final class FileChooser {
     }
 
     private static Uri materialize(Uri uri, File target) throws IOException {
-        FileUtil.copyAtomically(uri, target);
+        Path.writeAtomically(target, uri);
         return Uri.fromFile(target);
     }
 

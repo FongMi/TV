@@ -2,7 +2,6 @@ package com.fongmi.android.tv.api.node;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.ui.activity.WebActivity;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.nodejs.NodeClient;
 import com.google.gson.JsonElement;
@@ -115,7 +114,7 @@ public final class NodeRuntime implements NodeClient.Callback {
             File file = client.getProfileFile();
             if (file == null) return FAILURE_RESPONSE;
             try {
-                FileUtil.writeAtomically(profile.toString().getBytes(StandardCharsets.UTF_8), file);
+                Path.writeAtomically(file, profile.toString().getBytes(StandardCharsets.UTF_8));
                 return SUCCESS_RESPONSE;
             } catch (IOException e) {
                 SpiderDebug.log(e);

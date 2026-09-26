@@ -8,7 +8,6 @@ import android.util.LruCache;
 import androidx.annotation.Nullable;
 import androidx.media3.exoplayer.libass.LibassFontFile;
 
-import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
@@ -167,7 +166,7 @@ public final class ExternalFont {
 
     private static byte[] copyWithSha256(Uri uri, File target) throws IOException {
         MessageDigest digest = Crypto.newDigest("SHA-256");
-        try (InputStream input = openInputStream(uri); FileOutputStream fileOutput = new FileOutputStream(target); DigestOutputStream output = new DigestOutputStream(fileOutput, digest)) {
+        try (InputStream input = Path.open(uri, "Unable to open source file"); FileOutputStream fileOutput = new FileOutputStream(target); DigestOutputStream output = new DigestOutputStream(fileOutput, digest)) {
             byte[] buffer = new byte[COPY_BUFFER_SIZE];
             long totalBytes = 0L;
             int count;
@@ -181,12 +180,6 @@ public final class ExternalFont {
             fileOutput.getFD().sync();
         }
         return digest.digest();
-    }
-
-    private static InputStream openInputStream(Uri uri) throws IOException {
-        InputStream input = App.get().getContentResolver().openInputStream(uri);
-        if (input == null) throw new IOException("Unable to open source file");
-        return input;
     }
 
     private static Item installFont(Uri uri, File directory, File temporary, PreparedFont font) throws IOException {

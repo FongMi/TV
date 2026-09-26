@@ -5,8 +5,6 @@ import android.net.Uri;
 import androidx.annotation.Nullable;
 import androidx.media3.mpvplayer.MpvConfigFileInspector;
 
-import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -34,8 +32,7 @@ public final class MpvConfigFile {
     }
 
     public static String read(Uri uri) throws IOException {
-        try (InputStream input = App.get().getContentResolver().openInputStream(uri)) {
-            if (input == null) throw new IOException("Unable to open mpv.conf");
+        try (InputStream input = Path.open(uri, "Unable to open mpv.conf")) {
             InputStreamReader reader = new InputStreamReader(input, StandardCharsets.UTF_8.newDecoder());
             StringBuilder content = new StringBuilder();
             char[] buffer = new char[8192];
@@ -52,7 +49,7 @@ public final class MpvConfigFile {
 
     public static boolean write(String content) {
         try {
-            FileUtil.writeAtomically(content.getBytes(StandardCharsets.UTF_8), file());
+            Path.writeAtomically(file(), content.getBytes(StandardCharsets.UTF_8));
             return true;
         } catch (IOException | SecurityException e) {
             return false;

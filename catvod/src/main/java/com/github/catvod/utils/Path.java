@@ -1,5 +1,6 @@
 package com.github.catvod.utils;
 
+import android.net.Uri;
 import android.os.Environment;
 import android.os.StatFs;
 import android.system.ErrnoException;
@@ -8,12 +9,15 @@ import android.system.Os;
 import com.github.catvod.Init;
 import com.orhanobut.logger.Logger;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InterruptedIOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +26,7 @@ import java.util.List;
 public class Path {
 
     private static final String TAG = Path.class.getSimpleName();
+    private static final int BUFFER_SIZE = 16 * 1024;
 
     private static File mkdir(File file) {
         if (file == null || file.exists()) return file;
@@ -169,10 +174,20 @@ public class Path {
 
     public static String read(InputStream is) {
         try {
-            return new String(readToByte(is), StandardCharsets.UTF_8);
+            return readOrThrow(is);
         } catch (IOException e) {
             return "";
         }
+    }
+
+    public static String readOrThrow(InputStream is) throws IOException {
+        return new String(readToByte(is), StandardCharsets.UTF_8);
+    }
+
+    public static InputStream open(Uri uri, String error) throws IOException {
+        InputStream input = Init.context().getContentResolver().openInputStream(uri);
+        if (input == null) throw new IOException(error);
+        return input;
     }
 
     public static byte[] readToByte(File file) {
@@ -185,22 +200,49 @@ public class Path {
 
     private static byte[] readToByte(InputStream is) throws IOException {
         try (InputStream input = is; ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            int read;
-            byte[] buffer = new byte[16384];
-            while ((read = input.read(buffer)) != -1) bos.write(buffer, 0, read);
+            transfer(input, bos);
             return bos.toByteArray();
         }
     }
 
     public static File write(File file, InputStream is) {
         try (InputStream input = is; FileOutputStream output = new FileOutputStream(create(file))) {
-            int read;
-            byte[] buffer = new byte[16384];
-            while ((read = input.read(buffer)) != -1) output.write(buffer, 0, read);
+            transfer(input, output);
             return file;
         } catch (IOException e) {
             return file;
         }
+    }
+
+    public static void writeAtomically(File file, InputStream is) throws IOException {
+        try (InputStream input = is) {
+            File parent = file.getAbsoluteFile().getParentFile();
+            if (parent == null || (!parent.isDirectory() && !parent.mkdirs())) throw new IOException("Unable to create " + parent);
+            File temp = File.createTempFile("write-", ".tmp", parent);
+            try {
+                try (FileOutputStream output = new FileOutputStream(temp)) {
+                    transfer(input, output);
+                    output.flush();
+                    output.getFD().sync();
+                }
+                move(temp, file);
+            } finally {
+                clear(temp);
+            }
+        }
+    }
+
+    public static void writeAtomically(File file, File source) throws IOException {
+        if (source.getCanonicalFile().equals(file.getCanonicalFile())) return;
+        writeAtomically(file, new FileInputStream(source));
+    }
+
+    public static void writeAtomically(File file, Uri source) throws IOException {
+        writeAtomically(file, open(source, "Unable to open " + source));
+    }
+
+    public static void writeAtomically(File file, byte[] data) throws IOException {
+        writeAtomically(file, new ByteArrayInputStream(data));
     }
 
     public static File write(File file, byte[] data) {
@@ -258,9 +300,16 @@ public class Path {
 
     private static void copyOrThrow(InputStream in, File out) throws IOException {
         try (InputStream input = in; FileOutputStream output = new FileOutputStream(create(out))) {
-            int read;
-            byte[] buffer = new byte[16384];
-            while ((read = input.read(buffer)) != -1) output.write(buffer, 0, read);
+            transfer(input, output);
+        }
+    }
+
+    private static void transfer(InputStream input, OutputStream output) throws IOException {
+        int read;
+        byte[] buffer = new byte[BUFFER_SIZE];
+        while ((read = input.read(buffer)) != -1) {
+            if (Thread.currentThread().isInterrupted()) throw new InterruptedIOException("Canceled");
+            output.write(buffer, 0, read);
         }
     }
 
