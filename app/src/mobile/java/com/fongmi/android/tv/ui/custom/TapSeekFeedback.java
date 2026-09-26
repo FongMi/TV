@@ -96,8 +96,8 @@ public final class TapSeekFeedback extends LinearLayout {
     }
 
     public int directionAt(float x) {
-        float fifth = video.getWidth() / 5f;
-        return x < fifth ? -1 : x >= fifth * 4 ? 1 : 0;
+        float eighth = video.getWidth() / 8f;
+        return x < eighth ? -1 : x >= eighth * 7 ? 1 : 0;
     }
 
     public long show(float x) {
@@ -111,7 +111,7 @@ public final class TapSeekFeedback extends LinearLayout {
         animate().cancel();
         if (entering) resetArrows();
         FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) getLayoutParams();
-        int inset = video.getWidth() / 6;
+        int inset = ResUtil.dp2px(32);
         if (direction != nextDirection || (nextDirection > 0 ? params.rightMargin : params.leftMargin) != inset) arrange(nextDirection, inset);
         direction = nextDirection;
         int seconds = direction * (int) (TimeUnit.MILLISECONDS.toSeconds(Constant.INTERVAL_SEEK) * count);
@@ -152,10 +152,10 @@ public final class TapSeekFeedback extends LinearLayout {
         LinearLayout.LayoutParams arrowParams = new LinearLayout.LayoutParams(arrowSize + ResUtil.dp2px(ARROW_TRAVEL_DP) * 2, arrowSize);
         if (direction > 0) {
             addView(secondsView);
-            arrowParams.leftMargin = ResUtil.dp2px(16);
+            arrowParams.leftMargin = ResUtil.dp2px(8);
             addView(arrows, arrowParams);
         } else {
-            arrowParams.rightMargin = ResUtil.dp2px(16);
+            arrowParams.rightMargin = ResUtil.dp2px(8);
             addView(arrows, arrowParams);
             addView(secondsView);
         }
