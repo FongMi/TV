@@ -12,9 +12,8 @@ class AbiApkPackaging {
         configureAbis(android)
         configureDebugResourceCacheKey(project, components)
         components.onVariants(components.selector().withBuildType('release')) { variant ->
-            def device = configureOutputFileNames(variant)
+            configureOutputFileNames(variant)
             configureFinalizer(project, android, components, variant, apkArtifact)
-            configureReleaseExport(project, variant, device)
         }
     }
 
@@ -45,14 +44,13 @@ class AbiApkPackaging {
         }
     }
 
-    private static String configureOutputFileNames(def variant) {
+    private static void configureOutputFileNames(def variant) {
         def flavors = variant.productFlavors.collectEntries { [(it.first): it.second] }
         def device = flavors['device'] ?: 'device'
         variant.outputs.each { output ->
             def abi = output.filters.find { it.filterType.name() == 'ABI' }?.identifier?.replace('-', '_') ?: 'universal'
             output.outputFileName.set("${device}-${abi}.apk")
         }
-        return device
     }
 
     private static void configureFinalizer(Project project, def android, def components, def variant, Object apkArtifact) {
@@ -73,21 +71,6 @@ class AbiApkPackaging {
                 .toTransformMany(apkArtifact)
         finalizeTask.configure { task ->
             task.transformationRequest.set(request)
-        }
-    }
-
-    private static void configureReleaseExport(Project project, def variant, String device) {
-        def taskName = "assemble${variant.name.capitalize()}"
-        def apkDirectory = project.layout.buildDirectory.dir("outputs/apk/${device}/release").get().asFile
-        project.tasks.matching { it.name == taskName }.configureEach {
-            doLast {
-                project.copy {
-                    from project.fileTree(dir: apkDirectory, include: "${device}-*.apk")
-                    into project.rootProject.file('Release/apk')
-                    eachFile { it.path = it.name }
-                    includeEmptyDirs = false
-                }
-            }
         }
     }
 }

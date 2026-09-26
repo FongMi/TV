@@ -20,8 +20,8 @@ android {
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        versionCode 563
-        versionName "5.6.3"
+        versionCode 566
+        versionName "5.6.6"
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
