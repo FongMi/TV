@@ -71,6 +71,10 @@ public class MpvPlayerEngine implements PlayerEngine, DiscMenuController, Player
         player.setBdjDiscMenu(bdjDiscMenu);
     }
 
+    public void setDiscMenuAvailabilityListener(Runnable listener) {
+        player.setDiscMenuAvailabilityListener(listener);
+    }
+
     @Override
     public boolean isActive() {
         return player.isDiscMenuActive();

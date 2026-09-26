@@ -9,6 +9,7 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.util.LocalClearKeyLicense;
 import androidx.media3.common.util.Util;
+import androidx.media3.datasource.IsoUri;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
@@ -62,7 +63,9 @@ public final class MediaItemFactory {
     }
 
     public static MediaItem from(PlaySpec spec) {
-        return new MediaItem.Builder().setUri(spec.getUri())
+        Uri uri = spec.getUri();
+        if (spec.getIsoEditionIndex() != C.INDEX_UNSET) uri = IsoUri.withEditionIndex(uri, spec.getIsoEditionIndex());
+        return new MediaItem.Builder().setUri(uri)
                 .setSubtitleConfigurations(buildSubtitleConfigs(spec.getSubs()))
                 .setDrmConfiguration(buildDrmConfig(spec.getDrm()))
                 .setRequestMetadata(buildRequestMetadata(spec))

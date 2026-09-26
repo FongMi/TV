@@ -1200,8 +1200,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     private void showControl() {
         if (service() == null || isInPictureInPictureMode()) return;
         if (isDiscMenuActive()) updatePlayControl(isPlayingForControls());
-        int discMenuVisibility = hasDiscMenu() ? View.VISIBLE : View.GONE;
-        mBinding.control.action.discMenu.setVisibility(discMenuVisibility);
+        updateDiscMenuVisibility();
         mBinding.control.danmaku.setVisibility(isLock() || !player().haveDanmaku() ? View.GONE : View.VISIBLE);
         mBinding.control.setting.setVisibility(mHistory == null || isFullscreen() ? View.GONE : View.VISIBLE);
         mBinding.control.right.rotate.setVisibility(isFullscreen() && !isLock() ? View.VISIBLE : View.GONE);
@@ -1415,7 +1414,16 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     protected void onDiscMenuUnavailable() {
-        mBinding.control.action.discMenu.setVisibility(View.GONE);
+        updateDiscMenuVisibility();
+    }
+
+    @Override
+    protected void onDiscMenuAvailabilityChanged() {
+        updateDiscMenuVisibility();
+    }
+
+    private void updateDiscMenuVisibility() {
+        mBinding.control.action.discMenu.setVisibility(hasDiscMenu() ? View.VISIBLE : View.GONE);
     }
 
     @Override

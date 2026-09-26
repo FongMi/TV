@@ -88,6 +88,7 @@ public class PlayerManager implements ParseCallback {
     private Map<String, String> inspectedMenuHeaders;
     private IsoDiscMenuInfo.MenuStatus discMenuStatus;
     private boolean inspectedMenuBdj;
+    private boolean inspectedMenuRuntimeReady;
     private boolean retryMenuProbe;
     private Player player;
     private float speedBeforePress = Float.NaN;
@@ -110,6 +111,7 @@ public class PlayerManager implements ParseCallback {
         this.effects = new PlayerEffectManager(() -> engine);
         this.danmakuEnabled = DanmakuSetting.isShow();
         this.player = engine.getPlayer();
+        if (engine instanceof MpvPlayerEngine mpv) mpv.setDiscMenuAvailabilityListener(callback::onDiscMenuAvailabilityChanged);
     }
 
     public void release() {
@@ -117,6 +119,7 @@ public class PlayerManager implements ParseCallback {
         App.removeCallbacks(runnable);
         clearSpeedPressState();
         if (player != null) player.removeListener(listener);
+        if (engine instanceof MpvPlayerEngine mpv) mpv.setDiscMenuAvailabilityListener(null);
         if (engine != null) engine.release();
         engine = null;
         player = null;
@@ -132,8 +135,12 @@ public class PlayerManager implements ParseCallback {
     }
 
     public boolean isDiscMenuAvailable() {
-        return spec == null || !isIso(spec)
-                || (isMenuInspected(spec) && discMenuStatus != IsoDiscMenuInfo.MenuStatus.UNAVAILABLE);
+        if (isEmpty()) return false;
+        if (!isIso(spec)) return true;
+        if (!isMenuInspected(spec) || (inspectedMenuBdj && !inspectedMenuRuntimeReady)) return false;
+        return discMenuStatus == IsoDiscMenuInfo.MenuStatus.AVAILABLE
+                || (discMenuStatus == IsoDiscMenuInfo.MenuStatus.UNKNOWN
+                && engine instanceof MpvPlayerEngine mpv && mpv.hasMenu());
     }
 
     private boolean isMenuInspected(PlaySpec value) {
@@ -638,6 +645,7 @@ public class PlayerManager implements ParseCallback {
     public void clear() {
         cancelBdjPreparation();
         spec = null;
+        callback.onDiscMenuAvailabilityChanged();
     }
 
     public boolean preload(PlaySpec spec, long startPositionMs) {
@@ -685,6 +693,7 @@ public class PlayerManager implements ParseCallback {
         PlayerEngine.Type previousType = engine.getType();
         boolean live = player.isCurrentMediaItemLive() && player.isCurrentMediaItemDynamic();
         PlaybackSnapshot snapshot = PlaybackSnapshot.capture(this);
+        spec.setIsoEditionIndex(snapshot.selectedIsoEditionIndex());
         ensureEngine(spec.checkUa());
         // Positions in an ongoing live window cannot be transferred to another engine's window.
         startCurrent(live && previousType != engine.getType() ? C.TIME_UNSET : snapshot.positionMs());
@@ -708,9 +717,12 @@ public class PlayerManager implements ParseCallback {
     private void replaceEngine(PlayerEngine replacement) {
         PlayerEngine old = engine;
         player.removeListener(listener);
+        if (old instanceof MpvPlayerEngine mpv) mpv.setDiscMenuAvailabilityListener(null);
         engine = replacement;
         setPlayer(engine.getPlayer());
+        if (engine instanceof MpvPlayerEngine mpv) mpv.setDiscMenuAvailabilityListener(callback::onDiscMenuAvailabilityChanged);
         old.release();
+        callback.onDiscMenuAvailabilityChanged();
     }
 
     public void browse(PlaySpec spec, long startPositionMs) {
@@ -726,6 +738,7 @@ public class PlayerManager implements ParseCallback {
 
     public void start(PlaySpec spec, long timeout, long startPositionMs) {
         this.spec = spec;
+        callback.onDiscMenuAvailabilityChanged();
         setMediaItem(timeout, startPositionMs, true);
     }
 
@@ -738,6 +751,7 @@ public class PlayerManager implements ParseCallback {
         stopParse();
         pendingStartPositionMs = startPositionMs;
         spec = PlaySpec.fromParse(result, key, metadata);
+        callback.onDiscMenuAvailabilityChanged();
         parseJob = ParseJob.create(this).start(result, useParse);
     }
 
@@ -781,9 +795,11 @@ public class PlayerManager implements ParseCallback {
                     inspectedMenuHeaders = new HashMap<>(headers);
                     discMenuStatus = preparation.menuStatus;
                     inspectedMenuBdj = preparation.bdj;
+                    inspectedMenuRuntimeReady = preparation.runtimeError == null;
                     retryMenuProbe = preparation.shouldRetry();
                     if (preparation.runtimeError != null) Notify.show(ResUtil.getString(R.string.error_bdj_prepare, preparation.runtimeError.getMessage()));
                     startMediaItem(timeout, startPositionMs, newMedia);
+                    callback.onDiscMenuAvailabilityChanged();
                 });
             });
             return;
@@ -816,6 +832,7 @@ public class PlayerManager implements ParseCallback {
         initTrack = false;
         pendingTrackRestore.clear();
         engine.start(spec, startPositionMs);
+        callback.onDiscMenuAvailabilityChanged();
         notifyDanmakuSourceChanged();
         App.post(runnable, timeout);
         callback.onPrepare();
@@ -888,6 +905,8 @@ public class PlayerManager implements ParseCallback {
 
         void onTracksChanged();
 
+        default void onDiscMenuAvailabilityChanged() {}
+
         void onDecodeChanged();
 
         void onMediaOptionsChanged();
@@ -948,7 +967,7 @@ public class PlayerManager implements ParseCallback {
         pendingTrackRestore.removeIf(track -> track.getType() == type && track.getRole() == role);
     }
 
-    private record PlaybackSnapshot(long positionMs, boolean playWhenReady, PlaybackParameters playbackParameters, int repeatMode, float volume, long audioOffsetMs, SubtitleOffsets subtitleOffsets) {
+    private record PlaybackSnapshot(long positionMs, boolean playWhenReady, PlaybackParameters playbackParameters, int repeatMode, float volume, long audioOffsetMs, SubtitleOffsets subtitleOffsets, int selectedIsoEditionIndex) {
 
         private static PlaybackSnapshot capture(PlayerManager manager) {
             Player player = manager.player;
@@ -956,7 +975,16 @@ public class PlayerManager implements ParseCallback {
             long audioOffsetMs = player.isCommandAvailable(Player.COMMAND_GET_AUDIO_OFFSET) ? player.getAudioOffsetMs() : C.TIME_UNSET;
             SubtitleOffsets offsets = player.isCommandAvailable(Player.COMMAND_GET_TEXT_OFFSET) ? manager.getSubtitleOffsets() : null;
             int repeatMode = manager.engine instanceof ExoPlayerEngine exo && exo.isNavigationPlayback() ? exo.getNavigationRepeatMode() : player.getRepeatMode();
-            return new PlaybackSnapshot(player.getCurrentPosition(), player.getPlayWhenReady(), player.getPlaybackParameters(), repeatMode, volume, audioOffsetMs, offsets);
+            int selectedIsoEditionIndex = C.INDEX_UNSET;
+            if (manager.spec != null && isIso(manager.spec)) {
+                for (MediaEdition edition : player.getCurrentMediaEditions()) {
+                    if (edition.selected) {
+                        selectedIsoEditionIndex = edition.index;
+                        break;
+                    }
+                }
+            }
+            return new PlaybackSnapshot(player.getCurrentPosition(), player.getPlayWhenReady(), player.getPlaybackParameters(), repeatMode, volume, audioOffsetMs, offsets, selectedIsoEditionIndex);
         }
 
         private void restorePlayerState(PlayerManager manager) {
@@ -1009,6 +1037,7 @@ public class PlayerManager implements ParseCallback {
         @Override
         public void onMediaEditionsChanged(@NonNull List<MediaEdition> editions) {
             callback.onMediaOptionsChanged();
+            callback.onDiscMenuAvailabilityChanged();
         }
 
         @Override

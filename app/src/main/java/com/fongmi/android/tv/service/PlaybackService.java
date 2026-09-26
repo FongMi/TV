@@ -529,6 +529,11 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     @Override
+    public void onDiscMenuAvailabilityChanged() {
+        playerCallbacks.forEach(PlayerCallback::onDiscMenuAvailabilityChanged);
+    }
+
+    @Override
     public void onDecodeChanged() {
         playerCallbacks.forEach(PlayerCallback::onDecodeChanged);
     }
@@ -650,6 +655,9 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         }
 
         default void onTracksChanged() {
+        }
+
+        default void onDiscMenuAvailabilityChanged() {
         }
 
         default void onDecodeChanged() {

@@ -47,6 +47,7 @@
     <string name="play_chapter">Chapter</string>
     <string name="play_disc_menu">Top menu</string>
     <string name="play_disc_menu_unavailable">No usable disc menu</string>
+    <string name="play_disc_menu_timeout">Disc menu did not open; try again</string>
     <string name="play_scale">Default</string>
     <string name="play_config">Config</string>
     <string name="play_change">Change</string>

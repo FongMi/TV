@@ -236,7 +236,8 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         int state = player().getPlayer().getPlaybackState();
         if (!menu.hasMenu()) onDiscMenuUnavailable();
         if (state == Player.STATE_BUFFERING) onStateChanged(state);
-        Notify.show(R.string.play_disc_menu_unavailable);
+        Notify.show(result == DiscMenuController.OpenResult.TIMED_OUT
+                ? R.string.play_disc_menu_timeout : R.string.play_disc_menu_unavailable);
     }
 
     protected boolean handleDiscMenuBack() {
@@ -488,6 +489,9 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     protected void onDiscMenuUnavailable() {
+    }
+
+    protected void onDiscMenuAvailabilityChanged() {
     }
 
     protected void onWebPlaybackChanged(boolean active) {
@@ -996,6 +1000,11 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         public void onTracksChanged() {
             if (isOwner()) PlaybackActivity.this.onTracksChanged();
             restoreDebugView();
+        }
+
+        @Override
+        public void onDiscMenuAvailabilityChanged() {
+            if (isOwner()) PlaybackActivity.this.onDiscMenuAvailabilityChanged();
         }
 
         @Override

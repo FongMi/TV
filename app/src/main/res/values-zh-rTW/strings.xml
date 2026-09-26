@@ -47,6 +47,7 @@
     <string name="play_chapter">章節</string>
     <string name="play_disc_menu">主選單</string>
     <string name="play_disc_menu_unavailable">光碟沒有可用選單</string>
+    <string name="play_disc_menu_timeout">選單尚未開啟，請再試一次</string>
     <string name="play_scale">原始</string>
     <string name="play_config">配置</string>
     <string name="play_change">換源</string>

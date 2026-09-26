@@ -1096,8 +1096,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void showControl(View view) {
-        int discMenuVisibility = hasDiscMenu() ? View.VISIBLE : View.GONE;
-        mBinding.control.action.discMenu.setVisibility(discMenuVisibility);
+        updateDiscMenuVisibility();
         mBinding.control.getRoot().setVisibility(View.VISIBLE);
         view.requestFocus();
         setR1Callback();
@@ -1272,7 +1271,22 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onDiscMenuUnavailable() {
-        mBinding.control.action.discMenu.setVisibility(View.GONE);
+        updateDiscMenuVisibility();
+    }
+
+    @Override
+    protected void onDiscMenuAvailabilityChanged() {
+        updateDiscMenuVisibility();
+    }
+
+    private void updateDiscMenuVisibility() {
+        View button = mBinding.control.action.discMenu;
+        boolean focused = button.hasFocus();
+        boolean available = hasDiscMenu();
+        button.setVisibility(available ? View.VISIBLE : View.GONE);
+        if (!available && focused && mBinding.control.getRoot().getVisibility() == View.VISIBLE) {
+            mBinding.control.action.opening.requestFocus();
+        }
     }
 
     @Override
@@ -1454,7 +1468,10 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (dispatchDiscMenuKey(event)) {
+        int keyCode = event.getKeyCode();
+        boolean discMenuShortcut = keyCode == KeyEvent.KEYCODE_MEDIA_TOP_MENU || keyCode == KeyEvent.KEYCODE_TV_CONTENTS_MENU;
+        boolean discMenuNavigation = keyCode != KeyEvent.KEYCODE_MENU && isFullscreen() && isGone(mBinding.control.getRoot());
+        if ((discMenuShortcut || discMenuNavigation) && dispatchDiscMenuKey(event)) {
             hideControl();
             return true;
         }

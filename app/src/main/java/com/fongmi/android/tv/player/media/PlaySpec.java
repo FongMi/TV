@@ -31,6 +31,7 @@ public class PlaySpec {
     private String key;
     private String url;
     private Drm drm;
+    private int isoEditionIndex = C.INDEX_UNSET;
 
     private PlaySpec(String key, String url, Map<String, String> headers, String format, Drm drm, List<Sub> subs, List<Danmaku> danmakus, MediaMetadata metadata) {
         this.key = key;
@@ -80,6 +81,14 @@ public class PlaySpec {
 
     public Uri getUri() {
         return UrlUtil.uri(url);
+    }
+
+    public int getIsoEditionIndex() {
+        return isoEditionIndex;
+    }
+
+    public void setIsoEditionIndex(int isoEditionIndex) {
+        this.isoEditionIndex = isoEditionIndex;
     }
 
     public Map<String, String> getHeaders() {
