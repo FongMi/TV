@@ -319,7 +319,7 @@
     <string name="player_mpv_vulkan">vulkan</string>
     <string name="player_mpv_conf_priority_hint">Player settings take priority; reopen playback to apply.</string>
     <string name="player_mpv_conf_conflict_hint">Player settings will override: %1$s</string>
-    <string name="player_mpv_conf_import_success">Imported mpv.conf</string>
+    <string name="player_mpv_conf_import_success">Loaded mpv.conf. Tap OK to save.</string>
     <string name="player_mpv_conf_import_failed">Unable to import mpv.conf</string>
     <string name="player_mpv_conf_save_failed">Unable to save mpv.conf</string>
     <string name="player_ua">User-Agent</string>

@@ -42,7 +42,7 @@ public final class MpvUtil {
     private static final List<String> FONT_OPTIONS = List.of("sub-font", "sub-fonts-dir", "sub-ass-style-overrides");
     private static final List<String> SCALE_OPTIONS = List.of("sub-scale", "sub-scale-signs");
     private static final List<String> CACHE_OPTIONS = List.of("cache", "cache-on-disk", "demuxer-cache-dir", "cache-secs");
-    private static final List<String> PLAYER_OPTIONS = List.of("vo", "gpu-api", "gpu-context", "hwdec", "audio-spdif", "android-dolby-vision-output", "demuxer-dovi-profile7");
+    private static final List<String> PLAYER_OPTIONS = List.of("vo", "gpu-api", "gpu-context", "audio-spdif", "android-dolby-vision-output", "demuxer-dovi-profile7");
     private static final List<String> STYLE_OPTIONS = List.of("embeddedfonts", "sub-color", "sub-back-color", "sub-border-style", "sub-outline-color", "sub-outline-size", "sub-shadow-offset", "secondary-sub-ass-override");
 
     private static final String ASSET_CA_FILE = "cacert.pem";

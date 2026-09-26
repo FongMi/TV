@@ -318,7 +318,7 @@
     <string name="player_mpv_vulkan">vulkan</string>
     <string name="player_mpv_conf_priority_hint">界面设置优先，重进播放页生效。</string>
     <string name="player_mpv_conf_conflict_hint">界面设置将覆盖：%1$s</string>
-    <string name="player_mpv_conf_import_success">已导入 mpv.conf</string>
+    <string name="player_mpv_conf_import_success">已载入 mpv.conf，按确定后保存</string>
     <string name="player_mpv_conf_import_failed">无法导入 mpv.conf</string>
     <string name="player_mpv_conf_save_failed">无法保存 mpv.conf</string>
     <string name="player_ua">User-Agent</string>

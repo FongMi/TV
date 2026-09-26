@@ -23,6 +23,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import java.io.IOException;
 import java.util.List;
 
 public class MpvConfDialog extends BaseAlertDialog {
@@ -87,9 +88,12 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     private void importConfig(Uri uri) {
         if (!isAdded()) return;
-        boolean success = MpvConfigFile.importFrom(uri);
-        Notify.show(success ? R.string.player_mpv_conf_import_success : R.string.player_mpv_conf_import_failed);
-        if (success) setText(MpvConfigFile.read());
+        try {
+            setText(MpvConfigFile.read(uri));
+            Notify.show(R.string.player_mpv_conf_import_success);
+        } catch (IOException | SecurityException e) {
+            Notify.show(R.string.player_mpv_conf_import_failed);
+        }
     }
 
     @Override
