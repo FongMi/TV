@@ -31,45 +31,6 @@ jobs:
           path: media3
           fetch-depth: 1
 
-      - name: Align unpublished player integrations
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          # These two TV commits reference unpublished Media3 libass and
-          # PlayerView-controller APIs. Revert only those integrations while
-          # retaining the published danmaku, MPV and chapter implementations.
-          git revert --no-commit 9050830c58290fb7979670412e53bb9e44444791
-
-          set +e
-          git revert --no-commit b9455fb1b8485416e9231df174cdf747ad3ccf8c
-          REVERT_STATUS=$?
-          set -e
-
-          if [ "$REVERT_STATUS" -ne 0 ]; then
-            git checkout --theirs -- \
-              app/src/main/java/com/fongmi/android/tv/ui/dialog/SubtitleSettingPanel.java \
-              app/src/main/res/layout/view_subtitle_appearance.xml \
-              app/src/main/res/values/strings.xml \
-              app/src/main/res/values-zh-rCN/strings.xml \
-              app/src/main/res/values-zh-rTW/strings.xml
-            git add -A app
-          fi
-
-          UNRESOLVED="$(git diff --name-only --diff-filter=U)"
-          if [ -n "$UNRESOLVED" ]; then
-            echo "::error::Unresolved files after libass revert:"
-            printf '%s\n' "$UNRESOLVED"
-            exit 1
-          fi
-
-          git revert --quit || true
-
-          if grep -R -E "androidx\.media3.*(libass|DanmakuPlayerViewController)" app/src/main/java; then
-            echo "::error::An unavailable Media3 API is still referenced"
-            exit 1
-          fi
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
