@@ -32,6 +32,7 @@
     <string name="device_scan">請掃描影視 QRCode 進行綁定</string>
 
     <!-- Control -->
+    <string name="seek_seconds">%+d 秒</string>
     <string name="control_speed">倍速</string>
     <string name="control_scale">縮放</string>
     <string name="control_track">軌道</string>
@@ -59,4 +60,20 @@
         <item>子母畫面</item>
     </string-array>
 
+
+    <string name="dialog_action_choose_file">選取檔案</string>
+    <string name="dialog_action_delete_config">刪除配置紀錄</string>
+    <string name="dialog_action_delete_backup">刪除備份</string>
+    <string name="dialog_action_site_search">搜尋</string>
+    <string name="dialog_action_site_change">換源</string>
+    <string name="dialog_action_live_password">密碼保護</string>
+    <string name="dialog_action_live_boot">開機啟動</string>
+    <string name="dialog_action_toggle_hint">%1$s：%2$s，長按套用全部</string>
+    <string name="dialog_action_bulk_result">已批次設定%1$s：%2$s</string>
+    <string name="dialog_action_scan">掃描 QR Code</string>
+    <string name="dialog_action_sync_two">同步模式：雙向</string>
+    <string name="dialog_action_sync_upload">同步模式：上傳</string>
+    <string name="dialog_action_sync_download">同步模式：下載</string>
+
+    <string name="subtitle_search_api_title">Assrt</string>
 </resources>

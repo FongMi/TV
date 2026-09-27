@@ -7,6 +7,7 @@ import androidx.media3.common.MediaMetadata;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.playback.PlaybackResult;
 
 final class VodPreloader {
@@ -21,8 +22,14 @@ final class VodPreloader {
         this.state = state;
     }
 
-    boolean isRequestPending() {
-        return state.getPreloadRequest() != null && state.getPreloadResult() == null;
+    boolean deferUpdate(Vod item) {
+        VodPlaybackState.PreloadEntry preload = state.getPreload();
+        if (preload != null && preload.isPending()) {
+            state.setPreloadUpdate(item);
+            return true;
+        }
+        if (preload != null) state.setPreloadUpdate(null);
+        return false;
     }
 
     void update(Result result) {
@@ -37,10 +44,10 @@ final class VodPreloader {
     }
 
     @Nullable
-    Result consume(Episode episode) {
-        Result result = state.consumePreload(host.getVodKey(), state.getFlag(), episode);
-        if (result == null) clear();
-        return result;
+    VodPlaybackState.PreloadEntry consume(Episode episode) {
+        VodPlaybackState.PreloadEntry preload = state.consumePreload(host.getVodKey(), state.getFlag(), episode);
+        if (preload == null) clear();
+        return preload;
     }
 
     void onResult(PlaybackResult<VodPlayRequest> preload) {
@@ -69,8 +76,8 @@ final class VodPreloader {
     }
 
     private boolean isPending(PlaybackResult<VodPlayRequest> preload) {
-        VodPlayRequest pending = state.getPreloadRequest();
-        return preload != null && pending != null && pending.matches(preload.request()) && state.getPreloadResult() == null;
+        VodPlaybackState.PreloadEntry pending = state.getPreload();
+        return preload != null && pending != null && pending.isPending() && pending.request().matches(preload.request());
     }
 
     private void apply(VodPlayRequest request, Result result) {
@@ -86,14 +93,8 @@ final class VodPreloader {
     private void start(Result result, Episode episode) {
         result.getUrl().set(state.getQualityPosition());
         MediaMetadata metadata = VodPlaybackMedia.metadata(state.getHistory(), episode);
-        if (host.preloadPlayback(result, getStartPositionMs(result), metadata)) state.completePreload(result);
+        long position = Math.max(0, VodSkipPolicy.startPositionMs(state.getHistory(), result, C.TIME_UNSET));
+        if (host.preloadPlayback(result, position, metadata)) state.completePreload(result);
         else clear();
-    }
-
-    private long getStartPositionMs(Result result) {
-        History history = state.getHistory();
-        long opening = history == null ? C.TIME_UNSET : history.getOpening();
-        long position = result.hasPosition() ? result.getPosition() : C.TIME_UNSET;
-        return Math.max(0, Math.max(opening, position));
     }
 }

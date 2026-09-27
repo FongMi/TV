@@ -63,8 +63,4 @@ public class JianPian implements Source.Extractor {
             path = null;
         }
     }
-
-    @Override
-    public void exit() {
-    }
 }

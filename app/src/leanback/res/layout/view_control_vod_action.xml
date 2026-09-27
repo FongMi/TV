@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.fongmi.android.tv.ui.custom.CustomHorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -38,12 +38,6 @@
             style="@style/Control"
             android:layout_marginEnd="8dp"
             android:text="@string/play_exo" />
-
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
-            style="@style/Control"
-            android:layout_marginEnd="8dp"
-            android:text="@string/play_decode" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/reset"
@@ -121,6 +115,14 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/disc_menu"
+            style="@style/Control"
+            android:layout_marginEnd="8dp"
+            android:text="@string/play_disc_menu"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
         <com.fongmi.android.tv.ui.custom.CustomUpDownView
             android:id="@+id/opening"
             style="@style/Control"
@@ -130,8 +132,15 @@
         <com.fongmi.android.tv.ui.custom.CustomUpDownView
             android:id="@+id/ending"
             style="@style/Control"
+            android:layout_marginEnd="8dp"
             android:nextFocusRight="@id/next"
             android:text="@string/play_ed" />
 
+        <com.fongmi.android.tv.ui.custom.MpvScriptButtonsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:nextFocusLeft="@id/ending"
+            android:nextFocusRight="@id/next" />
+
     </androidx.appcompat.widget.LinearLayoutCompat>
-</HorizontalScrollView>
+</com.fongmi.android.tv.ui.custom.CustomHorizontalScrollView>

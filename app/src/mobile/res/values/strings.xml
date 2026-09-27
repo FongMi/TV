@@ -32,6 +32,7 @@
     <string name="device_scan">Please scan QR Code to bind</string>
 
     <!-- Control -->
+    <string name="seek_seconds">%+d s</string>
     <string name="control_speed">Speed</string>
     <string name="control_scale">Scale</string>
     <string name="control_track">Track</string>
@@ -59,4 +60,20 @@
         <item>PiP</item>
     </string-array>
 
+
+    <string name="dialog_action_choose_file">Choose file</string>
+    <string name="dialog_action_delete_config">Delete configuration record</string>
+    <string name="dialog_action_delete_backup">Delete backup</string>
+    <string name="dialog_action_site_search">Search</string>
+    <string name="dialog_action_site_change">Source switching</string>
+    <string name="dialog_action_live_password">Password protection</string>
+    <string name="dialog_action_live_boot">Start on boot</string>
+    <string name="dialog_action_toggle_hint">%1$s: %2$s. Long press to apply to all.</string>
+    <string name="dialog_action_bulk_result">Bulk setting applied — %1$s: %2$s</string>
+    <string name="dialog_action_scan">Scan QR code</string>
+    <string name="dialog_action_sync_two">Sync mode: two-way</string>
+    <string name="dialog_action_sync_upload">Sync mode: upload</string>
+    <string name="dialog_action_sync_download">Sync mode: download</string>
+
+    <string name="subtitle_search_api_title">Assrt</string>
 </resources>

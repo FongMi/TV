@@ -5,6 +5,7 @@ import android.net.Uri;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.MimeTypes;
 
 import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.Drm;
@@ -30,6 +31,7 @@ public class PlaySpec {
     private String key;
     private String url;
     private Drm drm;
+    private int isoEditionIndex = C.INDEX_UNSET;
 
     private PlaySpec(String key, String url, Map<String, String> headers, String format, Drm drm, List<Sub> subs, List<Danmaku> danmakus, MediaMetadata metadata) {
         this.key = key;
@@ -81,6 +83,14 @@ public class PlaySpec {
         return UrlUtil.uri(url);
     }
 
+    public int getIsoEditionIndex() {
+        return isoEditionIndex;
+    }
+
+    public void setIsoEditionIndex(int isoEditionIndex) {
+        this.isoEditionIndex = isoEditionIndex;
+    }
+
     public Map<String, String> getHeaders() {
         return headers;
     }
@@ -90,6 +100,7 @@ public class PlaySpec {
     }
 
     public String getFormat() {
+        if ((format == null || format.isEmpty()) && url != null && url.contains("/proxy/mpd/")) return MimeTypes.APPLICATION_MPD;
         return format;
     }
 
@@ -153,7 +164,7 @@ public class PlaySpec {
         else selectDanmaku(item);
     }
 
-    private void clearDanmaku() {
+    public void clearDanmaku() {
         danmakus.forEach(item -> item.setSelected(false));
     }
 

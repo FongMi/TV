@@ -6,6 +6,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
 
 import com.fongmi.quickjs.bean.Req;
+import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.utils.Connect;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.Proxy;
@@ -36,20 +37,26 @@ public class Global {
     private final AtomicInteger timerId;
     private final QuickJSContext ctx;
     private final Timer timer;
+    private final Host host;
 
     private volatile boolean destroyed;
 
-    private Global(QuickJSContext ctx, ExecutorService executor) {
-        this.executor = executor;
-        this.timerId = new AtomicInteger();
-        this.timers = new ConcurrentHashMap<>();
+    private Global(QuickJSContext ctx, ExecutorService executor, Host host) {
         this.timer = new Timer("quickjs-timer", true);
+        this.timers = new ConcurrentHashMap<>();
+        this.timerId = new AtomicInteger();
+        this.executor = executor;
+        this.host = host;
         this.ctx = ctx;
         setProperty();
     }
 
     public static Global create(QuickJSContext ctx, ExecutorService executor) {
-        return new Global(ctx, executor);
+        return create(ctx, executor, Host.NONE);
+    }
+
+    public static Global create(QuickJSContext ctx, ExecutorService executor, Host host) {
+        return new Global(ctx, executor, host);
     }
 
     public void destroy() {
@@ -93,6 +100,30 @@ public class Global {
     @JSMethod
     public String t2s(String text) {
         return Trans.t2s(false, text);
+    }
+
+    @Keep
+    @JSMethod
+    public Boolean openWeb(String url, String cookieName) {
+        return host.openWeb(url, cookieName);
+    }
+
+    @Keep
+    @JSMethod
+    public String getCookie(String url) {
+        return host.getCookie(url);
+    }
+
+    @Keep
+    @JSMethod
+    public Boolean setCookie(String url, String cookie) {
+        return host.setCookie(url, cookie);
+    }
+
+    @Keep
+    @JSMethod
+    public String getUserAgent() {
+        return host.getUserAgent();
     }
 
     @Keep
@@ -159,6 +190,18 @@ public class Global {
     @JSMethod
     public String md5X(String text) {
         return Crypto.md5(text);
+    }
+
+    @Keep
+    @JSMethod
+    public String sha256X(String text) {
+        return Crypto.sha256(text);
+    }
+
+    @Keep
+    @JSMethod
+    public String randomX(Integer size) {
+        return Crypto.randomUrlSafe(size == null ? 0 : size);
     }
 
     @Keep
@@ -236,16 +279,12 @@ public class Global {
 
     private boolean schedule(Timeout timeout, Integer delay) {
         try {
-            timer.schedule(timeout, getDelay(delay));
+            timer.schedule(timeout, Math.max(0, delay == null ? 0 : delay));
             return true;
         } catch (Throwable e) {
             cancel(timeout.id);
             return false;
         }
-    }
-
-    private int getDelay(Integer delay) {
-        return Math.max(0, delay == null ? 0 : delay);
     }
 
     private void cancel(Integer id) {

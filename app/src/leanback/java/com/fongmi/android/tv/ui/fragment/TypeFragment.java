@@ -50,6 +50,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private FragmentTypeBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
+    private VodPresenter mVodPresenter;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
     private List<Filter> mFilters;
@@ -199,11 +200,15 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void addGrid(List<Vod> items, Style style) {
+        // Leanback assigns recycled view types by presenter identity.
+        if (mVodPresenter == null || !mVodPresenter.matches(style)) {
+            mVodPresenter = new VodPresenter(this, style);
+            mLast = null;
+        }
         if (checkLastSize(items, style)) return;
         List<ListRow> rows = new ArrayList<>();
-        VodPresenter presenter = new VodPresenter(this, style);
         for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) {
-            mLast = new ArrayObjectAdapter(presenter);
+            mLast = new ArrayObjectAdapter(mVodPresenter);
             mLast.addAll(0, part);
             rows.add(new ListRow(mLast));
         }

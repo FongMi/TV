@@ -77,6 +77,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         if (ownsBinding(owner)) return;
         if (binding != null) binding.onReplaced().run();
         binding = new ActivityBinding(owner, onReplaced);
+        player.resetDecoderModesForNewSession();
     }
 
     public boolean ownsBinding(NavigationCallback owner) {
@@ -140,14 +141,20 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     private void handleAction(String action) {
-        if (ActionEvent.PLAY.equals(action)) player.play();
-        else if (ActionEvent.PAUSE.equals(action)) player.pause();
+        if (ActionEvent.PLAY.equals(action)) dispatchPlayPause(true);
+        else if (ActionEvent.PAUSE.equals(action)) dispatchPlayPause(false);
         else if (ActionEvent.PREV.equals(action)) dispatchPrev();
         else if (ActionEvent.NEXT.equals(action)) dispatchNext();
         else if (ActionEvent.STOP.equals(action)) dispatchStop();
         else if (ActionEvent.AUDIO.equals(action)) dispatchAudio();
         else if (ActionEvent.REPEAT.equals(action)) dispatchRepeat();
         else if (ActionEvent.REPLAY.equals(action)) dispatchReplay();
+    }
+
+    private void dispatchPlayPause(boolean play) {
+        if (hasExternalPlayback()) dispatch(play ? NavigationCallback::onPlay : NavigationCallback::onPause);
+        else if (play) player.play();
+        else player.pause();
     }
 
     private boolean isLocalBind(Intent intent) {
@@ -333,13 +340,23 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     private void dispatchNavigate(Consumer<NavigationCallback> action, int delta) {
-        if (hasNavigationCallback() && isNavigationOwner()) dispatch(action);
+        if (canDispatchNavigation()) dispatch(action);
         else navigateItem(delta);
     }
 
+    private boolean canDispatchNavigation() {
+        return hasNavigationCallback() && (hasExternalPlayback() || isNavigationOwner());
+    }
+
+    private boolean hasExternalPlayback() {
+        NavigationCallback callback = navigationCallback;
+        return callback != null && callback.isExternalPlaybackActive();
+    }
+
     public void dispatchStop() {
-        if (player.getPlaybackState() == Player.STATE_IDLE) return;
-        if (hasNavigationCallback() && isNavigationOwner()) dispatch(NavigationCallback::onStop);
+        if (hasExternalPlayback()) dispatch(NavigationCallback::onStop);
+        else if (player.getPlaybackState() == Player.STATE_IDLE) return;
+        else if (canDispatchNavigation()) dispatch(NavigationCallback::onStop);
         else {
             saveProgress();
             stopAndClear();
@@ -351,7 +368,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     public void dispatchReplay() {
-        if (hasNavigationCallback() && isNavigationOwner()) dispatch(NavigationCallback::onReplay);
+        if (canDispatchNavigation()) dispatch(NavigationCallback::onReplay);
         else {
             player.seekTo(0);
             player.play();
@@ -400,6 +417,29 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
     private ForwardingPlayer wrap(Player base) {
         return new ForwardingPlayer(base) {
+            @Override
+            public void prepare() {
+                if (!hasExternalPlayback()) super.prepare();
+            }
+
+            @Override
+            public void play() {
+                if (hasExternalPlayback()) dispatchPlayPause(true);
+                else super.play();
+            }
+
+            @Override
+            public void pause() {
+                if (hasExternalPlayback()) dispatchPlayPause(false);
+                else super.pause();
+            }
+
+            @Override
+            public void setPlayWhenReady(boolean playWhenReady) {
+                if (hasExternalPlayback()) dispatchPlayPause(playWhenReady);
+                else super.setPlayWhenReady(playWhenReady);
+            }
+
             @Override
             public void setMediaItem(@NonNull MediaItem item) {
                 interceptItem(item, C.TIME_UNSET);
@@ -479,8 +519,18 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     @Override
+    public void onBdjPreparing() {
+        playerCallbacks.forEach(PlayerCallback::onBdjPreparing);
+    }
+
+    @Override
     public void onTracksChanged() {
         playerCallbacks.forEach(PlayerCallback::onTracksChanged);
+    }
+
+    @Override
+    public void onDiscMenuAvailabilityChanged() {
+        playerCallbacks.forEach(PlayerCallback::onDiscMenuAvailabilityChanged);
     }
 
     @Override
@@ -496,6 +546,13 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     @Override
     public void onError(String msg) {
         playerCallbacks.forEach(callback -> callback.onError(msg));
+    }
+
+    @Override
+    public boolean onRefresh() {
+        boolean handled = false;
+        for (PlayerCallback callback : playerCallbacks) handled |= callback.onRefresh();
+        return handled;
     }
 
     @Override
@@ -594,7 +651,13 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         default void onPrepare() {
         }
 
+        default void onBdjPreparing() {
+        }
+
         default void onTracksChanged() {
+        }
+
+        default void onDiscMenuAvailabilityChanged() {
         }
 
         default void onDecodeChanged() {
@@ -604,6 +667,10 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         }
 
         default void onError(String msg) {
+        }
+
+        default boolean onRefresh() {
+            return false;
         }
 
         default void onPlayerRebuild(Player player) {
@@ -623,6 +690,16 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     public interface NavigationCallback {
+
+        default boolean isExternalPlaybackActive() {
+            return false;
+        }
+
+        default void onPlay() {
+        }
+
+        default void onPause() {
+        }
 
         default void onPrev() {
         }

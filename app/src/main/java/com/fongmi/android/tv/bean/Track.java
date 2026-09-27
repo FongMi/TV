@@ -11,21 +11,31 @@ import com.fongmi.android.tv.db.AppDatabase;
 import java.util.Collections;
 import java.util.List;
 
-@Entity(indices = @Index(value = {"key", "type"}, unique = true))
+@Entity(indices = @Index(value = {"key", "type", "role"}, unique = true))
 public class Track {
+
+    public static final int ROLE_PRIMARY = 0;
+    public static final int ROLE_SECONDARY = 1;
 
     @PrimaryKey(autoGenerate = true)
     private int id;
     private int type;
+    private int role;
+    private int ordinal;
     private String key;
     private String name;
     private String format;
+    private String label;
+    private String language;
+    private String mimeType;
     private boolean selected;
 
     public Track(int type, String name, String format) {
         this.type = type;
         this.name = name;
         this.format = format;
+        this.role = ROLE_PRIMARY;
+        this.ordinal = -1;
     }
 
     public static List<Track> find(String key) {
@@ -35,6 +45,11 @@ public class Track {
     public static void delete(String key) {
         if (TextUtils.isEmpty(key)) return;
         AppDatabase.get().getTrackDao().delete(key);
+    }
+
+    public static void delete(String key, int type, int role) {
+        if (TextUtils.isEmpty(key)) return;
+        AppDatabase.get().getTrackDao().delete(key, type, role);
     }
 
     public int getId() {
@@ -51,6 +66,22 @@ public class Track {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
+
+    public int getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(int ordinal) {
+        this.ordinal = ordinal;
     }
 
     public String getKey() {
@@ -77,6 +108,30 @@ public class Track {
         this.format = format;
     }
 
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
     public boolean isSelected() {
         return selected;
     }
@@ -88,6 +143,15 @@ public class Track {
     public Track key(String key) {
         setKey(key);
         return this;
+    }
+
+    public Track role(int role) {
+        setRole(role);
+        return this;
+    }
+
+    public boolean isSecondary() {
+        return role == ROLE_SECONDARY;
     }
 
     public Track toggle() {

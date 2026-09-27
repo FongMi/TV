@@ -2,22 +2,36 @@ package com.fongmi.android.tv.player.mpv;
 
 import android.content.pm.PackageManager;
 
+import androidx.annotation.Nullable;
 import androidx.media3.common.Player;
 import androidx.media3.common.util.Util;
+import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.ProgressiveIsoCache;
+import androidx.media3.datasource.cache.Cache;
+import androidx.media3.datasource.cache.CacheDataSource;
+import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.mpvplayer.MpvAndroidOptions;
+import androidx.media3.mpvplayer.MpvDecoderMode;
 import androidx.media3.mpvplayer.MpvPlayer;
 import androidx.media3.mpvplayer.MpvPlayerConfig;
 import androidx.media3.mpvplayer.MpvSubtitleOptions;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.player.exo.ExoMediaSourceFactory;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
+import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
 import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
+import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+
+import org.json.JSONException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,7 +42,7 @@ public final class MpvUtil {
     private static final List<String> FONT_OPTIONS = List.of("sub-font", "sub-fonts-dir", "sub-ass-style-overrides");
     private static final List<String> SCALE_OPTIONS = List.of("sub-scale", "sub-scale-signs");
     private static final List<String> CACHE_OPTIONS = List.of("cache", "cache-on-disk", "demuxer-cache-dir", "cache-secs");
-    private static final List<String> PLAYER_OPTIONS = List.of("vo", "gpu-api", "gpu-context", "hwdec", "audio-spdif", "android-dolby-vision-output", "demuxer-dovi-profile7");
+    private static final List<String> PLAYER_OPTIONS = List.of("vo", "gpu-api", "gpu-context", "audio-spdif", "android-dolby-vision-output", "demuxer-dovi-profile7");
     private static final List<String> STYLE_OPTIONS = List.of("embeddedfonts", "sub-color", "sub-back-color", "sub-border-style", "sub-outline-color", "sub-outline-size", "sub-shadow-offset", "secondary-sub-ass-override");
 
     private static final String ASSET_CA_FILE = "cacert.pem";
@@ -49,15 +63,16 @@ public final class MpvUtil {
         return App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION, VULKAN_1_2);
     }
 
-    public static MpvPlayer buildPlayer(int decode, Player.Listener listener) {
-        MpvPlayer player = new MpvPlayer.Builder(App.get()).setDecode(decode).setConfig(buildConfig()).build();
+    public static MpvPlayer buildPlayer(Player.Listener listener) {
+        MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(MpvDecoderMode.AUTO).setConfig(buildConfig()).build();
+        player.setSubtitleContentLoader(new SubtitleFileContent());
         setPreferredTextLanguages(player);
         player.addListener(listener);
         return player;
     }
 
     public static void applySubtitleStyle(MpvPlayer player) {
-        player.setSubtitleOptions(buildSubtitleOptions());
+        player.setSubtitleOptions(buildSubtitleOptions(SubtitleSetting.getFont()));
     }
 
     static List<String> getManagedOptionNames() {
@@ -75,12 +90,30 @@ public final class MpvUtil {
         return options;
     }
 
-    private static MpvPlayerConfig buildConfig() {
+    private static DataSource.Factory createIsoDataSourceFactory() {
+        Cache cache = ExoMediaSourceFactory.getCache();
+        CacheDataSource.Factory factory = new CacheDataSource.Factory().setCache(cache).setUpstreamDataSourceFactory(new OkHttpDataSource.Factory(OkHttp.player())).setCacheWriteDataSinkFactory(null).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        return ProgressiveIsoCache.withDiskCache(factory, cache);
+    }
+
+    static MpvPlayerConfig buildConfig() {
+        ExternalFont.Item font = SubtitleSetting.getFont();
         File cacheDir = Path.mpvCache();
+        File defaultFontsDirectory = ExternalFont.getDirectory();
         AndroidFontConfig.prepare();
-        MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().addConfigDirectory(Path.mpv()).addAndroidDefaults(buildAndroidOptions(cacheDir)).addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions());
-        addPreloadOptions(builder);
+        MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().setDataSourceFactory(createIsoDataSourceFactory()).setDefaultFontDirectories(defaultFontsDirectory, defaultFontsDirectory).addConfigDirectory(Path.mpv()).addAndroidDefaults(buildAndroidOptions(cacheDir));
+        builder.addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions(font));
+        if (PreloadSetting.isEnabled()) builder.addDiskCacheOptions(cacheDir, PreloadSetting.getTimeSeconds());
         return builder.build();
+    }
+
+    public static List<MpvScripts.Item> readScripts() {
+        try {
+            return MpvScripts.read();
+        } catch (JSONException e) {
+            Notify.show(Notify.getError(R.string.mpv_script_error, e));
+            return List.of();
+        }
     }
 
     private static MpvAndroidOptions buildAndroidOptions(File shaderCacheDirectory) {
@@ -94,19 +127,14 @@ public final class MpvUtil {
         player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setPreferredTextLanguages(LangUtil.getPreferredTextLanguages()).build());
     }
 
-    private static void addPreloadOptions(MpvPlayerConfig.Builder builder) {
-        if (!PreloadSetting.isEnabled()) return;
-        builder.addDiskCacheOptions(Path.mpvCache(), PreloadSetting.getTimeSeconds());
-    }
-
-    private static MpvSubtitleOptions buildSubtitleOptions() {
+    private static MpvSubtitleOptions buildSubtitleOptions(@Nullable ExternalFont.Item font) {
         MpvSubtitleOptions.Builder builder = new MpvSubtitleOptions.Builder();
+        if (font != null) builder.setFontsDirectory(font.directory().getAbsolutePath());
         if (SubtitleSetting.isPositionSet()) builder.setPosition(getSubtitlePosition());
         if (SubtitleSetting.isScaleApplied()) builder.setScale(SubtitleSetting.getAppliedScale());
         if (SubtitleSetting.isSecondaryPositionSet()) builder.setSecondarySubtitlePosition(SubtitleSetting.getSecondaryPosition());
         if (SubtitleSetting.isStyleForced()) builder.setSecondaryAssStyleOverride(true);
-        String fontFamily = SubtitleSetting.getFontFamily();
-        if (fontFamily != null) builder.setFontFamily(fontFamily).setFontsDirectory(ExternalFont.getDirectory().getAbsolutePath());
+        if (font != null) builder.setFontFamily(font.familyName());
         if (SubtitleSetting.isCustomStyle()) builder.setCustomStyle(SubtitleSetting.getTextColor(), SubtitleSetting.getBackgroundColor(), SubtitleSetting.getEdgeType(), SubtitleSetting.getEdgeColor(), SubtitleSetting.getEdgeWidth(), SubtitleSetting.getShadow());
         else if (SubtitleSetting.isSystemStyle()) builder.setSystemCaptionStyle();
         return builder.build();

@@ -34,7 +34,7 @@ public class JsLoader {
     public Spider getSpider(String key, String api, String ext, String jar) {
         return spiders.computeIfAbsent(key, k -> {
             try {
-                Spider spider = loader.spider(api, BaseLoader.get().dex(jar));
+                Spider spider = loader.spider(api, BaseLoader.get().dex(jar), JsHost.INSTANCE);
                 spider.siteKey = key;
                 spider.init(App.get(), ext);
                 return spider;

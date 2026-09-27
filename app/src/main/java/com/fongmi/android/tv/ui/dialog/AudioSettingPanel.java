@@ -1,11 +1,9 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.annotation.SuppressLint;
-import android.view.KeyEvent;
+import static com.fongmi.android.tv.ui.dialog.SettingPanelViews.applyEnabled;
+
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 
 import androidx.media3.common.Format;
 
@@ -20,15 +18,17 @@ import com.fongmi.android.tv.player.effect.audio.AudioEffectPreset;
 import com.fongmi.android.tv.player.effect.audio.AudioPresetLevels;
 import com.fongmi.android.tv.setting.AudioSetting;
 import com.fongmi.android.tv.utils.SliderUtil;
-import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 final class AudioSettingPanel {
 
@@ -42,6 +42,22 @@ final class AudioSettingPanel {
     private static final int MIN_AUDIO_OFFSET_MS = -10000;
     private static final int MAX_AUDIO_OFFSET_MS = 10000;
     private static final int AUDIO_OFFSET_STEP_MS = 100;
+    private static final int[][] PRESETS = {
+            {AudioEffectPreset.OFF, R.id.presetOriginal},
+            {AudioEffectPreset.NATURAL, R.id.presetNatural},
+            {AudioEffectPreset.VOCAL, R.id.presetVocal},
+            {AudioEffectPreset.CINEMA, R.id.presetCinema},
+            {AudioEffectPreset.BASS, R.id.presetBass},
+            {AudioEffectPreset.TREBLE, R.id.presetTreble},
+            {AudioEffectPreset.POP, R.id.presetPop},
+            {AudioEffectPreset.ROCK, R.id.presetRock},
+            {AudioEffectPreset.DANCE, R.id.presetDance},
+            {AudioEffectPreset.ELECTRONIC, R.id.presetElectronic},
+            {AudioEffectPreset.HIPHOP, R.id.presetHipHop},
+            {AudioEffectPreset.JAZZ, R.id.presetJazz},
+            {AudioEffectPreset.CLASSICAL, R.id.presetClassical},
+            {AudioEffectPreset.CUSTOM, R.id.presetCustom},
+    };
 
     private final DialogAudioSettingBinding binding;
     private final PlayerManager player;
@@ -63,16 +79,17 @@ final class AudioSettingPanel {
         bindSliders();
         bindChannelMode();
         bindSwitches();
-        bindTabs();
-        bindCompare();
+        SettingPanelViews.bindTabs(binding.tabGroup, getTabs(), this::showTab);
+        SettingPanelViews.bindCompare(binding.compare, this::previewOriginal);
         bindReset();
         showTab(0);
         updateControls();
-        if (Util.isLeanback()) binding.tabPreset.requestFocus();
-        binding.tabGroup.check(binding.tabPreset.getId());
+        PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
+        PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, binding.tabPreset);
     }
 
     void release() {
+        binding.tabGroup.clearOnButtonCheckedListeners();
         previewOriginal(false);
     }
 
@@ -82,7 +99,7 @@ final class AudioSettingPanel {
     }
 
     private void applyPreset(ChipGroup group, int chipId) {
-        clearOtherPresetGroups(group);
+        SettingPanelViews.clearOtherPresets(getPresetGroups(), group, this::onPresetChecked);
         previewOriginal(false);
         setAudioSetting(presetForChip(chipId));
         bindBands();
@@ -90,39 +107,11 @@ final class AudioSettingPanel {
     }
 
     private void updatePresetCheck() {
-        int chip = chipForPreset(getAppliedPreset());
-        setPresetListeners(null);
-        clearPresetGroups();
-        checkPresetGroup(chip);
-        setPresetListeners(this::onPresetChecked);
+        SettingPanelViews.checkPreset(getPresetGroups(), chipForPreset(getAppliedPreset()), this::onPresetChecked);
     }
 
     private ChipGroup[] getPresetGroups() {
         return new ChipGroup[]{binding.presetBasicGroup, binding.presetToneGroup, binding.presetGenreGroup, binding.presetCustomGroup};
-    }
-
-    private void setPresetListeners(ChipGroup.OnCheckedStateChangeListener listener) {
-        for (ChipGroup group : getPresetGroups()) group.setOnCheckedStateChangeListener(listener);
-    }
-
-    private void clearPresetGroups() {
-        for (ChipGroup group : getPresetGroups()) group.clearCheck();
-    }
-
-    private void clearOtherPresetGroups(ChipGroup checkedGroup) {
-        setPresetListeners(null);
-        for (ChipGroup group : getPresetGroups()) if (group != checkedGroup) group.clearCheck();
-        setPresetListeners(this::onPresetChecked);
-    }
-
-    private void checkPresetGroup(int chip) {
-        if (chip == View.NO_ID) return;
-        for (ChipGroup group : getPresetGroups()) {
-            if (group.findViewById(chip) != null) {
-                group.check(chip);
-                break;
-            }
-        }
     }
 
     private void bindSliders() {
@@ -179,44 +168,13 @@ final class AudioSettingPanel {
         setupSwitch(binding.loudness, AudioSetting.isLoudnessEnabled(), AudioSetting::putLoudness);
     }
 
-    private void setupSwitch(MaterialSwitch item, boolean checked, BooleanSetter setter) {
+    private void setupSwitch(MaterialSwitch item, boolean checked, Consumer<Boolean> setter) {
         item.setOnCheckedChangeListener(null);
         item.setChecked(checked);
         item.setOnCheckedChangeListener((button, enabled) -> {
             previewOriginal(false);
-            setter.set(enabled);
+            setter.accept(enabled);
             apply();
-        });
-    }
-
-    private void bindTabs() {
-        MaterialButton[] tabs = getTabs();
-        for (MaterialButton tab : tabs) checkOnFocus(tab);
-        binding.tabGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) showTab(i);
-        });
-    }
-
-    private void checkOnFocus(MaterialButton button) {
-        if (!Util.isLeanback()) return;
-        button.setOnFocusChangeListener((view, focused) -> {
-            if (focused) binding.tabGroup.check(button.getId());
-        });
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void bindCompare() {
-        binding.compare.setOnTouchListener((view, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) previewOriginal(true);
-            else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) previewOriginal(false);
-            return false;
-        });
-        binding.compare.setOnKeyListener((view, keyCode, event) -> {
-            boolean supported = keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER;
-            if (supported && event.getAction() == KeyEvent.ACTION_DOWN) previewOriginal(true);
-            else if (supported && event.getAction() == KeyEvent.ACTION_UP) previewOriginal(false);
-            return false;
         });
     }
 
@@ -275,22 +233,22 @@ final class AudioSettingPanel {
         apply();
     }
 
-    private void setupOptionSlider(ViewSettingSliderBinding item, int titleRes, int min, int max, int stepSize, int initial, ValueFormatter formatter, ValueSetter setter) {
+    private void setupOptionSlider(ViewSettingSliderBinding item, int titleRes, int min, int max, int stepSize, int initial, LabelFormatter formatter, IntConsumer setter) {
         Slider slider = item.slider;
         item.title.setText(titleRes);
         slider.clearOnChangeListeners();
         slider.setValueFrom(min);
         slider.setValueTo(max);
         slider.setStepSize(stepSize);
-        slider.setLabelFormatter(formatter::format);
+        slider.setLabelFormatter(formatter);
         SliderUtil.setValue(slider, initial);
-        item.value.setText(formatter.format(slider.getValue()));
+        item.value.setText(formatter.getFormattedValue(slider.getValue()));
         slider.addOnChangeListener((source, value, fromUser) -> {
             if (!fromUser) return;
             previewOriginal(false);
             float snapped = SliderUtil.snap(source, value);
-            item.value.setText(formatter.format(snapped));
-            setter.set(Math.round(snapped));
+            item.value.setText(formatter.getFormattedValue(snapped));
+            setter.accept(Math.round(snapped));
             apply();
         });
     }
@@ -395,18 +353,6 @@ final class AudioSettingPanel {
         if (!supported) binding.unsupported.setText(getUnsupportedText());
     }
 
-    private void applyEnabled(View view, boolean enabled) {
-        view.setAlpha(enabled ? 1.0f : 0.38f);
-        setEnabledRecursive(view, enabled);
-    }
-
-    private void setEnabledRecursive(View view, boolean enabled) {
-        view.setEnabled(enabled);
-        if (view instanceof ViewGroup group) {
-            for (int i = 0; i < group.getChildCount(); i++) setEnabledRecursive(group.getChildAt(i), enabled);
-        }
-    }
-
     private void apply() {
         if (isPlayerAvailable()) player.refreshAudioSetting();
         updateControls();
@@ -452,14 +398,17 @@ final class AudioSettingPanel {
     }
 
     private boolean isPlayerAvailable() {
-        return player != null && !player.isReleased();
+        return !player.isReleased();
     }
 
     private void showTab(int index) {
         View[] roots = {binding.presetSection, binding.equalizerSection, binding.offsetSection, binding.advancedSection};
         MaterialButton[] tabs = getTabs();
         for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
-        binding.reset.setNextFocusDownId(tabs[currentTab = index].getId());
+        currentTab = index;
+        int focusId = tabs[index].getId();
+        binding.reset.setNextFocusDownId(focusId);
+        binding.compare.setNextFocusDownId(focusId);
     }
 
     private MaterialButton[] getTabs() {
@@ -476,36 +425,17 @@ final class AudioSettingPanel {
     }
 
     private int chipForPreset(int preset) {
-        for (int[] item : getPresetItems()) if (item[0] == preset) return item[1];
+        for (int[] item : PRESETS) if (item[0] == preset) return item[1];
         return View.NO_ID;
     }
 
     private int presetForChip(int chipId) {
-        for (int[] item : getPresetItems()) if (item[1] == chipId) return item[0];
+        for (int[] item : PRESETS) if (item[1] == chipId) return item[0];
         return AudioEffectPreset.CUSTOM;
     }
 
     private int getAppliedPreset() {
         return AudioSetting.isEnabled() ? AudioSetting.getPreset() : AudioEffectPreset.OFF;
-    }
-
-    private int[][] getPresetItems() {
-        return new int[][]{
-                {AudioEffectPreset.OFF, binding.presetOriginal.getId()},
-                {AudioEffectPreset.NATURAL, binding.presetNatural.getId()},
-                {AudioEffectPreset.VOCAL, binding.presetVocal.getId()},
-                {AudioEffectPreset.CINEMA, binding.presetCinema.getId()},
-                {AudioEffectPreset.BASS, binding.presetBass.getId()},
-                {AudioEffectPreset.TREBLE, binding.presetTreble.getId()},
-                {AudioEffectPreset.POP, binding.presetPop.getId()},
-                {AudioEffectPreset.ROCK, binding.presetRock.getId()},
-                {AudioEffectPreset.DANCE, binding.presetDance.getId()},
-                {AudioEffectPreset.ELECTRONIC, binding.presetElectronic.getId()},
-                {AudioEffectPreset.HIPHOP, binding.presetHipHop.getId()},
-                {AudioEffectPreset.JAZZ, binding.presetJazz.getId()},
-                {AudioEffectPreset.CLASSICAL, binding.presetClassical.getId()},
-                {AudioEffectPreset.CUSTOM, binding.presetCustom.getId()},
-        };
     }
 
     private int chipForChannelMode(int mode) {
@@ -564,18 +494,4 @@ final class AudioSettingPanel {
         return String.format(Locale.getDefault(), "%+.1fs", value / 1000.0f);
     }
 
-    private interface ValueFormatter {
-
-        String format(float value);
-    }
-
-    private interface ValueSetter {
-
-        void set(int value);
-    }
-
-    private interface BooleanSetter {
-
-        void set(boolean value);
-    }
 }

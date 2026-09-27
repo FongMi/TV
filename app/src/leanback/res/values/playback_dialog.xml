@@ -1,0 +1,71 @@
+<resources>
+
+    <dimen name="playback_dialog_inset">24dp</dimen>
+    <dimen name="playback_dialog_spacing">8dp</dimen>
+    <dimen name="playback_dialog_switch_width">47dp</dimen>
+    <dimen name="playback_dialog_tab_content_spacing">16dp</dimen>
+
+    <style name="PlaybackDialogHeader">
+        <item name="android:paddingStart">@dimen/playback_dialog_inset</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingEnd">@dimen/playback_dialog_inset</item>
+        <item name="android:paddingBottom">@dimen/playback_dialog_spacing</item>
+    </style>
+
+    <style name="PlaybackDialogTitle">
+        <item name="android:textAppearance">?attr/textAppearanceHeadlineSmall</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
+    </style>
+
+    <style name="PlaybackDialogAction" parent="Widget.Material3.Button.TonalButton">
+        <item name="strokeColor">@color/selector_playback_dialog_action</item>
+        <item name="strokeWidth">1.5dp</item>
+    </style>
+
+    <style name="PlaybackDialogTabs">
+        <item name="android:layout_marginStart">@dimen/playback_dialog_inset</item>
+        <item name="android:layout_marginEnd">@dimen/playback_dialog_inset</item>
+        <item name="android:layout_marginBottom">@dimen/playback_dialog_spacing</item>
+        <item name="selectionRequired">true</item>
+        <item name="singleSelection">true</item>
+    </style>
+
+    <style name="PlaybackDialogTab" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="strokeColor">@color/selector_playback_dialog_tab</item>
+        <item name="strokeWidth">1.5dp</item>
+    </style>
+
+    <style name="PlaybackDialogSwitch">
+        <item name="android:layout_width">52dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:scaleX">0.75</item>
+        <item name="android:scaleY">0.75</item>
+        <item name="ensureMinTouchTargetSize">false</item>
+    </style>
+
+    <style name="PlaybackDialogSwitchContainer">
+        <item name="android:layout_width">@dimen/playback_dialog_switch_width</item>
+        <item name="android:layout_height">24dp</item>
+        <item name="android:addStatesFromChildren">true</item>
+        <item name="android:clipChildren">false</item>
+        <item name="android:clipToPadding">false</item>
+        <item name="android:foreground">@drawable/selector_playback_dialog_switch</item>
+    </style>
+
+    <style name="PlaybackDialogFirstRow">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">@dimen/playback_dialog_inset</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingEnd">@dimen/playback_dialog_inset</item>
+        <item name="android:paddingBottom">8dp</item>
+    </style>
+
+    <style name="PlaybackDialogTextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox" />
+
+    <style name="PlaybackDialogBody">
+        <item name="android:paddingBottom">@dimen/playback_dialog_inset</item>
+    </style>
+
+</resources>

@@ -42,6 +42,10 @@ public interface VodPlaybackHost {
 
     boolean canTrackPlaybackProgress();
 
+    default boolean isIsoNavigationPlayback() {
+        return false;
+    }
+
     boolean canPreloadNext();
 
     long getPlayerPosition();
@@ -59,6 +63,8 @@ public interface VodPlaybackHost {
     void resetPlaybackForError(String msg);
 
     void replay(long position);
+
+    void seekPlayback(long position);
 
     void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata);
 

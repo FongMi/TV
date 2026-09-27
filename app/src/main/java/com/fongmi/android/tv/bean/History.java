@@ -28,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 @Entity
 public class History implements Diffable<History> {
 
+    // Distinguishes an explicit Auto choice from an unset history value during title merges.
+    public static final long AUTO_SKIP = -1L;
+
     @NonNull
     @PrimaryKey
     @SerializedName("key")
@@ -204,6 +207,10 @@ public class History implements Diffable<History> {
         return opening;
     }
 
+    public static boolean isAutoSkip(long value) {
+        return value == C.TIME_UNSET || value == AUTO_SKIP;
+    }
+
     public void setOpening(long opening) {
         this.opening = opening;
     }
@@ -345,7 +352,8 @@ public class History implements Diffable<History> {
     private History mergeFrom(List<History> items, boolean force) {
         List<History> matches = items.stream().filter(item -> item.shouldMerge(this, force)).toList();
         if (matches.isEmpty()) return this;
-        matches.get(0).copyTo(this);
+        if (getEnding() == C.TIME_UNSET) setEnding(matches.get(0).getEnding());
+        if (getOpening() == C.TIME_UNSET) setOpening(matches.get(0).getOpening());
         matches.forEach(History::delete);
         return this;
     }

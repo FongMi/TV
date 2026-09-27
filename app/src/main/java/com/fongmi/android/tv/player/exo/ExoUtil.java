@@ -13,6 +13,7 @@ import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.audio.AudioProcessor;
+import androidx.media3.exoplayer.DecoderManager;
 import androidx.media3.exoplayer.DefaultLoadControl;
 import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
@@ -33,7 +34,6 @@ import androidx.media3.exoplayer.util.EventLogger;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
-import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
@@ -68,7 +68,11 @@ public final class ExoUtil {
 
     static LoadControl buildLoadControl(int maxPreloadBufferBytes) {
         int buffer = PlayerSetting.getBuffer();
-        return new DefaultLoadControl.Builder().setBufferDurationsMs(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS * buffer, DefaultLoadControl.DEFAULT_MAX_BUFFER_MS * buffer, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS).setPlayerTargetBufferBytes(PlayerId.PRELOAD.name, maxPreloadBufferBytes).build();
+        return new DefaultLoadControl.Builder()
+                .setBufferDurationsMsForStreaming(DefaultLoadControl.DEFAULT_MIN_BUFFER_MS * buffer, DefaultLoadControl.DEFAULT_MAX_BUFFER_MS * buffer, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_MS, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_MS)
+                .setBufferDurationsMsForLocalPlayback(DefaultLoadControl.DEFAULT_MIN_BUFFER_FOR_LOCAL_PLAYBACK_MS * buffer, DefaultLoadControl.DEFAULT_MAX_BUFFER_FOR_LOCAL_PLAYBACK_MS * buffer, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_FOR_LOCAL_PLAYBACK_MS, DefaultLoadControl.DEFAULT_BUFFER_FOR_PLAYBACK_AFTER_REBUFFER_FOR_LOCAL_PLAYBACK_MS)
+                .setPlayerTargetBufferBytes(PlayerId.PRELOAD.name, maxPreloadBufferBytes)
+                .build();
     }
 
     public static Map<String, String> extractHeaders(MediaItem item) {
@@ -77,38 +81,23 @@ public final class ExoUtil {
         return extras.keySet().stream().filter(key -> extras.getString(key) != null).collect(Collectors.toMap(key -> key, extras::getString));
     }
 
-    static DecodeTrackSelector buildTrackSelector(int decode) {
-        DecodeTrackSelector trackSelector = new DecodeTrackSelector(App.get());
+    static DecodeTrackSelector buildTrackSelector(DecoderManager decoderManager) {
+        DecodeTrackSelector trackSelector = decoderManager.createTrackSelector(App.get());
         DefaultTrackSelector.Parameters.Builder builder = trackSelector.buildUponParameters();
         if (DecodeSetting.isPreferAAC()) builder.setPreferredAudioMimeType(MimeTypes.AUDIO_AAC);
         builder.setPreferredTextLanguages(LangUtil.getPreferredTextLanguages());
         builder.setTunnelingEnabled(DecodeSetting.isTunnelingEnabled());
         builder.setForceHighestSupportedBitrate(true);
         trackSelector.setParameters(builder.build());
-        setDecodePreferences(trackSelector, decode);
         return trackSelector;
     }
 
-    static void setDecodePreferences(DecodeTrackSelector trackSelector, int decode) {
-        int audioDecode = isAudioSoftwareDecode(decode) ? PlayerEngine.SOFT : PlayerEngine.HARD;
-        int videoDecode = isVideoSoftwareDecode(decode) ? PlayerEngine.SOFT : PlayerEngine.HARD;
-        trackSelector.setRendererDecodePreferences(audioDecode, videoDecode);
-    }
-
-    private static boolean isAudioSoftwareDecode(int decode) {
-        return decode == PlayerEngine.SOFT && DecodeSetting.isAudioPrefer();
-    }
-
-    private static boolean isVideoSoftwareDecode(int decode) {
-        return decode == PlayerEngine.SOFT && DecodeSetting.isVideoPrefer();
-    }
-
     static RenderersFactory buildRenderersFactory() {
-        return new ExoRenderersFactory(null, null, null);
+        return new ExoRenderersFactory(null, null, null, null);
     }
 
-    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor, TextOutput secondaryTextOutput, LibassPlaybackSession libassPlaybackSession) {
-        return new ExoRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession);
+    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor, TextOutput secondaryTextOutput, LibassPlaybackSession libassPlaybackSession, DecoderManager decoderManager) {
+        return new ExoRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession, decoderManager);
     }
 
     private static AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams, @Nullable AudioProcessor audioProcessor) {
@@ -124,11 +113,12 @@ public final class ExoUtil {
         @Nullable private final TextOutput secondaryTextOutput;
         @Nullable private final LibassPlaybackSession libassPlaybackSession;
 
-        private ExoRenderersFactory(@Nullable AudioProcessor audioProcessor, @Nullable TextOutput secondaryTextOutput, @Nullable LibassPlaybackSession libassPlaybackSession) {
+        private ExoRenderersFactory(@Nullable AudioProcessor audioProcessor, @Nullable TextOutput secondaryTextOutput, @Nullable LibassPlaybackSession libassPlaybackSession, @Nullable DecoderManager decoderManager) {
             super(App.get());
             this.audioProcessor = audioProcessor;
             this.secondaryTextOutput = secondaryTextOutput;
             this.libassPlaybackSession = libassPlaybackSession;
+            if (decoderManager != null) setDecoderManager(decoderManager);
             setEnableDecoderFallback(true);
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);
             setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());

@@ -15,6 +15,7 @@ import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
 import com.fongmi.android.tv.gson.HeaderAdapter;
+import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.utils.Trans;
@@ -374,6 +375,16 @@ public class Live {
 
     public void save() {
         AppDatabase.get().getLiveDao().insertOrUpdate(this);
+    }
+
+    public void saveSettings() {
+        saveSettings(List.of(this));
+    }
+
+    public static void saveSettings(List<Live> items) {
+        List<Live> snapshots = new ArrayList<>(items.size());
+        for (Live item : items) snapshots.add(new Live(item.getName(), item.getUrl()).sync(item));
+        Task.executeSerial(() -> AppDatabase.get().getLiveDao().saveSettings(snapshots));
     }
 
     @Override

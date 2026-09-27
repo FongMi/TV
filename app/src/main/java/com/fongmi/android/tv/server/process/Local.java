@@ -78,7 +78,7 @@ public class Local implements Process {
         if (name.toLowerCase(Locale.ROOT).endsWith(".zip")) {
             if (!FileUtil.zipDecompress(source, directory)) throw new IOException("Unable to extract archive");
         } else {
-            FileUtil.copyAtomically(source, resolveChild(directory, name));
+            Path.writeAtomically(resolveChild(directory, name), source);
         }
     }
 

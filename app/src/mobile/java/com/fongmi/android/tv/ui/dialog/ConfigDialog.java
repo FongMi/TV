@@ -9,6 +9,7 @@ import android.view.inputmethod.EditorInfo;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.widget.TooltipCompat;
 import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
@@ -81,6 +82,7 @@ public class ConfigDialog extends BaseAlertDialog {
     @Override
     protected void initEvent() {
         binding.choose.setEndIconOnClickListener(this::onChoose);
+        TooltipCompat.setTooltipText(binding.choose.findViewById(com.google.android.material.R.id.text_input_end_icon), binding.choose.getEndIconContentDescription());
         binding.url.addTextChangedListener(new CustomTextListener() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {

@@ -12,6 +12,7 @@ import androidx.media3.ui.SubtitleView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.github.catvod.utils.Prefers;
 
@@ -226,11 +227,11 @@ public class SubtitleSetting {
 
     @Nullable
     public static ExternalFont.Item getFont() {
-        return ExternalFont.find(Prefers.getString("subtitle_font", ""));
+        return ExternalFont.find(Prefers.getString("subtitle_font", ""), MpvConfigFile.getSubtitleFontsDirectory());
     }
 
     public static void putFont(@Nullable ExternalFont.Item font) {
-        Prefers.put("subtitle_font", font == null ? "" : font.fileName());
+        Prefers.put("subtitle_font", font == null ? "" : font.storageKey());
     }
 
     @Nullable
@@ -321,6 +322,7 @@ public class SubtitleSetting {
     public static void resetAdjust() {
         Prefers.put("subtitle_scale", DEFAULT_SCALE);
         Prefers.put("subtitle_position", DEFAULT_POSITION);
+        Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 
     public static void resetStyle() {
@@ -339,7 +341,6 @@ public class SubtitleSetting {
 
     public static void resetAdvanced() {
         Prefers.put("subtitle_secondary_track", DEFAULT_SECONDARY_MODE);
-        Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 
     public static void reset() {

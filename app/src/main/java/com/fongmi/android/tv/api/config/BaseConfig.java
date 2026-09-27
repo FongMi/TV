@@ -20,7 +20,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -44,6 +46,9 @@ abstract class BaseConfig {
 
     protected abstract boolean isLoaded();
 
+    protected void cancelLoad() {
+    }
+
     public synchronized void ensureLoaded() {
         try {
             if (isLoaded()) return;
@@ -60,7 +65,8 @@ abstract class BaseConfig {
     }
 
     public boolean needSync(String url) {
-        return sync || config == null || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
+        Config selected = getConfig();
+        return sync || selected.isEmpty() || url.equals(selected.getUrl());
     }
 
     public Config getConfig() {
@@ -81,7 +87,10 @@ abstract class BaseConfig {
 
     public void load(Callback callback) {
         int id = taskId.incrementAndGet();
-        if (future != null && !future.isDone()) future.cancel(true);
+        if (future != null && !future.isDone()) {
+            cancelLoad();
+            future.cancel(true);
+        }
         future = Task.submit(() -> loadConfig(id, config, callback));
         callback.start();
     }
@@ -93,24 +102,31 @@ abstract class BaseConfig {
             load(config);
             if (taskId.get() != id) return;
             if (config.equals(this.config)) config.update();
-            App.post(() -> Notify.show(config.getNotice()));
+            String notice = config.getNotice();
+            App.post(() -> {
+                if (taskId.get() == id) Notify.show(notice);
+            });
             App.post(callback::success);
         } catch (Throwable e) {
-            e.printStackTrace();
             if (isCanceled(e)) return;
+            e.printStackTrace();
             if (taskId.get() != id) return;
             if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
             else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
-        } finally {
-            if (taskId.get() == id) postEvent();
         }
+        if (taskId.get() == id) postEvent();
     }
 
     protected boolean isCanceled(Throwable e) {
-        if ("Canceled".equals(e.getMessage())) return true;
-        if (e instanceof InterruptedException) return true;
-        if (e instanceof InterruptedIOException) return true;
-        return e.getCause() instanceof InterruptedIOException;
+        if (Thread.currentThread().isInterrupted()) return true;
+        boolean canceled = false;
+        boolean timedOut = false;
+        for (Throwable current = e; current != null; current = current.getCause()) {
+            if (current instanceof InterruptedException || current instanceof CancellationException) return true;
+            canceled |= current instanceof InterruptedIOException || "Canceled".equals(current.getMessage());
+            timedOut |= current instanceof SocketTimeoutException;
+        }
+        return canceled && !timedOut;
     }
 
     protected JsonArray fetchArray(JsonObject object, String key) {

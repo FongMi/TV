@@ -12,6 +12,7 @@ import com.fongmi.android.tv.gson.DanmakuAdapter;
 import com.fongmi.android.tv.gson.FilterAdapter;
 import com.fongmi.android.tv.gson.HeaderAdapter;
 import com.fongmi.android.tv.gson.MsgAdapter;
+import com.fongmi.android.tv.gson.SkipAdapter;
 import com.fongmi.android.tv.gson.UrlAdapter;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.utils.Util;
@@ -68,6 +69,9 @@ public class Result implements Parcelable {
 
     @SerializedName("subs")
     private List<Sub> subs;
+    @SerializedName("skips")
+    @JsonAdapter(SkipAdapter.class)
+    private List<SkipSegment> skipSegments;
     @SerializedName("playUrl")
     private String playUrl;
     @SerializedName("artwork")
@@ -87,7 +91,7 @@ public class Result implements Parcelable {
     @SerializedName("position")
     private Long position;
     @SerializedName("pagecount")
-    private Integer pagecount;
+    private Long pagecount;
     @SerializedName("parse")
     private Integer parse;
     @SerializedName("code")
@@ -211,8 +215,19 @@ public class Result implements Parcelable {
         return subs == null ? new ArrayList<>() : new ArrayList<>(subs);
     }
 
+    public List<SkipSegment> getSkipSegments() {
+        return skipSegments == null ? Collections.emptyList() : skipSegments;
+    }
+
     public void setSubs(List<Sub> subs) {
         if (getSubs().isEmpty()) this.subs = subs;
+    }
+
+    public void addSub(Sub sub) {
+        if (sub == null || sub.isEmpty()) return;
+        subs = getSubs();
+        subs.remove(sub);
+        subs.add(0, sub);
     }
 
     public Map<String, String> getHeader() {
@@ -221,6 +236,12 @@ public class Result implements Parcelable {
 
     public void setHeader(Map<String, String> header) {
         if (getHeader().isEmpty()) this.header = header;
+    }
+
+    public void addHeaders(Map<String, String> headers) {
+        if (headers == null || headers.isEmpty()) return;
+        header = new HashMap<>(getHeader());
+        header.putAll(headers);
     }
 
     public String getPlayUrl() {
@@ -289,7 +310,10 @@ public class Result implements Parcelable {
     }
 
     public Integer getPageCount() {
-        return pagecount == null ? 0 : pagecount;
+        if (pagecount == null) return 0;
+        if (pagecount > Integer.MAX_VALUE) return Integer.MAX_VALUE;
+        if (pagecount < Integer.MIN_VALUE) return Integer.MIN_VALUE;
+        return pagecount.intValue();
     }
 
     public Integer getParse() {

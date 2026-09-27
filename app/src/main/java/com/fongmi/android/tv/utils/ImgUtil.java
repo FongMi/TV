@@ -80,9 +80,17 @@ public class ImgUtil {
 
     public static void load(String text, String url, ImageView view, boolean vod) {
         view.setScaleType(vod ? CENTER_CROP : FIT_CENTER);
-        if (!vod) view.setVisibility(TextUtils.isEmpty(url) ? View.GONE : View.VISIBLE);
-        if (TextUtils.isEmpty(url) || failed.contains(url)) view.setImageDrawable(getTextDrawable(text, vod));
-        else try {
+        if (!vod && TextUtils.isEmpty(url)) {
+            Glide.with(view).clear(view);
+            view.setImageDrawable(null);
+            view.setVisibility(View.GONE);
+            return;
+        }
+        if (!vod) view.setVisibility(View.VISIBLE);
+        if (TextUtils.isEmpty(url) || failed.contains(url)) {
+            Glide.with(view).clear(view);
+            view.setImageDrawable(getTextDrawable(text, vod));
+        } else try {
             RequestBuilder<Drawable> builder = Glide.with(view).load(getUrl(url)).listener(getListener(text, url, view, vod));
             if (vod) builder.centerCrop().into(view);
             else builder.fitCenter().into(view);

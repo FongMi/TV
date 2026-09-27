@@ -12,7 +12,6 @@ import com.fongmi.android.tv.bean.Vod;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 public class VodPlaybackState {
@@ -23,8 +22,7 @@ public class VodPlaybackState {
     private VodPlayRequest pendingRequest;
     private VodPlayRequest playingRequest;
     private MediaMetadata playbackMetadata;
-    private VodPlayRequest preloadRequest;
-    private Result preloadResult;
+    private PreloadEntry preload;
     private Result quality;
     private History history;
     private String detailKey;
@@ -121,27 +119,34 @@ public class VodPlaybackState {
     }
 
     Episode getRelativeEpisode(int offset) {
-        List<Episode> episodes = getFlag().getEpisodes();
-        int position = Math.clamp(getFlag().getPosition() + offset, 0, episodes.size() - 1);
+        Flag flag = getFlag();
+        List<Episode> episodes = flag.getEpisodes();
+        int position = Math.clamp(flag.getPosition() + offset, 0, episodes.size() - 1);
         return episodes.get(position);
     }
 
     @Nullable
     Episode findEpisode(String key, VodPlayRequest request) {
         if (request == null) return null;
-        return flags.stream().map(flag -> findEpisode(key, flag, request)).filter(Objects::nonNull).findFirst().orElse(null);
+        for (Flag flag : flags) {
+            Episode episode = findEpisode(key, flag, request);
+            if (episode != null) return episode;
+        }
+        return null;
     }
 
     @Nullable
     Episode findEpisode(String key, Flag flag, VodPlayRequest request) {
         if (flag == null || request == null) return null;
-        return flag.getEpisodes().stream().filter(episode -> request.matches(key, flag, episode)).findFirst().orElse(null);
+        for (Episode episode : flag.getEpisodes()) if (request.matches(key, flag, episode)) return episode;
+        return null;
     }
 
     @Nullable
     Flag findFlag(String key, VodPlayRequest request) {
         if (request == null) return null;
-        return flags.stream().filter(flag -> findEpisode(key, flag, request) != null).findFirst().orElse(null);
+        for (Flag flag : flags) if (findEpisode(key, flag, request) != null) return flag;
+        return null;
     }
 
     Result getQuality() {
@@ -206,35 +211,32 @@ public class VodPlaybackState {
     }
 
     @Nullable
-    VodPlayRequest getPreloadRequest() {
-        return preloadRequest;
-    }
-
-    @Nullable
-    Result getPreloadResult() {
-        return preloadResult;
+    PreloadEntry getPreload() {
+        return preload;
     }
 
     void beginPreload(VodPlayRequest request) {
-        preloadRequest = request;
-        preloadResult = null;
+        preload = new PreloadEntry(request, null, null);
     }
 
     void completePreload(Result result) {
-        preloadResult = result;
+        if (preload != null) preload = new PreloadEntry(preload.request(), result, preload.update());
+    }
+
+    void setPreloadUpdate(@Nullable Vod preloadUpdate) {
+        if (preload != null) preload = new PreloadEntry(preload.request(), preload.result(), preloadUpdate);
     }
 
     @Nullable
-    Result consumePreload(String key, Flag flag, Episode episode) {
-        if (preloadRequest == null || preloadResult == null || !preloadRequest.matches(key, flag, episode)) return null;
-        Result result = preloadResult;
+    PreloadEntry consumePreload(String key, Flag flag, Episode episode) {
+        if (preload == null || preload.isPending() || !preload.request().matches(key, flag, episode)) return null;
+        PreloadEntry result = preload;
         clearPreload();
         return result;
     }
 
     void clearPreload() {
-        preloadRequest = null;
-        preloadResult = null;
+        preload = null;
     }
 
     @Nullable
@@ -271,10 +273,17 @@ public class VodPlaybackState {
     }
 
     String getSearchKeyword() {
-        return searchKeyword == null ? "" : searchKeyword;
+        return searchKeyword;
     }
 
     void setSearchKeyword(String searchKeyword) {
         this.searchKeyword = searchKeyword == null ? "" : searchKeyword;
+    }
+
+    record PreloadEntry(VodPlayRequest request, @Nullable Result result, @Nullable Vod update) {
+
+        boolean isPending() {
+            return result == null;
+        }
     }
 }

@@ -10,7 +10,7 @@ import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.impl.ParseCallback;
 import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.ui.custom.CustomWebView;
+import com.fongmi.android.tv.ui.custom.ParseWebView;
 import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.WebViewUtil;
@@ -38,11 +38,13 @@ import okhttp3.Response;
 public class ParseJob implements ParseCallback {
 
     private final AtomicBoolean done = new AtomicBoolean();
-    private final List<CustomWebView> webViews;
+    private final List<ParseWebView> webViews;
     private ExecutorService executor;
     private ExecutorService infinite;
     private ParseCallback callback;
     private Parse parse;
+    private Map<String, String> parseHeaders;
+    private String parseClick;
 
     private ParseJob(ParseCallback callback) {
         this.executor = Executors.newSingleThreadExecutor();
@@ -66,60 +68,47 @@ public class ParseJob implements ParseCallback {
         if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
         if (result.getPlayUrl().startsWith("parse:")) parse = VodConfig.get().getParse(result.getPlayUrl().substring(6));
         if (parse == null || parse.isEmpty()) parse = Parse.get(0, result.getPlayUrl());
-        parse.setHeader(result.getHeader());
-        parse.setClick(getClick(result));
+        parseHeaders = resolveHeaders(parse, result);
+        String click = VodConfig.get().getSite(result.getKey()).getClick();
+        parseClick = TextUtils.isEmpty(click) ? result.getClick() : click;
     }
 
-    private String getClick(Result result) {
-        String click = VodConfig.get().getSite(result.getKey()).getClick();
-        if (!TextUtils.isEmpty(click)) return click;
-        return result.getClick();
+    static Map<String, String> resolveHeaders(Parse parse, Result result) {
+        Map<String, String> configured = parse.getHeader();
+        return new HashMap<>(configured.isEmpty() ? result.getHeader() : configured);
     }
 
     private void execute(Result result) {
-        Future<?> task = executor.submit(getTask(result));
-        Task.schedule(() -> {
-            if (task.cancel(true)) onParseError();
-        }, Constant.TIMEOUT_PARSE_DEF, TimeUnit.MILLISECONDS);
-    }
-
-    private Runnable getTask(Result result) {
-        return () -> {
+        Future<?> task = executor.submit(() -> {
             try {
                 doInBackground(result.getKey(), result.getUrl().v(), result.getFlag());
             } catch (Throwable e) {
                 onParseError();
             }
-        };
+        });
+        Task.schedule(() -> {
+            if (task.cancel(true)) onParseError();
+        }, Constant.TIMEOUT_PARSE_DEF, TimeUnit.MILLISECONDS);
     }
 
     private void doInBackground(String key, String webUrl, String flag) throws Throwable {
         switch (parse.getType()) {
-            case 0:
-                startWeb(key, parse, webUrl);
-                break;
-            case 1:
-                jsonParse(parse, webUrl, true);
-                break;
-            case 2:
-                jsonExtend(webUrl);
-                break;
-            case 3:
-                jsonMix(webUrl, flag);
-                break;
-            case 4:
-                superParse(webUrl, flag);
-                break;
+            case 0 -> startWeb(key, parse, webUrl);
+            case 1 -> jsonParse(parse, webUrl, true);
+            case 2 -> jsonExtend(webUrl);
+            case 3 -> jsonMix(webUrl, flag);
+            case 4 -> superParse(webUrl, flag);
         }
     }
 
     private void jsonParse(Parse item, String webUrl, boolean fatal) throws Exception {
-        try (Response res = OkHttp.newCall(item.getUrl() + webUrl, item.getHeader()).execute()) {
+        Map<String, String> headers = getHeaders(item);
+        try (Response res = OkHttp.newCall(item.getUrl() + webUrl, headers).execute()) {
             JsonObject object = Json.parse(res.body().string()).getAsJsonObject();
             String url = Json.safeString(object, "url");
             JsonObject data = object.getAsJsonObject("data");
             if (url.isEmpty()) url = Json.safeString(data, "url");
-            checkResult(getHeader(object), url, item.getName(), fatal);
+            checkResult(getHeader(object, headers), url, item.getName(), fatal);
         }
     }
 
@@ -162,7 +151,7 @@ public class ParseJob implements ParseCallback {
     }
 
     private void checkResult(Result result) {
-        result.setHeader(parse.getHeader());
+        result.setHeader(new HashMap<>(parseHeaders));
         if (result.getUrl().isEmpty()) onParseError();
         else if (result.needParse()) startWeb(result.getHeader(), UrlUtil.convert(result.getUrl().v()));
         else onParseSuccess(result.getHeader(), result.getUrl().v(), result.getJxFrom());
@@ -175,7 +164,7 @@ public class ParseJob implements ParseCallback {
     }
 
     private void startWeb(String key, Parse item, String webUrl) {
-        startWeb(key, item.getName(), item.getHeader(), item.getUrl() + webUrl, item.getClick());
+        startWeb(key, item.getName(), getHeaders(item), item.getUrl() + webUrl, item == parse ? parseClick : item.getClick());
     }
 
     private void startWeb(Map<String, String> headers, String url) {
@@ -185,15 +174,22 @@ public class ParseJob implements ParseCallback {
     private void startWeb(String key, String from, Map<String, String> headers, String url, String click) {
         if (!WebViewUtil.support()) {
             onParseError();
-        } else {
-            App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, from, headers, url, click, this, !url.contains("player/?url="))));
+            return;
         }
+        App.post(() -> {
+            if (done.get()) return;
+            webViews.add(ParseWebView.create(App.get()).start(key, from, headers, url, click, this, !url.contains("player/?url=")));
+        });
     }
 
-    private Map<String, String> getHeader(JsonObject object) {
+    private Map<String, String> getHeaders(Parse item) {
+        return item == parse ? parseHeaders : new HashMap<>(item.getHeader());
+    }
+
+    private Map<String, String> getHeader(JsonObject object, Map<String, String> fallback) {
         Map<String, String> headers = new HashMap<>();
         for (Map.Entry<String, JsonElement> entry : object.entrySet()) if (!entry.getValue().isJsonNull() && (entry.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT) || entry.getKey().equalsIgnoreCase(HttpHeaders.REFERER) || entry.getKey().equalsIgnoreCase(HttpHeaders.COOKIE) || entry.getKey().equalsIgnoreCase("ua"))) headers.put(UrlUtil.fixHeader(entry.getKey()), entry.getValue().getAsString());
-        return headers.isEmpty() ? parse.getHeader() : headers;
+        return headers.isEmpty() ? fallback : headers;
     }
 
     @Override
@@ -214,12 +210,6 @@ public class ParseJob implements ParseCallback {
         });
     }
 
-    private void stopWeb() {
-        for (CustomWebView webView : webViews) webView.stop(false);
-        for (CustomWebView webView : webViews) webView.destroy();
-        if (!webViews.isEmpty()) webViews.clear();
-    }
-
     public void stop() {
         if (executor != null) executor.shutdownNow();
         if (infinite != null) infinite.shutdownNow();
@@ -227,6 +217,7 @@ public class ParseJob implements ParseCallback {
         executor = null;
         callback = null;
         done.set(true);
-        stopWeb();
+        for (ParseWebView webView : webViews) webView.release();
+        webViews.clear();
     }
 }

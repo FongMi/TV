@@ -34,11 +34,6 @@
             android:text="@string/player_engine" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
-            style="@style/Control"
-            android:text="@string/play_decode" />
-
-        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/speed"
             style="@style/Control"
             android:fontFeatureSettings="tnum"
@@ -75,6 +70,10 @@
             style="@style/Control"
             android:tag="2"
             android:text="@string/play_track_video" />
+
+        <com.fongmi.android.tv.ui.custom.MpvScriptButtonsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/invert"

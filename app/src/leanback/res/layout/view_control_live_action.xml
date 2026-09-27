@@ -45,12 +45,6 @@
             android:layout_marginEnd="8dp"
             android:text="@string/play_exo" />
 
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
-            style="@style/Control"
-            android:layout_marginEnd="8dp"
-            android:text="@string/play_decode" />
-
         <com.fongmi.android.tv.ui.custom.CustomUpDownView
             android:id="@+id/speed"
             style="@style/Control"
@@ -88,6 +82,12 @@
             android:layout_marginEnd="8dp"
             android:tag="2"
             android:text="@string/play_track_video" />
+
+        <com.fongmi.android.tv.ui.custom.MpvScriptButtonsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:nextFocusLeft="@id/video"
+            android:nextFocusRight="@id/invert" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/invert"

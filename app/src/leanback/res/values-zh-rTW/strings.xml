@@ -17,4 +17,11 @@
     <string name="push_clip">推送剪貼簿內容</string>
     <string name="push_info">使用手機掃描 QR Code，或於瀏覽器輸入網址\n<xliff:g name="name">%s</xliff:g></string>
 
+
+    <string name="dialog_action_site_searchable">設定可搜尋站源</string>
+    <string name="dialog_action_site_changeable">設定可換源站源</string>
+    <string name="dialog_action_select_all">全選</string>
+    <string name="dialog_action_clear_all">取消全選</string>
+    <string name="dialog_action_grid">切換為網格</string>
+    <string name="dialog_action_list">切換為列表</string>
 </resources>

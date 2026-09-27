@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -69,6 +70,7 @@ public class Channel {
     private String show;
     private int index;
     private List<Epg> dataList;
+    private transient boolean epgFromLive;
 
     public Channel() {
     }
@@ -128,6 +130,11 @@ public class Channel {
 
     public void setEpg(String epg) {
         this.epg = epg;
+        this.epgFromLive = false;
+    }
+
+    public boolean hasEpgOverride() {
+        return !epgFromLive && getEpg().startsWith("http");
     }
 
     public String getName() {
@@ -253,9 +260,27 @@ public class Channel {
     }
 
     public Epg getData(ZoneId zoneId) {
-        String today = LocalDate.now(zoneId).format(Formatters.DATE);
-        if (dataList == null) return new Epg();
-        return dataList.stream().filter(e -> e.equal(today)).findFirst().orElse(new Epg());
+        return getData(zoneId, LocalDate.now(zoneId));
+    }
+
+    Epg getData(ZoneId zoneId, LocalDate day) {
+        String date = day.format(Formatters.DATE);
+        List<Epg> days = getDataList();
+        Epg today = days.stream().filter(e -> e.equal(date)).findFirst().orElseGet(() -> Epg.create(getTvgId(), date));
+        long midnight = day.atStartOfDay(zoneId).toInstant().toEpochMilli();
+        List<EpgData> list = new ArrayList<>();
+        for (Epg epg : days) {
+            if (epg.equal(date)) continue;
+            for (EpgData item : epg.getList()) {
+                if (item.getStartTime() < midnight && item.getEndTime() > midnight) list.add(item);
+            }
+        }
+        if (list.isEmpty()) return today;
+        list.addAll(today.getList());
+        list.sort(Comparator.comparingLong(EpgData::getStartTime));
+        Epg result = Epg.create(getTvgId(), date);
+        result.setList(list);
+        return result;
     }
 
     public List<Epg> getDataList() {
@@ -355,7 +380,10 @@ public class Channel {
         if (!live.getOrigin().isEmpty() && getOrigin().isEmpty()) setOrigin(live.getOrigin());
         if (!live.getCatchup().isEmpty() && getCatchup().isEmpty()) setCatchup(live.getCatchup());
         if (!live.getReferer().isEmpty() && getReferer().isEmpty()) setReferer(live.getReferer());
-        if (live.getEpg().contains("{") && !getEpg().startsWith("http")) setEpg(live.getEpgApi().replace("{id}", getTvgId()).replace("{name}", getTvgName()).replace("{epg}", getEpg()));
+        if (live.getEpg().contains("{") && !getEpg().startsWith("http")) {
+            setEpg(live.getEpgApi().replace("{id}", getTvgId()).replace("{name}", getTvgName()).replace("{epg}", getEpg()));
+            epgFromLive = true;
+        }
         if (live.getLogo().contains("{") && !getLogo().startsWith("http")) setLogo(live.getLogo().replace("{id}", getTvgId()).replace("{name}", getTvgName()).replace("{logo}", getLogo()));
     }
 
@@ -384,7 +412,8 @@ public class Channel {
         setUrls(item.getUrls());
         setDataList(item.getDataList());
         setDrm(item.getDrm());
-        setEpg(item.getEpg());
+        epg = item.getEpg();
+        epgFromLive = item.epgFromLive;
         setUa(item.getUa());
         return this;
     }

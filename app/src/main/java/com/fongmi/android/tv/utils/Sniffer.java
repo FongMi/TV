@@ -23,27 +23,35 @@ public class Sniffer {
 
     public static final Pattern CLICKER = Pattern.compile("\\[a=cr:(\\{.*?\\})\\/](.*?)\\[\\/a]");
     public static final Pattern AI_PUSH = Pattern.compile("(https?|thunder|magnet|ed2k|video):\\S+");
-    public static final Pattern SNIFFER = Pattern.compile("https?://[^\\s]{12,}\\.(?:m3u8|mp4|mkv|flv|mp3|m4a|aac|mpd)(?:\\?.*)?|https?://.*?video/tos[^\\s]*|rtmp:[^\\s]+");
+    public static final Pattern SNIFFER = Pattern.compile("https?://[^\\s]{12,}\\.(?:m3u8|mp4|mkv|flv|mp3|m4a|aac|mpd)|https?://.*?video/tos[^\\s]*|rtmp:[^\\s]+");
 
     public static String getUrl(String text) {
-        if (Json.isObj(text) || text.contains("$")) return text;
+        if (UrlUtil.isWebView(text) || Json.isObj(text) || text.contains("$")) return text;
         Matcher m = AI_PUSH.matcher(text);
         if (m.find()) return m.group(0);
         return text;
     }
 
     public static boolean isVideoFormat(String url) {
-        Rule rule = getRule(UrlUtil.uri(url));
+        return isVideoFormat(url, getRule(UrlUtil.uri(url)));
+    }
+
+    static boolean isVideoFormat(String url, Rule rule) {
         for (String exclude : rule.getExclude()) if (url.contains(exclude)) return false;
-        for (String exclude : rule.getExclude()) if (Pattern.compile(exclude).matcher(url).find()) return false;
+        for (Pattern exclude : rule.getExcludePatterns()) if (exclude.matcher(url).find()) return false;
         for (String regex : rule.getRegex()) if (url.contains(regex)) return true;
-        for (String regex : rule.getRegex()) if (Pattern.compile(regex).matcher(url).find()) return true;
-        if (url.contains("url=http") || url.contains("v=http") || url.contains(".html")) return false;
-        return SNIFFER.matcher(url).find();
+        for (Pattern regex : rule.getRegexPatterns()) if (regex.matcher(url).find()) return true;
+        String path = UrlUtil.stripQueryAndFragment(url);
+        if (url.contains("url=http") || url.contains("v=http") || path.contains(".html")) return false;
+        return SNIFFER.matcher(path).find();
     }
 
     public static List<String> getScript(Uri uri) {
         return getRule(uri).getScript();
+    }
+
+    public static List<String> getClick(Uri uri) {
+        return getRule(uri).getClick();
     }
 
     private static Rule getRule(Uri uri) {

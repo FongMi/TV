@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="mpv_script_action_spacing">0</integer>
+    <integer name="mpv_script_item_spacing">16</integer>
+
+</resources>

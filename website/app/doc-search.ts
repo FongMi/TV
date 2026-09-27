@@ -44,6 +44,13 @@ const entries: Entry[] = [
     keywords: methods.flat().join(" "),
   },
   {
+    title: "片段跳過",
+    description: "playerContent 的片頭、片中、片尾 skips 區間與毫秒規則",
+    href: "/spider#skips",
+    names: ["skips", "SkipSegment"],
+    keywords: "opening middle ending start end 片頭片尾 片中跳過 自動 手動 關閉",
+  },
+  {
     title: "Result 回傳欄位",
     description: "探索與播放資料、標頭、字幕、起點及解析參數",
     href: "/spider#result",

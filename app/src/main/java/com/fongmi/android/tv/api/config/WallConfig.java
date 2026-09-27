@@ -12,7 +12,6 @@ import com.fongmi.android.tv.event.ConfigEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.utils.Download;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.utils.Path;
@@ -87,7 +86,7 @@ public class WallConfig extends BaseConfig {
     }
 
     private void checkUrl(String url, File file) throws Throwable {
-        if (url.startsWith("file")) FileUtil.copyAtomically(Path.local(url), file);
+        if (url.startsWith("file")) Path.writeAtomically(file, Path.local(url));
         else Download.create(UrlUtil.convert(url), file).tag(TAG).get();
         if (!Path.exists(file)) throw new FileNotFoundException();
     }

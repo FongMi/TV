@@ -1,7 +1,13 @@
 # TV
 -keep class androidx.leanback.widget.** { *; }
--keep class com.fongmi.quickjs.method.** { *; }
 -keep class com.fongmi.android.tv.bean.** { *; }
+
+# External scripts load this App entry point by its fully qualified Java name.
+-keep class com.fongmi.android.tv.ui.activity.WebActivity {
+  public static boolean open(java.lang.String);
+  public static boolean open(java.lang.String, java.lang.String);
+  public static java.lang.String getUserAgent();
+}
 
 # Gson
 -keep class com.google.gson.** { *; }
@@ -32,11 +38,6 @@
 # Kotlin
 -keeppackagenames kotlin.**
 -keep class kotlin.** { *; }
-
-# CatVod
--keep class com.github.catvod.Proxy { *; }
--keep class com.github.catvod.crawler.** { *; }
--keep class * extends com.github.catvod.crawler.Spider
 
 # Jianpian
 -keep class com.p2p.** { *; }

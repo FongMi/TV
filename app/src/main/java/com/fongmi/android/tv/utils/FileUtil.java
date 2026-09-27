@@ -16,7 +16,6 @@ import com.github.catvod.utils.Path;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -44,54 +43,11 @@ public class FileUtil {
         App.get().startActivity(intent);
     }
 
-    private static InputStream openInputStream(Uri uri) throws IOException {
-        InputStream input = App.get().getContentResolver().openInputStream(uri);
-        if (input == null) throw new IOException("Unable to open source file");
-        return input;
-    }
-
-    public static void copyAtomically(Uri source, File target) throws IOException {
-        try (InputStream input = openInputStream(source)) {
-            copyAtomically(input, target);
-        }
-    }
-
-    public static void copyAtomically(File source, File target) throws IOException {
-        if (source.getCanonicalFile().equals(target.getCanonicalFile())) return;
-        try (InputStream input = new FileInputStream(source)) {
-            copyAtomically(input, target);
-        }
-    }
-
-    public static void writeAtomically(byte[] data, File target) throws IOException {
-        try (InputStream input = new ByteArrayInputStream(data)) {
-            copyAtomically(input, target);
-        }
-    }
-
-    private static void copyAtomically(InputStream input, File target) throws IOException {
-        File temp = createTempFile(target);
-        try {
-            copyToFile(input, temp);
-            Path.move(temp, target);
-        } finally {
-            Path.clear(temp);
-        }
-    }
-
     private static File createTempFile(File target) throws IOException {
         File parent = target.getAbsoluteFile().getParentFile();
         if (parent == null) throw new IOException("Target has no parent directory");
         if (!parent.isDirectory() && !parent.mkdirs() && !parent.isDirectory()) throw new IOException("Unable to create target directory");
         return File.createTempFile("copy-", ".tmp", parent);
-    }
-
-    private static void copyToFile(InputStream input, File target) throws IOException {
-        try (FileOutputStream output = new FileOutputStream(target)) {
-            transfer(input, output, Long.MAX_VALUE);
-            output.flush();
-            output.getFD().sync();
-        }
     }
 
     private static void transfer(InputStream input, OutputStream output, long maxBytes) throws IOException {

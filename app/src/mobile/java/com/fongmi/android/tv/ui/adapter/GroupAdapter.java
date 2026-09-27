@@ -63,8 +63,13 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
     }
 
     public void setSelected(int position) {
-        for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelected(i == position);
-        notifyItemRangeChanged(0, getItemCount());
+        for (int i = 0; i < mItems.size(); i++) {
+            Group item = mItems.get(i);
+            boolean next = i == position;
+            if (item.isSelected() == next) continue;
+            item.setSelected(next);
+            notifyItemChanged(i, Boolean.TRUE);
+        }
         listener.setWidth(mItems.get(position));
     }
 
@@ -85,6 +90,12 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         holder.binding.name.setText(item.getName());
         holder.binding.getRoot().setSelected(item.isSelected());
         holder.binding.getRoot().setOnClickListener(view -> listener.onItemClick(item));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty() && payloads.stream().allMatch(Boolean.TRUE::equals)) holder.binding.getRoot().setSelected(mItems.get(position).isSelected());
+        else onBindViewHolder(holder, position);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

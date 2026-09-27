@@ -32,12 +32,4 @@ public class Strm implements Source.Extractor {
             return text ? res.body().string().split("\\R", 2)[0] : url;
         }
     }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void exit() {
-    }
 }

@@ -3,6 +3,7 @@ package com.fongmi.quickjs.crawler;
 import android.content.Context;
 
 import com.fongmi.quickjs.bean.Res;
+import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.method.Console;
 import com.fongmi.quickjs.method.Global;
 import com.fongmi.quickjs.method.Local;
@@ -18,6 +19,7 @@ import com.whl.quickjs.wrapper.JSObject;
 import com.whl.quickjs.wrapper.QuickJSContext;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
@@ -36,6 +38,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final ExecutorService executor;
     private final DexClassLoader dex;
     private final String api;
+    private final Host host;
 
     private QuickJSContext ctx;
     private JSObject jsObject;
@@ -43,9 +46,14 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private boolean cat;
 
     public Spider(String api, DexClassLoader dex) {
+        this(api, dex, Host.NONE);
+    }
+
+    public Spider(String api, DexClassLoader dex, Host host) {
         this.executor = Executors.newSingleThreadExecutor();
         this.api = api;
         this.dex = dex;
+        this.host = host;
     }
 
     private <T> Future<T> submit(Callable<T> callable) {
@@ -178,7 +186,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void createFun() {
         try {
-            global = Global.create(ctx, executor);
+            global = Global.create(ctx, executor, host);
             Class<?> clz = dex.loadClass("com.github.catvod.js.Function");
             clz.getDeclaredConstructor(QuickJSContext.class).newInstance(ctx);
         } catch (Throwable ignored) {
@@ -191,7 +199,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         String content = Module.get().fetch(api);
         cat = content.contains("__jsEvalReturn");
         ctx.evaluateModule(content.replace(spider, global), api);
-        ctx.evaluateModule(String.format(Asset.read("js/lib/spider.js"), api));
+        ctx.evaluateModule(String.format(Asset.read("js/lib/spider.js"), JSONObject.quote(api), JSONObject.quote(siteKey)));
         jsObject = (JSObject) ctx.getProperty(ctx.getGlobalObject(), spider);
     }
 
@@ -212,12 +220,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         JSONArray array = new JSONArray(json);
         Map<String, String> headers = array.length() > 3 ? Json.toMap(array.optString(3)) : null;
         boolean base64 = array.length() > 4 && array.optInt(4) == 1;
-        Object[] result = new Object[4];
-        result[0] = array.optInt(0);
-        result[1] = array.optString(1);
-        result[2] = getStream(array.opt(2), base64);
-        result[3] = headers;
-        return result;
+        return new Object[]{array.optInt(0), array.optString(1), getStream(array.opt(2), base64), headers};
     }
 
     private Object[] proxy2(Map<String, String> params) throws Exception {
@@ -227,20 +230,13 @@ public class Spider extends com.github.catvod.crawler.Spider {
         Object object = submit(() -> ctx.parse(header)).get();
         String proxy = (String) call("proxy", array, object);
         Res res = Res.objectFrom(proxy);
-        Object[] result = new Object[3];
-        result[0] = res.getCode();
-        result[1] = res.getContentType();
-        result[2] = res.getStream();
-        return result;
+        return new Object[]{res.getCode(), res.getContentType(), res.getStream()};
     }
 
     private ByteArrayInputStream getStream(Object o, boolean base64) {
-        if (o instanceof byte[]) {
-            return new ByteArrayInputStream((byte[]) o);
-        } else {
-            String content = o.toString();
-            if (base64 && content.contains("base64,")) content = content.split("base64,")[1];
-            return new ByteArrayInputStream(base64 ? Util.decode(content) : content.getBytes());
-        }
+        if (o instanceof byte[] bytes) return new ByteArrayInputStream(bytes);
+        String content = o.toString();
+        if (base64 && content.contains("base64,")) content = content.split("base64,")[1];
+        return new ByteArrayInputStream(base64 ? Util.decode(content) : content.getBytes());
     }
 }

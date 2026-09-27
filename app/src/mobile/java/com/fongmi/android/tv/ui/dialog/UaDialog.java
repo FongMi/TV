@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.databinding.DialogSingleInputBinding;
 import com.fongmi.android.tv.impl.UaListener;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
@@ -16,7 +16,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class UaDialog extends BaseAlertDialog {
 
-    private DialogUaBinding binding;
+    private DialogSingleInputBinding binding;
     private boolean append = true;
 
     public static void show(Fragment fragment) {
@@ -25,7 +25,7 @@ public class UaDialog extends BaseAlertDialog {
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = DialogUaBinding.inflate(getLayoutInflater());
+        return binding = DialogSingleInputBinding.inflate(getLayoutInflater());
     }
 
     @Override

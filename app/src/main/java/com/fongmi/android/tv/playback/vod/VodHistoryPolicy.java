@@ -63,6 +63,17 @@ public class VodHistoryPolicy {
         });
     }
 
+    public void saveDiscVisit(History history, boolean exit, long time) {
+        if (history == null || Setting.isIncognito()) return;
+        // Menu time is not a resumable title position; keep an earlier title bookmark intact.
+        history.setCreateTime(time);
+        History copy = copyForSave(history);
+        Task.executeSerial(() -> {
+            copy.save();
+            if (exit) RefreshEvent.history();
+        });
+    }
+
     public void saveCurrent(History history) {
         if (history == null || Setting.isIncognito()) return;
         History copy = copyForSave(history);
@@ -80,6 +91,7 @@ public class VodHistoryPolicy {
     }
 
     public void updateProgress(History history, long time, long position, long duration) {
+        if (position < 0 || duration <= 0) return;
         applyProgress(history, time, position, duration);
         if (history != null && history.canSave() && history.canScheduleSave()) saveCurrent(history);
     }
@@ -94,9 +106,5 @@ public class VodHistoryPolicy {
     private History copyForSave(History history) {
         history.markSaveScheduled();
         return history.copy();
-    }
-
-    public long startPositionMs(History history) {
-        return history == null ? C.TIME_UNSET : Math.max(history.getOpening(), history.getPosition());
     }
 }

@@ -13,6 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/dialog_config_url"
+        app:endIconContentDescription="@string/dialog_action_choose_file"
         app:endIconDrawable="@drawable/ic_action_choose"
         app:endIconMode="custom">
 

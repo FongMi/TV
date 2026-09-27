@@ -32,6 +32,7 @@
     <string name="device_scan">请扫描影视 QRCode 进行绑定</string>
 
     <!-- Control -->
+    <string name="seek_seconds">%+d 秒</string>
     <string name="control_speed">倍速</string>
     <string name="control_scale">缩放</string>
     <string name="control_track">轨道</string>
@@ -59,4 +60,20 @@
         <item>画中画</item>
     </string-array>
 
+
+    <string name="dialog_action_choose_file">选取文件</string>
+    <string name="dialog_action_delete_config">删除配置记录</string>
+    <string name="dialog_action_delete_backup">删除备份</string>
+    <string name="dialog_action_site_search">搜索</string>
+    <string name="dialog_action_site_change">换源</string>
+    <string name="dialog_action_live_password">密码保护</string>
+    <string name="dialog_action_live_boot">开机启动</string>
+    <string name="dialog_action_toggle_hint">%1$s：%2$s，长按应用到全部</string>
+    <string name="dialog_action_bulk_result">已批量设置%1$s：%2$s</string>
+    <string name="dialog_action_scan">扫描二维码</string>
+    <string name="dialog_action_sync_two">同步模式：双向</string>
+    <string name="dialog_action_sync_upload">同步模式：上传</string>
+    <string name="dialog_action_sync_download">同步模式：下载</string>
+
+    <string name="subtitle_search_api_title">Assrt</string>
 </resources>

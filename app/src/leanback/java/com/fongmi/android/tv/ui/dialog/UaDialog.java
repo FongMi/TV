@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.databinding.DialogSingleInputBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.UaListener;
 import com.fongmi.android.tv.server.Server;
@@ -25,7 +25,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class UaDialog extends BaseAlertDialog {
 
-    private DialogUaBinding binding;
+    private DialogSingleInputBinding binding;
     private boolean append = true;
 
     public static void show(FragmentActivity activity) {
@@ -34,7 +34,7 @@ public class UaDialog extends BaseAlertDialog {
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = DialogUaBinding.inflate(getLayoutInflater());
+        return binding = DialogSingleInputBinding.inflate(getLayoutInflater());
     }
 
     @Override

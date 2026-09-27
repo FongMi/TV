@@ -8,6 +8,7 @@
 
     <style name="Theme.Splash" parent="Theme.SplashScreen">
         <item name="postSplashScreenTheme">@style/Theme.App</item>
+        <item name="windowSplashScreenBackground">?android:colorBackground</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
     </style>
 
@@ -31,6 +32,10 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="titleTextColor">@color/white</item>
+    </style>
+
+    <style name="MpvScriptItem">
+        <item name="android:background">@drawable/shape_accent</item>
     </style>
 
 </resources>

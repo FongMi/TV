@@ -24,34 +24,63 @@
             android:textSize="16sp"
             tools:text="選擇字幕" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/search"
-            android:layout_width="wrap_content"
+        <com.fongmi.android.tv.ui.custom.DialogActionView
+            android:id="@+id/content"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/selector_chip_round"
+            android:contentDescription="@string/content_title"
             android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_action_content" />
+
+        <com.fongmi.android.tv.ui.custom.DialogActionView
+            android:id="@+id/search"
+            android:contentDescription="@string/dialog_action_search_subtitles"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/selector_chip_round"
+            android:focusable="true"
+            android:padding="8dp"
             android:src="@drawable/ic_action_search"
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/choose"
-            android:layout_width="wrap_content"
+            android:contentDescription="@string/dialog_action_load_subtitles"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/selector_chip_round"
             android:focusable="true"
+            android:padding="8dp"
             android:src="@drawable/ic_action_choose"
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/setting"
-            android:layout_width="wrap_content"
+        <com.fongmi.android.tv.ui.custom.DialogActionView
+            android:id="@+id/decoder"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/selector_chip_round"
             android:focusable="true"
+            android:padding="8dp"
+            android:src="@drawable/ic_action_decoder"
+            android:visibility="gone"
+            app:tint="@color/white"
+            tools:visibility="visible" />
+
+        <com.fongmi.android.tv.ui.custom.DialogActionView
+            android:id="@+id/setting"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/selector_chip_round"
+            android:focusable="true"
+            android:padding="8dp"
             android:src="@drawable/ic_action_setting"
             android:visibility="gone"
             tools:visibility="visible" />

@@ -1,36 +1,27 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogSpeedSettingBinding;
-import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 
 public final class SpeedSettingDialog {
 
-    private PlayerManager player;
     private boolean save;
 
     public static SpeedSettingDialog create() {
         return new SpeedSettingDialog();
-    }
-
-    private static DialogSpeedSettingBinding inflate(LayoutInflater inflater, ViewGroup container) {
-        return DialogSpeedSettingBinding.inflate(inflater, container, false);
-    }
-
-    public SpeedSettingDialog player(PlayerManager player) {
-        this.player = player;
-        return this;
     }
 
     public SpeedSettingDialog save(boolean save) {
@@ -40,26 +31,22 @@ public final class SpeedSettingDialog {
 
     public void show(FragmentActivity activity) {
         FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
         for (Fragment fragment : manager.getFragments()) if (fragment instanceof BottomSheet || fragment instanceof SideSheet) return;
-        if (Util.isFullscreenLand(activity) || Util.isLeanback()) new SideSheet(player, save).show(manager, null);
-        else new BottomSheet(player, save).show(manager, null);
+        DialogFragment dialog = Util.isFullscreenLand(activity) || Util.isLeanback() ? new SideSheet() : new BottomSheet();
+        Bundle arguments = new Bundle();
+        arguments.putBoolean("save", save);
+        dialog.setArguments(arguments);
+        dialog.show(manager, null);
     }
 
     public static final class BottomSheet extends BaseBottomSheetDialog {
 
-        private final PlayerManager player;
-        private final boolean save;
         private DialogSpeedSettingBinding binding;
-        private SpeedSettingPanel panel;
-
-        BottomSheet(PlayerManager player, boolean save) {
-            this.player = player;
-            this.save = save;
-        }
 
         @Override
         protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-            return binding = SpeedSettingDialog.inflate(inflater, container);
+            return binding = DialogSpeedSettingBinding.inflate(inflater, container, false);
         }
 
         @Override
@@ -69,14 +56,13 @@ public final class SpeedSettingDialog {
 
         @Override
         protected void initView() {
-            panel = new SpeedSettingPanel(binding, player, save);
-            panel.bind();
+            PlaybackDialog.observe(this, player -> {
+                if (player != null) new SpeedSettingPanel(binding, player, requireArguments().getBoolean("save")).bind();
+            });
         }
 
         @Override
         public void onDestroyView() {
-            if (panel != null) panel.release();
-            panel = null;
             binding = null;
             super.onDestroyView();
         }
@@ -84,15 +70,7 @@ public final class SpeedSettingDialog {
 
     public static final class SideSheet extends BaseSideSheetDialog {
 
-        private final PlayerManager player;
-        private final boolean save;
         private DialogSpeedSettingBinding binding;
-        private SpeedSettingPanel panel;
-
-        SideSheet(PlayerManager player, boolean save) {
-            this.player = player;
-            this.save = save;
-        }
 
         @Override
         protected int getWidth() {
@@ -101,19 +79,18 @@ public final class SpeedSettingDialog {
 
         @Override
         protected ViewBinding getBinding(@NonNull LayoutInflater inflater, @Nullable ViewGroup container) {
-            return binding = SpeedSettingDialog.inflate(inflater, container);
+            return binding = DialogSpeedSettingBinding.inflate(inflater, container, false);
         }
 
         @Override
         protected void initView() {
-            panel = new SpeedSettingPanel(binding, player, save);
-            panel.bind();
+            PlaybackDialog.observe(this, player -> {
+                if (player != null) new SpeedSettingPanel(binding, player, requireArguments().getBoolean("save")).bind();
+            });
         }
 
         @Override
         public void onDestroyView() {
-            if (panel != null) panel.release();
-            panel = null;
             binding = null;
             super.onDestroyView();
         }

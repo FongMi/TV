@@ -30,7 +30,7 @@ import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.service.DLNARendererService;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.PlayerSetting;
-import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
+import com.fongmi.android.tv.ui.custom.VodInput;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
 import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
@@ -43,12 +43,12 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jupnp.support.contentdirectory.DIDLParser;
 
-public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.Listener {
+public class CastActivity extends PlaybackActivity implements VodInput.Listener {
 
     private final Object mDlnaOwner = new Object();
     private ActivityCastBinding mBinding;
     private DLNARendererService mRenderer;
-    private CustomKeyDownVod mKeyDown;
+    private VodInput mInput;
     private String mPlaybackKey;
     private CastAction mAction;
     private Runnable mR1;
@@ -90,7 +90,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
 
     @Override
     protected void onServiceConnected() {
-        mBinding.control.action.decode.setText(player().getDecodeText());
         setAction(getIntent());
     }
 
@@ -108,8 +107,8 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         super.initView(savedInstanceState);
         bound = bindService(new Intent(this, DLNARendererService.class), mRendererConnection, Context.BIND_AUTO_CREATE);
         mClock = Clock.create(mBinding.widget.clock);
-        mKeyDown = CustomKeyDownVod.create(this);
-        mKeyDown.setFull(true);
+        mInput = VodInput.create(this, this);
+        mInput.setFullscreen(true);
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setVideoView();
@@ -125,9 +124,8 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.reset.setOnClickListener(view -> onReset());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
     }
 
     private void setVideoView() {
@@ -168,7 +166,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
 
     private void setPlaybackMode() {
         PlayerEngineDialog.setText(mBinding.control.action.player, player());
-        mBinding.control.action.decode.setText(player().getDecodeText());
     }
 
     private void setScale(int scale) {
@@ -183,7 +180,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().player(player()).show(this);
+        SpeedSettingDialog.create().show(this);
         hideControl();
     }
 
@@ -199,18 +196,12 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void onPlayer() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
+        PlayerEngineDialog.show(this);
         hideControl();
     }
 
-    private void onDecode() {
-        if (player().isEmpty()) return;
-        position = player().getPosition();
-        player().toggleDecode();
-    }
-
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -363,6 +354,12 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     @Override
+    protected boolean onRefresh() {
+        onReset();
+        return true;
+    }
+
+    @Override
     protected void onStateChanged(int state) {
         switch (state) {
             case Player.STATE_BUFFERING:
@@ -412,7 +409,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
-        if (isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event) && service() != null) return mKeyDown.onKeyDown(event);
+        if (isGone(mBinding.control.getRoot()) && service() != null && mInput.onKeyEvent(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 
@@ -429,20 +426,18 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     public void onSeekEnd(long time) {
         if (player().isEmpty()) return;
-        mKeyDown.reset();
         seekTo(time);
     }
 
     @Override
-    public void onSpeedUp() {
-        if (!player().isPlaying()) return;
-        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
+    public boolean onSpeedPressStart() {
+        if (!player().isPlaying()) return false;
+        return PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
-    public void onSpeedEnd() {
-        PlaybackAction.hideSpeedHint(mBinding.widget.message);
-        player().setSpeed(1.0f);
+    public void onSpeedPressEnd() {
+        PlaybackAction.endSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
@@ -465,11 +460,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     @Override
     public void onSingleTap() {
         onToggle();
-    }
-
-    @Override
-    public void onDoubleTap() {
-        onKeyCenter();
     }
 
     @Override

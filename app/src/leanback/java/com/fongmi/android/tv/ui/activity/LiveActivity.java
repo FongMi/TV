@@ -55,7 +55,7 @@ import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.EpgDataAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
-import com.fongmi.android.tv.ui.custom.CustomKeyDownLive;
+import com.fongmi.android.tv.ui.custom.LiveInput;
 import com.fongmi.android.tv.ui.custom.CustomLiveListView;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LiveDialog;
@@ -77,7 +77,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CustomKeyDownLive.Listener, CustomLiveListView.Callback, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
+public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, LiveInput.Listener, CustomLiveListView.Callback, PassListener, ConfigListener, LiveListener, LivePlaybackHost {
 
     private ActivityLiveBinding mBinding;
     private LiveViewModel mViewModel;
@@ -85,7 +85,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private GroupAdapter mGroupAdapter;
     private ChannelAdapter mChannelAdapter;
     private EpgDataAdapter mEpgDataAdapter;
-    private CustomKeyDownLive mKeyDown;
+    private LiveInput mInput;
     private Clock mClock;
     private View mOldView;
     private View mFocus2;
@@ -97,6 +97,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private List<Group> mHides;
     private Group mGroup;
     private Channel mChannel;
+    private Channel mRestoreChannel;
     private String mPlaybackKey;
     private int count;
 
@@ -155,7 +156,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
         mClock = Clock.create(mBinding.widget.clock);
-        mKeyDown = CustomKeyDownLive.create(this);
+        mInput = LiveInput.create(this, this);
         mHides = new ArrayList<>();
         mR0 = this::setSelected;
         mR1 = this::hideControl;
@@ -187,9 +188,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.across.setOnClickListener(view -> onAcross());
         mBinding.control.action.change.setOnClickListener(view -> onChange());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
         mBinding.group.addOnChildViewHolderSelectedListener(new OnChildViewHolderSelectedListener() {
             @Override
             public void onChildViewHolderSelected(@NonNull RecyclerView parent, @Nullable RecyclerView.ViewHolder child, int position, int subposition) {
@@ -218,7 +218,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void setPlaybackMode() {
-        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player, mBinding.control.action.decode);
+        if (isWebPlaybackActive()) return;
+        PlaybackAction.setPlaybackMode(player(), mBinding.control.action.player);
     }
 
     private void setScale(int scale) {
@@ -284,7 +285,9 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         List<Group> items = new ArrayList<>();
         for (Group group : live.getGroups()) (group.isHidden() ? mHides : items).add(group);
         mGroupAdapter.addAll(items);
-        setPosition(LiveConfig.get().findKeepPosition(items));
+        int[] position = LiveConfig.get().findChannelPosition(mRestoreChannel, items);
+        mRestoreChannel = null;
+        setPosition(position[0] == -1 ? LiveConfig.get().findKeepPosition(items) : position);
     }
 
     private void setWidth(Live live) {
@@ -355,21 +358,19 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     private void setSelected() {
         mChannelAdapter.setSelected(mChannel);
-        notifyItemChanged(mBinding.channel, mChannelAdapter);
     }
 
     private void setSelected(EpgData item) {
         mEpgDataAdapter.setSelected(item);
-        notifyItemChanged(mBinding.epgData, mEpgDataAdapter);
     }
 
     private void checkPlay() {
-        if (player().isPlaying()) onPaused();
+        if (isWebPlaybackPlaying() || player().isPlaying()) onPaused();
         else onPlay();
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -390,7 +391,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().player(player()).show(this);
+        SpeedSettingDialog.create().show(this);
         hideControl();
     }
 
@@ -424,12 +425,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void onPlayer() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
+        PlayerEngineDialog.show(this);
         hideControl();
-    }
-
-    private void onDecode() {
-        player().toggleDecode();
     }
 
     private void hideUI() {
@@ -448,6 +445,21 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private final PlaybackService.NavigationCallback mNavigationCallback = new PlaybackService.NavigationCallback() {
+        @Override
+        public boolean isExternalPlaybackActive() {
+            return isWebPlaybackActive();
+        }
+
+        @Override
+        public void onPlay() {
+            LiveActivity.this.onPlay();
+        }
+
+        @Override
+        public void onPause() {
+            LiveActivity.this.onPaused();
+        }
+
         @Override
         public void onNext() {
             mLive.nextChannel();
@@ -485,6 +497,12 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
+    protected boolean onRefresh() {
+        mLive.refresh();
+        return true;
+    }
+
+    @Override
     protected void onReclaim() {
         mLive.refresh();
     }
@@ -508,7 +526,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying || isPaused()) updatePlayControl(isPlaying);
+        if (isPlaying || isPaused() || isWebPlaybackActive()) updatePlayControl(isPlaying);
     }
 
     private void updatePlayControl(boolean isPlaying) {
@@ -737,7 +755,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public boolean hasPlaybackSession() {
-        return mPlaybackKey != null && service() != null && isOwner() && player().hasPlaySpec();
+        return mPlaybackKey != null && hasActivePlaybackSession();
     }
 
     @Override
@@ -753,7 +771,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public long getPlayerPosition() {
-        return player().getPosition();
+        return getActivePlaybackPosition();
     }
 
     @Override
@@ -768,12 +786,18 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void stopPlaybackForRefresh() {
+        stopWebPlayback();
         stopPlayer();
     }
 
     @Override
     public void startPlayback(Result result, long position, MediaMetadata metadata) {
-        startPlayer(mPlaybackKey = result.getRealUrl(), result, false, getHome().getTimeout(), position, metadata);
+        mPlaybackKey = result.getRealUrl();
+        if (startWebPlayback(mBinding.video, result, mInput::onTouchEvent)) {
+            updateNavigationKey(mPlaybackKey);
+            return;
+        }
+        startPlayer(mPlaybackKey, result, false, getHome().getTimeout(), position, metadata);
     }
 
     @Override
@@ -865,6 +889,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void setLive(Live item) {
+        if (mChannel != null) mRestoreChannel = Channel.create(mChannel);
         if (item.isSelected()) item.getGroups().clear();
         LiveConfig.get().setHome(item);
         player().reset();
@@ -904,7 +929,17 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         }
     }
 
+    @Override
+    protected void onWebPlaybackChanged(boolean active) {
+        PlaybackAction.setWebPlaybackMode(active, mBinding.control.action.player, mBinding.control.action.speed, mBinding.control.action.scale, mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video);
+        if (!active) {
+            setPlaybackMode();
+            setTrackVisible();
+        }
+    }
+
     private void setTrackVisible() {
+        if (isWebPlaybackActive()) return;
         PlaybackAction.setTracks(player(), mBinding.control.action.text, mBinding.control.action.audio, mBinding.control.action.video, mBinding.control.action.speed);
     }
 
@@ -925,15 +960,16 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     private void seek(long time) {
-        mKeyDown.reset();
         seekTo(time);
     }
 
     private void onPaused() {
+        if (pauseWebPlayback()) return;
         controller().pause();
     }
 
     private void onPlay() {
+        if (resumeWebPlayback()) return;
         controller().play();
     }
 
@@ -945,7 +981,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
         if (isVisible(mBinding.control.getRoot())) mFocus2 = getCurrentFocus();
-        if (mKeyDown.hasEvent(event) && service() != null) mKeyDown.onKeyDown(event);
+        if (service() != null && mInput.onKeyEvent(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 
@@ -955,8 +991,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
-    public boolean dispatch(boolean check) {
-        return !check || isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
+    public boolean canHandleKeyEvent() {
+        return isGone(mBinding.recycler) && isGone(mBinding.control.getRoot());
     }
 
     @Override
@@ -1022,13 +1058,6 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
-    public void onDoubleTap() {
-        if (isVisible(mBinding.recycler)) hideUI();
-        else if (isVisible(mBinding.control.getRoot())) hideControl();
-        else onMenu();
-    }
-
-    @Override
     protected void onStart() {
         super.onStart();
         mClock.stop().start();
@@ -1048,6 +1077,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
             hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
+        } else if (handleWebViewNavigation()) {
+            return;
         } else {
             if (isTaskRoot()) startActivity(new Intent(this, HomeActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP));
             super.onBackInvoked();

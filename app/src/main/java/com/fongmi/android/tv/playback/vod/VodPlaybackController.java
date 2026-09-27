@@ -10,6 +10,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.bean.SkipSegment;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.playback.PlaybackResult;
 
@@ -28,6 +29,8 @@ public class VodPlaybackController {
     private final VodFallbackPolicy fallbackPolicy;
     private final VodPreloader preloader;
     private History lastHistory;
+    private SkipSegment activeSkip;
+    private boolean manualEndingTriggered;
 
     public VodPlaybackController(VodPlaybackHost host, VodDataSource dataSource, VodPlaybackState state) {
         this.host = host;
@@ -41,6 +44,12 @@ public class VodPlaybackController {
     public void reset() {
         preloader.clear();
         state.reset();
+        clearSkipState();
+    }
+
+    private void clearSkipState() {
+        activeSkip = null;
+        manualEndingTriggered = false;
     }
 
     public void checkId() {
@@ -72,13 +81,18 @@ public class VodPlaybackController {
     }
 
     public void updateVod(Vod item) {
-        if (preloader.isRequestPending()) return;
+        if (preloader.deferUpdate(item)) return;
+        applyVodUpdate(item);
+    }
+
+    private void applyVodUpdate(Vod item) {
         History history = state.getHistory();
         replaceVodId(history, item.getId());
         mergeFlags(item.getFlags());
         updateHistory(history, item);
         host.renderVodUpdate(item);
-        publishActivePlaybackMetadata();
+        Episode episode = findEpisode(state.getActiveRequest());
+        if (episode != null) publishPlaybackMetadata(episode);
     }
 
     private void updateHistory(History history, Vod item) {
@@ -89,11 +103,6 @@ public class VodPlaybackController {
         if (hasPic) history.setVodPic(pic);
         if (hasName) history.setVodName(name);
         if (hasName || hasPic) historyPolicy.saveCurrent(history);
-    }
-
-    private void publishActivePlaybackMetadata() {
-        Episode episode = findEpisode(state.getActiveRequest());
-        if (episode != null) publishPlaybackMetadata(episode);
     }
 
     private void replaceVodId(History history, String id) {
@@ -114,29 +123,22 @@ public class VodPlaybackController {
         Episode episode = findEpisode(request);
         if (episode == null) return;
         applyPlaybackState(result, request);
-        renderPlaybackResult(result);
-        updatePlaybackPosition(result);
+        host.renderUseParse(state.isUseParse());
+        host.renderQuality(result, result.getUrl().isMulti());
+        if (result.hasDesc()) host.renderDescription(result.getDesc());
+        if (result.hasArtwork()) host.renderArtwork(result.getArtwork());
+        if (result.hasPosition()) state.getHistory().setPosition(result.getPosition());
         host.loadDanmaku(result, state.getHistory(), episode);
         startPlayback(result, startPositionMs(), episode);
         preloader.update(result);
     }
 
     private void applyPlaybackState(Result result, VodPlayRequest request) {
+        clearSkipState();
         state.setQuality(result);
         state.setPlayingRequest(request);
         state.setUseParse(result.isUseParse());
         result.getUrl().set(state.getQualityPosition());
-    }
-
-    private void renderPlaybackResult(Result result) {
-        host.renderUseParse(state.isUseParse());
-        host.renderQuality(result, result.getUrl().isMulti());
-        if (result.hasDesc()) host.renderDescription(result.getDesc());
-        if (result.hasArtwork()) host.renderArtwork(result.getArtwork());
-    }
-
-    private void updatePlaybackPosition(Result result) {
-        if (result.hasPosition()) state.getHistory().setPosition(result.getPosition());
     }
 
     private void startPlayback(Result result, long startPositionMs, Episode episode) {
@@ -176,10 +178,14 @@ public class VodPlaybackController {
     }
 
     private void playEpisode(Episode item) {
-        Result result = preloader.consume(item);
+        VodPlaybackState.PreloadEntry preload = preloader.consume(item);
         host.stopPlaybackForRefresh();
-        if (result == null) requestSelectedEpisode();
-        else applyPlaybackResult(result, VodPlayRequest.create(host.getVodKey(), state.getFlag(), item));
+        if (preload == null) {
+            requestSelectedEpisode();
+            return;
+        }
+        if (preload.update() != null) applyVodUpdate(preload.update());
+        applyPlaybackResult(preload.result(), preload.request());
     }
 
     public void selectQuality(Result result) {
@@ -201,11 +207,8 @@ public class VodPlaybackController {
         if (state.hasFlags()) {
             Flag activated = state.getFlag();
             for (Flag item : items) mergeFlag(activated, item);
-            host.renderFlags(state.getFlags());
-        } else {
-            state.setFlags(items);
-            host.renderFlags(state.getFlags());
-        }
+        } else state.setFlags(items);
+        host.renderFlags(state.getFlags());
     }
 
     public void selectSource(Vod item) {
@@ -290,15 +293,13 @@ public class VodPlaybackController {
 
     public void reverseEpisode(boolean scroll) {
         if (!state.hasFlags()) return;
-        for (Flag flag : state.getFlags()) reverseEpisodes(flag);
+        for (Flag flag : state.getFlags()) {
+            List<Episode> episodes = flag.getEpisodes();
+            int position = flag.getPosition();
+            Collections.reverse(episodes);
+            if (position >= 0 && position < episodes.size()) flag.setPosition(episodes.size() - position - 1);
+        }
         host.renderReverseEpisodes(state.getFlag().getEpisodes(), scroll);
-    }
-
-    private void reverseEpisodes(Flag flag) {
-        List<Episode> episodes = flag.getEpisodes();
-        int position = flag.getPosition();
-        Collections.reverse(episodes);
-        if (position >= 0 && position < episodes.size()) flag.setPosition(episodes.size() - position - 1);
     }
 
     private void saveCurrentHistory() {
@@ -309,17 +310,52 @@ public class VodPlaybackController {
     public void saveHistory(boolean exit, long time, long position, long duration) {
         History history = exit ? historyForExit() : currentHistory();
         if (host.isLivePlayback()) historyPolicy.saveVisit(history, exit, time);
+        else if (host.isIsoNavigationPlayback()) historyPolicy.saveDiscVisit(history, exit, time);
         else historyPolicy.saveProgress(history, exit, time, position, duration);
     }
 
     public void onTimeChanged(long time, long position, long duration) {
+        if (state.getPlayingRequest() == null) return;
         History history = currentHistory();
         historyPolicy.updateProgress(history, time, position, duration);
-        if (history != null && history.getEnding() > 0 && history.getEnding() + position >= duration) nextEpisode(false);
+        if (history != null && duration > 0 && history.getEnding() > 0 && history.getEnding() + position >= duration) {
+            if (!manualEndingTriggered) manualEndingTriggered = skipToEnd(history, duration);
+            return;
+        }
+        manualEndingTriggered = false;
+        SkipSegment segment = VodSkipPolicy.activeSegment(history, state.getQuality(), position);
+        if (segment == null) {
+            activeSkip = null;
+            return;
+        }
+        if (segment == activeSkip) return;
+        if (!segment.isToEnd()) {
+            activeSkip = segment;
+            host.seekPlayback(segment.getEnd());
+            return;
+        }
+        if (skipToEnd(history, duration) && state.getPlayingRequest() != null) activeSkip = segment;
+    }
+
+    private boolean skipToEnd(History history, long duration) {
+        if (!state.hasEpisode()) return false;
+        boolean reversed = history != null && history.isRevPlay();
+        if (!state.getRelativeEpisode(reversed ? -1 : 1).isSelected()) {
+            nextEpisode(false);
+            return true;
+        }
+        if (duration <= 0) return false;
+        host.seekPlayback(duration);
+        return true;
     }
 
     public long startPositionMs() {
-        return historyPolicy.startPositionMs(state.getHistory());
+        History history = state.getHistory();
+        return VodSkipPolicy.startPositionMs(history, state.getQuality(), history == null ? C.TIME_UNSET : history.getPosition());
+    }
+
+    public long openingPositionMs() {
+        return Math.max(0, VodSkipPolicy.startPositionMs(state.getHistory(), state.getQuality(), C.TIME_UNSET));
     }
 
     private History currentHistory() {
@@ -339,10 +375,12 @@ public class VodPlaybackController {
 
     public void setOpening(long opening) {
         if (state.getHistory() != null) state.getHistory().setOpening(opening);
+        activeSkip = null;
     }
 
     public void setEnding(long ending) {
         if (state.getHistory() != null) state.getHistory().setEnding(ending);
+        clearSkipState();
     }
 
     public void setScale(int scale) {
@@ -416,7 +454,9 @@ public class VodPlaybackController {
     }
 
     private void requestPlayer(Flag flag, Episode episode) {
+        clearSkipState();
         historyPolicy.updateEpisode(state.getHistory(), flag, episode);
+        VodPlaybackInfo.update(state.getHistory(), flag, episode);
         VodPlayRequest request = VodPlayRequest.create(host.getVodKey(), flag, episode);
         state.setPendingRequest(request);
         publishPlaybackMetadata(episode);
@@ -456,8 +496,7 @@ public class VodPlaybackController {
 
     private Flag resolveFlag(Flag item) {
         Flag flag = findFlag(item);
-        if (flag != null) return flag;
-        return state.getFlags().get(0);
+        return flag == null ? state.getFlags().get(0) : flag;
     }
 
     private Flag findFlag(Flag item) {

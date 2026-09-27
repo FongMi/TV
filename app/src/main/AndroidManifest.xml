@@ -82,6 +82,12 @@
             android:process=":error_activity"
             android:theme="@style/Theme.Crash" />
 
+        <activity
+            android:name=".ui.activity.WebActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize" />
+
         <receiver
             android:name=".receiver.ActionReceiver"
             android:exported="false">

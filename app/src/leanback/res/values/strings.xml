@@ -17,4 +17,11 @@
     <string name="push_clip">Push clipboard content</string>
     <string name="push_info">Scan QR Code or enter the URL in browser\n<xliff:g name="name">%s</xliff:g></string>
 
+
+    <string name="dialog_action_site_searchable">Choose searchable sites</string>
+    <string name="dialog_action_site_changeable">Choose switchable sites</string>
+    <string name="dialog_action_select_all">Select all</string>
+    <string name="dialog_action_clear_all">Clear selection</string>
+    <string name="dialog_action_grid">Switch to grid</string>
+    <string name="dialog_action_list">Switch to list</string>
 </resources>

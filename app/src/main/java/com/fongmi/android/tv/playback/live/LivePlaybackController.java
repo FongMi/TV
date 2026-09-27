@@ -106,7 +106,8 @@ public class LivePlaybackController {
         if (channel == null) return;
         LivePlayRequest request = state.getActiveRequest();
         if (request != null && request.isCatchup() && request.matches(channel)) {
-            long startPositionMs = host.hasPlaybackSession() ? host.getPlayerPosition() : request.getPosition();
+            long position = host.getPlayerPosition();
+            long startPositionMs = host.hasPlaybackSession() && position != C.TIME_UNSET ? position : request.getPosition();
             requestPlayback(LivePlayRequest.catchup(channel, request.getCatchupData(), startPositionMs), true);
         } else {
             requestLive();

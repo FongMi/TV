@@ -117,13 +117,17 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
         int index = Setting.getSyncMode();
         binding.mode.setImageResource(mode.getResourceId(index, 0));
         binding.mode.setTag(String.valueOf(index));
+        binding.mode.setContentDescription(getString(switch (index) {
+            case 1 -> R.string.dialog_action_sync_upload;
+            case 2 -> R.string.dialog_action_sync_download;
+            default -> R.string.dialog_action_sync_two;
+        }));
     }
 
     private void onMode() {
         int index = Setting.getSyncMode();
-        Setting.putSyncMode(index = index == mode.length() - 1 ? 0 : ++index);
-        binding.mode.setImageResource(mode.getResourceId(index, 0));
-        binding.mode.setTag(String.valueOf(index));
+        Setting.putSyncMode(index == mode.length() - 1 ? 0 : index + 1);
+        setMode();
     }
 
     private void onScan() {
@@ -136,10 +140,6 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
             scanTask.start();
             binding.recycler.setVisibility(View.GONE);
         });
-    }
-
-    private void onSuccess() {
-        dismiss();
     }
 
     @Override
@@ -169,27 +169,23 @@ public class SyncDialog extends BaseBottomSheetDialog implements DeviceAdapter.O
     }
 
     private FormBody buildBody() {
+        FormBody.Builder body = new FormBody.Builder().add("device", Device.get().toString());
         if (type.equals("history")) {
             Config config = Config.vod();
-            FormBody.Builder body = new FormBody.Builder();
-            body.add("device", Device.get().toString());
             body.add("config", config.toString());
             body.add("targets", App.gson().toJson(History.get(config.getId())));
-            return body.build();
         } else {
-            FormBody.Builder body = new FormBody.Builder();
-            body.add("device", Device.get().toString());
             body.add("targets", App.gson().toJson(Keep.getVod()));
             body.add("configs", App.gson().toJson(Config.findUrls()));
-            return body.build();
         }
+        return body.build();
     }
 
     private Callback getCallback() {
         return new Callback() {
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
-                App.post(() -> onSuccess());
+                App.post(SyncDialog.this::dismiss);
             }
 
             @Override

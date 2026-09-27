@@ -5,12 +5,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.StringRes;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.AdapterSiteBinding;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +82,8 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
         holder.binding.text.setSelected(on && item.isSelected());
         holder.binding.search.setImageResource(getSearchIcon(item));
         holder.binding.change.setImageResource(getChangeIcon(item));
+        holder.binding.search.setContentDescription(getActionDescription(R.string.dialog_action_site_search, item.isSearchable()));
+        holder.binding.change.setContentDescription(getActionDescription(R.string.dialog_action_site_change, item.isChangeable()));
         holder.binding.search.setVisibility(search ? View.VISIBLE : View.GONE);
         holder.binding.change.setVisibility(change ? View.VISIBLE : View.GONE);
         holder.binding.text.setOnClickListener(v -> listener.onTextClick(item));
@@ -91,6 +95,10 @@ public class SiteAdapter extends RecyclerView.Adapter<SiteAdapter.ViewHolder> {
 
     private int getSearchIcon(Site item) {
         return item.isSearchable() ? R.drawable.ic_site_search : R.drawable.ic_site_block;
+    }
+
+    private static String getActionDescription(@StringRes int action, boolean enabled) {
+        return ResUtil.getString(R.string.dialog_action_toggle_hint, ResUtil.getString(action), ResUtil.getString(enabled ? R.string.setting_on : R.string.setting_off));
     }
 
     private int getChangeIcon(Site item) {

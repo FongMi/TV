@@ -30,6 +30,7 @@ public abstract class BaseSideSheetDialog extends AppCompatDialogFragment {
         dialog.getBehavior().setDraggable(false);
         Window window = dialog.getWindow();
         if (window == null) return dialog;
+        window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
         if (Util.isFullscreen(getActivity())) window.addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         return dialog;
     }

@@ -16,6 +16,7 @@ import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.gson.ExtAdapter;
 import com.fongmi.android.tv.gson.HeaderAdapter;
+import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.net.OkHttp;
@@ -24,6 +25,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,10 @@ public class Site implements Parcelable {
     @Ignore
     @SerializedName("name")
     private String name;
+
+    @Ignore
+    @SerializedName("lang")
+    private String lang;
 
     @Ignore
     @SerializedName("api")
@@ -116,6 +122,7 @@ public class Site implements Parcelable {
     protected Site(Parcel in) {
         this.key = in.readString();
         this.name = in.readString();
+        this.lang = in.readString();
         this.api = in.readString();
         this.ext = in.readString();
         this.jar = in.readString();
@@ -160,6 +167,10 @@ public class Site implements Parcelable {
 
     public void setKey(@NonNull String key) {
         this.key = key;
+    }
+
+    public String getLang() {
+        return lang == null ? "" : lang;
     }
 
     public String getName() {
@@ -342,6 +353,22 @@ public class Site implements Parcelable {
         AppDatabase.get().getSiteDao().insertOrUpdate(this);
     }
 
+    public void saveSettings() {
+        saveSettings(List.of(this));
+    }
+
+    public static void saveSettings(List<Site> items) {
+        List<Site> snapshots = new ArrayList<>(items.size());
+        for (Site item : items) {
+            Site snapshot = new Site();
+            snapshot.key = item.key;
+            snapshot.searchable = item.searchable;
+            snapshot.changeable = item.changeable;
+            snapshots.add(snapshot);
+        }
+        Task.executeSerial(() -> AppDatabase.get().getSiteDao().insertOrUpdate(snapshots));
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         if (this == obj) return true;
@@ -363,6 +390,7 @@ public class Site implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.key);
         dest.writeString(this.name);
+        dest.writeString(this.lang);
         dest.writeString(this.api);
         dest.writeString(this.ext);
         dest.writeString(this.jar);

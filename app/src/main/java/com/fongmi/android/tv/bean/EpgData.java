@@ -9,7 +9,9 @@ import com.github.catvod.utils.Trans;
 import com.google.gson.annotations.SerializedName;
 
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 public class EpgData {
@@ -78,7 +80,11 @@ public class EpgData {
     }
 
     public boolean isInRange() {
-        return getStartTime() <= System.currentTimeMillis() && System.currentTimeMillis() <= getEndTime();
+        return isInRange(System.currentTimeMillis());
+    }
+
+    boolean isInRange(long now) {
+        return getStartTime() <= now && now < getEndTime();
     }
 
     public boolean isFuture() {
@@ -88,12 +94,22 @@ public class EpgData {
     public String format() {
         if (getTitle().isEmpty()) return "";
         if (getStart().isEmpty() && getEnd().isEmpty()) return getTitle();
-        return getStart() + " ~ " + getEnd() + "  " + getTitle();
+        return getTime() + "  " + getTitle();
     }
 
     public String getTime() {
         if (getStart().isEmpty() && getEnd().isEmpty()) return "";
-        return getStart() + " ~ " + getEnd();
+        return formatTime(getStart()) + " ~ " + formatTime(getEnd());
+    }
+
+    private static String formatTime(String time) {
+        if (time.isEmpty()) return time;
+        if (time.equals("24:00:00")) return "24:00";
+        try {
+            return LocalTime.parse(time).format(Formatters.TIME);
+        } catch (DateTimeParseException e) {
+            return time;
+        }
     }
 
     public String getRange() {

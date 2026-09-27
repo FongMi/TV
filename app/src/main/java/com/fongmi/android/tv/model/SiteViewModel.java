@@ -10,7 +10,6 @@ import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.exception.ExtractException;
-import com.github.catvod.utils.Trans;
 
 import java.util.HashMap;
 import java.util.List;
@@ -97,10 +96,6 @@ public class SiteViewModel extends ViewModel {
     private record SearchTask(Site site, String keyword, boolean quick, String page) implements Callable<Result> {
 
         private static final String FIRST_PAGE = "1";
-
-        SearchTask {
-            keyword = Trans.t2s(keyword);
-        }
 
         private static SearchTask create(Site site, String keyword, boolean quick) {
             return create(site, keyword, quick, FIRST_PAGE);

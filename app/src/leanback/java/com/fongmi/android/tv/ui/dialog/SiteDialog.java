@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
 import com.fongmi.android.tv.databinding.DialogSiteBinding;
@@ -55,11 +56,7 @@ public class SiteDialog extends BaseAlertDialog implements SiteAdapter.OnClickLi
     }
 
     private int getIcon() {
-        return list() ? com.fongmi.android.tv.R.drawable.ic_site_grid : com.fongmi.android.tv.R.drawable.ic_site_list;
-    }
-
-    private float getWidth() {
-        return 0.4f + (getCount() - 1) * 0.2f;
+        return list() ? R.drawable.ic_site_grid : R.drawable.ic_site_list;
     }
 
     @Override
@@ -112,10 +109,11 @@ public class SiteDialog extends BaseAlertDialog implements SiteAdapter.OnClickLi
         if (adapter.getItemCount() < GRID_COUNT) Setting.putSiteMode(0);
         binding.mode.setEnabled(adapter.getItemCount() >= GRID_COUNT);
         binding.mode.setImageResource(getIcon());
+        binding.mode.setContentDescription(getString(list() ? R.string.dialog_action_grid : R.string.dialog_action_list));
     }
 
     private void setWidth() {
-        setWidth(getWidth());
+        setWidth(0.4f + (getCount() - 1) * 0.2f);
     }
 
     private void onMode(View view) {

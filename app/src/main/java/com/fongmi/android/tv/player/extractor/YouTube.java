@@ -264,14 +264,6 @@ public class YouTube implements Source.Extractor {
         if (value > 0) attr(element, name, String.valueOf(value));
     }
 
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void exit() {
-    }
-
     public record Parser(String url) implements Callable<List<Episode>> {
 
         private static final Pattern PATTERN = Pattern.compile("(youtube\\.com|youtu\\.be).*list=");

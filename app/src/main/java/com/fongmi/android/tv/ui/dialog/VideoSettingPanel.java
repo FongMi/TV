@@ -1,10 +1,8 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.annotation.SuppressLint;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
+import static com.fongmi.android.tv.ui.dialog.SettingPanelViews.applyEnabled;
+
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogVideoSettingBinding;
@@ -15,7 +13,6 @@ import com.fongmi.android.tv.player.effect.video.VideoEffectProfile;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.VideoSetting;
 import com.fongmi.android.tv.utils.SliderUtil;
-import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.Slider;
@@ -25,6 +22,23 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 final class VideoSettingPanel {
+
+    private static final int[][] PRESETS = {
+            {VideoEffectPreset.OFF, R.id.presetOriginal},
+            {VideoEffectPreset.NATURAL, R.id.presetNatural},
+            {VideoEffectPreset.VIVID, R.id.presetVivid},
+            {VideoEffectPreset.CLEAR, R.id.presetClear},
+            {VideoEffectPreset.BRIGHT, R.id.presetBright},
+            {VideoEffectPreset.CINEMA, R.id.presetCinema},
+            {VideoEffectPreset.SOFT, R.id.presetSoft},
+            {VideoEffectPreset.WARM, R.id.presetWarm},
+            {VideoEffectPreset.COOL, R.id.presetCool},
+            {VideoEffectPreset.COMFORT, R.id.presetComfort},
+            {VideoEffectPreset.ANIME, R.id.presetAnime},
+            {VideoEffectPreset.SPORT, R.id.presetSport},
+            {VideoEffectPreset.GAME, R.id.presetGame},
+            {VideoEffectPreset.CUSTOM, R.id.presetCustom},
+    };
 
     private final DialogVideoSettingBinding binding;
     private final PlayerManager player;
@@ -39,16 +53,17 @@ final class VideoSettingPanel {
     void bind() {
         updatePresetCheck();
         bindSliders();
-        bindTabs();
-        bindCompare();
+        SettingPanelViews.bindTabs(binding.tabGroup, getTabs(), this::showTab);
+        SettingPanelViews.bindCompare(binding.compare, this::previewOriginal);
         bindReset();
         showTab(0);
         updateControls();
-        if (Util.isLeanback()) binding.tabPreset.requestFocus();
-        binding.tabGroup.check(binding.tabPreset.getId());
+        PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
+        PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, binding.tabPreset);
     }
 
     void release() {
+        binding.tabGroup.clearOnButtonCheckedListeners();
         previewOriginal(false);
     }
 
@@ -58,7 +73,7 @@ final class VideoSettingPanel {
     }
 
     private void applyPreset(ChipGroup group, int chipId) {
-        clearOtherPresetGroups(group);
+        SettingPanelViews.clearOtherPresets(getPresetGroups(), group, this::onPresetChecked);
         previewOriginal(false);
         setVideoSetting(presetForChip(chipId));
         updateSliderValues(getDisplayProfile());
@@ -66,39 +81,11 @@ final class VideoSettingPanel {
     }
 
     private void updatePresetCheck() {
-        int chip = chipForPreset(getAppliedPreset());
-        setPresetListeners(null);
-        clearPresetGroups();
-        checkPresetGroup(chip);
-        setPresetListeners(this::onPresetChecked);
+        SettingPanelViews.checkPreset(getPresetGroups(), chipForPreset(getAppliedPreset()), this::onPresetChecked);
     }
 
     private ChipGroup[] getPresetGroups() {
         return new ChipGroup[]{binding.presetBasicGroup, binding.presetBoostGroup, binding.presetToneGroup, binding.presetSceneGroup, binding.presetCustomGroup};
-    }
-
-    private void setPresetListeners(ChipGroup.OnCheckedStateChangeListener listener) {
-        for (ChipGroup group : getPresetGroups()) group.setOnCheckedStateChangeListener(listener);
-    }
-
-    private void clearPresetGroups() {
-        for (ChipGroup group : getPresetGroups()) group.clearCheck();
-    }
-
-    private void clearOtherPresetGroups(ChipGroup checkedGroup) {
-        setPresetListeners(null);
-        for (ChipGroup group : getPresetGroups()) if (group != checkedGroup) group.clearCheck();
-        setPresetListeners(this::onPresetChecked);
-    }
-
-    private void checkPresetGroup(int chip) {
-        if (chip == View.NO_ID) return;
-        for (ChipGroup group : getPresetGroups()) {
-            if (group.findViewById(chip) != null) {
-                group.check(chip);
-                break;
-            }
-        }
     }
 
     private void bindSliders() {
@@ -115,37 +102,6 @@ final class VideoSettingPanel {
 
     private VideoEffectProfile getDisplayProfile() {
         return getProfileForPreset(VideoSetting.getPreset());
-    }
-
-    private void bindTabs() {
-        MaterialButton[] tabs = getTabs();
-        for (MaterialButton tab : tabs) checkOnFocus(tab);
-        binding.tabGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (!isChecked) return;
-            for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) showTab(i);
-        });
-    }
-
-    private void checkOnFocus(MaterialButton button) {
-        if (!Util.isLeanback()) return;
-        button.setOnFocusChangeListener((view, focused) -> {
-            if (focused) binding.tabGroup.check(button.getId());
-        });
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    private void bindCompare() {
-        binding.compare.setOnTouchListener((view, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) previewOriginal(true);
-            else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) previewOriginal(false);
-            return false;
-        });
-        binding.compare.setOnKeyListener((view, keyCode, event) -> {
-            boolean supported = keyCode == KeyEvent.KEYCODE_DPAD_CENTER || keyCode == KeyEvent.KEYCODE_ENTER;
-            if (supported && event.getAction() == KeyEvent.ACTION_DOWN) previewOriginal(true);
-            else if (supported && event.getAction() == KeyEvent.ACTION_UP) previewOriginal(false);
-            return false;
-        });
     }
 
     private void bindReset() {
@@ -269,18 +225,6 @@ final class VideoSettingPanel {
         if (!supported) binding.unsupported.setText(getUnsupportedText());
     }
 
-    private void applyEnabled(View view, boolean enabled) {
-        view.setAlpha(enabled ? 1.0f : 0.38f);
-        setEnabledRecursive(view, enabled);
-    }
-
-    private void setEnabledRecursive(View view, boolean enabled) {
-        view.setEnabled(enabled);
-        if (view instanceof ViewGroup group) {
-            for (int i = 0; i < group.getChildCount(); i++) setEnabledRecursive(group.getChildAt(i), enabled);
-        }
-    }
-
     private void apply() {
         if (isPlayerAvailable()) player.refreshVideoSetting();
     }
@@ -314,14 +258,17 @@ final class VideoSettingPanel {
     }
 
     private boolean isPlayerAvailable() {
-        return player != null && !player.isReleased();
+        return !player.isReleased();
     }
 
     private void showTab(int index) {
         View[] roots = {binding.presetSection, binding.adjustSection};
         MaterialButton[] tabs = getTabs();
         for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
-        binding.reset.setNextFocusDownId(tabs[currentTab = index].getId());
+        currentTab = index;
+        int focusId = tabs[index].getId();
+        binding.reset.setNextFocusDownId(focusId);
+        binding.compare.setNextFocusDownId(focusId);
     }
 
     private MaterialButton[] getTabs() {
@@ -337,36 +284,17 @@ final class VideoSettingPanel {
     }
 
     private int chipForPreset(int preset) {
-        for (int[] item : getPresetItems()) if (item[0] == preset) return item[1];
+        for (int[] item : PRESETS) if (item[0] == preset) return item[1];
         return View.NO_ID;
     }
 
     private int presetForChip(int chipId) {
-        for (int[] item : getPresetItems()) if (item[1] == chipId) return item[0];
+        for (int[] item : PRESETS) if (item[1] == chipId) return item[0];
         return VideoEffectPreset.CUSTOM;
     }
 
     private int getAppliedPreset() {
         return VideoSetting.isEnabled() ? VideoSetting.getPreset() : VideoEffectPreset.OFF;
-    }
-
-    private int[][] getPresetItems() {
-        return new int[][]{
-                {VideoEffectPreset.OFF, binding.presetOriginal.getId()},
-                {VideoEffectPreset.NATURAL, binding.presetNatural.getId()},
-                {VideoEffectPreset.VIVID, binding.presetVivid.getId()},
-                {VideoEffectPreset.CLEAR, binding.presetClear.getId()},
-                {VideoEffectPreset.BRIGHT, binding.presetBright.getId()},
-                {VideoEffectPreset.CINEMA, binding.presetCinema.getId()},
-                {VideoEffectPreset.SOFT, binding.presetSoft.getId()},
-                {VideoEffectPreset.WARM, binding.presetWarm.getId()},
-                {VideoEffectPreset.COOL, binding.presetCool.getId()},
-                {VideoEffectPreset.COMFORT, binding.presetComfort.getId()},
-                {VideoEffectPreset.ANIME, binding.presetAnime.getId()},
-                {VideoEffectPreset.SPORT, binding.presetSport.getId()},
-                {VideoEffectPreset.GAME, binding.presetGame.getId()},
-                {VideoEffectPreset.CUSTOM, binding.presetCustom.getId()},
-        };
     }
 
     private String format(float value, String format) {
