@@ -29,12 +29,6 @@ import java.util.List;
 public class MpvConfDialog extends BaseAlertDialog {
 
     private static final String[] MPV_CONF_MIME_TYPES = new String[]{"text/*", "application/octet-stream", "*/*"};
-    private static final String IMPORT = "Import";
-    private static final String PRIORITY_HINT = "Player settings take priority; reopen playback to apply.";
-    private static final String CONFLICT_HINT = "Player settings will override: %s";
-    private static final String SAVE_FAILED = "Unable to save mpv.conf";
-    private static final String IMPORT_SUCCESS = "Imported mpv.conf";
-    private static final String IMPORT_FAILED = "Unable to import mpv.conf";
 
     private DialogMpvConfBinding binding;
 
@@ -49,7 +43,7 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     @Override
     protected MaterialAlertDialogBuilder getBuilder() {
-        return builder().setTitle(R.string.player_mpv_conf).setView(getBinding().getRoot()).setNeutralButton(IMPORT, null).setPositiveButton(R.string.dialog_positive, null).setNegativeButton(R.string.dialog_negative, null);
+        return builder().setTitle(R.string.player_mpv_conf).setView(getBinding().getRoot()).setNeutralButton(R.string.dialog_import, null).setPositiveButton(R.string.dialog_positive, null).setNegativeButton(R.string.dialog_negative, null);
     }
 
     @Override
@@ -78,13 +72,12 @@ public class MpvConfDialog extends BaseAlertDialog {
         boolean hasConflicts = !conflicts.isEmpty();
         int color = hasConflicts ? colorError : colorOnSurfaceVariant;
         binding.hint.setTextColor(MaterialColors.getColor(binding.hint, color));
-        String hint = hasConflicts ? String.format(CONFLICT_HINT, TextUtils.join(", ", conflicts)) : PRIORITY_HINT;
-        binding.hint.setText(hint);
+        binding.hint.setText(hasConflicts ? getString(R.string.player_mpv_conf_conflict_hint, TextUtils.join(", ", conflicts)) : getString(R.string.player_mpv_conf_priority_hint));
     }
 
     private void onPositive(View view) {
         if (MpvConfigFile.write(binding.text.getText().toString())) dismiss();
-        else Notify.show(SAVE_FAILED);
+        else Notify.show(R.string.player_mpv_conf_save_failed);
     }
 
     private void onChoose(View view) {
@@ -95,9 +88,6 @@ public class MpvConfDialog extends BaseAlertDialog {
 
     private void importConfig(Uri uri) {
         if (!isAdded()) return;
-        boolean success = MpvConfigFile.importFrom(uri);
-        Notify.show(success ? IMPORT_SUCCESS : IMPORT_FAILED);
-        if (success) setText(MpvConfigFile.read());
         try {
             setText(MpvConfigFile.read(uri));
             Notify.show(R.string.player_mpv_conf_import_success);

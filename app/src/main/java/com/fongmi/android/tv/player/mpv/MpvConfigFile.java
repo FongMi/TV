@@ -19,37 +19,6 @@ public final class MpvConfigFile {
 
     private static final String MPV_CONF = "mpv.conf";
 
-    private static final List<String> INTERFACE_MANAGED_OPTIONS = List.of(
-            "vo",
-            "gpu-api",
-            "gpu-context",
-            "hwdec",
-            "audio-spdif",
-            "android-dolby-vision-output",
-            "demuxer-dovi-profile7",
-            "cache",
-            "cache-on-disk",
-            "demuxer-cache-dir",
-            "cache-secs",
-            "sub-font",
-            "sub-fonts-dir",
-            "sub-ass-style-overrides",
-            "embeddedfonts",
-            "sub-color",
-            "sub-back-color",
-            "sub-border-style",
-            "sub-outline-color",
-            "sub-outline-size",
-            "sub-shadow-offset",
-            "secondary-sub-ass-override",
-            "sub-ass-override",
-            "sub-pos",
-            "sub-scale",
-            "sub-scale-signs",
-            "secondary-sub-pos",
-            "secondary-sid"
-    );
-
     private static File file() {
         return Path.mpv(MPV_CONF);
     }
@@ -73,9 +42,6 @@ public final class MpvConfigFile {
         }
     }
 
-    public static List<String> findInterfaceManagedOptions(CharSequence content) {
-        Set<String> configured = getDefaultOptions(content);
-        return INTERFACE_MANAGED_OPTIONS.stream().filter(option -> configured.contains(option) || configured.contains("no-" + option)).toList();
     @Nullable
     public static File getSubtitleFontsDirectory() {
         return inspector().readSubtitleFontsDirectory();
