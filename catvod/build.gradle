@@ -33,4 +33,5 @@ dependencies {
     api libs.startup
     api libs.zxing.core
     coreLibraryDesugaring libs.desugar
+    testImplementation libs.junit
 }

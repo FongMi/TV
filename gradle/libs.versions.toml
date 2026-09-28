@@ -34,6 +34,7 @@ guava = "33.7.1-android"
 jna = "5.19.1"
 jupnp = "3.0.5"
 juniversalchardet = "1.0.3"
+junit = "4.13.2"
 logger = "2.2.0"
 lottie = "6.7.1"
 material = "1.14.0"
@@ -86,6 +87,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
 juniversalchardet = { group = "com.googlecode.juniversalchardet", name = "juniversalchardet", version.ref = "juniversalchardet" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 rtmp-client = { group = "com.github.mcxinyu", name = "LibRtmp-Client-for-Android", version.ref = "rtmpClient" }
 logger = { group = "com.orhanobut", name = "logger", version.ref = "logger" }
 lottie = { group = "com.airbnb.android", name = "lottie", version.ref = "lottie" }
