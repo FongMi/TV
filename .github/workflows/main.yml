@@ -300,7 +300,7 @@ jobs:
           retention-days: 30
 
       - name: Publish four APKs to GitHub Release
-        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927'
+        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927' || github.ref == 'refs/heads/codex/media3-public-compat-ass-20260928'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -308,6 +308,13 @@ jobs:
 
           TAG="auto-${{ github.run_number }}"
           TITLE="TV 5.6.6 自动构建"
+          RELEASE_FLAGS=(--latest)
+
+          if [ "$GITHUB_REF" = 'refs/heads/codex/media3-public-compat-ass-20260928' ]; then
+            TAG="ass-test-${{ github.run_number }}"
+            TITLE="TV 5.6.6 ASS 字幕测试版"
+            RELEASE_FLAGS=(--prerelease)
+          fi
 
           cat > release-notes.md <<EOF
           TV 5.6.6 自动构建
@@ -320,6 +327,14 @@ jobs:
           - leanback armeabi-v7a
           EOF
 
+          if [ "$GITHUB_REF" = 'refs/heads/codex/media3-public-compat-ass-20260928' ]; then
+            cat >> release-notes.md <<'EOF'
+
+          此版本使用公开的 FongMi libass 源码恢复基础 ASS/SSA 字幕，并测试 Matroska 字幕和字体解析。
+          尚未完成 ARM 设备实测；光盘菜单、杜比视界 P5 和其他 5.6.6 专用原生功能仍待恢复。
+          EOF
+          fi
+
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release delete "$TAG" --cleanup-tag -y
           else
@@ -330,7 +345,7 @@ jobs:
             --target "$GITHUB_SHA" \
             --title "$TITLE" \
             --notes-file release-notes.md \
-            --latest
+            "${RELEASE_FLAGS[@]}"
 
           for APK in \
             "dist/mobile-arm64-v8a.apk" \
