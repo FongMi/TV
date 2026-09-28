@@ -1,0 +1,451 @@
+diff --git a/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/Iso9660FileSystem.java b/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/Iso9660FileSystem.java
+new file mode 100644
+index 0000000..cd20e38
+--- /dev/null
++++ b/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/Iso9660FileSystem.java
+@@ -0,0 +1,250 @@
++/*
++ * Copyright (C) 2026 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package androidx.media3.extractor.iso.udf;
++
++import androidx.annotation.Nullable;
++import androidx.media3.common.CacheDataReader;
++import androidx.media3.extractor.iso.IsoConstants;
++import androidx.media3.extractor.iso.IsoFileEntry;
++import java.io.IOException;
++import java.nio.charset.StandardCharsets;
++import java.util.ArrayList;
++import java.util.List;
++
++/** Reads the primary ISO 9660 directory tree when a disc image has no UDF file set. */
++final class Iso9660FileSystem {
++
++  private static final int BLOCK_SIZE = IsoConstants.SECTOR_SIZE;
++  private static final int PRIMARY_VOLUME_SECTOR = 16;
++  private static final int MAX_VOLUME_DESCRIPTORS = 32;
++  private static final int ROOT_RECORD_OFFSET = 156;
++  private static final int MIN_RECORD_LENGTH = 34;
++  private static final int MAX_DIRECTORY_BYTES = 8 * 1024 * 1024;
++
++  private final CacheDataReader reader;
++  private final Entry root;
++
++  private Iso9660FileSystem(CacheDataReader reader, Entry root) {
++    this.reader = reader;
++    this.root = root;
++  }
++
++  public static Iso9660FileSystem open(CacheDataReader reader) throws IOException {
++    for (int sectorNumber = PRIMARY_VOLUME_SECTOR;
++        sectorNumber < PRIMARY_VOLUME_SECTOR + MAX_VOLUME_DESCRIPTORS;
++        sectorNumber++) {
++      byte[] sector = readSector(reader, sectorNumber);
++      if (sector[1] != 'C'
++          || sector[2] != 'D'
++          || sector[3] != '0'
++          || sector[4] != '0'
++          || sector[5] != '1'
++          || sector[6] != 1) {
++        throw new IOException("ISO 9660: invalid volume descriptor");
++      }
++      if (sector[0] == (byte) 255) {
++        break;
++      }
++      if (sector[0] == 1) {
++        if (unsigned16(sector, 128) != BLOCK_SIZE) {
++          throw new IOException("ISO 9660: unsupported logical block size");
++        }
++        int rootLength = sector[ROOT_RECORD_OFFSET] & 0xFF;
++        Entry root = readRecord(sector, ROOT_RECORD_OFFSET, rootLength);
++        if (!root.directory) {
++          throw new IOException("ISO 9660: root directory is missing");
++        }
++        return new Iso9660FileSystem(reader, root);
++      }
++    }
++    throw new IOException("ISO 9660: primary volume descriptor not found");
++  }
++
++  @Nullable
++  public IsoFileEntry findFile(String path) throws IOException {
++    Entry entry = resolve(path);
++    if (entry == null || entry.directory) {
++      return null;
++    }
++    if (entry.continuesInNextRecord) {
++      throw new IOException("ISO 9660: multi-extent files are not supported: " + entry.name);
++    }
++    long byteOffset = entry.sector * BLOCK_SIZE;
++    long imageLength = reader.length();
++    if (imageLength >= 0 && (byteOffset > imageLength || entry.length > imageLength - byteOffset)) {
++      throw new IOException("ISO 9660: file extent is outside the image");
++    }
++    return new IsoFileEntry(entry.name, byteOffset, entry.length);
++  }
++
++  public List<String> listFiles(String path) throws IOException {
++    Entry entry = resolve(path);
++    List<String> names = new ArrayList<>();
++    if (entry != null && entry.directory) {
++      for (Entry child : readDirectory(entry)) {
++        names.add(child.name);
++      }
++    }
++    return names;
++  }
++
++  @Nullable
++  private Entry resolve(@Nullable String path) throws IOException {
++    Entry current = root;
++    if (path == null || path.isEmpty() || path.equals("/")) {
++      return current;
++    }
++    for (String part : path.replace('\\', '/').split("/")) {
++      if (part.isEmpty() || part.equals(".")) {
++        continue;
++      }
++      if (part.equals("..") || !current.directory) {
++        return null;
++      }
++      Entry next = null;
++      for (Entry child : readDirectory(current)) {
++        if (child.name.equalsIgnoreCase(part)) {
++          next = child;
++          break;
++        }
++      }
++      if (next == null) {
++        return null;
++      }
++      current = next;
++    }
++    return current;
++  }
++
++  private List<Entry> readDirectory(Entry directory) throws IOException {
++    if (directory.length < 0 || directory.length > MAX_DIRECTORY_BYTES) {
++      throw new IOException("ISO 9660: directory exceeds size limit");
++    }
++    List<Entry> children = new ArrayList<>();
++    for (long bytePosition = 0; bytePosition < directory.length; bytePosition += BLOCK_SIZE) {
++      long sectorNumber = directory.sector + bytePosition / BLOCK_SIZE;
++      byte[] sector = readSector(reader, sectorNumber);
++      int limit = (int) Math.min(BLOCK_SIZE, directory.length - bytePosition);
++      int offset = 0;
++      while (offset < limit) {
++        int length = sector[offset] & 0xFF;
++        if (length == 0) {
++          break;
++        }
++        if (length < MIN_RECORD_LENGTH || length > limit - offset) {
++          throw new IOException("ISO 9660: malformed directory record");
++        }
++        Entry entry = readRecord(sector, offset, length);
++        if (entry.directory && entry.continuesInNextRecord) {
++          throw new IOException("ISO 9660: multi-extent directories are not supported");
++        }
++        if (!entry.name.equals("/") && !entry.name.equals("..")) {
++          children.add(entry);
++        }
++        offset += length;
++      }
++    }
++    return children;
++  }
++
++  private static Entry readRecord(byte[] sector, int offset, int length) throws IOException {
++    if (length < MIN_RECORD_LENGTH || offset < 0 || offset > sector.length - length) {
++      throw new IOException("ISO 9660: invalid directory record length");
++    }
++    if (sector[offset + 1] != 0) {
++      throw new IOException("ISO 9660: extended attribute records are not supported");
++    }
++    int nameLength = sector[offset + 32] & 0xFF;
++    if (nameLength == 0 || nameLength > length - 33) {
++      throw new IOException("ISO 9660: invalid file identifier length");
++    }
++    if (nameLength == 1 && (sector[offset + 33] == 0 || sector[offset + 33] == 1)) {
++      String specialName = sector[offset + 33] == 0 ? "/" : "..";
++      return new Entry(
++          specialName,
++          unsigned32(sector, offset + 2),
++          unsigned32(sector, offset + 10),
++          (sector[offset + 25] & 2) != 0,
++          false);
++    }
++    String name = new String(sector, offset + 33, nameLength, StandardCharsets.US_ASCII);
++    int version = name.lastIndexOf(';');
++    if (version >= 0 && version + 1 < name.length()) {
++      String suffix = name.substring(version + 1);
++      if (suffix.chars().allMatch(Character::isDigit)) {
++        name = name.substring(0, version);
++      }
++    }
++    if (name.endsWith(".")) {
++      name = name.substring(0, name.length() - 1);
++    }
++    if (name.isEmpty()) {
++      throw new IOException("ISO 9660: empty file identifier");
++    }
++    return new Entry(
++        name,
++        unsigned32(sector, offset + 2),
++        unsigned32(sector, offset + 10),
++        (sector[offset + 25] & 2) != 0,
++        (sector[offset + 25] & 0x80) != 0);
++  }
++
++  private static byte[] readSector(CacheDataReader reader, long sectorNumber) throws IOException {
++    byte[] sector = new byte[BLOCK_SIZE];
++    long byteOffset;
++    try {
++      byteOffset = Math.multiplyExact(sectorNumber, BLOCK_SIZE);
++    } catch (ArithmeticException e) {
++      throw new IOException("ISO 9660: sector offset overflow", e);
++    }
++    for (int offset = 0; offset < BLOCK_SIZE; ) {
++      int count = reader.read(byteOffset + offset, sector, offset, BLOCK_SIZE - offset);
++      if (count <= 0) {
++        throw new IOException("ISO 9660: truncated sector " + sectorNumber);
++      }
++      offset += count;
++    }
++    return sector;
++  }
++
++  private static int unsigned16(byte[] data, int offset) {
++    return (data[offset] & 0xFF) | ((data[offset + 1] & 0xFF) << 8);
++  }
++
++  private static long unsigned32(byte[] data, int offset) {
++    return (data[offset] & 0xFFL)
++        | ((data[offset + 1] & 0xFFL) << 8)
++        | ((data[offset + 2] & 0xFFL) << 16)
++        | ((data[offset + 3] & 0xFFL) << 24);
++  }
++
++  private static final class Entry {
++    public final String name;
++    public final long sector;
++    public final long length;
++    public final boolean directory;
++    public final boolean continuesInNextRecord;
++
++    private Entry(
++        String name, long sector, long length, boolean directory, boolean continuesInNextRecord) {
++      this.name = name;
++      this.sector = sector;
++      this.length = length;
++      this.directory = directory;
++      this.continuesInNextRecord = continuesInNextRecord;
++    }
++  }
++}
+diff --git a/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/UdfFileSystem.java b/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/UdfFileSystem.java
+index 304b7b3..77020c6 100644
+--- a/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/UdfFileSystem.java
++++ b/libraries/extractor/src/main/java/androidx/media3/extractor/iso/udf/UdfFileSystem.java
+@@ -100,6 +100,7 @@ public final class UdfFileSystem {
+   private final ByteBuffer sectorBB = ByteBuffer.wrap(sectorBuf).order(ByteOrder.LITTLE_ENDIAN);
+ 
+   private CacheDataReader reader;
++  @Nullable private Iso9660FileSystem iso9660Fallback;
+   private long metadataPartitionSectors;
+   private long fsdPhysicalSector;
+   private long partition0Base;
+@@ -107,11 +108,24 @@ public final class UdfFileSystem {
+ 
+   public void open(CacheDataReader reader) throws IOException {
+     this.reader = reader;
+-    findFsdAndPartitionBase();
++    iso9660Fallback = null;
++    try {
++      findFsdAndPartitionBase();
++    } catch (IOException udfError) {
++      try {
++        iso9660Fallback = Iso9660FileSystem.open(reader);
++      } catch (IOException isoError) {
++        udfError.addSuppressed(isoError);
++        throw udfError;
++      }
++    }
+   }
+ 
+   @Nullable
+   public IsoFileEntry findFile(String path) throws IOException {
++    if (iso9660Fallback != null) {
++      return iso9660Fallback.findFile(path);
++    }
+     String normalized = path.replace('\\', '/');
+     int lastSlash = normalized.lastIndexOf('/');
+     String dirPath = lastSlash > 0 ? normalized.substring(0, lastSlash) : "";
+@@ -143,6 +157,9 @@ public final class UdfFileSystem {
+   }
+ 
+   public List<String> listFiles(String dirPath) throws IOException {
++    if (iso9660Fallback != null) {
++      return iso9660Fallback.listFiles(dirPath);
++    }
+     long dirLbn;
+     if (dirPath == null || dirPath.isEmpty() || dirPath.equals("/")) {
+       dirLbn = rootIcbLbn;
+diff --git a/libraries/extractor/src/test/java/androidx/media3/extractor/iso/udf/Iso9660FallbackTest.java b/libraries/extractor/src/test/java/androidx/media3/extractor/iso/udf/Iso9660FallbackTest.java
+new file mode 100644
+index 0000000..84f2fe8
+--- /dev/null
++++ b/libraries/extractor/src/test/java/androidx/media3/extractor/iso/udf/Iso9660FallbackTest.java
+@@ -0,0 +1,141 @@
++package androidx.media3.extractor.iso.udf;
++
++import static com.google.common.truth.Truth.assertThat;
++import static org.junit.Assert.assertThrows;
++
++import androidx.media3.common.CacheDataReader;
++import androidx.media3.extractor.iso.IsoFileEntry;
++import java.io.IOException;
++import java.nio.charset.StandardCharsets;
++import java.util.Arrays;
++import org.junit.Test;
++
++/** Tests a DVD-style ISO 9660 image without a UDF anchor or file set descriptor. */
++public final class Iso9660FallbackTest {
++
++  private static final int BLOCK = 2048;
++
++  @Test
++  public void iso9660OnlyDisc_findFileAndListFiles() throws Exception {
++    byte[] image = createDisc();
++    UdfFileSystem fileSystem = new UdfFileSystem();
++    fileSystem.open(reader(image));
++
++    IsoFileEntry file = fileSystem.findFile("video_ts\\VIDEO_TS.IFO");
++    assertThat(file).isNotNull();
++    assertThat(file.name).isEqualTo("VIDEO_TS.IFO");
++    assertThat(file.byteOffset).isEqualTo(22L * BLOCK);
++    assertThat(file.length).isEqualTo(5);
++    assertThat(fileSystem.findFile("VIDEO_TS")).isNull();
++    assertThat(fileSystem.findFile("VIDEO_TS/MISSING.IFO")).isNull();
++    assertThat(fileSystem.listFiles("/VIDEO_TS")).containsExactly("VIDEO_TS.IFO");
++    assertThat(fileSystem.listFiles("/MISSING")).isEmpty();
++  }
++
++  @Test
++  public void bootRecordBeforePrimaryVolumeDescriptor_findsDvdFiles() throws Exception {
++    byte[] image = createDisc();
++    System.arraycopy(image, 16 * BLOCK, image, 17 * BLOCK, BLOCK);
++    Arrays.fill(image, 16 * BLOCK, 17 * BLOCK, (byte) 0);
++    System.arraycopy("CD001".getBytes(StandardCharsets.US_ASCII), 0, image, 16 * BLOCK + 1, 5);
++    image[16 * BLOCK + 6] = 1;
++    UdfFileSystem fileSystem = new UdfFileSystem();
++    fileSystem.open(reader(image));
++
++    assertThat(fileSystem.findFile("VIDEO_TS/VIDEO_TS.IFO")).isNotNull();
++  }
++
++  @Test
++  public void malformedDirectoryRecord_rejectsInsteadOfReadingPastRecord() throws Exception {
++    byte[] image = createDisc();
++    // Two special records (34 bytes each) and VIDEO_TS (42 bytes) precede this record.
++    image[20 * BLOCK + 110] = 2;
++    UdfFileSystem fileSystem = new UdfFileSystem();
++    fileSystem.open(reader(image));
++
++    assertThrows(IOException.class, () -> fileSystem.listFiles("/"));
++  }
++
++  @Test
++  public void unknownImage_doesNotClaimIso9660Support() {
++    byte[] image = new byte[40 * BLOCK];
++    assertThrows(IOException.class, () -> new UdfFileSystem().open(reader(image)));
++  }
++
++  @Test
++  public void multiExtentFile_rejectsPartialPlayback() throws Exception {
++    byte[] image = createDisc();
++    // Two special records (34 bytes each) precede VIDEO_TS.IFO in the child directory.
++    image[21 * BLOCK + 68 + 25] = (byte) 0x80;
++    UdfFileSystem fileSystem = new UdfFileSystem();
++    fileSystem.open(reader(image));
++
++    assertThrows(IOException.class, () -> fileSystem.findFile("VIDEO_TS/VIDEO_TS.IFO"));
++  }
++
++  private static byte[] createDisc() {
++    byte[] image = new byte[40 * BLOCK];
++    int pvd = 16 * BLOCK;
++    image[pvd] = 1;
++    System.arraycopy("CD001".getBytes(StandardCharsets.US_ASCII), 0, image, pvd + 1, 5);
++    image[pvd + 6] = 1;
++    put16(image, pvd + 128, BLOCK);
++    image[pvd + 130] = (byte) (BLOCK >>> 8);
++    image[pvd + 131] = (byte) BLOCK;
++    writeRecord(image, pvd + 156, 20, BLOCK, true, new byte[] {0});
++
++    int root = 20 * BLOCK;
++    int position = writeRecord(image, root, 20, BLOCK, true, new byte[] {0});
++    position = writeRecord(image, position, 20, BLOCK, true, new byte[] {1});
++    writeRecord(image, position, 21, BLOCK, true, "VIDEO_TS".getBytes(StandardCharsets.US_ASCII));
++
++    int videoTs = 21 * BLOCK;
++    position = writeRecord(image, videoTs, 21, BLOCK, true, new byte[] {0});
++    position = writeRecord(image, position, 20, BLOCK, true, new byte[] {1});
++    writeRecord(image, position, 22, 5, false, "VIDEO_TS.IFO;1".getBytes(StandardCharsets.US_ASCII));
++    System.arraycopy(new byte[] {1, 2, 3, 4, 5}, 0, image, 22 * BLOCK, 5);
++    return image;
++  }
++
++  private static int writeRecord(
++      byte[] image, int offset, int extent, int length, boolean directory, byte[] name) {
++    int recordLength = 33 + name.length + (name.length % 2 == 0 ? 1 : 0);
++    image[offset] = (byte) recordLength;
++    put32(image, offset + 2, extent);
++    put32(image, offset + 10, length);
++    image[offset + 25] = (byte) (directory ? 2 : 0);
++    image[offset + 32] = (byte) name.length;
++    System.arraycopy(name, 0, image, offset + 33, name.length);
++    return offset + recordLength;
++  }
++
++  private static void put16(byte[] image, int offset, int value) {
++    image[offset] = (byte) value;
++    image[offset + 1] = (byte) (value >>> 8);
++  }
++
++  private static void put32(byte[] image, int offset, int value) {
++    for (int i = 0; i < 4; i++) {
++      image[offset + i] = (byte) (value >>> (i * 8));
++    }
++  }
++
++  private static CacheDataReader reader(byte[] image) {
++    return new CacheDataReader() {
++      @Override
++      public int read(long byteOffset, byte[] buffer, int offset, int length) {
++        if (byteOffset < 0 || byteOffset >= image.length) {
++          return -1;
++        }
++        int read = Math.min(Math.min(length, 217), image.length - (int) byteOffset);
++        System.arraycopy(image, (int) byteOffset, buffer, offset, read);
++        return read;
++      }
++
++      @Override
++      public long length() {
++        return image.length;
++      }
++    };
++  }
++}

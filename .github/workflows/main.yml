@@ -3,7 +3,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ fongmi, 'codex/media3-public-compat-*' ]
+    branches: [ fongmi, 'codex/media3-public-compat-*', 'codex/iso-source-rebuild-20260928' ]
   workflow_dispatch:
 
 permissions:
@@ -145,11 +145,12 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew media3/gradlew media3-ass/gradlew
 
-      - name: Restore ASS sample and font attachment callbacks in Media3
+      - name: Restore ASS callbacks and ISO 9660 disc reading in Media3
         run: |
           set -euo pipefail
           git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-ass-matroska.patch"
           git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-ass-matroska-test.patch"
+          git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-iso9660-fallback.patch"
           git -C media3 diff --check
 
       - name: Build matching FongMi Media3 AARs
@@ -208,11 +209,12 @@ jobs:
           cp "$source_aar" app/libs/lib-exoplayer-libass-release.aar
           python3 scripts/test_libass_aar.py
 
-      - name: Test patched Matroska extraction
+      - name: Test Matroska subtitles and ISO 9660 disc reading
         run: |
           set -euo pipefail
           ./media3/gradlew -p media3 :lib-extractor:testDebugUnitTest \
             --tests 'androidx.media3.extractor.mkv.MatroskaExtractorNonParameterizedTest' \
+            --tests 'androidx.media3.extractor.iso.udf.Iso9660FallbackTest' \
             --no-daemon
 
       - name: Verify expected build tasks
@@ -300,7 +302,7 @@ jobs:
           retention-days: 30
 
       - name: Publish four APKs to GitHub Release
-        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927' || github.ref == 'refs/heads/codex/media3-public-compat-ass-20260928'
+        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927' || github.ref == 'refs/heads/codex/media3-public-compat-ass-20260928' || github.ref == 'refs/heads/codex/iso-source-rebuild-20260928'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -313,6 +315,10 @@ jobs:
           if [ "$GITHUB_REF" = 'refs/heads/codex/media3-public-compat-ass-20260928' ]; then
             TAG="ass-test-${{ github.run_number }}"
             TITLE="TV 5.6.6 ASS 字幕测试版"
+            RELEASE_FLAGS=(--prerelease)
+          elif [ "$GITHUB_REF" = 'refs/heads/codex/iso-source-rebuild-20260928' ]; then
+            TAG="iso-test-${{ github.run_number }}"
+            TITLE="TV 5.6.6 DVD ISO 源码测试版"
             RELEASE_FLAGS=(--prerelease)
           fi
 
@@ -332,6 +338,12 @@ jobs:
 
           此版本使用公开的 FongMi libass 源码恢复基础 ASS/SSA 字幕，并测试 Matroska 字幕和字体解析。
           尚未完成 ARM 设备实测；光盘菜单、杜比视界 P5 和其他 5.6.6 专用原生功能仍待恢复。
+          EOF
+          elif [ "$GITHUB_REF" = 'refs/heads/codex/iso-source-rebuild-20260928' ]; then
+            cat >> release-notes.md <<'EOF'
+
+          在 ASS 字幕测试版的基础上，新增从源码实现的 ISO 9660 目录读取回退路径，支持读取没有 UDF 的 DVD 镜像文件；测试覆盖文件查找、目录列表、前置引导记录和损坏目录。
+          这是预发布测试版。DVD/蓝光图形菜单、杜比视界 P5 等 5.6.6 专用原生功能仍待开发；尚未在 ARM 设备和真实光盘镜像上验证。
           EOF
           fi
 
