@@ -293,6 +293,20 @@ jobs:
             }
           done
 
+          # Verify the source-built ISO 9660 reader survived AAR copying and R8 packaging.
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          marker = b"ISO 9660: primary volume descriptor not found"
+          for apk in sorted(Path("dist").glob("*.apk")):
+              with ZipFile(apk) as archive:
+                  dex_names = [name for name in archive.namelist() if name.endswith(".dex")]
+                  if not any(marker in archive.read(name) for name in dex_names):
+                      raise SystemExit(f"::error::ISO 9660 reader missing from {apk}")
+              print(f"ISO 9660 reader found in {apk}")
+          PY
+
       - name: Upload four APKs to Actions
         uses: actions/upload-artifact@v4
         with:
