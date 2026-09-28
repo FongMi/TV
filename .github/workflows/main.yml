@@ -195,8 +195,10 @@ jobs:
           mkdir -p dist
 
           ./gradlew \
+            -Dorg.gradle.jvmargs="-Xmx4096m -Dfile.encoding=UTF-8 --add-exports jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED" \
             :app:assembleMobileRelease \
             :app:assembleLeanbackRelease \
+            --max-workers=1 \
             --stacktrace \
             --no-daemon
 
