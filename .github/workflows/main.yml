@@ -3,7 +3,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ fongmi ]
+    branches: [ fongmi, 'codex/media3-public-compat-*' ]
   workflow_dispatch:
 
 permissions:
@@ -191,8 +191,8 @@ jobs:
           GRADLE_OPTS: "-Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.internal.http.socketTimeout=120000"
         run: |
           set -euo pipefail
-          rm -rf Release/apk dist
-          mkdir -p Release/apk dist
+          rm -rf dist
+          mkdir -p dist
 
           ./gradlew \
             :app:assembleMobileRelease \
@@ -200,31 +200,37 @@ jobs:
             --stacktrace \
             --no-daemon
 
-          echo "== Raw Release/apk =="
-          find Release/apk -maxdepth 1 -type f -name '*.apk' -print -exec ls -lh {} \;
+          echo "== Gradle APK outputs =="
+          find app/build/outputs/apk -type f -name '*.apk' -print -exec ls -lh {} \;
 
       - name: Collect four APKs
         run: |
           set -euo pipefail
 
-          MOBILE_64="Release/apk/mobile-arm64_v8a.apk"
-          MOBILE_32="Release/apk/mobile-armeabi_v7a.apk"
-          TV_64="Release/apk/leanback-arm64_v8a.apk"
-          TV_32="Release/apk/leanback-armeabi_v7a.apk"
+          APK_ROOT="app/build/outputs/apk"
+          test -d "$APK_ROOT" || {
+            echo "::error::Gradle APK output directory not found: $APK_ROOT"
+            find app/build -type f -name '*.apk' -print || true
+            exit 1
+          }
 
-          for f in "$MOBILE_64" "$MOBILE_32" "$TV_64" "$TV_32"; do
-            test -f "$f" || {
-              echo "::error::缺少 APK: $f"
-              echo "实际输出："
-              find Release/apk -maxdepth 1 -type f -name '*.apk' -print || true
+          copy_apk() {
+            local source_name="$1" target_name="$2"
+            local -a matches=()
+            mapfile -d '' -t matches < <(find "$APK_ROOT" -type f -name "$source_name" -print0)
+            if [ "${#matches[@]}" -ne 1 ]; then
+              echo "::error::Expected one $source_name in $APK_ROOT, found ${#matches[@]}"
+              find "$APK_ROOT" -type f -name '*.apk' -print
               exit 1
-            }
-          done
+            fi
+            test -s "${matches[0]}" || { echo "::error::Empty APK: ${matches[0]}"; exit 1; }
+            cp "${matches[0]}" "dist/$target_name"
+          }
 
-          cp "$MOBILE_64" "dist/mobile-arm64-v8a.apk"
-          cp "$MOBILE_32" "dist/mobile-armeabi-v7a.apk"
-          cp "$TV_64" "dist/leanback-arm64_v8a.apk"
-          cp "$TV_32" "dist/leanback-armeabi_v7a.apk"
+          copy_apk "mobile-arm64_v8a.apk" "mobile-arm64-v8a.apk"
+          copy_apk "mobile-armeabi_v7a.apk" "mobile-armeabi-v7a.apk"
+          copy_apk "leanback-arm64_v8a.apk" "leanback-arm64_v8a.apk"
+          copy_apk "leanback-armeabi_v7a.apk" "leanback-armeabi_v7a.apk"
 
           COUNT="$(find dist -maxdepth 1 -type f -name '*.apk' | wc -l | tr -d ' ')"
           [ "$COUNT" = "4" ] || {
@@ -238,22 +244,23 @@ jobs:
       - name: Upload four APKs to Actions
         uses: actions/upload-artifact@v4
         with:
-          name: TV-5.6.3-four-apks
+          name: TV-5.6.6-four-apks
           path: dist/*.apk
           if-no-files-found: error
           retention-days: 30
 
       - name: Publish four APKs to GitHub Release
+        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
 
           TAG="auto-${{ github.run_number }}"
-          TITLE="TV 5.6.3 自动构建"
+          TITLE="TV 5.6.6 自动构建"
 
           cat > release-notes.md <<EOF
-          TV 5.6.3 自动构建
+          TV 5.6.6 自动构建
 
           Commit: ${{ github.sha }}
 
