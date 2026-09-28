@@ -1,0 +1,152 @@
+name: Publish verified official 5.6.6 APK mirror
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: official-5.6.6-mirror
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    if: github.repository == '15840213978a/fongmi' && github.ref == 'refs/heads/fongmi'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+
+    steps:
+      - name: Check for an existing mirror tag
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view upstream-5.6.6 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+              || gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/upstream-5.6.6" >/dev/null 2>&1; then
+            echo '::error::upstream-5.6.6 already exists. This workflow does not replace existing releases or drafts.'
+            exit 1
+          fi
+
+      - name: Download all four APKs from the official 5.6.6 release
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p official
+          for apk in \
+            leanback-arm64_v8a.apk \
+            leanback-armeabi_v7a.apk \
+            mobile-arm64_v8a.apk \
+            mobile-armeabi_v7a.apk; do
+            curl --fail --location --retry 4 --retry-all-errors \
+              --connect-timeout 30 --max-time 1200 \
+              "https://github.com/FongMi/Release/releases/download/5.6.6/$apk" \
+              --output "official/$apk"
+          done
+
+      - name: Verify original bytes and ZIP integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd official
+          sha256sum --check <<'SHA256'
+          0799e9942972a642149105ada63b483f5de0f4dddf546ce698b7a6ef2299a679  leanback-arm64_v8a.apk
+          74f578537e063e01423667b2acad4b152eb8e1fdae0f75c98ed9a1c9b05c5789  leanback-armeabi_v7a.apk
+          0906ebed0424c25df4886735efc40146044f9c78ee2b7e7a5d1c470da56c6173  mobile-arm64_v8a.apk
+          ff6bfa26006a50c6825b64d2f6a3107dfa99b8277509909bd10987b6ca09fcc5  mobile-armeabi_v7a.apk
+          SHA256
+
+          while read -r expected apk; do
+            actual="$(stat -c '%s' "$apk")"
+            if [ "$actual" != "$expected" ]; then
+              echo "::error::$apk: expected $expected bytes, got $actual"
+              exit 1
+            fi
+            unzip -tqq "$apk" >/dev/null
+          done <<'SIZES'
+          156758273 leanback-arm64_v8a.apk
+          133935683 leanback-armeabi_v7a.apk
+          156674648 mobile-arm64_v8a.apk
+          133852058 mobile-armeabi_v7a.apk
+          SIZES
+
+      - name: Write provenance and checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > release-notes.md <<'NOTES'
+          Official FongMi 5.6.6 APK mirror, downloaded byte-for-byte from
+          https://github.com/FongMi/Release/releases/tag/5.6.6.
+
+          All four APKs keep the original official signing certificate, contents,
+          and file size. They were not compiled or signed by this repository.
+          This mirror does not change the app, re-enable source-build features,
+          or prove that the repository's Media3 dependencies are complete.
+
+          | File | Size (bytes) | SHA256 |
+          | --- | ---: | --- |
+          | leanback-arm64_v8a.apk | 156758273 | 0799e9942972a642149105ada63b483f5de0f4dddf546ce698b7a6ef2299a679 |
+          | leanback-armeabi_v7a.apk | 133935683 | 74f578537e063e01423667b2acad4b152eb8e1fdae0f75c98ed9a1c9b05c5789 |
+          | mobile-arm64_v8a.apk | 156674648 | 0906ebed0424c25df4886735efc40146044f9c78ee2b7e7a5d1c470da56c6173 |
+          | mobile-armeabi_v7a.apk | 133852058 | ff6bfa26006a50c6825b64d2f6a3107dfa99b8277509909bd10987b6ca09fcc5 |
+
+          This release is marked as a prerelease to keep the repository's own
+          compiled release in the main position. Apps with a different signing
+          certificate cannot update each other in place.
+          NOTES
+
+      - name: Upload verified APKs to a draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release create upstream-5.6.6 \
+            official/leanback-arm64_v8a.apk \
+            official/leanback-armeabi_v7a.apk \
+            official/mobile-arm64_v8a.apk \
+            official/mobile-armeabi_v7a.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title 'Official 5.6.6 APK mirror (unmodified)' \
+            --notes-file release-notes.md \
+            --draft \
+            --latest=false
+
+          gh api "repos/${GITHUB_REPOSITORY}/releases/tags/upstream-5.6.6" > uploaded-assets.json
+          python3 - <<'PY'
+          import json
+
+          with open('uploaded-assets.json', encoding='utf-8') as file:
+              assets = json.load(file)['assets']
+          expected = {
+              'leanback-arm64_v8a.apk': (156758273, '0799e9942972a642149105ada63b483f5de0f4dddf546ce698b7a6ef2299a679'),
+              'leanback-armeabi_v7a.apk': (133935683, '74f578537e063e01423667b2acad4b152eb8e1fdae0f75c98ed9a1c9b05c5789'),
+              'mobile-arm64_v8a.apk': (156674648, '0906ebed0424c25df4886735efc40146044f9c78ee2b7e7a5d1c470da56c6173'),
+              'mobile-armeabi_v7a.apk': (133852058, 'ff6bfa26006a50c6825b64d2f6a3107dfa99b8277509909bd10987b6ca09fcc5'),
+          }
+          actual = {asset['name']: asset for asset in assets}
+          if set(actual) != set(expected):
+              raise SystemExit(f'Expected four APK assets, got: {sorted(actual)}')
+          for name, (size, digest) in expected.items():
+              asset = actual[name]
+              if asset['size'] != size:
+                  raise SystemExit(f'{name}: uploaded size differs from the original')
+              if asset.get('digest') and asset['digest'] != 'sha256:' + digest:
+                  raise SystemExit(f'{name}: uploaded SHA256 differs from the original')
+          print('All four draft assets have their original sizes and matching digests when supplied by GitHub.')
+          PY
+
+      - name: Publish the complete mirror without changing Latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh release edit upstream-5.6.6 \
+            --repo "$GITHUB_REPOSITORY" \
+            --draft=false \
+            --prerelease \
+            --latest=false
+          gh release view upstream-5.6.6 --repo "$GITHUB_REPOSITORY" --json url --jq .url
