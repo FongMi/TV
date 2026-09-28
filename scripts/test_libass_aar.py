@@ -8,6 +8,7 @@ import zipfile
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 AAR = ROOT / "app/libs/lib-exoplayer-libass-release.aar"
+CREATE_SIGNATURE = b"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)J"
 
 
 class LibassAarTest(unittest.TestCase):
@@ -19,6 +20,10 @@ class LibassAarTest(unittest.TestCase):
                     "androidx/media3/exoplayer/libass/LibassPlaybackSession.class",
                     classes.namelist(),
                 )
+                self.assertIn(
+                    CREATE_SIGNATURE,
+                    classes.read("androidx/media3/exoplayer/libass/LibassNative.class"),
+                )
 
             for abi, elf_class in (("arm64-v8a", 2), ("armeabi-v7a", 1)):
                 library = aar.read(f"jni/{abi}/libmedia3ass.so")
@@ -26,6 +31,9 @@ class LibassAarTest(unittest.TestCase):
                     self.assertTrue(library.startswith(b"\x7fELF"))
                     self.assertEqual(library[4], elf_class)
                     self.assertIn(b"JNI_OnLoad", library)
+                    # The 5.6.6 APK uses a different nativeCreate ABI; never mix
+                    # that binary with the older Java bridge rebuilt here.
+                    self.assertIn(CREATE_SIGNATURE, library)
 
 
 if __name__ == "__main__":

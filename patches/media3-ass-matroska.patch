@@ -1,0 +1,242 @@
+diff --git a/libraries/extractor/src/main/java/androidx/media3/extractor/mkv/MatroskaExtractor.java b/libraries/extractor/src/main/java/androidx/media3/extractor/mkv/MatroskaExtractor.java
+index 9cae8be..2bb57d3 100644
+--- a/libraries/extractor/src/main/java/androidx/media3/extractor/mkv/MatroskaExtractor.java
++++ b/libraries/extractor/src/main/java/androidx/media3/extractor/mkv/MatroskaExtractor.java
+@@ -196,6 +196,13 @@ public class MatroskaExtractor implements Extractor {
+   private static final int ID_DOC_TYPE = 0x4282;
+   private static final int ID_DOC_TYPE_READ_VERSION = 0x4285;
+   private static final int ID_SEGMENT = 0x18538067;
++  private static final int ID_ATTACHMENTS = 0x1941A469;
++  private static final int ID_ATTACHED_FILE = 0x61A7;
++  private static final int ID_FILE_DESCRIPTION = 0x467E;
++  private static final int ID_FILE_NAME = 0x466E;
++  private static final int ID_FILE_MIME_TYPE = 0x4660;
++  private static final int ID_FILE_DATA = 0x465C;
++  private static final int ID_FILE_UID = 0x46AE;
+   private static final int ID_SEGMENT_INFO = 0x1549A966;
+   private static final int ID_CHAPTERS = 0x1043A770;
+   private static final int ID_EDITION_ENTRY = 0x45B9;
+@@ -547,6 +554,7 @@ public class MatroskaExtractor implements Extractor {
+ 
+   // Extractor outputs.
+   private @MonotonicNonNull ExtractorOutput extractorOutput;
++  @Nullable private Attachment currentAttachment;
+ 
+   /**
+    * @deprecated Use {@link #MatroskaExtractor(SubtitleParser.Factory)} instead.
+@@ -640,6 +648,7 @@ public class MatroskaExtractor implements Extractor {
+     currentCueTrackNumber = C.INDEX_UNSET;
+     currentCueClusterPosition = C.INDEX_UNSET;
+     currentCueRelativePosition = C.INDEX_UNSET;
++    currentAttachment = null;
+     // To prevent creating duplicate cue points on a re-parse, clear any existing cue data if the
+     // seek map has not yet been sent. Once sent, the cue data is considered final, and subsequent
+     // Cues elements will be ignored by the parsing logic.
+@@ -694,6 +703,8 @@ public class MatroskaExtractor implements Extractor {
+       case ID_CHAPTER_ATOM:
+       case ID_CHAPTER_TRACK:
+       case ID_CHAPTER_DISPLAY:
++      case ID_ATTACHMENTS:
++      case ID_ATTACHED_FILE:
+       case ID_SEEK_HEAD:
+       case ID_SEEK:
+       case ID_INFO:
+@@ -737,6 +748,7 @@ public class MatroskaExtractor implements Extractor {
+       case ID_CHAPTER_TIME_END:
+       case ID_CHAPTER_UID:
+       case ID_CHAPTER_TRACK_UID:
++      case ID_FILE_UID:
+       case ID_FLAG_DEFAULT:
+       case ID_FLAG_FORCED:
+       case ID_DEFAULT_DURATION:
+@@ -773,6 +785,9 @@ public class MatroskaExtractor implements Extractor {
+       case ID_LANGUAGE:
+       case ID_CHAP_STRING:
+       case ID_CHAP_LANGUAGE:
++      case ID_FILE_DESCRIPTION:
++      case ID_FILE_NAME:
++      case ID_FILE_MIME_TYPE:
+         return EbmlProcessor.ELEMENT_TYPE_STRING;
+       case ID_SEEK_ID:
+       case ID_BLOCK_ADD_ID_EXTRA_DATA:
+@@ -783,6 +798,7 @@ public class MatroskaExtractor implements Extractor {
+       case ID_CODEC_PRIVATE:
+       case ID_PROJECTION_PRIVATE:
+       case ID_BLOCK_ADDITIONAL:
++      case ID_FILE_DATA:
+         return EbmlProcessor.ELEMENT_TYPE_BINARY;
+       case ID_DURATION:
+       case ID_SAMPLING_FREQUENCY:
+@@ -814,6 +830,7 @@ public class MatroskaExtractor implements Extractor {
+   protected boolean isLevel1Element(int id) {
+     return id == ID_SEGMENT_INFO
+         || id == ID_CHAPTERS
++        || id == ID_ATTACHMENTS
+         || id == ID_CLUSTER
+         || id == ID_CUES
+         || id == ID_TRACKS;
+@@ -897,6 +914,9 @@ public class MatroskaExtractor implements Extractor {
+         getCurrentChapter(id).currentDisplayString = null;
+         getCurrentChapter(id).currentDisplayLanguage = null;
+         break;
++      case ID_ATTACHED_FILE:
++        currentAttachment = new Attachment();
++        break;
+       case ID_TRACK_ENTRY:
+         currentTrack = new Track();
+         currentTrack.isWebm = isWebm;
+@@ -1008,6 +1028,13 @@ public class MatroskaExtractor implements Extractor {
+           }
+         }
+         break;
++      case ID_ATTACHED_FILE:
++        Attachment attachment = checkNotNull(currentAttachment);
++        if (attachment.data != null) {
++          onAttachment(attachment.fileName, attachment.mimeType, attachment.data);
++        }
++        currentAttachment = null;
++        break;
+       case ID_EDITION_ENTRY:
+         for (int i = 0; i < tracks.size(); i++) {
+           updateTrackFormatWithMetadata(tracks.valueAt(i));
+@@ -1078,6 +1105,14 @@ public class MatroskaExtractor implements Extractor {
+             currentTrack.initializeFormat(currentTrack.number);
+             currentTrack.output = extractorOutput.track(currentTrack.number, currentTrack.type);
+             tracks.put(currentTrack.number, currentTrack);
++            if (CODEC_ID_ASS.equals(currentTrack.codecId)
++                || CODEC_ID_SSA.equals(currentTrack.codecId)) {
++              onAssTrackInitialized(
++                  currentTrack.number,
++                  currentTrack.name,
++                  currentTrack.language,
++                  checkNotNull(currentTrack.codecPrivate));
++            }
+           }
+         }
+         this.currentTrack = null;
+@@ -1511,6 +1546,15 @@ public class MatroskaExtractor implements Extractor {
+       case ID_LANGUAGE:
+         getCurrentTrack(id).language = value;
+         break;
++      case ID_FILE_NAME:
++        getCurrentAttachment(id).fileName = value;
++        break;
++      case ID_FILE_MIME_TYPE:
++        getCurrentAttachment(id).mimeType = value;
++        break;
++      case ID_FILE_DESCRIPTION:
++        // The description is not required to identify or render attachment fonts.
++        break;
+       default:
+         break;
+     }
+@@ -1556,6 +1600,15 @@ public class MatroskaExtractor implements Extractor {
+             new TrackOutput.CryptoData(
+                 C.CRYPTO_MODE_AES_CTR, encryptionKey, 0, 0); // We assume patternless AES-CTR.
+         break;
++      case ID_FILE_DATA:
++        Attachment attachment = getCurrentAttachment(id);
++        if (shouldReadAttachment(attachment.fileName, attachment.mimeType, contentSize)) {
++          attachment.data = new byte[contentSize];
++          input.readFully(attachment.data, 0, contentSize);
++        } else {
++          input.skipFully(contentSize);
++        }
++        break;
+       case ID_SIMPLE_BLOCK:
+       case ID_BLOCK:
+         // Please refer to http://www.matroska.org/technical/specs/index.html#simpleblock_structure
+@@ -1782,6 +1835,56 @@ public class MatroskaExtractor implements Extractor {
+     return currentTrack;
+   }
+ 
++  private Attachment getCurrentAttachment(int currentElementId) throws ParserException {
++    if (currentAttachment == null) {
++      throw ParserException.createForMalformedContainer(
++          "Element " + currentElementId + " must be in an AttachedFile", /* cause= */ null);
++    }
++    return currentAttachment;
++  }
++
++  /**
++   * Returns whether an attachment payload should be read for a later {@link #onAttachment} call.
++   *
++   * <p>The default returns {@code false}, so ordinary extractor instances do not allocate or retain
++   * attachment data. The file name or MIME type may be {@code null} if it appears after FileData in
++   * the Matroska element.
++   */
++  protected boolean shouldReadAttachment(
++      @Nullable String fileName, @Nullable String mimeType, int contentSize) {
++    return false;
++  }
++
++  /** Called synchronously with an attachment selected by {@link #shouldReadAttachment}. */
++  protected void onAttachment(
++      @Nullable String fileName, @Nullable String mimeType, byte[] attachmentData) {
++    // Do nothing.
++  }
++
++  /** Called after an ASS/SSA track and its Matroska CodecPrivate data have been initialized. */
++  protected void onAssTrackInitialized(
++      int trackNumber,
++      @Nullable String name,
++      @Nullable String language,
++      byte[] codecPrivate) {
++    // Do nothing.
++  }
++
++  /**
++   * Called synchronously with one original Matroska ASS/SSA sample.
++   *
++   * <p>The provided array is reused by the extractor and must not be retained or modified.
++   */
++  protected void onAssSubtitleSample(
++      int trackNumber,
++      long timeUs,
++      long durationUs,
++      byte[] sampleData,
++      int sampleOffset,
++      int sampleLength) {
++    // Do nothing.
++  }
++
+   @RequiresNonNull("#1.output")
+   private void commitSampleToOutput(
+       Track track, long timeUs, @C.BufferFlags int flags, int size, int offset) {
+@@ -1798,6 +1901,23 @@ public class MatroskaExtractor implements Extractor {
+         } else if (blockDurationUs == C.TIME_UNSET) {
+           Log.w(TAG, "Skipping subtitle sample with no duration.");
+         } else {
++          if (CODEC_ID_ASS.equals(track.codecId) || CODEC_ID_SSA.equals(track.codecId)) {
++            int sampleOffset = SSA_PREFIX.length;
++            int sampleLimit = subtitleSample.limit();
++            for (int i = sampleOffset; i < sampleLimit; i++) {
++              if (subtitleSample.getData()[i] == 0) {
++                sampleLimit = i;
++                break;
++              }
++            }
++            onAssSubtitleSample(
++                track.number,
++                timeUs,
++                blockDurationUs,
++                subtitleSample.getData(),
++                sampleOffset,
++                sampleLimit - sampleOffset);
++          }
+           setSubtitleEndTime(track.codecId, blockDurationUs, subtitleSample.getData());
+           // The Matroska spec doesn't clearly define whether subtitle samples are null-terminated
+           // or the sample should instead be sized precisely. We truncate the sample at a null-byte
+@@ -2414,6 +2534,12 @@ public class MatroskaExtractor implements Extractor {
+     }
+   }
+ 
++  private static final class Attachment {
++    @Nullable public String fileName;
++    @Nullable public String mimeType;
++    @Nullable public byte[] data;
++  }
++
+   /** Holds data corresponding to a single chapter. */
+   protected static final class ChapterEntry {
+     public long uid;

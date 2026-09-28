@@ -1,0 +1,178 @@
+diff --git a/libraries/extractor/src/test/java/androidx/media3/extractor/mkv/MatroskaExtractorNonParameterizedTest.java b/libraries/extractor/src/test/java/androidx/media3/extractor/mkv/MatroskaExtractorNonParameterizedTest.java
+index 6764540..0260af0 100644
+--- a/libraries/extractor/src/test/java/androidx/media3/extractor/mkv/MatroskaExtractorNonParameterizedTest.java
++++ b/libraries/extractor/src/test/java/androidx/media3/extractor/mkv/MatroskaExtractorNonParameterizedTest.java
+@@ -15,10 +15,12 @@
+  */
+ package androidx.media3.extractor.mkv;
+ 
++import static androidx.media3.extractor.Extractor.RESULT_END_OF_INPUT;
+ import static androidx.media3.extractor.Extractor.RESULT_SEEK;
+ import static com.google.common.base.Preconditions.checkNotNull;
+ import static com.google.common.truth.Truth.assertThat;
+ 
++import androidx.annotation.Nullable;
+ import androidx.media3.extractor.PositionHolder;
+ import androidx.media3.extractor.SeekPoint;
+ import androidx.media3.extractor.TrackAwareSeekMap;
+@@ -30,6 +32,10 @@ import androidx.test.core.app.ApplicationProvider;
+ import androidx.test.ext.junit.runners.AndroidJUnit4;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
++import java.nio.charset.StandardCharsets;
++import java.util.ArrayList;
++import java.util.Arrays;
++import java.util.List;
+ import org.junit.Test;
+ import org.junit.runner.RunWith;
+ 
+@@ -37,6 +43,12 @@ import org.junit.runner.RunWith;
+ @RunWith(AndroidJUnit4.class)
+ public class MatroskaExtractorNonParameterizedTest {
+ 
++  private static final int ID_ATTACHMENTS = 0x1941A469;
++  private static final int ID_ATTACHED_FILE = 0x61A7;
++  private static final int ID_FILE_NAME = 0x466E;
++  private static final int ID_FILE_MIME_TYPE = 0x4660;
++  private static final int ID_FILE_DATA = 0x465C;
++
+   @Test
+   public void initializeFormat_hdrStaticInfo_encodesMinimumLuminanceInCta861Units()
+       throws Exception {
+@@ -101,4 +113,136 @@ public class MatroskaExtractorNonParameterizedTest {
+     assertThat(trackAwareSeekMap.getSeekPoints(timeStampUs, videoTrackId).first)
+         .isEqualTo(expectedTrackSpecificSeekPoint);
+   }
++
++  @Test
++  public void assHooks_receiveCodecPrivateAndOriginalMatroskaSamples() throws Exception {
++    byte[] fileBytes =
++        TestUtil.getByteArray(
++            ApplicationProvider.getApplicationContext(),
++            "media/mkv/sample_with_ass_subtitles.mkv");
++    HookMatroskaExtractor extractor = new HookMatroskaExtractor();
++    extractor.init(new FakeExtractorOutput());
++    FakeExtractorInput input = new FakeExtractorInput.Builder().setData(fileBytes).build();
++    PositionHolder positionHolder = new PositionHolder();
++
++    int result;
++    do {
++      result = extractor.read(input, positionHolder);
++      if (result == RESULT_SEEK) {
++        input.setPosition((int) positionHolder.position);
++      }
++    } while (result != RESULT_END_OF_INPUT);
++
++    assertThat(new String(checkNotNull(extractor.codecPrivate), StandardCharsets.UTF_8))
++        .contains("[Script Info]");
++    assertThat(extractor.trackNumbers).hasSize(1);
++    assertThat(extractor.sampleTrackNumbers).isNotEmpty();
++    for (int trackNumber : extractor.sampleTrackNumbers) {
++      assertThat(trackNumber).isEqualTo(extractor.trackNumbers.get(0));
++    }
++    assertThat(extractor.samples).isNotEmpty();
++    assertThat(new String(extractor.samples.get(0), StandardCharsets.UTF_8)).doesNotContain("Dialogue:");
++    assertThat(extractor.sampleDurationsUs.get(0)).isGreaterThan(0);
++  }
++
++  @Test
++  public void attachmentHooks_readOnlySelectedAttachmentData() throws Exception {
++    HookMatroskaExtractor extractor = new HookMatroskaExtractor();
++    extractor.init(new FakeExtractorOutput());
++    byte[] fontData = new byte[] {1, 2, 3, 4};
++
++    assertThat(extractor.getElementType(ID_ATTACHMENTS))
++        .isEqualTo(EbmlProcessor.ELEMENT_TYPE_MASTER);
++    assertThat(extractor.isLevel1Element(ID_ATTACHMENTS)).isTrue();
++    assertThat(extractor.getElementType(ID_FILE_DATA))
++        .isEqualTo(EbmlProcessor.ELEMENT_TYPE_BINARY);
++    extractor.startMasterElement(ID_ATTACHED_FILE, /* contentPosition= */ 0, fontData.length);
++    extractor.stringElement(ID_FILE_NAME, "subtitle.ttf");
++    extractor.stringElement(ID_FILE_MIME_TYPE, "font/ttf");
++    extractor.binaryElement(
++        ID_FILE_DATA,
++        fontData.length,
++        new FakeExtractorInput.Builder().setData(fontData).build());
++    extractor.endMasterElement(ID_ATTACHED_FILE);
++
++    assertThat(extractor.attachmentName).isEqualTo("subtitle.ttf");
++    assertThat(extractor.attachmentMimeType).isEqualTo("font/ttf");
++    assertThat(extractor.attachmentData).isEqualTo(fontData);
++  }
++
++  @Test
++  public void attachmentHooks_fileDataBeforeMetadata_receivesFinalMetadata() throws Exception {
++    HookMatroskaExtractor extractor = new HookMatroskaExtractor();
++    extractor.init(new FakeExtractorOutput());
++    byte[] fontData = new byte[] {5, 6, 7, 8};
++
++    extractor.startMasterElement(ID_ATTACHED_FILE, /* contentPosition= */ 0, fontData.length);
++    extractor.binaryElement(
++        ID_FILE_DATA,
++        fontData.length,
++        new FakeExtractorInput.Builder().setData(fontData).build());
++    extractor.stringElement(ID_FILE_NAME, "late-font.otf");
++    extractor.stringElement(ID_FILE_MIME_TYPE, "font/otf");
++    extractor.endMasterElement(ID_ATTACHED_FILE);
++
++    assertThat(extractor.attachmentName).isEqualTo("late-font.otf");
++    assertThat(extractor.attachmentMimeType).isEqualTo("font/otf");
++    assertThat(extractor.attachmentData).isEqualTo(fontData);
++  }
++
++  private static final class HookMatroskaExtractor extends MatroskaExtractor {
++    public final List<Integer> trackNumbers;
++    public final List<Integer> sampleTrackNumbers;
++    public final List<byte[]> samples;
++    public final List<Long> sampleDurationsUs;
++    @Nullable public byte[] codecPrivate;
++    @Nullable public String attachmentName;
++    @Nullable public String attachmentMimeType;
++    @Nullable public byte[] attachmentData;
++
++    public HookMatroskaExtractor() {
++      super(SubtitleParser.Factory.UNSUPPORTED, FLAG_EMIT_RAW_SUBTITLE_DATA);
++      trackNumbers = new ArrayList<>();
++      sampleTrackNumbers = new ArrayList<>();
++      samples = new ArrayList<>();
++      sampleDurationsUs = new ArrayList<>();
++    }
++
++    @Override
++    protected boolean shouldReadAttachment(
++        @Nullable String fileName, @Nullable String mimeType, int contentSize) {
++      return contentSize <= 1024;
++    }
++
++    @Override
++    protected void onAttachment(
++        @Nullable String fileName, @Nullable String mimeType, byte[] attachmentData) {
++      attachmentName = fileName;
++      attachmentMimeType = mimeType;
++      this.attachmentData = attachmentData;
++    }
++
++    @Override
++    protected void onAssTrackInitialized(
++        int trackNumber,
++        @Nullable String name,
++        @Nullable String language,
++        byte[] codecPrivate) {
++      trackNumbers.add(trackNumber);
++      this.codecPrivate = Arrays.copyOf(codecPrivate, codecPrivate.length);
++    }
++
++    @Override
++    protected void onAssSubtitleSample(
++        int trackNumber,
++        long timeUs,
++        long durationUs,
++        byte[] sampleData,
++        int sampleOffset,
++        int sampleLength) {
++      sampleTrackNumbers.add(trackNumber);
++      samples.add(Arrays.copyOfRange(sampleData, sampleOffset, sampleOffset + sampleLength));
++      sampleDurationsUs.add(durationUs);
++    }
++  }
+ }

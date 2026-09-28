@@ -145,6 +145,13 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew media3/gradlew media3-ass/gradlew
 
+      - name: Restore ASS sample and font attachment callbacks in Media3
+        run: |
+          set -euo pipefail
+          git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-ass-matroska.patch"
+          git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-ass-matroska-test.patch"
+          git -C media3 diff --check
+
       - name: Build matching FongMi Media3 AARs
         env:
           GRADLE_OPTS: "-Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.internal.http.socketTimeout=120000"
@@ -200,6 +207,13 @@ jobs:
           test -n "$source_aar"
           cp "$source_aar" app/libs/lib-exoplayer-libass-release.aar
           python3 scripts/test_libass_aar.py
+
+      - name: Test patched Matroska extraction
+        run: |
+          set -euo pipefail
+          ./media3/gradlew -p media3 :lib-extractor:testDebugUnitTest \
+            --tests 'androidx.media3.extractor.mkv.MatroskaExtractorNonParameterizedTest' \
+            --no-daemon
 
       - name: Verify expected build tasks
         run: |
