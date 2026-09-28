@@ -2,19 +2,26 @@ package com.fongmi.android.tv.player.exo;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.Player;
+import androidx.media3.common.Tracks;
+import androidx.media3.common.VideoSize;
 import androidx.media3.common.audio.AudioProcessor;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
 import androidx.media3.exoplayer.source.preload.PreloadException;
 import androidx.media3.exoplayer.source.preload.PreloadManagerListener;
 import androidx.media3.exoplayer.trackselection.DecodeTrackSelector;
 import androidx.media3.exoplayer.trackselection.TrackSelector;
+import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.App;
 
@@ -28,15 +35,21 @@ final class ExoPlayerSession {
     private static final long PRELOAD_DURATION_MS = 10_000;
 
     private final DecodeTrackSelectorFactory trackSelectorFactory;
+    private final LibassPlaybackSession libassSession;
     private final DefaultPreloadManager preloadManager;
     private final ExoPlayer player;
 
     @Nullable
     private PreloadRequest preloadRequest;
+    @Nullable
+    private PlayerView boundPlayerView;
+    @Nullable
+    private View assSubtitleView;
 
     ExoPlayerSession(int decode, Player.Listener listener, AudioProcessor audioProcessor) {
         this.trackSelectorFactory = new DecodeTrackSelectorFactory(decode);
-        DefaultPreloadManager.Builder builder = new DefaultPreloadManager.Builder(App.get(), ignored -> DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(getPreloadStartPositionMs(), PRELOAD_DURATION_MS)).setMediaSourceFactorySupplier(ExoMediaSourceFactory.supplier()).setRenderersFactory(ExoUtil.buildRenderersFactory(audioProcessor)).setTrackSelectorFactory(trackSelectorFactory).setLoadControl(ExoUtil.buildLoadControl(MAX_PRELOAD_BUFFER_BYTES));
+        this.libassSession = new LibassPlaybackSession(null, null, null);
+        DefaultPreloadManager.Builder builder = new DefaultPreloadManager.Builder(App.get(), ignored -> DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(getPreloadStartPositionMs(), PRELOAD_DURATION_MS)).setMediaSourceFactorySupplier(ExoMediaSourceFactory.supplier(libassSession)).setRenderersFactory(ExoUtil.buildRenderersFactory(audioProcessor, libassSession)).setTrackSelectorFactory(trackSelectorFactory).setLoadControl(ExoUtil.buildLoadControl(MAX_PRELOAD_BUFFER_BYTES));
         this.preloadManager = builder.build();
         this.preloadManager.addListener(new PreloadListener());
         this.player = ExoUtil.buildPlayer(listener, builder);
@@ -44,6 +57,34 @@ final class ExoPlayerSession {
 
     ExoPlayer player() {
         return player;
+    }
+
+    void bindPlayerView(@Nullable PlayerView view) {
+        if (boundPlayerView == view) return;
+        if (assSubtitleView != null) {
+            ViewGroup parent = (ViewGroup) assSubtitleView.getParent();
+            if (parent != null) parent.removeView(assSubtitleView);
+            libassSession.detachSubtitleView(assSubtitleView);
+            assSubtitleView = null;
+        }
+        boundPlayerView = view;
+        if (view == null || !libassSession.isAvailable()) return;
+        FrameLayout overlay = view.getOverlayFrameLayout();
+        if (overlay == null) return;
+        assSubtitleView = libassSession.attachSubtitleView(view.getContext());
+        overlay.addView(assSubtitleView, new FrameLayout.LayoutParams(-1, -1));
+    }
+
+    void setCurrentMediaItem(MediaItem item) {
+        libassSession.setCurrentMediaItem(item);
+    }
+
+    void setActiveTracks(Tracks tracks) {
+        libassSession.setActiveTracks(tracks);
+    }
+
+    void setVideoSize(VideoSize size) {
+        libassSession.setVideoSize(size.width, size.height);
     }
 
     void setDecode(int decode) {
@@ -55,6 +96,7 @@ final class ExoPlayerSession {
         if (request.equals(preloadRequest)) return;
         clearPreload();
         preloadRequest = request;
+        libassSession.setPreloadMediaItem(mediaItem);
         preloadManager.add(request.mediaItem(), 0);
         preloadManager.invalidate();
     }
@@ -72,12 +114,15 @@ final class ExoPlayerSession {
         if (request == null) return;
         preloadRequest = null;
         preloadManager.remove(request.mediaItem());
+        libassSession.setPreloadMediaItem(null);
     }
 
     void release() {
+        bindPlayerView(null);
         preloadRequest = null;
         preloadManager.release();
         player.release();
+        libassSession.close();
     }
 
     private boolean isPreloaded(MediaItem mediaItem) {

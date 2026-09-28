@@ -621,11 +621,13 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void detachPlayerView() {
+        if (mService != null) player().bindPlayerView(null);
         getPlayerView().setPlayer(null);
     }
 
     private void hidePlayerViewForWebPlayback() {
         PlayerView playerView = getPlayerView();
+        if (mService != null) player().bindPlayerView(null);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         View shutter = playerView.findViewById(androidx.media3.ui.R.id.exo_shutter);
         if (shutter != null) shutter.setVisibility(View.VISIBLE);
@@ -635,6 +637,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void syncPlayerView(Player player) {
         getPlayerView().setPlayer(player);
+        player().bindPlayerView(getPlayerView());
         syncDanmakuSource();
         restoreDebugView();
     }

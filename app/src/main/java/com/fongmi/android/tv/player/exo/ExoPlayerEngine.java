@@ -6,17 +6,19 @@ import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
+import androidx.media3.common.VideoSize;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.audio.AudioSink;
 import androidx.media3.exoplayer.source.MediaSource;
+import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.player.effect.PlayerEffect;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 
-public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
+public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener, Player.Listener {
 
     private final ExoErrorMessageProvider provider;
     private final ExoPlayerSession session;
@@ -32,6 +34,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
         this.session = new ExoPlayerSession(decode, listener, effect.getAudioProcessor());
         this.player = this.session.player();
         this.player.addAnalyticsListener(this);
+        this.player.addListener(this);
         this.effect.setPlayer(player);
     }
 
@@ -48,6 +51,12 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public void onTracksChanged(@NonNull EventTime eventTime, @NonNull Tracks tracks) {
         effect.applyVideoEffect();
+        session.setActiveTracks(tracks);
+    }
+
+    @Override
+    public void onVideoSizeChanged(@NonNull VideoSize size) {
+        session.setVideoSize(size);
     }
 
     @Override
@@ -74,6 +83,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public void release() {
         player.removeAnalyticsListener(this);
+        player.removeListener(this);
         preload.release();
         effect.release();
         session.release();
@@ -82,6 +92,11 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public void setDecode(int decode) {
         session.setDecode(decode);
+    }
+
+    @Override
+    public void bindPlayerView(PlayerView view) {
+        session.bindPlayerView(view);
     }
 
     @Override
@@ -123,6 +138,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
 
     private void startInternal(long position) {
         MediaItem item = MediaItemFactory.from(spec);
+        session.setCurrentMediaItem(item);
         MediaSource source = session.usePreloadedMediaSource(item);
         effect.clearAudioEffect();
         if (source == null) player.setMediaItem(item, position);

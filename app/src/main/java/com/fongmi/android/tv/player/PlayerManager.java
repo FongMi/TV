@@ -17,6 +17,7 @@ import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.VideoSize;
 import androidx.media3.ui.danmaku.DanmakuConfig;
+import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
@@ -93,6 +94,10 @@ public class PlayerManager implements ParseCallback {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public void bindPlayerView(@Nullable PlayerView view) {
+        if (engine != null) engine.bindPlayerView(view);
     }
 
     // Public Media3 has no MPV script bridge. Keep the settings readable until

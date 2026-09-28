@@ -15,6 +15,8 @@ import androidx.media3.exoplayer.DefaultRenderersFactory;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.LoadControl;
 import androidx.media3.exoplayer.RenderersFactory;
+import androidx.media3.exoplayer.Renderer;
+import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.analytics.PlayerId;
 import androidx.media3.exoplayer.audio.AudioSink;
 import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider;
@@ -33,6 +35,7 @@ import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
 
 import java.util.HashMap;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -104,6 +107,17 @@ public class ExoUtil {
             }
         };
         return factory.setEnableDecoderFallback(true).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy()).setExtensionRendererMode(DefaultRenderersFactory.EXTENSION_RENDERER_MODE_ON);
+    }
+
+    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor, LibassPlaybackSession libassSession) {
+        RenderersFactory baseFactory = buildRenderersFactory(audioProcessor);
+        if (!libassSession.isAvailable()) return baseFactory;
+        return (eventHandler, videoListener, audioListener, textOutput, metadataOutput) -> {
+            Renderer[] renderers = baseFactory.createRenderers(eventHandler, videoListener, audioListener, textOutput, metadataOutput);
+            Renderer[] withAssClock = Arrays.copyOf(renderers, renderers.length + 1);
+            withAssClock[renderers.length] = libassSession.createClockRenderer();
+            return withAssClock;
+        };
     }
 
     private static AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams, AudioProcessor audioProcessor) {

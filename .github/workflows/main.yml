@@ -16,6 +16,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-22.04
+    timeout-minutes: 120
 
     steps:
       - name: Checkout source code
@@ -31,6 +32,15 @@ jobs:
           path: media3
           fetch-depth: 1
 
+      - name: Checkout original FongMi libass source and its native submodules
+        uses: actions/checkout@v4
+        with:
+          repository: FongMi/media
+          ref: 9dae39e9689ee305c83f94bd11cf3bcecb9d6171
+          path: media3-ass
+          fetch-depth: 1
+          submodules: recursive
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -42,7 +52,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y python3.10 python3.10-dev python3.10-venv
+          sudo apt-get install -y python3.10 python3.10-dev python3.10-venv autoconf automake autopoint gettext gperf libtool ninja-build pkg-config
           python3.10 --version
 
       - name: Ensure Android SDK 37
@@ -133,7 +143,7 @@ jobs:
           echo "Release signing configured."
 
       - name: Grant execute permission
-        run: chmod +x gradlew media3/gradlew
+        run: chmod +x gradlew media3/gradlew media3-ass/gradlew
 
       - name: Build matching FongMi Media3 AARs
         env:
@@ -178,6 +188,18 @@ jobs:
 
           echo "== Media3 AARs copied to app/libs =="
           find app/libs -maxdepth 1 -type f -name 'lib-*-release.aar' -print | sort
+
+      - name: Build the original FongMi libass module from source
+        env:
+          GRADLE_OPTS: "-Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.internal.http.socketTimeout=120000"
+        run: |
+          set -euo pipefail
+          bash media3-ass/libraries/exoplayer_libass/src/main/jni/prepare_libass.sh
+          ./media3-ass/gradlew -p media3-ass :lib-exoplayer-libass:assembleRelease --stacktrace --no-daemon
+          source_aar="$(find media3-ass -type f -path '*/outputs/aar/lib-exoplayer-libass-release.aar' -print -quit)"
+          test -n "$source_aar"
+          cp "$source_aar" app/libs/lib-exoplayer-libass-release.aar
+          python3 scripts/test_libass_aar.py
 
       - name: Verify expected build tasks
         run: |
@@ -242,6 +264,18 @@ jobs:
 
           echo "== Final APKs =="
           ls -lh dist/
+
+          for apk in dist/*.apk; do
+            case "$apk" in
+              *arm64*) abi=arm64-v8a ;;
+              *armeabi*) abi=armeabi-v7a ;;
+              *) echo "::error::Unknown ABI for $apk"; exit 1 ;;
+            esac
+            unzip -Z1 "$apk" | grep -Fx "lib/$abi/libmedia3ass.so" >/dev/null || {
+              echo "::error::Missing native libass in $apk ($abi)"
+              exit 1
+            }
+          done
 
       - name: Upload four APKs to Actions
         uses: actions/upload-artifact@v4
