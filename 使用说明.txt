@@ -1,0 +1,6 @@
+仅核验，尚未恢复功能。
+1. 解压 ZIP，把 .github、scripts、OFFICIAL_NATIVE_RECOVERY.md 复制到 fongmi 仓库根目录。
+2. GitHub Desktop 提交，说明填写 Inspect official native [skip ci]，然后 Push。
+3. GitHub → Actions → Inspect official 5.6.6 native dependencies → Run workflow。
+4. 下载 official-5.6.6-native-inspection 工作流产物，用于下一步核对 Java 接口。
+不要把检查产物直接放进 app/src/main/jniLibs；当前 AAR 仍缺对应 Java 类。

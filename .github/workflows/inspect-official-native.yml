@@ -1,0 +1,103 @@
+name: Inspect official 5.6.6 native dependencies
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout this repository
+        uses: actions/checkout@v4
+
+      - name: Checkout the public Media3 source used by the build
+        uses: actions/checkout@v4
+        with:
+          repository: FongMi/media
+          ref: 3c2cbe8ac742c2fe15eff52f03eeb3b1b648848d
+          path: media3
+
+      - name: Set up JDK for JADX
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Download official 5.6.6 mobile APKs
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/fongmi-official"
+          for filename in mobile-arm64_v8a.apk mobile-armeabi_v7a.apk; do
+            curl --fail --location --retry 3 --retry-all-errors \
+              --connect-timeout 20 --max-time 600 \
+              "https://github.com/FongMi/Release/releases/download/5.6.6/$filename" \
+              --output "$RUNNER_TEMP/fongmi-official/$filename"
+          done
+
+      - name: Verify official SHA256 hashes and extract missing native files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/recover_official_native.py \
+            --arm64 "$RUNNER_TEMP/fongmi-official/mobile-arm64_v8a.apk" \
+            --armeabi "$RUNNER_TEMP/fongmi-official/mobile-armeabi_v7a.apk" \
+            --media3-root media3 \
+            --output "$RUNNER_TEMP/fongmi-recovery"
+          cat "$RUNNER_TEMP/fongmi-recovery/inspection.json"
+
+      - name: Record native runtime dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          report="$RUNNER_TEMP/fongmi-recovery/native-dependencies.txt"
+          while IFS= read -r so; do
+            printf '%s\n' "$so" >> "$report"
+            readelf --dynamic "$so" | grep -E 'NEEDED|SONAME' >> "$report"
+          done < <(find "$RUNNER_TEMP/fongmi-recovery/jniLibs" -name '*.so' -type f | sort)
+
+      - name: Recover Java interface references from official DEX
+        shell: bash
+        run: |
+          set -euo pipefail
+          tool="$RUNNER_TEMP/jadx-1.5.6.zip"
+          curl --fail --location --retry 3 --retry-all-errors \
+            --connect-timeout 20 --max-time 600 \
+            'https://github.com/skylot/jadx/releases/download/v1.5.6/jadx-1.5.6.zip' \
+            --output "$tool"
+          echo '545ea2be9c242511bc145755cf4bda2485ade42966e096f8b4d3da2a230e8974  '"$tool" | sha256sum --check
+          mkdir -p "$RUNNER_TEMP/jadx-cli" "$RUNNER_TEMP/fongmi-recovery/decompiled"
+          unzip -q "$tool" -d "$RUNNER_TEMP/jadx-cli"
+          jadx_bin="$(find "$RUNNER_TEMP/jadx-cli" -type f -path '*/bin/jadx' -print -quit)"
+          test -n "$jadx_bin"
+          chmod +x "$jadx_bin"
+
+          while IFS= read -r class; do
+            [ -n "$class" ] || continue
+            target="$RUNNER_TEMP/fongmi-recovery/decompiled/${class##*.}.java"
+            if ! "$jadx_bin" --no-res --threads-count 2 \
+                --single-class "$class" --single-class-output "$target" \
+                "$RUNNER_TEMP/fongmi-official/mobile-arm64_v8a.apk" \
+                > "$target.log" 2>&1; then
+              echo "::warning::JADX could not decompile $class; see inspection artifact"
+            fi
+          done <<'JAVA_CLASSES'
+          androidx.media3.exoplayer.iso.IsoNavigationSession
+          androidx.media3.exoplayer.libass.LibassNative
+          androidx.media3.exoplayer.hls.CmgNativeRuntime
+          androidx.media3.decoder.ffmpeg.FfmpegDolbyVisionP5Native
+          androidx.media3.extractor.iso.udf.NativeUdfFileSystem
+          androidx.media3.extractor.iso.sacd.SacdTocParser
+          JAVA_CLASSES
+
+      - name: Downloadable inspection artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-5.6.6-native-inspection
+          path: ${{ runner.temp }}/fongmi-recovery/
+          if-no-files-found: error
+          retention-days: 7
