@@ -1,6 +1,6 @@
 # 影視TV 使用與開發指南
 
-五頁靜態文件站：首頁、爬蟲介接、配置字典、本地 API 及 App 功能。Next.js 在建置時產生 HTML、CSS、JavaScript；正式網站不需要 Node.js、Worker、資料庫或 ChatGPT 登入。搜尋、篩選、語言切換與複製均在瀏覽器執行。
+六頁靜態文件站：首頁、爬蟲介接、配置字典、本地 API、App 功能及播放指令。Next.js 在建置時產生 HTML、CSS、JavaScript；正式網站不需要 Node.js、Worker、資料庫或 ChatGPT 登入。搜尋、篩選、語言切換與複製均在瀏覽器執行。
 
 ## 本機使用
 
@@ -57,5 +57,6 @@ npm start
 - `public/`：SVG Logo、品牌預覽圖及 `.nojekyll`。
 - `../.github/workflows/pages.yml`：儲存庫根目錄的 GitHub Pages 建置與發布。
 - `app/local/page.tsx`、`app/local-api.ts`：由舊 `docs/LOCAL.md` 整合、核對原始碼後的本地 HTTP API 文件與範例。
+- `app/commands/page.tsx`、`app/playback-commands.ts`：給使用者的 Exo 播放指令、按鈕設定與範例；依 `ExoCommand` 核對支援語法、數值範圍與限制。
 
 參考：[Next.js 靜態輸出](https://nextjs.org/docs/app/guides/static-exports)、[GitHub Pages 自訂流程](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)。

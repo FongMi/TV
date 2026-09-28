@@ -510,6 +510,15 @@ input::placeholder {
   margin-top: 20px;
   color: var(--muted);
 }
+.docs-content > section > ol {
+  margin-top: 20px;
+  padding-left: 24px;
+  list-style: decimal;
+  color: var(--muted);
+}
+.docs-content > section > ol > li + li {
+  margin-top: 8px;
+}
 .docs-content > section > h3 {
   margin-top: 36px;
 }
@@ -765,6 +774,16 @@ input::placeholder {
   min-width: 0;
   overflow-x: auto;
 }
+.command-example {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.command-example > code {
+  flex: 1 1 16rem;
+  overflow-wrap: anywhere;
+}
 .method-table,
 .field-table {
   width: 100%;
@@ -791,6 +810,9 @@ input::placeholder {
   vertical-align: top;
   border-top: 1px solid var(--line);
   color: var(--muted);
+}
+.command-examples td {
+  vertical-align: middle;
 }
 .field-table td:first-child {
   width: 23%;

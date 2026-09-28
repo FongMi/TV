@@ -27,6 +27,18 @@ export default function FeaturesPage() {
         </section>
         <section className="start-panel">
           <div>
+            <p className="start-label">自訂播放控制</p>
+            <h2>常用操作，一鍵執行。</h2>
+            <p>
+              用指令按鈕調整倍速、音量、延遲與影片縮放。
+            </p>
+          </div>
+          <Link className="button" href="/commands">
+            查看播放指令 <span aria-hidden="true">→</span>
+          </Link>
+        </section>
+        <section className="start-panel">
+          <div>
             <p className="start-label">開始使用</p>
             <h2>第一次使用，從配置開始。</h2>
             <p>

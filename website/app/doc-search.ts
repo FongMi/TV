@@ -1,6 +1,7 @@
 import { configFieldGroups } from "./config-fields.ts";
 import { methods, objectGroups, resultFields } from "./spider-fields.ts";
 import { features } from "./feature-content.ts";
+import { playbackProperties } from "./playback-commands.ts";
 import {
   localActions,
   localMediaFields,
@@ -159,6 +160,34 @@ const entries: Entry[] = [
     href: "/local#internal",
     names: ["/proxy", "/parse", "/image", "/tvbus"],
   },
+  {
+    title: "Exo 播放指令",
+    description: "新增播放指令按鈕、支援範圍與可複製的 mpv 指令範例",
+    href: "/commands#start",
+    names: ["Exo", "mpv"],
+    keywords: "播放指令 按鈕 Lua 腳本 mp.commandv 新增",
+  },
+  {
+    title: "cycle-values 輪流切換",
+    description: "倍速、音量、延遲、循環與縮放的順序及反向切換",
+    href: "/commands#cycle-values",
+    names: ["cycle-values", "!reverse"],
+    keywords: "set add cycle pause 輪切 回繞 下一個 數值",
+  },
+  {
+    title: "seek 跳轉位置",
+    description: "相對、絕對、百分比與影片結束前的位置",
+    href: "/commands#seek",
+    names: ["seek", "absolute", "relative", "absolute-percent", "relative-percent"],
+    keywords: "快轉 倒退 跳轉 秒 百分比 片長",
+  },
+  ...playbackProperties.map((property) => ({
+    title: `${property.name} 播放指令`,
+    description: property.description,
+    href: `/commands#${property.name}`,
+    names: [property.name, ...property.modes.map((mode) => `${mode} ${property.name}`)],
+    keywords: property.values,
+  })),
   ...features.map(([title, meta, copy]) => ({
     title,
     description: meta,
