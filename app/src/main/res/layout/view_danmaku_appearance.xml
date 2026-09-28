@@ -6,10 +6,12 @@
     android:orientation="vertical">
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        style="@style/PlaybackDialogFirstRow"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -18,43 +20,12 @@
             android:text="@string/danmaku_text_bold"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
-
-            <com.google.android.material.materialswitch.MaterialSwitch
-                android:id="@+id/textBoldSwitch"
-                style="@style/PlaybackDialogSwitch" />
-
-        </FrameLayout>
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/textBoldSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
-        android:text="@string/playback_font"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
-
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="false"
-        android:focusable="false"
-        android:scrollbars="none">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/fontGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="24dp"
-            app:chipSpacingVertical="0dp"
-            app:selectionRequired="true"
-            app:singleLine="true"
-            app:singleSelection="true" />
-
-    </HorizontalScrollView>
 
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
@@ -62,8 +33,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp">
+        android:paddingTop="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -98,8 +68,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp">
+        android:paddingTop="4dp">
 
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="0dp"
@@ -132,8 +101,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:text="@string/danmaku_style_mode"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -183,8 +151,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -222,8 +189,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -261,8 +227,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -300,8 +265,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -339,8 +303,7 @@
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:visibility="gone">
 
         <com.google.android.material.textview.MaterialTextView
@@ -375,8 +338,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
+        android:paddingTop="4dp"
         android:text="@string/danmaku_color_mode"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 

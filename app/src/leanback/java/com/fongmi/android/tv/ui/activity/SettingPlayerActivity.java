@@ -42,7 +42,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
         setPlaybackModeText();
         mBinding.engine.requestFocus();
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
-        mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
         mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
         mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
         mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
@@ -55,7 +54,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
         mBinding.engine.setOnClickListener(this::setEngine);
         mBinding.decode.setOnClickListener(this::onDecodeSetting);
         mBinding.adblock.setOnClickListener(this::setAdblock);
-        mBinding.libass.setOnClickListener(this::setLibass);
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
@@ -74,8 +72,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
-        mBinding.adblock.setVisibility(View.VISIBLE);
-        mBinding.libass.setVisibility(exo ? View.VISIBLE : View.GONE);
+        mBinding.adblock.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
@@ -137,11 +134,6 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
     private void setAdblock(View view) {
         Setting.putAdblock(!Setting.isAdblock());
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
-    }
-
-    private void setLibass(View view) {
-        PlayerSetting.putLibass(!PlayerSetting.isLibass());
-        mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
     }
 
     private void onPreloadSetting(View view) {

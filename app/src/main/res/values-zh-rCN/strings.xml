@@ -42,12 +42,10 @@
     <string name="play_speed_hint">倍速 <xliff:g name="speed">%1$s</xliff:g></string>
     <string name="play_reset">刷新</string>
     <string name="play_replay">重播</string>
+    <string name="play_decode">硬解</string>
     <string name="play_timer">定时</string>
     <string name="play_edition">标题</string>
     <string name="play_chapter">章节</string>
-    <string name="play_disc_menu">主菜单</string>
-    <string name="play_disc_menu_unavailable">光盘没有可用菜单</string>
-    <string name="play_disc_menu_timeout">菜单尚未打开，请重试</string>
     <string name="play_scale">原始</string>
     <string name="play_config">配置</string>
     <string name="play_change">换源</string>
@@ -152,6 +150,7 @@
 
     <!-- Subtitle Setting -->
     <string name="subtitle_setting">字幕设置</string>
+    <string name="subtitle_search_api_title">Assrt</string>
     <string name="subtitle_search_token_hint">Token</string>
     <string name="subtitle_reset">重置</string>
     <string name="subtitle_tab_appearance">外观</string>
@@ -160,14 +159,7 @@
     <string name="subtitle_offset">字幕偏移</string>
     <string name="subtitle_size">大小</string>
     <string name="subtitle_position">位置</string>
-    <string name="subtitle_primary_position">主字幕位置</string>
-    <string name="subtitle_style">样式</string>
-    <string name="playback_font">字体</string>
-    <string name="playback_font_default">系统默认</string>
-    <string name="playback_font_import">导入字体</string>
-    <string name="playback_font_imported">已导入字体：%1$s</string>
-    <string name="playback_font_import_failed">无法导入字体</string>
-    <string name="playback_font_load_failed">无法加载字体</string>
+    <string name="subtitle_style_source">样式来源</string>
     <string name="subtitle_style_original">原始</string>
     <string name="subtitle_style_system">系统</string>
     <string name="subtitle_style_custom">自定义</string>
@@ -185,12 +177,9 @@
     <string name="subtitle_background">背景</string>
     <string name="subtitle_background_opacity">背景透明度</string>
     <string name="subtitle_secondary_track">双字幕</string>
-    <string name="subtitle_secondary_default">默认</string>
     <string name="subtitle_secondary_off">关闭</string>
     <string name="subtitle_secondary_auto">自动</string>
     <string name="subtitle_secondary_select">指定</string>
-    <string name="subtitle_primary_role">主</string>
-    <string name="subtitle_secondary_role">副</string>
     <string name="subtitle_secondary_track_select">副字幕</string>
     <string name="subtitle_secondary_position">副字幕位置</string>
     <string name="subtitle_color_white">白色</string>
@@ -258,7 +247,6 @@
     <string name="parse_from">解析来自：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
-    <string name="local">本地</string>
     <string name="push">推送</string>
 
     <!-- Setting -->
@@ -293,9 +281,9 @@
     <string name="player">播放核心</string>
     <string name="player_engine">播放引擎</string>
     <string name="player_debug">调试</string>
-    <string name="player_render">视频输出</string>
+    <string name="player_render">渲染方式</string>
     <string name="player_scale">缩放比例</string>
-    <string name="player_libass">字幕特效</string>
+    <string name="player_libass">字幕渲染</string>
     <string name="player_background">后台播放</string>
     <string name="player_audio_pass_through">音频直通</string>
     <string name="player_audio_decode">音频软解</string>
@@ -317,11 +305,7 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
-    <string name="player_mpv_conf_priority_hint">界面设置优先，重进播放页生效。</string>
-    <string name="player_mpv_conf_conflict_hint">界面设置将覆盖：%1$s</string>
-    <string name="player_mpv_conf_import_success">已载入 mpv.conf，按确定后保存</string>
-    <string name="player_mpv_conf_import_failed">无法导入 mpv.conf</string>
-    <string name="player_mpv_conf_save_failed">无法保存 mpv.conf</string>
+    <string name="player_mpv_conf_import_success">已导入 mpv.conf</string>
     <string name="player_ua">User-Agent</string>
 
     <!-- Danmaku -->
@@ -338,7 +322,6 @@
 
     <!-- Dialog -->
     <string name="dialog_edit">修改</string>
-    <string name="dialog_import">导入</string>
     <string name="dialog_positive">确定</string>
     <string name="dialog_negative">取消</string>
     <string name="dialog_select_edition">选择标题</string>
@@ -348,10 +331,7 @@
     <string name="dialog_config_url">请输入地址…</string>
 
     <!-- Error -->
-    <string name="file_export_success">文件已导出</string>
     <string name="error_config_get">配置取得失败</string>
-    <string name="error_file_open">无法打开文件</string>
-    <string name="error_file_save">无法保存文件</string>
     <string name="error_play_next">已经是最后一集了！</string>
     <string name="error_play_prev">已经是第一集了！</string>
     <string name="error_play_parse">播放地址解析失败</string>
@@ -359,8 +339,6 @@
     <string name="error_play_url">播放地址加载失败</string>
     <string name="error_play_flag">暂无线路数据</string>
     <string name="error_play_timeout">连接超时</string>
-    <string name="bdj_preparing">正在准备 BD-J 菜单</string>
-    <string name="error_bdj_prepare">ISO 菜单检查或 BD-J 准备失败：%1$s</string>
     <string name="error_audio_effect_unsupported">当前播放方式不支持音质设置</string>
     <string name="error_audio_effect_tunnel">隧道模式下不支持音质设置</string>
     <string name="error_audio_effect_passthrough">音频直通音轨不支持音质设置</string>
@@ -395,6 +373,11 @@
     <string name="none">无</string>
     <string name="times">倍</string>
     <string name="lines">行</string>
+
+    <string-array name="select_decode">
+        <item>软解</item>
+        <item>硬解</item>
+    </string-array>
 
     <string-array name="select_dolby_vision_output">
         <item>自动</item>
@@ -432,6 +415,33 @@
         <item>选择字幕</item>
     </string-array>
 
+
+    <!-- Retained by shared playback and file dialogs -->
+    <string name="play_disc_menu">主菜单</string>
+    <string name="play_disc_menu_unavailable">光盘没有可用菜单</string>
+    <string name="play_disc_menu_timeout">菜单尚未打开，请重试</string>
+    <string name="subtitle_primary_position">主字幕位置</string>
+    <string name="subtitle_style">样式</string>
+    <string name="playback_font">字体</string>
+    <string name="playback_font_default">系统默认</string>
+    <string name="playback_font_import">导入字体</string>
+    <string name="playback_font_imported">已导入字体：%1$s</string>
+    <string name="playback_font_import_failed">无法导入字体</string>
+    <string name="playback_font_load_failed">无法加载字体</string>
+    <string name="subtitle_secondary_default">默认</string>
+    <string name="subtitle_primary_role">主</string>
+    <string name="subtitle_secondary_role">副</string>
+    <string name="local">本地</string>
+    <string name="player_mpv_conf_priority_hint">界面设置优先，重进播放页生效。</string>
+    <string name="player_mpv_conf_conflict_hint">界面设置将覆盖：%1$s</string>
+    <string name="player_mpv_conf_import_failed">无法导入 mpv.conf</string>
+    <string name="player_mpv_conf_save_failed">无法保存 mpv.conf</string>
+    <string name="dialog_import">导入</string>
+    <string name="file_export_success">文件已导出</string>
+    <string name="error_file_open">无法打开文件</string>
+    <string name="error_file_save">无法保存文件</string>
+    <string name="bdj_preparing">正在准备 BD-J 菜单</string>
+    <string name="error_bdj_prepare">ISO 菜单检查或 BD-J 准备失败：%1$s</string>
     <string name="content_title">浏览列表</string>
     <string name="content_search">搜索内容</string>
     <string name="content_search_action">搜索</string>
@@ -456,7 +466,6 @@
     <string name="subtitle_offset_link">一起偏移</string>
     <string name="subtitle_offset_reset">重置字幕时间</string>
     <string name="subtitle_offset_limit">字幕偏移须在正负 300 秒内。</string>
-
     <string name="player_audio_decoder_mode">音频解码器</string>
     <string name="player_video_decoder_mode">视频解码器</string>
     <string name="decoder_mode_auto">自动</string>
@@ -464,13 +473,11 @@
     <string name="decoder_mode_software">软解</string>
     <string name="decoder_mode_ffmpeg">FFmpeg</string>
     <string name="track_decoder_mode">解码器：%1$s</string>
-
     <string name="dialog_action_search_subtitles">搜索字幕</string>
     <string name="dialog_action_load_subtitles">加载字幕</string>
     <string name="dialog_action_search_danmaku">搜索弹幕</string>
     <string name="dialog_action_load_danmaku">加载弹幕</string>
     <string name="dialog_action_search_settings">搜索设置</string>
-
     <string name="mpv_script_buttons">脚本</string>
     <string name="mpv_script_tab_buttons">按钮</string>
     <string name="mpv_script_tab_automatic">自动加载</string>

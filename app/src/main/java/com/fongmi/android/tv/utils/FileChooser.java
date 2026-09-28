@@ -91,21 +91,24 @@ public final class FileChooser {
     }
 
     public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback) {
-        getFileUri(uri, callback, () -> {});
+        getFileUri(uri, callback, null);
     }
 
-    public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback, Runnable onFailure) {
-        if (!isFileSource(uri)) return;
-        Task.execute(() -> resolveFileUri(uri, callback, onFailure));
+    public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback, @Nullable Runnable onError) {
+        if (!isFileSource(uri)) {
+            if (onError != null) App.post(onError);
+            return;
+        }
+        Task.execute(() -> resolveFileUri(uri, callback, onError));
     }
 
-    private static void resolveFileUri(Uri uri, Consumer<Uri> callback, Runnable onFailure) {
+    private static void resolveFileUri(Uri uri, Consumer<Uri> callback, @Nullable Runnable onError) {
         try {
             deliver(callback, resolveFileUri(uri));
-        } catch (IOException | SecurityException | IllegalArgumentException e) {
+        } catch (IOException | SecurityException e) {
             App.post(() -> {
-                Notify.show(Notify.getError(R.string.error_file_open, e));
-                onFailure.run();
+                Notify.show(e.getMessage());
+                if (onError != null) onError.run();
             });
         }
     }
@@ -211,7 +214,7 @@ public final class FileChooser {
     }
 
     private static Uri materialize(Uri uri, File target) throws IOException {
-        Path.writeAtomically(target, uri);
+        FileUtil.copyAtomically(uri, target);
         return Uri.fromFile(target);
     }
 
@@ -233,15 +236,13 @@ public final class FileChooser {
         return ContentResolver.SCHEME_CONTENT.equalsIgnoreCase(scheme) || ContentResolver.SCHEME_FILE.equalsIgnoreCase(scheme);
     }
 
-    public static boolean isLiveSource(@Nullable Intent intent) {
-        if (intent == null || !isFileSource(intent.getData())) return false;
-        String path = UrlUtil.path(intent.getData()).toLowerCase(Locale.ROOT);
-        if (path.endsWith(".m3u")) return true;
-        if (!"text/plain".equalsIgnoreCase(intent.getType())) return false;
-        String extension = path.substring(path.lastIndexOf('.') + 1);
-        return switch (extension) {
-            case "strm", "m3u8", "mpd", "torrent", "mp4", "mkv", "flv", "mp3", "m4a", "aac", "ts", "webm", "mov", "avi", "wav", "ogg", "wmv", "iso", "m2ts" -> false;
-            default -> true;
-        };
+    public static boolean isLiveSource(Intent intent) {
+        String type = intent.getType();
+        if ("application/vnd.apple.mpegurl".equalsIgnoreCase(type) || "application/x-mpegurl".equalsIgnoreCase(type) || "audio/x-mpegurl".equalsIgnoreCase(type)) return true;
+        Uri uri = intent.getData();
+        String name = uri == null ? null : uri.getLastPathSegment();
+        if (name == null) return false;
+        name = name.toLowerCase(Locale.ROOT);
+        return name.endsWith(".m3u") || name.endsWith(".m3u8");
     }
 }

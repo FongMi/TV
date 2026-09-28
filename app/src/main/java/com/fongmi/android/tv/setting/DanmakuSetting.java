@@ -1,15 +1,10 @@
 package com.fongmi.android.tv.setting;
 
-import android.graphics.Typeface;
 import android.text.TextUtils;
-
-import androidx.annotation.Nullable;
 
 import androidx.media3.ui.danmaku.DanmakuConfig;
 
 import com.fongmi.android.tv.api.config.VodConfig;
-import com.fongmi.android.tv.player.mpv.MpvConfigFile;
-import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.github.catvod.utils.Prefers;
 
 public class DanmakuSetting {
@@ -104,20 +99,6 @@ public class DanmakuSetting {
 
     public static void putTextBold(boolean value) {
         Prefers.put("danmaku_text_bold", value);
-    }
-
-    @Nullable
-    public static ExternalFont.Item getFont() {
-        return ExternalFont.find(Prefers.getString("danmaku_font", ""), MpvConfigFile.getSubtitleFontsDirectory());
-    }
-
-    public static void putFont(@Nullable ExternalFont.Item font) {
-        Prefers.put("danmaku_font", font == null ? "" : font.storageKey());
-    }
-
-    @Nullable
-    private static Typeface getTypeface() {
-        return ExternalFont.getTypeface(getFont());
     }
 
     public static int getStyleMode() {
@@ -323,7 +304,6 @@ public class DanmakuSetting {
         putTextScale(config.textScale);
         putTransparency(config.transparency);
         putTextBold(config.textBold);
-        putFont(null);
         putStyleMode(config.styleMode);
         putShadowTransparency(config.shadowTransparency);
         putStrokeWidthMultiplier(config.strokeWidthMultiplier);
@@ -367,7 +347,6 @@ public class DanmakuSetting {
                 .setTextScale(getTextScale())
                 .setTransparency(getTransparency())
                 .setTextBold(isTextBold())
-                .setTypeface(getTypeface())
                 .setStyleMode(getStyleMode())
                 .setShadowTransparency(getShadowTransparency())
                 .setStrokeWidthMultiplier(getStrokeWidthMultiplier())

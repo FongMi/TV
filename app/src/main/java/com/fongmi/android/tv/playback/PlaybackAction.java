@@ -65,8 +65,8 @@ public final class PlaybackAction {
 
     public static void setTracks(PlayerManager player, View text, View audio, View video) {
         setVisible(text, player != null && (player.haveTrack(C.TRACK_TYPE_TEXT) || player.isVod()));
-        setVisible(audio, player != null && (player.haveTrack(C.TRACK_TYPE_AUDIO) || player.getDecoderMode(C.TRACK_TYPE_AUDIO) != null));
-        setVisible(video, player != null && (player.haveTrack(C.TRACK_TYPE_VIDEO) || player.getDecoderMode(C.TRACK_TYPE_VIDEO) != null));
+        setVisible(audio, player != null && player.haveTrack(C.TRACK_TYPE_AUDIO));
+        setVisible(video, player != null && player.haveTrack(C.TRACK_TYPE_VIDEO));
     }
 
     public static void setTracks(PlayerManager player, View text, View audio, View video, View speed) {

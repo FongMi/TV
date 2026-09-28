@@ -62,6 +62,20 @@ public class FileUtil {
         }
     }
 
+    public static void copyAtomically(Uri source, File target) throws IOException {
+        File temp = createTempFile(target);
+        try (InputStream input = App.get().getContentResolver().openInputStream(source)) {
+            if (input == null) throw new IOException("Unable to open source file");
+            try (FileOutputStream output = new FileOutputStream(temp)) {
+                transfer(input, output, Long.MAX_VALUE);
+                output.getFD().sync();
+            }
+            Path.move(temp, target);
+        } finally {
+            Path.clear(temp);
+        }
+    }
+
     public static String getDisplayName(Uri uri) {
         return getDisplayName(uri, uri.toString());
     }

@@ -1,10 +1,6 @@
 package com.fongmi.android.tv.setting;
 
 import androidx.media3.common.DolbyVisionOutputPolicy;
-import androidx.media3.common.DecoderMode;
-
-import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.utils.ResUtil;
 
 import com.github.catvod.utils.Prefers;
 
@@ -18,13 +14,20 @@ public class DecodeSetting {
         Prefers.put("decode_audio_pass_through", audioPassThrough);
     }
 
-    public static String getDecoderModeText(DecoderMode mode) {
-        return ResUtil.getString(switch (mode) {
-            case AUTO -> R.string.decoder_mode_auto;
-            case HARDWARE -> R.string.decoder_mode_hardware;
-            case SOFTWARE -> R.string.decoder_mode_software;
-            case FFMPEG -> R.string.decoder_mode_ffmpeg;
-        });
+    public static boolean isAudioPrefer() {
+        return Prefers.getBoolean("decode_audio_prefer", Prefers.getBoolean("audio_prefer"));
+    }
+
+    public static void putAudioPrefer(boolean audioPrefer) {
+        Prefers.put("decode_audio_prefer", audioPrefer);
+    }
+
+    public static boolean isVideoPrefer() {
+        return Prefers.getBoolean("decode_video_prefer", Prefers.getBoolean("video_prefer"));
+    }
+
+    public static void putVideoPrefer(boolean videoPrefer) {
+        Prefers.put("decode_video_prefer", videoPrefer);
     }
 
     public static @DolbyVisionOutputPolicy.Mode int getDolbyVisionOutputPolicy() {

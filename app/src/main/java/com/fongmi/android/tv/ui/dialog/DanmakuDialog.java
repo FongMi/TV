@@ -82,18 +82,12 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
         binding.search.setOnClickListener(this::onSearch);
         binding.choose.setOnClickListener(this::onChoose);
         binding.setting.setOnClickListener(this::onSetting);
-        binding.content.setOnClickListener(this::onContent);
+        binding.content.setVisibility(View.GONE);
     }
 
     private void onSearch(View view) {
         DanmakuSearchDialog.create().show(requireActivity());
         dismiss();
-    }
-
-    private void onContent(View view) {
-        FragmentActivity activity = requireActivity();
-        dismissNow();
-        PlaybackContentDialog.create().type(PlaybackContentDialog.DANMAKU).show(activity);
     }
 
     private void onChoose(View view) {

@@ -7,9 +7,7 @@ import android.text.TextUtils;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
-import androidx.media3.common.util.LocalClearKeyLicense;
 import androidx.media3.common.util.Util;
-import androidx.media3.datasource.IsoUri;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
@@ -64,7 +62,6 @@ public final class MediaItemFactory {
 
     public static MediaItem from(PlaySpec spec) {
         Uri uri = spec.getUri();
-        if (spec.getIsoEditionIndex() != C.INDEX_UNSET) uri = IsoUri.withEditionIndex(uri, spec.getIsoEditionIndex());
         return new MediaItem.Builder().setUri(uri)
                 .setSubtitleConfigurations(buildSubtitleConfigs(spec.getSubs()))
                 .setDrmConfiguration(buildDrmConfig(spec.getDrm()))
@@ -120,7 +117,7 @@ public final class MediaItemFactory {
 
     private static MediaItem.DrmConfiguration buildDrmConfig(Drm drm) {
         if (drm == null) return null;
-        UUID scheme = LocalClearKeyLicense.parse(drm.getKey()).isEmpty() ? drm.getUUID() : C.CLEARKEY_UUID;
+        UUID scheme = drm.getUUID();
         return new MediaItem.DrmConfiguration.Builder(scheme).setMultiSession(!C.CLEARKEY_UUID.equals(scheme)).setForceDefaultLicenseUri(drm.isForceKey()).setLicenseRequestHeaders(drm.getHeader()).setLicenseUri(drm.getKey()).build();
     }
 

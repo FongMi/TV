@@ -6,17 +6,16 @@
     android:orientation="vertical">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/styleHeader"
+        android:id="@+id/styleSourceHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
-        android:text="@string/subtitle_style"
+        android:paddingVertical="4dp"
+        android:text="@string/subtitle_style_source"
         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
     <com.google.android.material.chip.ChipGroup
-        android:id="@+id/styleGroup"
+        android:id="@+id/styleSourceGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingHorizontal="24dp"
@@ -49,7 +48,7 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/systemSetting"
-        style="@style/PlaybackDialogAction"
+        style="@style/Widget.Material3.Button.TonalButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -62,36 +61,6 @@
         app:iconGravity="textStart"
         app:iconTint="?attr/colorPrimary" />
 
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/fontHeader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="4dp"
-        android:text="@string/playback_font"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
-
-    <HorizontalScrollView
-        android:id="@+id/fontContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fillViewport="false"
-        android:focusable="false"
-        android:scrollbars="none">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/fontGroup"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingHorizontal="24dp"
-            app:chipSpacingVertical="0dp"
-            app:selectionRequired="true"
-            app:singleLine="true"
-            app:singleSelection="true" />
-
-    </HorizontalScrollView>
-
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/textSection"
         android:layout_width="match_parent"
@@ -103,7 +72,6 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="24dp"
             android:paddingTop="8dp"
-            android:paddingBottom="4dp"
             android:text="@string/subtitle_text_color"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -191,7 +159,6 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="24dp"
             android:paddingTop="8dp"
-            android:paddingBottom="4dp"
             android:text="@string/subtitle_edge_style"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -240,7 +207,6 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="24dp"
             android:paddingTop="8dp"
-            android:paddingBottom="4dp"
             android:text="@string/subtitle_edge_color"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
@@ -308,7 +274,6 @@
             android:layout_height="wrap_content"
             android:paddingHorizontal="24dp"
             android:paddingTop="8dp"
-            android:paddingBottom="4dp"
             android:text="@string/subtitle_background"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
 
