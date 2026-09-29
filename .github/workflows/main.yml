@@ -173,6 +173,16 @@ jobs:
             --armeabi "$RUNNER_TEMP/fongmi-official/mobile-armeabi_v7a.apk" \
             --media3-root media3
 
+      - name: Stage verified official 5.6.6 native payloads
+        run: |
+          set -euo pipefail
+          python3 scripts/stage_official_native_test.py \
+            --arm64 "$RUNNER_TEMP/fongmi-official/mobile-arm64_v8a.apk" \
+            --armeabi "$RUNNER_TEMP/fongmi-official/mobile-armeabi_v7a.apk" \
+            --app-root app \
+            --report official-native-stage.json
+          cat official-native-stage.json
+
       - name: Build matching FongMi Media3 AARs
         env:
           GRADLE_OPTS: "-Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.internal.http.socketTimeout=120000"
@@ -323,6 +333,18 @@ jobs:
               echo "::error::Missing native MPV disc navigation in $apk ($abi)"
               exit 1
             }
+            for native in libisoJNI.so libffmpegDoviJNI.so libcmg_decrypt.so libmedia3effect.so; do
+              unzip -Z1 "$apk" | grep -Fx "lib/$abi/$native" >/dev/null || {
+                echo "::error::Missing staged official native $native in $apk ($abi)"
+                exit 1
+              }
+            done
+            for bdj in libbluray-j2se-1.4.1.jar libbluray-awt-j2se-1.4.1.jar; do
+              unzip -Z1 "$apk" | grep -Fx "assets/bdj/$bdj" >/dev/null || {
+                echo "::error::Missing BD-J asset $bdj in $apk"
+                exit 1
+              }
+            done
           done
 
           # Verify the source-built ISO 9660 reader survived AAR copying and R8 packaging.
@@ -402,8 +424,8 @@ jobs:
           elif [ "$GITHUB_REF" = 'refs/heads/codex/disc-dovi-rebuild-20260929' ]; then
             cat >> release-notes.md <<'EOF'
 
-          预发布测试版：校验官方 5.6.6 APK 的 SHA256，并将其带 discnav 命令的 MPV 原生库与公开 Media3 Java 接口、FFmpeg 动态符号核对后打包；菜单操作接到手机触控和电视遥控器。保留源码构建的 ISO 9660、ASS 功能。为已有的 FFmpeg/libplacebo Dolby Vision P5 映射路径增加策略测试与播放解码器日志。
-          仍需真实 DVD/蓝光镜像与 ARM 设备验证菜单画面、导航、BD-J 和 P5 实际输出。当前没有恢复官方专用 libisoJNI、libffmpegDoviJNI 或 BD-J 运行时。
+          预发布测试版：校验官方 5.6.6 APK 的 SHA256，恢复带 discnav 命令的官方 libmpv.so，并把官方缺失于公开 Media3 的 libisoJNI.so、libffmpegDoviJNI.so、libcmg_decrypt.so、libmedia3effect.so 与两份 BD-J JAR 作为兼容性测试载荷打入 APK。保留源码构建的 ISO 9660、ASS 功能，并强制校验最终 APK 中这些文件确实存在。
+          注意：本版首先解决“官方约 156MB、自建约 146MB”的原生载荷缺口。专用 JNI 的完整 Java 调用链仍需逐项恢复和 ARM 真机验证；文件被打包不等于对应功能已经完全恢复。
           EOF
           fi
 
