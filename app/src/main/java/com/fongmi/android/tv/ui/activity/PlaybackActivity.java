@@ -161,7 +161,9 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     protected boolean dispatchDiscMenuTouch(MotionEvent event) {
         if (isLock() || !isDiscMenuActive() || event.getPointerCount() != 1) return false;
         int action = event.getActionMasked();
-        if (action != MotionEvent.ACTION_MOVE && action != MotionEvent.ACTION_UP) return false;
+        if (action == MotionEvent.ACTION_CANCEL) return true;
+        if (action != MotionEvent.ACTION_DOWN && action != MotionEvent.ACTION_MOVE
+                && action != MotionEvent.ACTION_UP) return false;
         View video = getPlayerView().getVideoSurfaceView();
         if (video == null || video.getWidth() <= 0 || video.getHeight() <= 0) return false;
         int[] origin = new int[2];
