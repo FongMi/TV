@@ -1,0 +1,196 @@
+diff --git a/libraries/decoder_ffmpeg/src/test/java/androidx/media3/decoder/ffmpeg/FfmpegDolbyVisionOutputTest.java b/libraries/decoder_ffmpeg/src/test/java/androidx/media3/decoder/ffmpeg/FfmpegDolbyVisionOutputTest.java
+new file mode 100644
+index 0000000..958703f
+--- /dev/null
++++ b/libraries/decoder_ffmpeg/src/test/java/androidx/media3/decoder/ffmpeg/FfmpegDolbyVisionOutputTest.java
+@@ -0,0 +1,58 @@
++/*
++ * Copyright (C) 2026 The Android Open Source Project
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ */
++package androidx.media3.decoder.ffmpeg;
++
++import static com.google.common.truth.Truth.assertThat;
++
++import androidx.media3.common.Format;
++import androidx.media3.common.MimeTypes;
++import androidx.media3.common.util.CodecSpecificDataUtil;
++import androidx.test.ext.junit.runners.AndroidJUnit4;
++import org.junit.Test;
++import org.junit.runner.RunWith;
++
++/** Guards the software RPU mapping policy used by non-backward-compatible Dolby Vision P5. */
++@RunWith(AndroidJUnit4.class)
++public final class FfmpegDolbyVisionOutputTest {
++
++  @Test
++  public void profile5WithRpu_requiresGpuMapping() {
++    Format format = profile5WithConfiguration(true);
++
++    assertThat(FfmpegLibrary.getDolbyVisionOutputMode(format))
++        .isEqualTo(FfmpegLibrary.DOLBY_VISION_OUTPUT_MODE_REQUIRE_MAPPING);
++  }
++
++  @Test
++  public void profile5WithoutRpu_doesNotDisplayUnmappedBaseLayer() {
++    Format format = profile5WithConfiguration(false);
++
++    assertThat(FfmpegLibrary.getDolbyVisionOutputMode(format))
++        .isEqualTo(FfmpegLibrary.DOLBY_VISION_OUTPUT_MODE_NONE);
++  }
++
++  private static Format profile5WithConfiguration(boolean rpuPresent) {
++    byte[] config = CodecSpecificDataUtil.buildDolbyVisionInitializationData(5, 1);
++    if (!rpuPresent) {
++      config[3] &= ~0x04;
++    }
++    return new Format.Builder()
++        .setSampleMimeType(MimeTypes.VIDEO_DOLBY_VISION)
++        .setCodecs("dvhe.05.01")
++        .setInitializationData(CodecSpecificDataUtil.setDolbyVisionCsd(null, config))
++        .build();
++  }
++}
+diff --git a/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/MpvPlayer.java b/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/MpvPlayer.java
+index 773b156..278903e 100644
+--- a/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/MpvPlayer.java
++++ b/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/MpvPlayer.java
+@@ -189,6 +189,30 @@ public final class MpvPlayer extends SimpleBasePlayer {
+     return MpvLibrary.isAvailable();
+   }
+ 
++  /** Whether the loaded source exposes native DVD or Blu-ray menu navigation. */
++  public boolean canOpenDiscMenu() {
++    verifyApplicationThread();
++    return !playerInfo.isReleased()
++        && nativeLifecycle.isInitialized()
++        && commandDispatcher.getDiscMenuActive() != null;
++  }
++
++  /** Whether a native disc menu currently occupies the video viewport. */
++  public boolean isDiscMenuActive() {
++    verifyApplicationThread();
++    return canOpenDiscMenu() && Boolean.TRUE.equals(commandDispatcher.getDiscMenuActive());
++  }
++
++  public boolean sendDiscNav(String action) {
++    verifyApplicationThread();
++    return canOpenDiscMenu() && commandDispatcher.sendDiscNavigation(action);
++  }
++
++  public boolean sendDiscNavPointer(float x, float y, boolean activate) {
++    verifyApplicationThread();
++    return isDiscMenuActive() && commandDispatcher.sendDiscPointer(x, y, activate);
++  }
++
+   public void setDecode(@C.DecodeMode int decode) {
+     runOnPlayerLooper(() -> setDecodeInternal(decode));
+   }
+diff --git a/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcher.java b/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcher.java
+index bbf8ce6..8d71113 100644
+--- a/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcher.java
++++ b/libraries/mpvplayer/src/main/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcher.java
+@@ -137,6 +137,46 @@ public final class MpvCommandDispatcher {
+     return client.command(new String[] {CMD_SCRIPT_BINDING, STATS_GENERAL_PAGE_TOGGLE});
+   }
+ 
++  /** Sends a DVD/Blu-ray menu command to mpv's native disc navigation backend. */
++  public boolean sendDiscNavigation(String action) {
++    if (action == null) {
++      return false;
++    }
++    switch (action) {
++      case "up":
++      case "down":
++      case "left":
++      case "right":
++      case "select":
++      case "menu":
++      case "title-menu":
++      case "popup":
++      case "prev":
++        return client.command(new String[] {"discnav", action});
++      default:
++        return false;
++    }
++  }
++
++  /** Sends a pointer event inside the video viewport, with coordinates in the range [0, 1). */
++  public boolean sendDiscPointer(float x, float y, boolean activate) {
++    if (!Float.isFinite(x) || !Float.isFinite(y) || x < 0 || x > 1 || y < 0 || y > 1) {
++      return false;
++    }
++    return client.command(
++        new String[] {
++          "discnav",
++          activate ? "mouse-click" : "mouse-move",
++          Float.toString(Math.min(x, Math.nextDown(1.0f))),
++          Float.toString(Math.min(y, Math.nextDown(1.0f)))
++        });
++  }
++
++  /** Null means the currently loaded source is not an optical-disc navigation stream. */
++  public Boolean getDiscMenuActive() {
++    return client.getPropertyBoolean("disc-menu-active");
++  }
++
+   public boolean addSubtitle(MediaItem.SubtitleConfiguration subtitle, boolean select) {
+     return client.command(getAddSubtitleCommand(subtitle, select));
+   }
+diff --git a/libraries/mpvplayer/src/test/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcherTest.java b/libraries/mpvplayer/src/test/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcherTest.java
+index 64e5308..b36cf05 100644
+--- a/libraries/mpvplayer/src/test/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcherTest.java
++++ b/libraries/mpvplayer/src/test/java/androidx/media3/mpvplayer/nativebridge/MpvCommandDispatcherTest.java
+@@ -57,4 +57,41 @@ public final class MpvCommandDispatcherTest {
+     verify(client).command(aryEq(command));
+     verifyNoMoreInteractions(client);
+   }
++
++  @Test
++  public void sendDiscNavigation_queuesNativeMenuCommand() {
++    MpvClient client = mock(MpvClient.class);
++    MpvCommandDispatcher dispatcher = new MpvCommandDispatcher(client);
++    String[] command = {"discnav", "menu"};
++    when(client.command(aryEq(command))).thenReturn(true);
++
++    assertThat(dispatcher.sendDiscNavigation("menu")).isTrue();
++
++    verify(client).command(aryEq(command));
++    verifyNoMoreInteractions(client);
++  }
++
++  @Test
++  public void sendDiscNavigation_rejectsUnrecognizedCommand() {
++    MpvClient client = mock(MpvClient.class);
++    MpvCommandDispatcher dispatcher = new MpvCommandDispatcher(client);
++
++    assertThat(dispatcher.sendDiscNavigation("loadfile")).isFalse();
++
++    verifyNoMoreInteractions(client);
++  }
++
++  @Test
++  public void sendDiscPointer_usesNormalizedCoordinates() {
++    MpvClient client = mock(MpvClient.class);
++    MpvCommandDispatcher dispatcher = new MpvCommandDispatcher(client);
++    String[] command = {"discnav", "mouse-click", "0.25", "0.75"};
++    when(client.command(aryEq(command))).thenReturn(true);
++
++    assertThat(dispatcher.sendDiscPointer(0.25f, 0.75f, true)).isTrue();
++    assertThat(dispatcher.sendDiscPointer(Float.NaN, 0.5f, true)).isFalse();
++
++    verify(client).command(aryEq(command));
++    verifyNoMoreInteractions(client);
++  }
+ }

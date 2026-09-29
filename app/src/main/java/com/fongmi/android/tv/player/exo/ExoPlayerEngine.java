@@ -1,17 +1,21 @@
 package com.fongmi.android.tv.player.exo;
 
 import androidx.annotation.NonNull;
+import android.util.Log;
 import androidx.media3.common.Format;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MimeTypes;
 import androidx.media3.common.PlaybackException;
 import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.VideoSize;
 import androidx.media3.exoplayer.ExoPlayer;
+import androidx.media3.exoplayer.DecoderReuseEvaluation;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.audio.AudioSink;
 import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.ui.PlayerView;
+import androidx.media3.common.util.CodecSpecificDataUtil;
 
 import com.fongmi.android.tv.player.effect.PlayerEffect;
 import com.fongmi.android.tv.player.engine.PlayerEngine;
@@ -25,6 +29,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener, Player.
     private final ExoPlayerEffect effect;
     private final ExoDiskPreload preload;
     private final ExoPlayer player;
+    private boolean dolbyVisionVideoSelected;
     private PlaySpec spec;
 
     public ExoPlayerEngine(int decode, Player.Listener listener) {
@@ -57,6 +62,23 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener, Player.
     @Override
     public void onVideoSizeChanged(@NonNull VideoSize size) {
         session.setVideoSize(size);
+    }
+
+    @Override
+    public void onVideoInputFormatChanged(@NonNull EventTime eventTime, @NonNull Format format,
+                                          DecoderReuseEvaluation decoderReuseEvaluation) {
+        dolbyVisionVideoSelected = MimeTypes.VIDEO_DOLBY_VISION.equals(format.sampleMimeType);
+        if (dolbyVisionVideoSelected) {
+            Log.i("DolbyVisionPlayback", "Profile=" + format.codecs + ", RPU configuration="
+                    + CodecSpecificDataUtil.hasDolbyVisionRpu(format) + ", resolution="
+                    + format.width + "x" + format.height);
+        }
+    }
+
+    @Override
+    public void onVideoDecoderInitialized(@NonNull EventTime eventTime, @NonNull String decoderName,
+                                          long initializedTimestampMs, long initializationDurationMs) {
+        if (dolbyVisionVideoSelected) Log.i("DolbyVisionPlayback", "Selected video decoder=" + decoderName);
     }
 
     @Override

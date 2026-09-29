@@ -3,7 +3,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ fongmi, 'codex/media3-public-compat-*', 'codex/iso-source-rebuild-20260928' ]
+    branches: [ fongmi, 'codex/media3-public-compat-*', 'codex/iso-source-rebuild-20260928', 'codex/disc-dovi-rebuild-20260929' ]
   workflow_dispatch:
 
 permissions:
@@ -151,6 +151,7 @@ jobs:
           git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-ass-matroska.patch"
           git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-ass-matroska-test.patch"
           git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-iso9660-fallback.patch"
+          git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-mpv-disc-navigation-test.patch"
           git -C media3 diff --check
 
       - name: Build matching FongMi Media3 AARs
@@ -217,7 +218,15 @@ jobs:
             --tests 'androidx.media3.extractor.iso.udf.Iso9660FallbackTest' \
             --no-daemon
 
-      - name: Verify expected build tasks
+      - name: Test native menu commands and Dolby Vision P5 policy
+        run: |
+          set -euo pipefail
+          ./media3/gradlew -p media3 :lib-mpvplayer:testDebugUnitTest \
+            --tests 'androidx.media3.mpvplayer.nativebridge.MpvCommandDispatcherTest' --no-daemon
+          ./media3/gradlew -p media3 :lib-decoder-ffmpeg:testDebugUnitTest \
+            --tests 'androidx.media3.decoder.ffmpeg.FfmpegDolbyVisionOutputTest' --no-daemon
+
+      - name: Verify expected build tasks for app
         run: |
           set -euo pipefail
           ./gradlew :app:tasks --all --no-daemon > app-tasks.txt
@@ -291,6 +300,10 @@ jobs:
               echo "::error::Missing native libass in $apk ($abi)"
               exit 1
             }
+            unzip -Z1 "$apk" | grep -Fx "lib/$abi/libmpv.so" >/dev/null || {
+              echo "::error::Missing native MPV disc navigation in $apk ($abi)"
+              exit 1
+            }
           done
 
           # Verify the source-built ISO 9660 reader survived AAR copying and R8 packaging.
@@ -304,6 +317,10 @@ jobs:
                   dex_names = [name for name in archive.namelist() if name.endswith(".dex")]
                   if not any(marker in archive.read(name) for name in dex_names):
                       raise SystemExit(f"::error::ISO 9660 reader missing from {apk}")
+                  abi = "arm64-v8a" if "arm64" in apk.name else "armeabi-v7a"
+                  mpv = archive.read(f"lib/{abi}/libmpv.so")
+                  if not all(symbol in mpv for symbol in (b"dvdnav_menu_call", b"bd_menu_call", b"disc-menu-active")):
+                      raise SystemExit(f"::error::MPV disc menu support missing from {apk}")
               print(f"ISO 9660 reader found in {apk}")
           PY
 
@@ -316,7 +333,7 @@ jobs:
           retention-days: 30
 
       - name: Publish four APKs to GitHub Release
-        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927' || github.ref == 'refs/heads/codex/media3-public-compat-ass-20260928' || github.ref == 'refs/heads/codex/iso-source-rebuild-20260928'
+        if: github.ref == 'refs/heads/fongmi' || github.ref == 'refs/heads/codex/media3-public-compat-manual-20260927' || github.ref == 'refs/heads/codex/media3-public-compat-ass-20260928' || github.ref == 'refs/heads/codex/iso-source-rebuild-20260928' || github.ref == 'refs/heads/codex/disc-dovi-rebuild-20260929'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -333,6 +350,10 @@ jobs:
           elif [ "$GITHUB_REF" = 'refs/heads/codex/iso-source-rebuild-20260928' ]; then
             TAG="iso-test-${{ github.run_number }}"
             TITLE="TV 5.6.6 DVD ISO 源码测试版"
+            RELEASE_FLAGS=(--prerelease)
+          elif [ "$GITHUB_REF" = 'refs/heads/codex/disc-dovi-rebuild-20260929' ]; then
+            TAG="disc-dovi-test-${{ github.run_number }}"
+            TITLE="TV 5.6.6 光盘菜单与 P5 路径测试版"
             RELEASE_FLAGS=(--prerelease)
           fi
 
@@ -358,6 +379,12 @@ jobs:
 
           在 ASS 字幕测试版的基础上，新增从源码实现的 ISO 9660 目录读取回退路径，支持读取没有 UDF 的 DVD 镜像文件；测试覆盖文件查找、目录列表、前置引导记录和损坏目录。
           这是预发布测试版。DVD/蓝光图形菜单、杜比视界 P5 等 5.6.6 专用原生功能仍待开发；尚未在 ARM 设备和真实光盘镜像上验证。
+          EOF
+          elif [ "$GITHUB_REF" = 'refs/heads/codex/disc-dovi-rebuild-20260929' ]; then
+            cat >> release-notes.md <<'EOF'
+
+          预发布测试版：连接现有 MPV 原生 DVD/蓝光菜单命令至手机触控和电视遥控器；保留源码构建的 ISO 9660、ASS 功能。为已有的 FFmpeg/libplacebo Dolby Vision P5 映射路径增加策略测试与播放解码器日志。
+          仍需真实 DVD/蓝光镜像与 ARM 设备验证菜单画面、导航、BD-J 和 P5 实际输出。当前没有恢复官方专用 libisoJNI、libffmpegDoviJNI 或 BD-J 运行时。
           EOF
           fi
 

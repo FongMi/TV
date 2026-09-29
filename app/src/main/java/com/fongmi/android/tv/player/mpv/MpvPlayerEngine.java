@@ -42,6 +42,22 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
         return player;
     }
 
+    public boolean hasDiscMenu() {
+        return player.canOpenDiscMenu();
+    }
+
+    public boolean isDiscMenuActive() {
+        return player.isDiscMenuActive();
+    }
+
+    public boolean sendDiscMenuAction(String action) {
+        return player.sendDiscNav(action);
+    }
+
+    public boolean sendDiscMenuPointer(float x, float y, boolean activate) {
+        return player.sendDiscNavPointer(x, y, activate);
+    }
+
     @Override
     public int getAudioChannelCount() {
         return player.getAudioChannelCount();

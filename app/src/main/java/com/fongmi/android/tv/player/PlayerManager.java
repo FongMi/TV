@@ -96,6 +96,22 @@ public class PlayerManager implements ParseCallback {
         return player;
     }
 
+    public boolean hasDiscMenu() {
+        return engine instanceof MpvPlayerEngine mpv && mpv.hasDiscMenu();
+    }
+
+    public boolean isDiscMenuActive() {
+        return engine instanceof MpvPlayerEngine mpv && mpv.isDiscMenuActive();
+    }
+
+    public boolean sendDiscMenuAction(String action) {
+        return engine instanceof MpvPlayerEngine mpv && mpv.sendDiscMenuAction(action);
+    }
+
+    public boolean sendDiscMenuPointer(float x, float y, boolean activate) {
+        return engine instanceof MpvPlayerEngine mpv && mpv.sendDiscMenuPointer(x, y, activate);
+    }
+
     public void bindPlayerView(@Nullable PlayerView view) {
         if (engine != null) engine.bindPlayerView(view);
     }

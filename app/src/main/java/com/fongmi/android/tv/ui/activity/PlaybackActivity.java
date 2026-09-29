@@ -49,6 +49,7 @@ import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.BrowserWebView;
 import com.fongmi.android.tv.ui.dialog.CloudflareDialog;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.Util;
@@ -96,16 +97,79 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         return mService.player();
     }
 
-    protected boolean hasDiscMenu() { return false; }
-    protected boolean isIsoNavigationPlayback() { return false; }
-    protected boolean isDiscMenuActive() { return false; }
-    protected boolean isDiscMenuTransition() { return false; }
-    protected boolean dispatchDiscMenuKey(KeyEvent event) { return false; }
-    protected void openDiscMenu() { }
-    protected boolean openDiscTitleMenu() { return false; }
-    protected boolean openDiscPopupMenu() { return false; }
-    protected boolean handleDiscMenuBack() { return false; }
-    protected boolean dispatchDiscMenuTouch(MotionEvent event) { return false; }
+    protected boolean hasDiscMenu() {
+        return hasPlaybackSource() && player().hasDiscMenu();
+    }
+
+    protected boolean isIsoNavigationPlayback() {
+        return isDiscMenuActive();
+    }
+
+    protected boolean isDiscMenuActive() {
+        return hasPlaybackSource() && player().isDiscMenuActive();
+    }
+
+    protected boolean isDiscMenuTransition() {
+        return isDiscMenuActive();
+    }
+
+    protected boolean dispatchDiscMenuKey(KeyEvent event) {
+        if (isLock() || !hasDiscMenu()) return false;
+        String action = switch (event.getKeyCode()) {
+            case KeyEvent.KEYCODE_DPAD_UP -> "up";
+            case KeyEvent.KEYCODE_DPAD_DOWN -> "down";
+            case KeyEvent.KEYCODE_DPAD_LEFT -> "left";
+            case KeyEvent.KEYCODE_DPAD_RIGHT -> "right";
+            case KeyEvent.KEYCODE_DPAD_CENTER, KeyEvent.KEYCODE_ENTER -> "select";
+            case KeyEvent.KEYCODE_MEDIA_TOP_MENU -> "menu";
+            case KeyEvent.KEYCODE_TV_CONTENTS_MENU -> "popup";
+            default -> null;
+        };
+        if (action == null) return false;
+        if (!isDiscMenuActive() && !"menu".equals(action) && !"popup".equals(action)) return false;
+        if (event.getAction() == KeyEvent.ACTION_UP) return true;
+        if (event.getAction() != KeyEvent.ACTION_DOWN) return false;
+        return player().sendDiscMenuAction(action);
+    }
+
+    protected void openDiscMenu() {
+        openDiscMenuAction("menu");
+    }
+
+    protected boolean openDiscTitleMenu() {
+        return openDiscMenuAction("title-menu");
+    }
+
+    protected boolean openDiscPopupMenu() {
+        return openDiscMenuAction("popup");
+    }
+
+    private boolean openDiscMenuAction(String action) {
+        if (!hasDiscMenu() || !player().sendDiscMenuAction(action)) {
+            onDiscMenuUnavailable();
+            Notify.show(R.string.play_disc_menu_unavailable);
+            return false;
+        }
+        onDiscMenuOpening();
+        return true;
+    }
+
+    protected boolean handleDiscMenuBack() {
+        return isDiscMenuActive() && player().sendDiscMenuAction("prev");
+    }
+
+    protected boolean dispatchDiscMenuTouch(MotionEvent event) {
+        if (isLock() || !isDiscMenuActive() || event.getPointerCount() != 1) return false;
+        int action = event.getActionMasked();
+        if (action != MotionEvent.ACTION_MOVE && action != MotionEvent.ACTION_UP) return false;
+        View video = getPlayerView().getVideoSurfaceView();
+        if (video == null || video.getWidth() <= 0 || video.getHeight() <= 0) return false;
+        int[] origin = new int[2];
+        video.getLocationOnScreen(origin);
+        float x = (event.getRawX() - origin[0]) / video.getWidth();
+        float y = (event.getRawY() - origin[1]) / video.getHeight();
+        return player().sendDiscMenuPointer(x, y, action == MotionEvent.ACTION_UP);
+    }
     protected void onDiscMenuLongPress() { }
 
     public List<Danmaku> getDanmakuItems() {
@@ -805,7 +869,10 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     @Override
     public void onPlaybackStateChanged(int state) {
-        if (isOwner()) onStateChanged(state);
+        if (isOwner()) {
+            onStateChanged(state);
+            onDiscMenuAvailabilityChanged();
+        }
     }
 
     @Override
