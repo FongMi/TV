@@ -1,7 +1,8 @@
 # 光盘菜单与 Dolby Vision P5 设备验证
 
-本分支使用已打包的 MPV 原生光盘导航实现作为图形菜单入口；官方 APK 的
-`libisoJNI.so`、BD-J 运行时及独立的 `libffmpegDoviJNI.so` 尚未移植。
+本分支从校验过哈希的官方 APK 提取含 `discnav` 命令的 `libmpv.so`，与公开
+Media3 的播放器 Java 接口和 FFmpeg 预编译库做动态符号核对后打包。
+官方 APK 的 `libisoJNI.so`、BD-J 运行时及独立的 `libffmpegDoviJNI.so` 尚未移植。
 FFmpeg/libplacebo 的 P5 RPU 映射实现已包含在公开 Media3 源码和此前的
 源码构建 APK 中，本次增加路径检查和设备日志。
 

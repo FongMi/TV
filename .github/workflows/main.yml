@@ -154,6 +154,25 @@ jobs:
           git -C media3 apply "$GITHUB_WORKSPACE/patches/media3-mpv-disc-navigation-test.patch"
           git -C media3 diff --check
 
+      - name: Download verified official 5.6.6 menu binaries
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/fongmi-official"
+          for filename in mobile-arm64_v8a.apk mobile-armeabi_v7a.apk; do
+            curl --fail --location --retry 3 --retry-all-errors \
+              --connect-timeout 20 --max-time 600 \
+              "https://github.com/FongMi/Release/releases/download/5.6.6/$filename" \
+              --output "$RUNNER_TEMP/fongmi-official/$filename"
+          done
+
+      - name: Restore MPV disc menu commands for both ABIs
+        run: |
+          set -euo pipefail
+          python3 scripts/recover_official_mpv.py \
+            --arm64 "$RUNNER_TEMP/fongmi-official/mobile-arm64_v8a.apk" \
+            --armeabi "$RUNNER_TEMP/fongmi-official/mobile-armeabi_v7a.apk" \
+            --media3-root media3
+
       - name: Build matching FongMi Media3 AARs
         env:
           GRADLE_OPTS: "-Dorg.gradle.internal.http.connectionTimeout=120000 -Dorg.gradle.internal.http.socketTimeout=120000"
@@ -383,7 +402,7 @@ jobs:
           elif [ "$GITHUB_REF" = 'refs/heads/codex/disc-dovi-rebuild-20260929' ]; then
             cat >> release-notes.md <<'EOF'
 
-          预发布测试版：连接现有 MPV 原生 DVD/蓝光菜单命令至手机触控和电视遥控器；保留源码构建的 ISO 9660、ASS 功能。为已有的 FFmpeg/libplacebo Dolby Vision P5 映射路径增加策略测试与播放解码器日志。
+          预发布测试版：校验官方 5.6.6 APK 的 SHA256，并将其带 discnav 命令的 MPV 原生库与公开 Media3 Java 接口、FFmpeg 动态符号核对后打包；菜单操作接到手机触控和电视遥控器。保留源码构建的 ISO 9660、ASS 功能。为已有的 FFmpeg/libplacebo Dolby Vision P5 映射路径增加策略测试与播放解码器日志。
           仍需真实 DVD/蓝光镜像与 ARM 设备验证菜单画面、导航、BD-J 和 P5 实际输出。当前没有恢复官方专用 libisoJNI、libffmpegDoviJNI 或 BD-J 运行时。
           EOF
           fi
