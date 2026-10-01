@@ -1,5 +1,19 @@
 import type { Field } from "./config-fields";
 
+export const networkMethods = [
+  ["req / http", "取得 code、headers、content 與 error；HTTP 非 2xx 需自行判斷。"],
+  ["json", "取得 JSON；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。"],
+  ["get / post", "Java 取得文字正文；連線失敗拋出例外，HTTP 非 2xx 仍保留正文。"],
+  ["session", "建立隔離 Cookie 的請求流程，用完關閉。"],
+  ["getCookie / setCookie", "讀寫 WebView Cookie；Session 使用隔離 Cookie。"],
+  ["batch", "批次請求，預設每批最多 4 筆並行，按輸入順序回傳。"],
+  ["cached / peek / refresh", "TTL 快取；peek 只讀已有值，refresh 背景更新且遵守 TTL。"],
+  ["clearCache", "清除一筆；省略 key 清除目前站點全部 TTL 快取並取消載入。"],
+  ["download", "直接串流至檔案；下載失敗會拋出例外，部分檔案由呼叫者處理。"],
+  ["ws", "一次 WebSocket 訊息交換，取得首個完整文字訊息後關閉。"],
+  ["sleep", "可取消的等待，單位為毫秒。"],
+];
+
 export const methods = [
   ["init", "建立實例時；Node 重啟可再次呼叫", "讀取 ext、建立連線或快取", "無"],
   ["homeContent / home", "進入首頁", "分類與選填 filters", "Result.class"],
@@ -18,18 +32,23 @@ export const methods = [
     "list + pagecount",
   ],
   ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result.url、選填 skips"],
-  ["liveContent / live", "載入直播配置", "TXT、M3U 或 Group JSON", "原始文字"],
+  ["liveContent / live", "載入直播配置", "TXT、M3U 或 Group JSON", "文字 / Group 陣列"],
   [
     "proxy / localProxy",
     "本地代理收到請求",
     "依執行環境提供狀態、類型、內容與標頭",
     "陣列 / HTTP 回應",
   ],
-  ["action", "自訂操作", "可由 Result 解析的結果", "JSON 字串 / Python dict"],
+  ["action", "自訂操作", "可由 Result 解析的結果", "Java JSON 字串 / Python、JS 物件"],
   ["destroy", "重新載入或清除", "釋放執行緒、連線、引擎資源", "無"],
 ];
 
 export const resultFields: Field[] = [
+  {
+    name: "web",
+    type: "{url, mode?, cookie?: {url?, keys: string[]}[]}",
+    description: "action 回應的開網頁指令，只執行一次。url 限 HTTP(S)；mode 省略為普通網頁，view 為返回退出的內容視窗。Cookie 同組全部需要、不同組任一組完成即可；需有新值且頁面同源。詳見開網頁的 JSON 格式說明。",
+  },
   {
     name: "class",
     type: "Class[]",
@@ -179,7 +198,7 @@ export const objectGroups = [
       ["vod_director / vod_actor", "人員資訊。"],
       ["vod_content", "詳細描述。"],
       ["vod_play_from / vod_play_url", "播放分組與集數，分隔方式見下節。"],
-      ["vod_tag / action", "folder 表示資料夾；action 為自訂操作。"],
+      ["vod_tag / action", "folder 表示資料夾；非空 action 在點擊時觸發操作。type 3 傳給爬蟲 action()；type 4 填回傳 JSON 的接口網址。"],
       ["cate", "提供此物件時也視為資料夾，可含 land、circle、ratio。"],
       ["land / circle / ratio / style", "卡片外觀覆蓋。"],
     ],

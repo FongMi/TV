@@ -3,90 +3,87 @@ import Link from "next/link";
 import { CodeTabs, type CodeSample } from "../CodeTabs";
 import { CodeBlock, DocsLayout } from "../ui";
 import { FieldTable } from "../FieldTable";
-import { resultFields, objectGroups, methods } from "../spider-fields";
+import { resultFields, objectGroups, methods, networkMethods } from "../spider-fields";
 
 export const metadata: Metadata = {
   title: "爬蟲介接",
   description: "Java、Python、JavaScript 爬蟲 Demo、生命週期與回傳資料格式。",
 };
 
-const java = `package com.github.catvod.spider;
+const java = `// 最小點播範例；example.com 為示意網址。
+package com.github.catvod.spider;
 
 import android.content.Context;
+
+import com.github.catvod.bean.Class;
+import com.github.catvod.bean.Result;
+import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.List;
 
 public class Demo extends Spider {
-    private String ext;
 
     @Override
     public void init(Context context, String extend) {
-        this.ext = extend;
     }
 
+    // 回傳分類清單。
     @Override
-    public String homeContent(boolean filter) throws Exception {
-        JSONArray classes = new JSONArray()
-            .put(new JSONObject().put("type_id", "movie")
-            .put("type_name", "電影"));
-        return new JSONObject().put("class", classes).toString();
+    public String homeContent(boolean filter) {
+        return Result.string(List.of(new Class("movie", "電影")));
     }
 
+    // 完整清單交給共用方法分頁。
     @Override
     public String categoryContent(String tid, String pg, boolean filter,
-            HashMap<String, String> extend) throws Exception {
-        JSONArray list = new JSONArray().put(card("demo-1", "範例項目"));
-        return new JSONObject().put("list", list)
-            .put("pagecount", 1).toString();
+            HashMap<String, String> extend) {
+        List<Vod> items = List.of(card("demo-1", "範例項目"));
+        return Result.page(items, Integer.parseInt(pg), 20).string();
     }
 
+    // 集數先使用穩定 ID，播放時再取得網址。
     @Override
-    public String detailContent(List<String> ids) throws Exception {
-        JSONObject item = card(ids.get(0), "範例項目")
-            .put("vod_play_from", "Demo")
-            .put("vod_play_url", "第 1 集$demo://episode/1");
-        return new JSONObject().put("list",
-            new JSONArray().put(item)).toString();
+    public String detailContent(List<String> ids) {
+        Vod item = card(ids.get(0), "範例項目");
+        item.setVodPlayFrom("Demo");
+        item.setVodPlayUrl("第 1 集$demo://episode/1");
+        return Result.string(item);
     }
 
+    // 將播放 ID 換成實際網址。
     @Override
-    public String playerContent(String flag, String id,
-            List<String> vipFlags) throws Exception {
-        return new JSONObject().put("parse", 0)
-            .put("url", resolve(id)).toString();
+    public String playerContent(String flag, String id, List<String> vipFlags) {
+        String url = id.replace("demo://", "https://example.com/");
+        return Result.get().url(url).string();
     }
 
-    private JSONObject card(String id, String name) throws Exception {
-        return new JSONObject().put("vod_id", id).put("vod_name", name)
-            .put("vod_pic", "https://example.com/poster.jpg");
-    }
-
-    private String resolve(String id) {
-        return id.replace("demo://", "https://example.com/");
+    private Vod card(String id, String name) {
+        return new Vod(id, name, "https://example.com/poster.jpg");
     }
 }`;
 
-const python = `# demo.py
+const python = `# 最小點播範例；example.com 為示意網址。
 from base.spider import Spider as BaseSpider
+
 
 class Spider(BaseSpider):
     def init(self, extend=""):
-        self.extend = extend
+        pass
 
+    # 回傳分類清單。
     def homeContent(self, filter):
-        return {"class": [
-            {"type_id": "movie", "type_name": "電影"}
-        ]}
-
-    def categoryContent(self, tid, pg, filter, extend):
         return {
-            "list": [self.card("demo-1", "範例項目")],
-            "pagecount": 1
+            "class": [{"type_id": "movie", "type_name": "電影"}]
         }
 
+    # 完整清單交給共用方法分頁。
+    def categoryContent(self, tid, pg, filter, extend):
+        items = [self.card("demo-1", "範例項目")]
+        return self.page(items, pg, 20)
+
+    # 集數先使用穩定 ID，播放時再取得網址。
     def detailContent(self, ids):
         item = self.card(ids[0], "範例項目")
         item.update({
@@ -95,51 +92,55 @@ class Spider(BaseSpider):
         })
         return {"list": [item]}
 
+    # 將播放 ID 換成實際網址。
     def playerContent(self, flag, id, vipFlags):
-        return {"parse": 0, "url": self.resolve(id)}
+        url = id.replace("demo://", "https://example.com/")
+        return {"parse": 0, "url": url}
 
     def card(self, id, name):
-        return {"vod_id": id, "vod_name": name,
-                "vod_pic": "https://example.com/poster.jpg"}
+        return {
+            "vod_id": id,
+            "vod_name": name,
+            "vod_pic": "https://example.com/poster.jpg"
+        }`;
 
-    def resolve(self, id):
-        return id.replace("demo://", "https://example.com/")`;
-
-const javascript = `// demo.js — QuickJS ES module
+const javascript = `// 最小點播範例；example.com 為示意網址。
 const card = (id, name) => ({
   vod_id: id,
   vod_name: name,
   vod_pic: "https://example.com/poster.jpg"
 });
 
-const resolve = (id) => id.replace("demo://", "https://example.com/");
-
 export default {
-  init(ext) { this.ext = ext; },
+  init(ext) {},
 
+  // 回傳分類清單。
   home(filter) {
-    return JSON.stringify({ class: [
-      { type_id: "movie", type_name: "電影" }
-    ]});
+    return {
+      class: [{ type_id: "movie", type_name: "電影" }]
+    };
   },
 
+  // 完整清單交給共用方法分頁。
   category(tid, pg, filter, extend) {
-    return JSON.stringify({
-      list: [card("demo-1", "範例項目")],
-      pagecount: 1
-    });
+    const items = [card("demo-1", "範例項目")];
+    return page(items, pg, 20);
   },
 
+  // 集數先使用穩定 ID，播放時再取得網址。
   detail(id) {
-    return JSON.stringify({ list: [{
+    const item = {
       ...card(id, "範例項目"),
       vod_play_from: "Demo",
       vod_play_url: "第 1 集$demo://episode/1"
-    }]});
+    };
+    return { list: [item] };
   },
 
+  // 將播放 ID 換成實際網址。
   play(flag, id, vipFlags) {
-    return JSON.stringify({ parse: 0, url: resolve(id) });
+    const url = id.replace("demo://", "https://example.com/");
+    return { parse: 0, url };
   }
 };`;
 
@@ -226,10 +227,12 @@ export default function SpiderPage() {
           <b>本頁導覽</b>
           <a href="#start">載入方式</a>
           <a href="#demo">三語言 Demo</a>
+          <a href="#network">共用網路</a>
           <a href="#node">Node.js</a>
           <a href="#lifecycle">方法生命週期</a>
           <a href="#result">Result 結構</a>
           <a href="#skips">片段跳過</a>
+          <a href="#web">開網頁</a>
           <a href="#objects">資料物件</a>
           <a href="#episodes">集數格式</a>
           <a href="#proxy">Proxy 回傳</a>
@@ -252,7 +255,8 @@ export default function SpiderPage() {
                 <p>
                   類別放在 <code>com.github.catvod.spider.Demo</code>
                   ，並繼承抽象 Spider；主配置必須提供 <code>spider</code>{" "}
-                  或站點的 <code>jar</code>。
+                  或站點的 <code>jar</code>。使用 <code>catvod-api.jar</code>{" "}
+                  作為 <code>compileOnly</code> 編譯依賴。
                 </p>
               </article>
               <article>
@@ -280,11 +284,57 @@ export default function SpiderPage() {
               是結構示意，並不是可用來源。正式實作時須接上自己的資料取得、錯誤處理與搜尋。
             </p>
             <div className="callout">
-              <b>回傳型別依語言區分</b>Java 與 QuickJS 回傳 JSON 字串；Python
-              直接回傳 dict，由 Chaquopy bridge 序列化，不要再呼叫
-              json.dumps。直播方法回傳原始文字。
+              <b>回傳格式</b>Java 使用 Result／Vod 組裝 JSON 字串；Python 回傳
+              dict／list，QuickJS 回傳物件／陣列，由 App 序列化。
+              分頁使用 <code>Result.page</code>、<code>self.page</code> 或{" "}
+              <code>page</code>；直播可回傳 Group 陣列或 TXT／M3U 原始文字。
             </div>
             <CodeTabs samples={samples} />
+            <p>
+              CatVodSpider 的完整範例涵蓋分類樣式、篩選、搜尋分頁、直播、快取與網頁操作：
+              Java 的 <code>app/src/main/java/com/github/catvod/spider/Demo.java</code>、
+              Python 的 <code>examples/python/spider.py</code> 與 QuickJS 的{" "}
+              <code>examples/javascript/spider.js</code>。
+            </p>
+          </section>
+          <section id="network">
+            <h2>共用網路</h2>
+            <p>
+              App 在初始化前提供網路接口：Java／QuickJS 使用 <code>net</code>，
+              Python 使用 <code>self.net</code>。QuickJS 的 <code>net.req()</code> 同步執行；
+              <code>net.http()</code> 與 <code>net.json()</code> 使用 <code>await</code> 取得結果。
+            </p>
+            <p>
+              Java 的 options 與 <code>net.json()</code> 結果都是 JSON 字串。
+              Python／QuickJS 的 options 是物件，<code>net.json()</code> 結果為 JSON 值。
+            </p>
+            <div className="table-scroll">
+              <table className="method-table" aria-label="共用網路方法">
+                <thead>
+                  <tr><th scope="col">方法</th><th scope="col">用途</th></tr>
+                </thead>
+                <tbody>
+                  {networkMethods.map(([name, description]) => (
+                    <tr key={name}>
+                      <td data-label="方法"><code>{name}</code></td>
+                      <td data-label="用途">{description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p>
+              <code>cookie: true</code> 使用 WebView Cookie；隔離 Session 用完須關閉。
+              快取 options 使用 <code>ttl</code>、<code>stale</code>、<code>persist</code>，
+              播放網址使用 <code>stale: false</code>。時間單位為毫秒。
+              完整參數與三語言範例見 CatVodSpider 的 <code>docs/development.md</code>。
+            </p>
+            <p>
+              小型設定用 Local：Java／QuickJS 使用 <code>local</code>，Python 使用{" "}
+              <code>self.local</code>。以 <code>get(key)</code>、<code>set(key, value)</code> 與{" "}
+              <code>delete(key)</code> 讀寫，由 App 按站點隔離。Java 使用 JSON 字串，
+              Python／QuickJS 直接讀寫 JSON 值。
+            </p>
           </section>
           <section id="node">
             <h2>Node.js 使用獨立的載入契約</h2>
@@ -374,24 +424,6 @@ export default function SpiderPage() {
             </div>
             <h3>完整 Result 欄位</h3>
             <FieldTable fields={resultFields} label="Result" />
-            <h3 id="skips">片段跳過</h3>
-            <p>
-              每集的 <code>playerContent</code> 可在 Result 頂層提供{" "}
-              <code>skips</code> 陣列，範例見上方播放類 Result。<code>start</code>
-              是開始跳過的時間，<code>end</code> 是要跳到的時間，單位都是毫秒；
-              有填 end 時，必須晚於 start。片頭一定要填 end；start 為 0 時從 end 開始播放，
-              但續播位置或 Result.position 更晚時，仍從較晚的位置播放。
-              其他片頭區間會在播放進入時跳到 end。
-            </p>
-            <p>
-              <code>middle</code> 可提供多段片中區間，每段都必須有 end；播放進入區間時跳到 end。
-              例如 start 為 600000、end 為 630000，會從 10:00 跳到 10:30。
-              片頭或片尾設為關閉時，片中區間仍會生效。有 end 的片尾跳到 end 繼續播放；片尾可在 start 大於 0 時省略 end，例如{" "}
-              <code>{'{"type":"ending","start":1200000}'}</code>
-              ，則依播放順序換集，沒有後續集數時跳到片尾。使用者手動設定的片頭或片尾會各自覆蓋來源區間；
-              設為 0 則關閉該側自動跳過。
-              缺少 skips 或其中有無效區間時，播放網址仍可正常使用。
-            </p>
             <h3>url 的多畫質寫法</h3>
             <p>
               單一 URL
@@ -432,8 +464,86 @@ export default function SpiderPage() {
               ；詳情的播放分組見下方集數格式。
             </p>
           </section>
+          <section id="skips">
+            <h2>片段跳過</h2>
+            <p>
+              在每集的 <code>playerContent</code> 回應頂層加入 <code>skips</code>：
+            </p>
+            <CodeBlock label="JSON / Result" path="playerContent">{`{
+  "parse": 0,
+  "url": "https://example.com/video.m3u8",
+  "skips": [
+    {"type": "opening", "start": 0, "end": 90000},
+    {"type": "middle", "start": 600000, "end": 630000},
+    {"type": "ending", "start": 1200000}
+  ]
+}`}</CodeBlock>
+            <p>
+              <code>opening</code> 為片頭、<code>middle</code> 為片中、<code>ending</code> 為片尾。
+              時間單位是毫秒；<code>start</code> 是開始跳過的時間，<code>end</code> 是要跳到的時間。
+              上例片中會從 10:00 跳到 10:30。
+            </p>
+            <p>
+              片頭與片中必填 end，且須晚於 start；片中可提供多段。
+              片尾可在 start 大於 0 時省略 end，表示換下一集，沒有下一集則跳到片尾。
+            </p>
+            <p>
+              使用者手動設定的片頭或片尾會優先套用；片中跳過不受影響。
+            </p>
+          </section>
+          <section id="web">
+            <h2>開網頁</h2>
+            <p>
+              卡片的 <code>action</code> 觸發後，在回應頂層提供 <code>web</code>。
+            </p>
+            <div className="schema-grid">
+              <article>
+                <h3>一般網頁</h3>
+                <CodeBlock label="JSON / Result" path="action">{`{
+  "web": {
+    "url": "https://example.com/"
+  }
+}`}</CodeBlock>
+              </article>
+              <article>
+                <h3>獨立內容視窗</h3>
+                <CodeBlock label="JSON / Result" path="action">{`{
+  "web": {
+    "url": "https://example.com/game",
+    "mode": "view"
+  }
+}`}</CodeBlock>
+              </article>
+            </div>
+            <p>
+              <code>url</code> 必填，只接受 HTTP 或 HTTPS。<code>mode</code> 省略或填{" "}
+              <code>browser</code> 為一般網頁，返回可退出全螢幕、回上一頁或關閉視窗。
+              <code>view</code> 為獨立內容視窗，返回直接關閉且不啟動外部 App；
+              網頁退出全螢幕時仍保持視窗開啟。view 不會自動全螢幕。
+            </p>
+            <h3>登入後自動關閉</h3>
+            <CodeBlock label="JSON / Result" path="action">{`{
+  "web": {
+    "url": "https://example.com/login",
+    "cookie": [
+      {"keys": ["sid", "token"]},
+      {"url": "https://login.example.com/", "keys": ["auth"]}
+    ]
+  }
+}`}</CodeBlock>
+            <p>
+              <code>cookie</code> 為選填陣列，每組 url 省略時使用開啟網址。同組 keys 必須全部非空，
+              不同組任一組完成即可；至少一個指定 Cookie 比開啟前改變，且目前頁面與該組的
+              scheme、host、port 相同，才自動關閉。此條件不代表站點已驗證帳號授權。
+            </p>
+          </section>
           <section id="objects">
             <h2>常用資料物件</h2>
+            <p>
+              演員或分類超連結使用 Java 的 <code>Json.link(name, target)</code>、
+              Python 的 <code>self.link(name, target)</code> 或 QuickJS 的 <code>link(name, target)</code>。
+              target 包含目標分類及篩選，可用 id、name、type_flag、filter。
+            </p>
             <div className="object-grid">
               {objectGroups.map((group) => (
                 <article key={group.name}>
@@ -500,8 +610,9 @@ export default function SpiderPage() {
               則直接轉接 HTTP 回應。
             </p>
             <p>
-              代理請求帶 <code>siteKey</code> 時會交給對應 Spider；JAR 模式沒有
-              siteKey 時，則找{" "}
+              使用 <code>getProxyUrl(params)</code> 產生網址，App 自動加入{" "}
+              <code>do</code>、<code>siteKey</code> 並編碼參數。JAR 模式沒有
+              siteKey 時會找{" "}
               <code>com.github.catvod.spider.Proxy.proxy(Map)</code> 靜態入口。
             </p>
           </section>

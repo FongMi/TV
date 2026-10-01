@@ -1,5 +1,5 @@
 import { configFieldGroups } from "./config-fields.ts";
-import { methods, objectGroups, resultFields } from "./spider-fields.ts";
+import { methods, networkMethods, objectGroups, resultFields } from "./spider-fields.ts";
 import { features } from "./feature-content.ts";
 import { playbackProperties } from "./playback-commands.ts";
 import {
@@ -23,14 +23,37 @@ const entries: Entry[] = [
     href: "/spider#start",
   },
   {
+    title: "三語言 Demo",
+    description: "Java、Python、JavaScript 範例",
+    href: "/spider#demo",
+    names: ["self.page", "page", "Result.page"],
+    keywords: "CatVodSpider examples/python/spider.py examples/javascript/spider.js Demo.java 分頁",
+  },
+  {
+    title: "爬蟲共用網路",
+    description: "Python、QuickJS、Java 的 HTTP、Cookie、TTL 快取、批次請求與下載",
+    href: "/spider#network",
+    names: networkMethods.flatMap(([name]) => name.split(" / ").map((method) => `net.${method}`)),
+    keywords: networkMethods.flat().join(" ") + " self.net stale persist",
+  },
+  {
     title: "Node.js 載入",
     description: "index.js.md5、bundle 與 HTTP 站點路由",
     href: "/spider#node",
   },
   {
-    title: "三語言 Demo",
-    description: "Java、Python、JavaScript 範例",
-    href: "/spider#demo",
+    title: "爬蟲 Local 設定",
+    description: "按站點隔離的 JSON 設定讀寫與刪除",
+    href: "/spider#network",
+    names: ["self.local", "local.get", "local.set", "local.delete"],
+    keywords: "Python QuickJS Java get set delete JSON 本地儲存",
+  },
+  {
+    title: "演員與分類超連結",
+    description: "用共用 link 格式連到分類與篩選",
+    href: "/spider#objects",
+    names: ["self.link", "link", "Json.link"],
+    keywords: "vod_actor 演員 id name type_flag filter",
   },
   {
     title: "完整配置範例",
@@ -50,6 +73,13 @@ const entries: Entry[] = [
     href: "/spider#skips",
     names: ["skips", "SkipSegment"],
     keywords: "opening middle ending start end 片頭片尾 片中跳過 自動 手動 關閉",
+  },
+  {
+    title: "開網頁與登入",
+    description: "action 回應的 web JSON、獨立視窗與多組 Cookie",
+    href: "/spider#web",
+    names: ["web", "action"],
+    keywords: "QuickJS Python Java JAR Node.js JSON url mode view browser keys cookie 登入 全螢幕 返回",
   },
   {
     title: "Result 回傳欄位",
