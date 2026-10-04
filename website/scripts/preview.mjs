@@ -2,7 +2,11 @@
 import { createServer } from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
-import { basePath } from "../app/site-config.ts";
+
+// Preview the path used by the build, regardless of the current SITE_URL.
+const { basePath } = JSON.parse(
+  await readFile(new URL("../.next/routes-manifest.json", import.meta.url), "utf8"),
+);
 
 const root = resolve("out");
 const types = {

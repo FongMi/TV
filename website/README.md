@@ -4,7 +4,7 @@
 
 ## 本機使用
 
-需要 Node.js 22.18+（22.x）或 Node.js 24+（預覽使用 Node 內建的 TypeScript 型別移除功能）。
+需要 Node.js 22.18+（22.x）或 Node.js 24+。
 
 ```sh
 cd website
@@ -20,7 +20,7 @@ npm run build
 npm start
 ```
 
-`npm run build` 會建置靜態網站並執行 TypeScript 型別檢查。`npm start` 只提供 `out/` 內的檔案，網址為 `http://localhost:3000/`；它不是正式部署所需的伺服器。請透過 HTTP 預覽，不要直接雙擊 HTML。
+`npm run build` 會建置靜態網站並執行 TypeScript 型別檢查。`npm start` 依 `.next/routes-manifest.json` 的建置路徑提供 `out/` 內的檔案，預設網址為 `http://localhost:3000/`；它不是正式部署所需的伺服器。請透過 HTTP 預覽，不要直接雙擊 HTML。
 
 不需要完整建置時，可選擇執行 `npm run typecheck` 快速檢查型別；此指令執行 `next typegen` 與 `tsc --noEmit`，不產生靜態網站輸出。
 
@@ -48,7 +48,7 @@ npm run build
 npm start
 ```
 
-預覽網址此時為 `http://localhost:3000/TV/`。`SITE_URL` 是建置時設定，預覽應使用與建置相同的值；更換網域或路徑需重新建置。完成後以 `Remove-Item Env:SITE_URL` 清除設定。
+預覽網址此時為 `http://localhost:3000/TV/`。`SITE_URL` 是建置時設定，`npm start` 會自動使用建置結果的路徑，不需要再次設定。更換網域或路徑需重新建置並重新啟動預覽。完成後以 `Remove-Item Env:SITE_URL` 清除設定。
 
 ## 維護位置
 
