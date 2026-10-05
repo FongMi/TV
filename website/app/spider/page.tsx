@@ -517,9 +517,9 @@ export default function SpiderPage() {
             </div>
             <p>
               <code>url</code> 必填，只接受 HTTP 或 HTTPS。<code>mode</code> 省略或填{" "}
-              <code>browser</code> 為一般網頁，返回可退出全螢幕、回上一頁或關閉視窗。
-              <code>view</code> 為獨立內容視窗，返回直接關閉且不啟動外部 App；
-              網頁退出全螢幕時仍保持視窗開啟。view 不會自動全螢幕。
+              <code>browser</code> 為一般網頁；<code>view</code> 為獨立內容視窗，
+              不啟動外部 App，也不會自動全螢幕。兩者返回都先退出全螢幕，
+              再依網頁歷史回上一頁；沒有歷史才關閉。
             </p>
             <h3>登入後自動關閉</h3>
             <CodeBlock label="JSON / Result" path="action">{`{
