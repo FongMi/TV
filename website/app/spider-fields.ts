@@ -10,7 +10,8 @@ export const networkMethods = [
   ["cached / peek / refresh", "TTL 快取；peek 只讀已有值，refresh 背景更新且遵守 TTL。"],
   ["clearCache", "清除一筆；省略 key 清除目前站點全部 TTL 快取並取消載入。"],
   ["download", "直接串流至檔案；下載失敗會拋出例外，部分檔案由呼叫者處理。"],
-  ["ws", "一次 WebSocket 訊息交換，取得首個完整文字訊息後關閉。"],
+  ["ws", "一次 WebSocket 訊息交換，取得首個完整訊息後關閉。"],
+  ["connect", "持續 WebSocket 連線，回呼接收連線與 open／message／error／close 事件。"],
   ["sleep", "可取消的等待，單位為毫秒。"],
 ];
 
