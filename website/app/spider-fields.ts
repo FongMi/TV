@@ -48,7 +48,7 @@ export const resultFields: Field[] = [
   {
     name: "web",
     type: "{url, mode?, cookie?: {url?, keys: string[]}[]}",
-    description: "action 回應的開網頁指令，只執行一次。url 限 HTTP(S)；mode 省略為普通網頁，view 為不啟動外部 App 的內容視窗。返回先退出全螢幕，再依網頁歷史回上一頁，沒有歷史才關閉。Cookie 同組全部需要、不同組任一組完成即可；需有新值且頁面同源。詳見開網頁的 JSON 格式說明。",
+    description: "action 回應的開網頁指令，只執行一次；詳見開網頁章節。",
   },
   {
     name: "class",

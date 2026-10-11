@@ -309,10 +309,12 @@ export default function SpiderPage() {
               Python／QuickJS 的 options 是物件，<code>net.json()</code> 結果為 JSON 值。
             </p>
             <p>
-              持續收訊使用 <code>net.connect(url, options, callback)</code>；回呼接收{" "}
+              <code>net.connect(url, options, callback)</code> 的回呼接收{" "}
               <code>(socket, event)</code>，事件為 open／message／error／close。
               訊息的 <code>content</code> 是文字，或 Python bytes／QuickJS Uint8Array／Java byte[]。
-              透過 <code>socket.send()</code> 發送，離開時呼叫 <code>close()</code>；
+              使用 <code>socket.send()</code> 發送訊息，<code>socket.close()</code> 關閉連線。
+            </p>
+            <p>
               站點或 Session 釋放時也會取消連線。<code>timeout</code> 只限制建立連線，
               <code>ping</code> 是協定 Ping 的毫秒間隔，平台訂閱與應用層心跳由爬蟲處理。
             </p>
