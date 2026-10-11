@@ -158,9 +158,9 @@ const entries: Entry[] = [
   },
   {
     title: "網頁播放遙控 /remote",
-    description: "影片封面、圖示遙控、切換項目與單集循環",
+    description: "影片封面、拖曳跳轉、圖示遙控、切換項目與單集循環",
     href: "/local#remote",
-    names: ["/remote", "/remote/artwork", "artwork", "repeat_on", "repeat_off", "repeatOne", "?tab=play"],
+    names: ["/remote", "/remote/artwork", "artwork", "repeat_on", "repeat_off", "repeatOne", "seek", "canSeek", "?tab=play"],
     keywords: localRemoteControls.flat().join(" ") + " " + localRemoteFields
       .map(({ name, description }) => `${name} ${description}`)
       .join(" "),

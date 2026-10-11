@@ -252,6 +252,9 @@ curl -G "http://127.0.0.1:9978/action" --data-urlencode "do=file" --data-urlenco
               上一集、播放／暫停、下一集及停止；直播改為上一台／下一台，並隱藏循環。
               封面缺失或載入失敗時顯示佔位圖，沒有播放時顯示簡短提示。
               循環圖示控制單集循環，開啟時顯示單曲循環圖示及選取底色。
+              進度列左側顯示已播放時間，右側顯示總時長；拖曳中間滑桿先預覽時間，
+              放手後才送出一次跳轉指令，鍵盤方向鍵每次調整五秒。
+              直播隱藏進度列，不能跳轉的影片停用滑桿。
               所有控制都跟隨播放器的實際狀態，從 App 修改也會在下次查詢時更新。
             </p>
             <p>
@@ -267,10 +270,11 @@ curl -G "http://127.0.0.1:9978/action" --data-urlencode "do=file" --data-urlenco
               <code>?tab=3</code>、<code>?tab=4</code>、<code>?tab=5</code>
               分別開啟彈幕、設定及本地頁。
             </p>
-            <CodeBlock label="HTTP" path="查詢與設定循環">
+            <CodeBlock label="HTTP" path="查詢、設定循環與跳轉">
               {`curl "http://127.0.0.1:9978/remote"
 curl --data-urlencode "type=repeat_on" "http://127.0.0.1:9978/remote"
-curl --data-urlencode "type=repeat_off" "http://127.0.0.1:9978/remote"`}
+curl --data-urlencode "type=repeat_off" "http://127.0.0.1:9978/remote"
+curl --data-urlencode "type=seek" --data-urlencode "position=120000" "http://127.0.0.1:9978/remote"`}
             </CodeBlock>
             <ReferenceTable
               label="網頁遙控指令"
@@ -290,6 +294,11 @@ curl --data-urlencode "type=repeat_off" "http://127.0.0.1:9978/remote"`}
               重複送出不會切回原狀；<code>/action?do=control&amp;type=repeat</code>
               仍是既有的循環切換指令。上一項、下一項及停止可能先派送至播放介面，
               客戶端應以後續 GET 回應確認結果。
+            </p>
+            <p>
+              <code>seek</code> 的 <code>position</code> 是非負整數毫秒，超過總長時跳到結尾；
+              缺少、格式錯誤或超過 64 位元整數範圍時回傳 400。
+              <code>canSeek</code> 為 false 時回傳 409；跳轉保留目前播放／暫停狀態。
             </p>
             <p>
               缺少或未知指令回傳 400，跨來源的瀏覽器控制請求回傳 403；

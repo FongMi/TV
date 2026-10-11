@@ -59,6 +59,7 @@ export const localRemoteControls = [
   ["next", "下一集／下一台；須支援切換項目。"],
   ["repeat_on", "開啟目前影片的單集循環；重複請求仍為開啟。"],
   ["repeat_off", "關閉單集循環；重複請求仍為關閉。"],
+  ["seek", "跳到 position 指定的毫秒位置；須支援跳轉，不改變播放／暫停狀態。"],
 ] as const;
 
 export const localRemoteFields: Field[] = [
@@ -111,6 +112,11 @@ export const localRemoteFields: Field[] = [
     name: "canNavigate",
     type: "boolean",
     description: "是否支援上一項／下一項。",
+  },
+  {
+    name: "canSeek",
+    type: "boolean",
+    description: "是否支援網頁跳轉；直播、未知長度或播放器不能跳轉時為 false。",
   },
   {
     name: "engine",
