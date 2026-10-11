@@ -4,6 +4,8 @@ import { features } from "./feature-content.ts";
 import { playbackProperties } from "./playback-commands.ts";
 import {
   localActions,
+  localRemoteControls,
+  localRemoteFields,
   localMediaFields,
   localDeviceFields,
 } from "./local-api.ts";
@@ -153,6 +155,22 @@ const entries: Entry[] = [
     description: "history、keep、Config 物件、targets、mode 與 force",
     href: "/local#sync",
     names: ["do=sync", "targets", "configs"],
+  },
+  {
+    title: "網頁播放遙控 /remote",
+    description: "影片封面、圖示遙控、切換項目與單集循環",
+    href: "/local#remote",
+    names: ["/remote", "/remote/artwork", "artwork", "repeat_on", "repeat_off", "repeatOne", "?tab=play"],
+    keywords: localRemoteControls.flat().join(" ") + " " + localRemoteFields
+      .map(({ name, description }) => `${name} ${description}`)
+      .join(" "),
+  },
+  {
+    title: "日誌與診斷分享",
+    description: "查看日誌、停止擷取、分享裝置資訊與播放狀態",
+    href: "/local#logs",
+    names: ["/logs.html", "/diagnostics"],
+    keywords: "應用日誌 logcat 分享診斷 裝置命名 別名 循環播放",
   },
   {
     title: "播放狀態 /media",

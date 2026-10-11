@@ -4,6 +4,8 @@ export const localSections = [
   ["connection", "連線與回應"],
   ["action", "動作指令"],
   ["sync", "裝置同步"],
+  ["remote", "網頁播放遙控"],
+  ["logs", "日誌與診斷分享"],
   ["media", "播放狀態"],
   ["device", "裝置資訊"],
   ["files", "檔案管理"],
@@ -48,6 +50,79 @@ export const localControls = [
   ["repeat", "切換循環模式"],
   ["replay", "重新播放"],
 ] as const;
+
+export const localRemoteControls = [
+  ["play", "播放；已播完時從頭播放。"],
+  ["pause", "暫停目前影片。"],
+  ["stop", "停止播放。"],
+  ["prev", "上一集／上一台；須支援切換項目。"],
+  ["next", "下一集／下一台；須支援切換項目。"],
+  ["repeat_on", "開啟目前影片的單集循環；重複請求仍為開啟。"],
+  ["repeat_off", "關閉單集循環；重複請求仍為關閉。"],
+] as const;
+
+export const localRemoteFields: Field[] = [
+  {
+    name: "active",
+    type: "boolean",
+    description: "是否有可遙控的本機播放；false 時不回傳其餘欄位。",
+  },
+  {
+    name: "title",
+    type: "string",
+    description: "目前影片的顯示標題。",
+  },
+  {
+    name: "artwork",
+    type: "string",
+    description: "目前影片的本機封面端點；沒有封面時為空字串，載入失敗時網頁顯示佔位圖。僅 /remote 回傳此欄位。",
+  },
+  {
+    name: "position",
+    type: "integer",
+    description: "目前播放位置，單位毫秒，最小為 0。",
+  },
+  {
+    name: "duration",
+    type: "integer",
+    description: "總長，單位毫秒；未知長度為 0。",
+  },
+  {
+    name: "state",
+    type: "integer",
+    description: "1＝播放結束；2＝就緒但未播放；3＝正在播放；6＝緩衝中。",
+  },
+  {
+    name: "playWhenReady",
+    type: "boolean",
+    description: "播放器是否設定為播放；影片已播完時為 false。",
+  },
+  {
+    name: "repeatOne",
+    type: "boolean",
+    description: "目前是否開啟單集循環，播完會重新播放同一部影片。",
+  },
+  {
+    name: "live",
+    type: "boolean",
+    description: "是否為直播；網頁隱藏循環開關，API 拒絕循環指令。",
+  },
+  {
+    name: "canNavigate",
+    type: "boolean",
+    description: "是否支援上一項／下一項。",
+  },
+  {
+    name: "engine",
+    type: "string",
+    description: "目前播放引擎，ExoPlayer 或 mpv。",
+  },
+  {
+    name: "video",
+    type: "string",
+    description: "播放器回報的視訊尺寸文字。",
+  },
+];
 
 export const localRefresh = [
   ["live", "—", "直播"],
