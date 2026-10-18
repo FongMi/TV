@@ -467,6 +467,14 @@ input::placeholder {
   gap: 4px;
   min-width: 0;
 }
+.docs-nav-toggle {
+  display: none;
+}
+.docs-nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
 .docs-nav b {
   padding: 0 14px 12px;
   color: var(--text);
@@ -956,6 +964,15 @@ footer {
   display: flex;
   align-items: center;
 }
+@media (min-width: 960px) and (min-height: 501px) {
+  .docs-nav {
+    max-height: calc(100dvh - 132px);
+    overflow-y: auto;
+  }
+  .docs-nav a:focus-visible {
+    outline-offset: -2px;
+  }
+}
 @media (max-width: 959px) {
   .wrap {
     width: min(100% - 48px, 800px);
@@ -988,15 +1005,40 @@ footer {
   }
   .docs-nav {
     position: static;
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 4px 8px;
+    display: block;
     padding-bottom: 20px;
     border-bottom: 1px solid var(--line);
   }
   .docs-nav b {
+    display: none;
+  }
+  .docs-nav-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
-    padding-left: 12px;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    background: var(--panel);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+  }
+  .docs-nav-toggle span {
+    color: var(--accent);
+  }
+  .docs-nav-links {
+    display: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    margin-top: 12px;
+  }
+  .docs-nav-links[data-expanded="true"] {
+    display: flex;
   }
   .docs-nav a {
     min-height: 40px;

@@ -6,19 +6,19 @@ import { features } from "../feature-content";
 export const metadata: Metadata = {
   title: "App 功能",
   description:
-    "影視TV 的電視與手機介面、搜尋、字幕、直播、投放與遠端控制功能。",
+    "影視TV 的電視與手機介面、Android Auto、獨立模組、爬蟲測試、遠端控制與檔案傳輸功能。",
 };
 
 export default function FeaturesPage() {
   return (
     <DocsLayout
       title="認識影視TV"
-      lead="影視TV 是一個可由使用者自行配置的 Android 影音應用程式，提供適合遙控器操作的電視版與觸控操作的手機版。App 本身不內建或提供任何內容來源。"
+      lead="為 Android 電視與手機設計，加入自己的來源即可開始使用。"
     >
       <div className="wrap feature-page">
         <section className="feature-grid">
-          {features.map(([title, meta, copy]) => (
-            <article key={title}>
+          {features.map(([title, meta, copy, id]) => (
+            <article key={title} id={id}>
               <h2>{title}</h2>
               <p className="feature-meta">{meta}</p>
               <p className="feature-copy">{copy}</p>
@@ -42,8 +42,7 @@ export default function FeaturesPage() {
             <p className="start-label">開始使用</p>
             <h2>第一次使用，從配置開始。</h2>
             <p>
-              加入自己的 VodConfig 或 LiveConfig，App
-              會依欄位載入站點、頻道、顯示樣式與網路行為。
+              加入點播或直播配置，載入自己的站點與頻道。
             </p>
           </div>
           <Link className="button primary" href="/config">

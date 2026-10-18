@@ -1,6 +1,6 @@
 # 影視TV 使用與開發指南
 
-六頁靜態文件站：首頁、爬蟲介接、配置字典、本地 API、App 功能及播放指令。Next.js 在建置時產生 HTML、CSS、JavaScript；正式網站不需要 Node.js、Worker、資料庫或 ChatGPT 登入。搜尋、篩選、語言切換與複製均在瀏覽器執行。
+六頁靜態文件站：首頁、爬蟲介接、配置字典、本地 API、App 功能及播放指令。Next.js 在建置時產生 HTML、CSS、JavaScript；正式網站不需要 Node.js、Worker、資料庫或 ChatGPT 登入。搜尋、篩選、三語言 Demo 切換與複製均在瀏覽器執行。
 
 ## 本機使用
 

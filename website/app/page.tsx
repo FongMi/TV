@@ -7,19 +7,19 @@ import { CodeBlock, Footer, Header } from "./ui";
 const tracks = [
   {
     title: "開發爬蟲",
-    copy: "從第一份 Demo 開始，了解 Java、Python、JavaScript 的載入方式與回傳資料。",
+    copy: "用 Java、Python 或 JavaScript 範例，開始開發。",
     href: "/spider",
     action: "爬蟲介接",
   },
   {
     title: "維護配置",
-    copy: "點播、直播、節目表與網路設定。欄位用途、預設值與可修改的配置範例。",
+    copy: "從範例設定點播、直播、節目表與網路。",
     href: "/config",
     action: "配置字典",
   },
   {
     title: "使用影視TV",
-    copy: "認識電視與手機介面，探索搜尋、播放、字幕、直播與個人記錄。",
+    copy: "了解搜尋、播放、字幕與個人記錄。",
     href: "/features",
     action: "App 功能",
   },
@@ -39,7 +39,7 @@ export default function Home() {
               從這裡開始。
             </h1>
             <p className="hero-lead">
-              給使用者的功能指南，也給開發者與配置維護者一份清楚、實用的技術文件。
+              認識功能、設定來源，開始開發自己的爬蟲。
             </p>
             <div className="hero-actions">
               <Link className="button primary" href="/config#examples">
@@ -78,8 +78,8 @@ export default function Home() {
         <section className="search-section wrap">
           <div>
             <p className="section-label">查找文件</p>
-            <h2>已經知道要找什麼？</h2>
-            <p>輸入 API、配置欄位或功能名稱，直接前往相關章節。</p>
+            <h2>快速找到需要的說明</h2>
+            <p>搜尋 API、配置欄位或 App 功能。</p>
           </div>
           <QuickSearch />
         </section>
@@ -88,9 +88,7 @@ export default function Home() {
             <p className="section-label">開發者起點</p>
             <h2>三種語言，共用一份資料格式。</h2>
             <p>
-              爬蟲負責取得資料，App
-              負責呈現。從分類、列表到播放資訊，依照對應方法回傳 Result
-              所需的欄位。
+              爬蟲取得資料，App 負責呈現。依 Result 格式回傳分類、列表與播放資訊。
             </p>
           </div>
           <CodeBlock label="JSON / Result" path="homeContent">{`{
@@ -112,8 +110,8 @@ export default function Home() {
         </section>
         <section className="source-strip wrap">
           <div>
-            <h2>內容，由你自行配置。</h2>
-            <p>影視TV 本身不內建或提供任何內容來源。</p>
+            <h2>加入自己的內容來源</h2>
+            <p>複製範例，替換成你的配置。</p>
           </div>
           <Link className="button" href="/config">
             查看配置指南 →

@@ -463,7 +463,11 @@ export const commonFields: Field[] = [
     type: "string",
     description: "DRM 請求位置或該類型接受的金鑰資料。",
   },
-  { name: "Drm.header", type: "object", description: "DRM 請求標頭。" },
+  {
+    name: "Drm.header",
+    type: "object | string",
+    description: "DRM 請求標頭，可用物件或 JSON 物件字串。",
+  },
   {
     name: "Drm.forceKey",
     type: "boolean",

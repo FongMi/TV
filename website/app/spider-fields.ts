@@ -8,8 +8,9 @@ export const networkMethods = [
   ["getCookie / setCookie", "讀寫 WebView Cookie；Session 使用隔離 Cookie。"],
   ["batch", "批次請求，預設每批最多 4 筆並行，按輸入順序回傳。"],
   ["cached / peek / refresh", "TTL 快取；peek 只讀已有值，refresh 背景更新且遵守 TTL。"],
+  ["cachedText", "Python 的 self.net.cachedText 直接取得快取的 JSON 原文；cached 則將原文解碼為 Python 值。"],
   ["clearCache", "清除一筆；省略 key 清除目前站點全部 TTL 快取並取消載入。"],
-  ["download", "直接串流至檔案；下載失敗會拋出例外，部分檔案由呼叫者處理。"],
+  ["download", "共用下載器管理串流、續傳暫存與落檔；是否能續傳或並行依來源與請求條件而定，下載失敗會拋出例外。"],
   ["ws", "一次 WebSocket 訊息交換，取得首個完整訊息後關閉。"],
   ["connect", "持續 WebSocket 連線，回呼接收連線與 open／message／error／close 事件。"],
   ["sleep", "可取消的等待，單位為毫秒。"],
@@ -41,7 +42,7 @@ export const methods = [
     "陣列 / HTTP 回應",
   ],
   ["action", "自訂操作", "可由 Result 解析的結果", "Java JSON 字串 / Python、JS 物件"],
-  ["destroy", "重新載入或清除", "釋放執行緒、連線、引擎資源", "無"],
+  ["destroy", "重新載入或清除", "釋放執行緒與連線；QuickJS 清理 hook 最長 5 秒", "無"],
 ];
 
 export const resultFields: Field[] = [

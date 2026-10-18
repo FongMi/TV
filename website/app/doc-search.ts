@@ -8,6 +8,7 @@ import {
   localRemoteFields,
   localMediaFields,
   localDeviceFields,
+  localTransferEndpoints,
 } from "./local-api.ts";
 
 type Entry = {
@@ -23,25 +24,48 @@ const entries: Entry[] = [
     title: "爬蟲載入方式",
     description: "Java JAR、Python、QuickJS 的 api 寫法",
     href: "/spider#start",
+    names: ["catvod-api.jar", ":apiJar", "compileOnly"],
+    keywords: "SDK 執行接口",
   },
   {
     title: "三語言 Demo",
     description: "Java、Python、JavaScript 範例",
     href: "/spider#demo",
-    names: ["self.page", "page", "Result.page"],
+    names: ["JSONObject", "JSONArray", "self.page", "page", "Response", "Response.page", "com.github.catvod.bean"],
     keywords: "CatVodSpider examples/python/spider.py examples/javascript/spider.js Demo.java 分頁",
   },
   {
     title: "爬蟲共用網路",
     description: "Python、QuickJS、Java 的 HTTP、Cookie、TTL 快取、批次請求與下載",
     href: "/spider#network",
-    names: networkMethods.flatMap(([name]) => name.split(" / ").map((method) => `net.${method}`)),
+    names: networkMethods.flatMap(([name]) => name.split(" / ").map((method) => `net.${method}`)).concat("self.net.cachedText"),
     keywords: networkMethods.flat().join(" ") + " self.net stale persist",
   },
   {
     title: "Node.js 載入",
     description: "index.js.md5、bundle 與 HTTP 站點路由",
     href: "/spider#node",
+  },
+  {
+    title: "安裝爬蟲執行模組",
+    description: "Python、QuickJS-NG、Node.js 獨立 runtime APK 的安裝、更新與測試",
+    href: "/spider#modules",
+    names: ["runtime APK", "QuickJS-NG", "模組安裝"],
+    keywords: "模組 缺少 不相容 ABI 重新啟動 Thunder mpv BD-J",
+  },
+  {
+    title: "爬蟲編輯與測試",
+    description: "載入 Python、QuickJS 或 Java JAR，儲存、格式化、重測與版本還原",
+    href: "/spider#testing",
+    names: ["/spider.html", "爬蟲測試", "格式化", "重測"],
+    keywords: "ext JSON 參數 方法 網路紀錄 上傳 來源 版本 播放結果 Java 編譯",
+  },
+  {
+    title: "Runtime 與 Android UI",
+    description: "Java、Python 的 Context、Activity 與 Toast 接口",
+    href: "/spider#runtime",
+    names: ["com.github.catvod.Runtime", "Runtime.context", "Runtime.activity", "Runtime.toast", "getActivity", "self.getActivity"],
+    keywords: "Application Context Activity Toast Dialog 主執行緒 jclass com.github.catvod.spider.Init",
   },
   {
     title: "爬蟲 Local 設定",
@@ -158,19 +182,47 @@ const entries: Entry[] = [
   },
   {
     title: "網頁播放遙控 /remote",
-    description: "影片封面、拖曳跳轉、圖示遙控、切換項目與單集循環",
+    description: "影片封面、拖曳跳轉、倍速、切換項目與單集循環",
     href: "/local#remote",
-    names: ["/remote", "/remote/artwork", "artwork", "repeat_on", "repeat_off", "repeatOne", "seek", "canSeek", "?tab=play"],
+    names: ["/remote", "/remote/artwork", "artwork", "repeat_on", "repeat_off", "repeatOne", "seek", "canSeek", "canSetSpeed", "speed", "?tab=play"],
     keywords: localRemoteControls.flat().join(" ") + " " + localRemoteFields
       .map(({ name, description }) => `${name} ${description}`)
       .join(" "),
   },
   {
-    title: "日誌與診斷分享",
-    description: "查看日誌、停止擷取、分享裝置資訊與播放狀態",
+    title: "網頁分頁網址",
+    description: "搜尋、推送、播放、字幕、彈幕、設定及檔案的語意網址",
+    href: "/local#navigation",
+    names: ["?tab=search", "?tab=push", "?tab=subtitles", "?tab=danmaku", "?tab=settings", "?tab=files"],
+    keywords: "QR Code 數字分頁 path 目錄 返回",
+  },
+  {
+    title: "獨立遙控器與按鍵 API",
+    description: "方向、確認、返回、選單、數字鍵與長按",
+    href: "/local#remote-keys",
+    names: ["/remote.html", "/remote/key", "數字鍵", "長按", "holding"],
+    keywords: "up down left right ok back menu 前景 焦點 遙控器 action press repeat cancel id",
+  },
+  {
+    title: "字幕上傳與彈幕套用",
+    description: "用目前 mediaKey 套用裝置字幕檔、彈幕檔或彈幕網址",
+    href: "/local#remote-media",
+    names: ["/remote/subtitle", "/remote/danmaku", "mediaKey"],
+    keywords: "SRT SSA ASS XML 字幕上傳 409 換片 key path",
+  },
+  {
+    title: "網頁裝置資訊",
+    description: "點連線狀態查看版本、裝置、Android、SDK 與 ABI",
+    href: "/local#remote-info",
+    names: ["/remote/info", "連線狀態"],
+    keywords: "variant buildType versionCode 離線 裝置資訊",
+  },
+  {
+    title: "日誌下載與分享",
+    description: "下載或分享日誌，含裝置資訊與完整播放網址",
     href: "/local#logs",
-    names: ["/logs.html", "/diagnostics"],
-    keywords: "應用日誌 logcat 分享診斷 裝置命名 別名 循環播放",
+    names: ["/logs.html", "/log/info", "playback.url", "collection", "playbackLog", "lastPlaybackError", "下載日誌", "分享日誌", "日誌資訊 API", "取得日誌資訊", "重新讀取資訊"],
+    keywords: "應用日誌 logcat 日誌資訊 日誌文字檔 512 KiB query 參數 匯出時間 狀態取樣時間 日誌筆數 缺漏 裝置命名 別名 循環播放",
   },
   {
     title: "播放狀態 /media",
@@ -192,9 +244,17 @@ const entries: Entry[] = [
   },
   {
     title: "本地檔案與上傳",
-    description: "/file /upload /newFolder /delFile /delFolder、Range 與 ETag",
+    description: "瀏覽、上傳、新建、重新命名、搬移與刪除；Range 與 ETag",
     href: "/local#files",
-    names: ["/file", "/upload", "/newFolder", "/delFile", "/delFolder"],
+    names: ["/file", "/upload", "/newFolder", "/rename", "/move", "/delFile", "/delFolder"],
+    keywords: "重新命名 搬移 批次操作",
+  },
+  {
+    title: "分塊續傳與裝置下載",
+    description: "SHA-256 分塊上傳，與 App 裝置端下載的暫停、繼續及任務狀態",
+    href: "/local#transfers",
+    names: [...localTransferEndpoints.map(([path]) => path), "續傳", "裝置下載", "sha256", "revision"],
+    keywords: localTransferEndpoints.flat().join(" ") + " chunkSize chunks threads offset completed failed speed",
   },
   {
     title: "本地快取 /cache",
@@ -236,10 +296,10 @@ const entries: Entry[] = [
     names: [property.name, ...property.modes.map((mode) => `${mode} ${property.name}`)],
     keywords: property.values,
   })),
-  ...features.map(([title, meta, copy]) => ({
+  ...features.map(([title, meta, copy, id]) => ({
     title,
     description: meta,
-    href: "/features",
+    href: id ? `/features#${id}` : "/features",
     keywords: copy,
   })),
 ];

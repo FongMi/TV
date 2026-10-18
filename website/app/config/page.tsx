@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { FieldTable } from "../FieldTable";
+import { DocsNav } from "../DocsNav";
 import {
   vodTop,
   siteFields,
@@ -216,35 +218,32 @@ format=hls
 export default function ConfigPage() {
   return (
     <DocsLayout
-      title="配置指南與欄位字典"
-      lead="配置載入由 BaseConfig 統一處理；VodConfig 管理站點與解析器，LiveConfig 管理直播清單與頻道。以下依目前本地程式碼整理，並區分完整配置與物件片段。"
+      title="配置字典"
+      lead="從範例設定點播與直播，再查閱欄位用途、預設值與格式。"
     >
       <div className="docs-layout wrap">
-        <aside className="docs-nav">
-          <b>本頁導覽</b>
-          <a href="#examples">完整範例</a>
-          <a href="#vod">Vod 頂層</a>
-          <a href="#site">Site</a>
-          <a href="#parse">Parse</a>
-          <a href="#live">Live</a>
-          <a href="#channel">Group / Channel</a>
-          <a href="#formats">直播格式</a>
-          <a href="#core">Core</a>
-          <a href="#common">共用物件</a>
-        </aside>
+        <DocsNav items={[
+          ["examples", "完整範例"],
+          ["vod", "Vod 頂層"],
+          ["site", "Site"],
+          ["parse", "Parse"],
+          ["live", "Live"],
+          ["channel", "Group / Channel"],
+          ["formats", "直播格式"],
+          ["core", "Core"],
+          ["common", "共用物件"],
+        ]} />
         <div className="docs-content">
           <section id="examples">
-            <h2>先從可直接修改的配置開始</h2>
+            <h2>複製配置範例</h2>
             <p>
-              先選擇點播或直播的完整配置，再替換名稱、路徑與需要的欄位。後續各節另有標明層級的物件片段，需放入對應欄位。
+              選擇點播或直播範例，換成自己的名稱與網址。標示為「物件片段」的範例，需放入對應欄位。
             </p>
             <div className="callout">
-              <b>範例位置說明</b>
+              <b>範例路徑</b>
               <span>
-                主配置中的 <code>./</code> 與 <code>../</code>{" "}
-                會以該配置檔的位置展開；外部陣列檔或直播列表內的路徑不會再次展開，請使用完整網址。
-                <code>example.com</code> 與保留測試 IP
-                只用來展示結構，並不是可用來源。
+                主配置的 <code>./</code> 與 <code>../</code> 以配置檔位置為基準；
+                外部陣列與直播列表內請用完整網址。<code>example.com</code> 與測試 IP 僅供示意。
               </span>
             </div>
             <div className="schema-grid">
@@ -273,9 +272,8 @@ export default function ConfigPage() {
           <section id="vod">
             <h2>VodConfig 頂層欄位</h2>
             <p>
-              主要配置入口。只有 <code>headers</code>、<code>proxy</code>、
-              <code>rules</code>、<code>doh</code> 等經過 fetchArray
-              的欄位，才支援物件陣列、外部位置或兩者混用。
+              <code>headers</code>、<code>proxy</code>、<code>rules</code> 與 <code>doh</code>
+              支援物件陣列、外部 JSON 陣列網址，或兩者混用。
             </p>
             <FieldTable fields={vodTop} label="VodConfig" />
             <div className="schema-grid">
@@ -327,6 +325,13 @@ export default function ConfigPage() {
               改用 Python 時只需把 <code>api</code> 換成 <code>./demo.py</code>
               ；Java 類別則填 <code>csp_Demo</code>。相對路徑也適用於{" "}
               <code>ext</code> 與 <code>jar</code>。
+            </p>
+            <p>
+              Python、QuickJS 與 Node.js 需先完成{" "}
+              <Link className="inline-link" href="/spider#modules">模組安裝</Link>
+              ，再用{" "}
+              <Link className="inline-link" href="/spider#testing">爬蟲測試頁</Link>
+              檢查回傳結果。
             </p>
           </section>
           <section id="parse">

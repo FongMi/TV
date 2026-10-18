@@ -19,10 +19,10 @@ const description = "影視TV 的爬蟲介接、配置字典與 App 功能指南
 
 export const metadata: Metadata = {
   metadataBase: siteUrl,
-  title: { default: "影視TV Developer Hub", template: "%s · 影視TV" },
+  title: { default: "影視TV 使用與開發指南", template: "%s · 影視TV" },
   description,
   openGraph: {
-    title: "影視TV Developer Hub",
+    title: "影視TV 使用與開發指南",
     description,
     type: "website",
     images: [
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "影視TV Developer Hub",
+    title: "影視TV 使用與開發指南",
     description,
     images: [previewUrl],
   },

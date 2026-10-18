@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { CodeBlock, DocsLayout } from "../ui";
 import { CopyButton } from "../CopyButton";
+import { DocsNav } from "../DocsNav";
 import {
   playbackSections,
   playbackProperties,
@@ -17,18 +18,11 @@ export const metadata: Metadata = {
 export default function CommandsPage() {
   return (
     <DocsLayout
-      title="Exo 播放指令"
+      title="播放指令"
       lead="複製指令，存成播放按鈕。Exo 與 mpv 都能使用。"
     >
       <div className="docs-layout wrap">
-        <aside className="docs-nav">
-          <b>本頁導覽</b>
-          {playbackSections.map(([id, title]) => (
-            <a href={`#${id}`} key={id}>
-              {title}
-            </a>
-          ))}
-        </aside>
+        <DocsNav items={playbackSections} />
         <div className="docs-content">
           <section id="start">
             <h2>新增指令按鈕</h2>
