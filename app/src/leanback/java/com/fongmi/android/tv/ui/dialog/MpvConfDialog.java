@@ -11,9 +11,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogMpvConfBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.player.mpv.MpvConfigFile;
-import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.QRCode;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -41,11 +39,11 @@ public class MpvConfDialog extends BaseAlertDialog {
     @Override
     protected void initView() {
         setText(MpvConfigFile.read());
-        binding.code.setImageBitmap(QRCode.getBitmap(Server.get().getAddress(4), 200, 0));
     }
 
     @Override
     protected void initEvent() {
+        binding.phone.setOnClickListener(view -> LocalConnectDialog.show(requireActivity(), "settings"));
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {

@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:padding="24dp">
 
-    <com.google.android.material.textfield.TextInputEditText
+    <com.fongmi.android.tv.ui.custom.CustomEditText
         android:id="@+id/pass"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -17,6 +17,7 @@
         android:imeOptions="actionDone"
         android:inputType="textPassword"
         android:maxLength="20"
+        android:nextFocusRight="@id/positive"
         android:singleLine="true"
         android:textSize="16sp" />
 

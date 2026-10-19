@@ -1,44 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="24dp">
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/code"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:scaleType="centerCrop" />
 
     <com.fongmi.android.tv.ui.custom.CustomEditText
         android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_toEndOf="@+id/code"
-        android:fontFamily="monospace"
-        android:gravity="top|start"
+        android:layout_marginBottom="16dp"
         android:hint="@string/player_mpv_conf"
         android:imeOptions="actionDone"
         android:importantForAutofill="no"
+        android:nextFocusDown="@id/positive"
         android:inputType="textMultiLine|textNoSuggestions"
-        android:maxLines="5"
         android:minLines="5"
+        android:maxLines="5"
+        android:fontFamily="monospace"
+        android:gravity="top|start"
         android:textSize="18sp" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/text"
-        android:layout_alignBottom="@+id/code"
         android:orientation="horizontal">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/phone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:background="@drawable/selector_button"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/phone_input"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/positive"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             android:layout_weight="1"
             android:background="@drawable/selector_button"
             android:focusable="true"
@@ -64,4 +71,4 @@
             android:textSize="14sp" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
-</RelativeLayout>
+</androidx.appcompat.widget.LinearLayoutCompat>

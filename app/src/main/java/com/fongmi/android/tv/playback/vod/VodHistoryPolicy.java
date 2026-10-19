@@ -11,7 +11,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.setting.Setting;
-import com.fongmi.android.tv.utils.Task;
+import com.github.catvod.utils.Task;
 
 public class VodHistoryPolicy {
 
@@ -20,6 +20,7 @@ public class VodHistoryPolicy {
         history = history == null ? create(key, item) : history;
         if (!TextUtils.isEmpty(mark)) history.setVodRemarks(mark);
         if (Setting.isIncognito()) history.delete();
+        item.checkName(history.getVodName());
         history.setVodName(item.getName());
         return history;
     }
@@ -63,10 +64,27 @@ public class VodHistoryPolicy {
         });
     }
 
+    public void saveDiscVisit(History history, boolean exit, long time) {
+        if (history == null || Setting.isIncognito()) return;
+        history.setCreateTime(time);
+        History copy = copyForSave(history);
+        Task.executeSerial(() -> {
+            copy.save();
+            if (exit) RefreshEvent.history();
+        });
+    }
+
     public void saveCurrent(History history) {
+        saveCurrent(history, false);
+    }
+
+    public void saveCurrent(History history, boolean refresh) {
         if (history == null || Setting.isIncognito()) return;
         History copy = copyForSave(history);
-        Task.executeSerial(copy::save);
+        Task.executeSerial(() -> {
+            copy.save();
+            if (refresh) RefreshEvent.history();
+        });
     }
 
     public void updateEpisode(History history, Flag flag, Episode episode) {
@@ -80,6 +98,7 @@ public class VodHistoryPolicy {
     }
 
     public void updateProgress(History history, long time, long position, long duration) {
+        if (position < 0 || duration <= 0) return;
         applyProgress(history, time, position, duration);
         if (history != null && history.canSave() && history.canScheduleSave()) saveCurrent(history);
     }
@@ -94,9 +113,5 @@ public class VodHistoryPolicy {
     private History copyForSave(History history) {
         history.markSaveScheduled();
         return history.copy();
-    }
-
-    public long startPositionMs(History history) {
-        return history == null ? C.TIME_UNSET : Math.max(history.getOpening(), history.getPosition());
     }
 }

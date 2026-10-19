@@ -14,22 +14,6 @@ public class DecodeSetting {
         Prefers.put("decode_audio_pass_through", audioPassThrough);
     }
 
-    public static boolean isAudioPrefer() {
-        return Prefers.getBoolean("decode_audio_prefer", Prefers.getBoolean("audio_prefer"));
-    }
-
-    public static void putAudioPrefer(boolean audioPrefer) {
-        Prefers.put("decode_audio_prefer", audioPrefer);
-    }
-
-    public static boolean isVideoPrefer() {
-        return Prefers.getBoolean("decode_video_prefer", Prefers.getBoolean("video_prefer"));
-    }
-
-    public static void putVideoPrefer(boolean videoPrefer) {
-        Prefers.put("decode_video_prefer", videoPrefer);
-    }
-
     public static @DolbyVisionOutputPolicy.Mode int getDolbyVisionOutputPolicy() {
         int mode = Prefers.getInt("decode_dolby_vision_output_policy", DolbyVisionOutputPolicy.AUTO);
         return mode >= DolbyVisionOutputPolicy.AUTO && mode <= DolbyVisionOutputPolicy.ASSUME_UNSUPPORTED ? mode : DolbyVisionOutputPolicy.AUTO;

@@ -6,7 +6,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.SiteApi;
 import com.fongmi.android.tv.bean.Result;
-import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.playback.PlaybackResult;
 import com.fongmi.android.tv.playback.vod.VodDataSource;
 import com.fongmi.android.tv.playback.vod.VodDetailResult;
@@ -14,6 +13,7 @@ import com.fongmi.android.tv.playback.vod.VodPlayRequest;
 import com.fongmi.android.tv.playback.vod.VodPlaybackController;
 import com.fongmi.android.tv.playback.vod.VodPlaybackHost;
 import com.fongmi.android.tv.playback.vod.VodPlaybackState;
+import com.fongmi.android.tv.utils.Notify;
 
 public class VideoViewModel extends SiteViewModel implements VodDataSource {
 
@@ -49,10 +49,15 @@ public class VideoViewModel extends SiteViewModel implements VodDataSource {
 
     @Override
     public void detailContent(String key, String id) {
+        detailContent(key, id, false);
+    }
+
+    @Override
+    public void detailContent(String key, String id, boolean builtin) {
         requestTasks.execute(
                 TaskType.DETAIL,
                 Constant.TIMEOUT_VOD,
-                () -> new VodDetailResult(key, id, SiteApi.detailContent(key, id)),
+                () -> new VodDetailResult(key, id, SiteApi.detailContent(key, id, builtin)),
                 detail::postValue,
                 error -> detail.postValue(new VodDetailResult(key, id, handleError(error))));
     }
@@ -67,18 +72,37 @@ public class VideoViewModel extends SiteViewModel implements VodDataSource {
         loadPlayback(request, TaskType.PRELOAD, preload);
     }
 
+    @Override
+    public void cancelPreloadContent() {
+        requestTasks.cancel(TaskType.PRELOAD);
+    }
+
+    @Override
+    public void cancelContent() {
+        for (TaskType type : TaskType.values()) requestTasks.cancel(type);
+        stopSearch();
+    }
+
     private void loadPlayback(VodPlayRequest request, TaskType type, MutableLiveData<PlaybackResult<VodPlayRequest>> output) {
         requestTasks.execute(
                 type,
                 Constant.TIMEOUT_VOD,
-                () -> new PlaybackResult<>(request, SiteApi.playerContent(request.getKey(), request.getFlag(), request.getId())),
+                () -> getPlaybackResult(request, type),
                 output::postValue,
                 error -> output.postValue(new PlaybackResult<>(request, handleError(error))));
     }
 
+    private PlaybackResult<VodPlayRequest> getPlaybackResult(VodPlayRequest request, TaskType type) throws Exception {
+        Result result = type == TaskType.PRELOAD
+                ? SiteApi.preloadContent(request.getKey(), request.getFlag(), request.getId(), request.isBuiltin())
+                : SiteApi.playerContent(request.getKey(), request.getFlag(), request.getId(), request.isBuiltin(), request.getQualityPosition());
+        return new PlaybackResult<>(request, result);
+    }
+
     private Result handleError(Throwable error) {
         error.printStackTrace();
-        return error instanceof ExtractException ? Result.error(error.getMessage()) : Result.empty();
+        String message = Notify.getError(error);
+        return message != null ? Result.error(message) : Result.empty();
     }
 
     @Override

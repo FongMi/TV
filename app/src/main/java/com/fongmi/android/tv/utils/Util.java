@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.utils;
 
+import static com.github.catvod.utils.Util.substring;
+
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
@@ -159,15 +161,6 @@ public class Util {
         String model = Build.MODEL;
         String manufacturer = Build.MANUFACTURER;
         return model.startsWith(manufacturer) ? model : manufacturer + " " + model;
-    }
-
-    public static String substring(String text) {
-        return substring(text, 1);
-    }
-
-    public static String substring(String text, int num) {
-        if (text != null && text.length() > num) return text.substring(0, text.length() - num);
-        return text;
     }
 
     public static boolean isLeanback() {

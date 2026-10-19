@@ -12,6 +12,7 @@ import androidx.media3.ui.SubtitleView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.github.catvod.utils.Prefers;
 
@@ -25,8 +26,10 @@ public class SubtitleSetting {
     public static final int SECONDARY_MODE_AUTO = -1;
     public static final float MIN_SCALE = 0.5f;
     public static final float MAX_SCALE = 2.0f;
-    public static final float MIN_POSITION = -20.0f;
-    public static final float MAX_POSITION = 30.0f;
+    public static final float MIN_BITMAP_BRIGHTNESS = 0.5f;
+    public static final float MAX_BITMAP_BRIGHTNESS = 2.0f;
+    public static final float MIN_POSITION = -100.0f;
+    public static final float MAX_POSITION = 100.0f;
     public static final float MIN_OPACITY = 0.0f;
     public static final float MAX_OPACITY = 1.0f;
     public static final float MIN_EDGE_WIDTH = 0.0f;
@@ -34,7 +37,7 @@ public class SubtitleSetting {
     public static final float MIN_SHADOW = 0.0f;
     public static final float MAX_SHADOW = 8.0f;
     public static final float MIN_SECONDARY_POSITION = 0.0f;
-    public static final float MAX_SECONDARY_POSITION = 150.0f;
+    public static final float MAX_SECONDARY_POSITION = 200.0f;
     public static final int SUBTITLE_COLOR_WHITE = Color.WHITE;
     public static final int SUBTITLE_COLOR_YELLOW = 0xFFFFFF00;
     public static final int SUBTITLE_COLOR_CYAN = 0xFF00E5FF;
@@ -53,6 +56,7 @@ public class SubtitleSetting {
     private static final int DEFAULT_EDGE_TYPE = CaptionStyleCompat.EDGE_TYPE_OUTLINE;
     private static final int DEFAULT_EDGE_COLOR = SUBTITLE_COLOR_BLACK;
     private static final float DEFAULT_SCALE = 1.0f;
+    private static final float DEFAULT_BITMAP_BRIGHTNESS = 1.0f;
     private static final float DEFAULT_POSITION = 0.0f;
     private static final float DEFAULT_TEXT_OPACITY = 1.0f;
     private static final float DEFAULT_EDGE_OPACITY = 1.0f;
@@ -112,6 +116,18 @@ public class SubtitleSetting {
 
     public static void putScale(float value) {
         Prefers.put("subtitle_scale", Math.clamp(value, MIN_SCALE, MAX_SCALE));
+    }
+
+    public static float getBitmapBrightness() {
+        return clampBitmapBrightness(Prefers.getFloat("subtitle_bitmap_brightness", DEFAULT_BITMAP_BRIGHTNESS));
+    }
+
+    public static void putBitmapBrightness(float value) {
+        Prefers.put("subtitle_bitmap_brightness", clampBitmapBrightness(value));
+    }
+
+    private static float clampBitmapBrightness(float value) {
+        return Float.isFinite(value) ? Math.clamp(value, MIN_BITMAP_BRIGHTNESS, MAX_BITMAP_BRIGHTNESS) : DEFAULT_BITMAP_BRIGHTNESS;
     }
 
     public static float getPosition() {
@@ -226,11 +242,11 @@ public class SubtitleSetting {
 
     @Nullable
     public static ExternalFont.Item getFont() {
-        return ExternalFont.find(Prefers.getString("subtitle_font", ""));
+        return ExternalFont.find(Prefers.getString("subtitle_font", ""), MpvConfigFile.getSubtitleFontsDirectory());
     }
 
     public static void putFont(@Nullable ExternalFont.Item font) {
-        Prefers.put("subtitle_font", font == null ? "" : font.fileName());
+        Prefers.put("subtitle_font", font == null ? "" : font.storageKey());
     }
 
     @Nullable
@@ -272,10 +288,6 @@ public class SubtitleSetting {
         return getPosition() != DEFAULT_POSITION;
     }
 
-    public static boolean isSecondaryPositionSet() {
-        return getSecondaryPosition() != DEFAULT_SECONDARY_POSITION;
-    }
-
     public static CaptionStyleCompat getStyle() {
         return withTypeface(getBaseStyle(), getTypeface());
     }
@@ -314,13 +326,16 @@ public class SubtitleSetting {
         subtitleView.setStyle(getStyle());
         subtitleView.setApplyEmbeddedStyles(!isStyleForced());
         subtitleView.setApplyEmbeddedFontSizes(true);
+        subtitleView.setBitmapSubtitleBrightness(getBitmapBrightness());
         if (isScaleApplied()) subtitleView.setTextSizeScale(getAppliedScale());
         if (isPositionSet()) subtitleView.setBottomPosition(getPosition() / 100.0f);
     }
 
     public static void resetAdjust() {
         Prefers.put("subtitle_scale", DEFAULT_SCALE);
+        Prefers.put("subtitle_bitmap_brightness", DEFAULT_BITMAP_BRIGHTNESS);
         Prefers.put("subtitle_position", DEFAULT_POSITION);
+        Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 
     public static void resetStyle() {
@@ -339,7 +354,6 @@ public class SubtitleSetting {
 
     public static void resetAdvanced() {
         Prefers.put("subtitle_secondary_track", DEFAULT_SECONDARY_MODE);
-        Prefers.put("subtitle_secondary_position", DEFAULT_SECONDARY_POSITION);
     }
 
     public static void reset() {

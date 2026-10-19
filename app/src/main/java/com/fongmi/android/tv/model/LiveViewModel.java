@@ -11,13 +11,13 @@ import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Result;
-import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.playback.PlaybackResult;
 import com.fongmi.android.tv.playback.live.LiveDataSource;
 import com.fongmi.android.tv.playback.live.LivePlayRequest;
 import com.fongmi.android.tv.playback.live.LivePlaybackController;
 import com.fongmi.android.tv.playback.live.LivePlaybackHost;
 import com.fongmi.android.tv.playback.live.LivePlaybackState;
+import com.fongmi.android.tv.utils.Notify;
 
 import java.time.ZoneId;
 import java.util.concurrent.Callable;
@@ -98,6 +98,11 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
         execute(TaskType.URL, () -> getUrlResult(request), result -> postUrl(request, result), error -> handleUrlError(request, error));
     }
 
+    @Override
+    public void cancelUrl() {
+        tasks.cancel(TaskType.URL);
+    }
+
     private Result getUrlResult(LivePlayRequest request) throws Exception {
         return request.isCatchup() ? LiveApi.getUrl(request.getChannel(), request.getCatchupData()) : LiveApi.getUrl(request.getChannel());
     }
@@ -108,12 +113,14 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
     }
 
     private void handleParseError(Throwable t) {
-        if (t instanceof ExtractException) error.postValue(t.getMessage());
+        String message = Notify.getError(t);
+        if (message != null) error.postValue(message);
         else live.postValue(new Live());
     }
 
     private void handleUrlError(LivePlayRequest request, Throwable t) {
-        if (t instanceof ExtractException) postUrl(request, Result.error(t.getMessage()));
+        String message = Notify.getError(t);
+        if (message != null) postUrl(request, Result.error(message));
         else postUrl(request, new Result());
     }
 

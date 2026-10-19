@@ -28,7 +28,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
     private FragmentSettingPlayerBinding mBinding;
     private String[] background;
     private String[] render;
-    private String[] scale;
     private String[] engine;
 
     public static SettingPlayerFragment newInstance() {
@@ -49,7 +48,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
         mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
         mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
-        mBinding.scaleText.setText((scale = ResUtil.getStringArray(R.array.select_scale))[PlayerSetting.getScale()]);
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[PlayerSetting.getBackground()]);
     }
 
@@ -63,7 +61,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
         mBinding.render.setOnClickListener(this::setRender);
-        mBinding.scale.setOnClickListener(this::onScale);
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.preload.setOnClickListener(this::onPreload);
@@ -76,13 +73,13 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
-        mBinding.adblock.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.libass.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
     private void setEngine(View view) {
         int index = (PlayerSetting.getEngine() + 1) % engine.length;
+        if (index == PlayerSetting.ENGINE_MPV && !MpvUtil.checkInstalled()) return;
         PlayerSetting.putEngine(index);
         setPlaybackModeText();
         setVisible();
@@ -113,14 +110,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         render = ResUtil.getStringArray(R.array.select_render);
         mBinding.engineText.setText(engine[PlayerSetting.getEngine()]);
         mBinding.renderText.setText(render[PlayerSetting.getRender()]);
-    }
-
-    private void onScale(View view) {
-        new MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.player_scale).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(scale, PlayerSetting.getScale(), (dialog, which) -> {
-            mBinding.scaleText.setText(scale[which]);
-            PlayerSetting.putScale(which);
-            dialog.dismiss();
-        }).show();
     }
 
     private void onBuffer(View view) {

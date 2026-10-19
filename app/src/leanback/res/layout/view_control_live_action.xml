@@ -26,7 +26,7 @@
             tools:text="首頁" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/action"
+            android:id="@+id/playPause"
             style="@style/Control"
             android:layout_marginEnd="8dp"
             android:text="@string/play" />
@@ -46,10 +46,10 @@
             android:text="@string/play_exo" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
+            android:id="@+id/decoder"
             style="@style/Control"
             android:layout_marginEnd="8dp"
-            android:text="@string/play_decode" />
+            android:text="@string/decoder_action" />
 
         <com.fongmi.android.tv.ui.custom.CustomUpDownView
             android:id="@+id/speed"
@@ -88,6 +88,12 @@
             android:layout_marginEnd="8dp"
             android:tag="2"
             android:text="@string/play_track_video" />
+
+        <com.fongmi.android.tv.ui.custom.PlaybackButtonsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:nextFocusLeft="@id/video"
+            android:nextFocusRight="@id/invert" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/invert"

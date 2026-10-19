@@ -4,13 +4,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.api.SiteApi;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
-import com.fongmi.android.tv.exception.ExtractException;
-import com.github.catvod.utils.Trans;
+import com.fongmi.android.tv.utils.Notify;
 
 import java.util.HashMap;
 import java.util.List;
@@ -69,19 +69,22 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void searchContent(Site site, String keyword, boolean quick, String page) {
-        execute(TaskType.RESULT, result, SearchTask.create(site, keyword, quick, page));
+        execute(TaskType.RESULT, result, new SearchTask(site, keyword, quick, page));
     }
 
     public void searchContent(List<Site> sites, String keyword, boolean quick) {
-        searches.start(sites, site -> SearchTask.create(site, keyword, quick), search::postValue);
+        searches.start(sites, site -> new SearchTask(site, keyword, quick, "1"), search::postValue);
     }
 
     private void execute(TaskType type, MutableLiveData<Result> liveData, Callable<Result> callable) {
-        tasks.execute(type, Constant.TIMEOUT_VOD, callable, liveData::postValue, error -> {
-            if (error instanceof ExtractException) liveData.postValue(Result.error(error.getMessage()));
-            else liveData.postValue(Result.empty());
-            error.printStackTrace();
-        });
+        tasks.execute(type, Constant.TIMEOUT_VOD, callable, liveData::postValue, error -> handleError(type, liveData, error));
+    }
+
+    private void handleError(TaskType type, MutableLiveData<Result> liveData, Throwable error) {
+        String message = Notify.getError(error);
+        liveData.postValue(message != null ? Result.error(message) : Result.empty());
+        if (type == TaskType.RESULT && message != null) App.post(() -> Notify.show(message));
+        error.printStackTrace();
     }
 
     public void stopSearch() {
@@ -95,20 +98,6 @@ public class SiteViewModel extends ViewModel {
     }
 
     private record SearchTask(Site site, String keyword, boolean quick, String page) implements Callable<Result> {
-
-        private static final String FIRST_PAGE = "1";
-
-        SearchTask {
-            keyword = Trans.t2s(keyword);
-        }
-
-        private static SearchTask create(Site site, String keyword, boolean quick) {
-            return create(site, keyword, quick, FIRST_PAGE);
-        }
-
-        private static SearchTask create(Site site, String keyword, boolean quick, String page) {
-            return new SearchTask(site, keyword, quick, page);
-        }
 
         @Override
         public Result call() throws Exception {

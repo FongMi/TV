@@ -62,8 +62,6 @@ public class LivePlaybackState {
 
     void setPendingRequest(LivePlayRequest pendingRequest) {
         this.pendingRequest = pendingRequest;
-        this.playingRequest = null;
-        this.playbackKey = null;
     }
 
     void setPlayingRequest(LivePlayRequest playingRequest, String playbackKey) {
@@ -86,7 +84,4 @@ public class LivePlaybackState {
         this.playbackMetadata = playbackMetadata;
     }
 
-    void clearPendingRequest() {
-        this.pendingRequest = null;
-    }
 }

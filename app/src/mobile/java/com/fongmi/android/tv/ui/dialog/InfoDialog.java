@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import static com.github.catvod.utils.Util.substring;
+
 import android.text.TextUtils;
 import android.view.View;
 
@@ -80,7 +82,7 @@ public class InfoDialog extends BaseAlertDialog {
         if (headers.isEmpty()) return "";
         StringBuilder sb = new StringBuilder();
         for (String key : headers.keySet()) sb.append(key).append(" : ").append(headers.get(key)).append("\n");
-        return Util.substring(sb.toString());
+        return substring(sb.toString());
     }
 
     public interface Listener {

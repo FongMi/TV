@@ -115,8 +115,11 @@ public class Catchup {
     }
 
     private String formatTime(long millis, String fmt) {
+        boolean utc = fmt.endsWith("|UTC");
+        if (utc) fmt = fmt.substring(0, fmt.length() - 4);
         if (fmt.equals("timestamp")) return String.valueOf(millis / 1000);
-        return DateTimeFormatter.ofPattern(fmt, Locale.getDefault()).format(Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault()));
+        ZoneId zoneId = utc ? ZoneId.of("UTC") : ZoneId.systemDefault();
+        return DateTimeFormatter.ofPattern(fmt, Locale.getDefault()).format(Instant.ofEpochMilli(millis).atZone(zoneId));
     }
 
     private String format(String group, long start, long end) {

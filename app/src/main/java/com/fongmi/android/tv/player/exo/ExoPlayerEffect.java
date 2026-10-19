@@ -14,6 +14,8 @@ import com.fongmi.android.tv.player.effect.video.ExoVideoEffectController;
 import com.fongmi.android.tv.player.effect.video.VideoEffectProfile;
 import com.fongmi.android.tv.setting.VideoSetting;
 
+import java.util.List;
+
 public final class ExoPlayerEffect implements PlayerEffect {
 
     private final ExoAudioEffectController audioEffectController;
@@ -35,6 +37,7 @@ public final class ExoPlayerEffect implements PlayerEffect {
 
     public void setPlayer(ExoPlayer player) {
         this.player = player;
+        player.setVideoEffects(List.of());
     }
 
     public void release() {
@@ -59,7 +62,7 @@ public final class ExoPlayerEffect implements PlayerEffect {
 
     @Override
     public void applyVideoEffect() {
-        if (supportsVideoEffect() && (previewVideoEffect || VideoSetting.isEnabled())) videoEffectController.apply(player, getVideoProfile());
+        if (supportsVideoEffect()) videoEffectController.apply(player, getVideoProfile());
         else videoEffectController.clear(player);
     }
 

@@ -9,13 +9,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.databinding.DialogSingleInputBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.DanmakuListener;
-import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.setting.DanmakuSetting;
-import com.fongmi.android.tv.utils.QRCode;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.EventBus;
@@ -24,7 +21,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class DanmakuApiDialog extends BaseAlertDialog {
 
-    private DialogUaBinding binding;
+    private DialogSingleInputBinding binding;
 
     public static void show(FragmentActivity activity) {
         new DanmakuApiDialog().show(activity.getSupportFragmentManager(), null);
@@ -36,7 +33,7 @@ public class DanmakuApiDialog extends BaseAlertDialog {
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = DialogUaBinding.inflate(getLayoutInflater());
+        return binding = DialogSingleInputBinding.inflate(getLayoutInflater());
     }
 
     @Override
@@ -47,14 +44,14 @@ public class DanmakuApiDialog extends BaseAlertDialog {
     @Override
     protected void initView() {
         String text;
+        binding.text.setHint(R.string.danmaku_api);
         binding.text.setText(text = DanmakuSetting.getEffectiveApiUrl());
         binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
-        binding.code.setImageBitmap(QRCode.getBitmap(Server.get().getAddress(4), 200, 0));
-        binding.info.setText(ResUtil.getString(R.string.push_info, Server.get().getAddress()).replace("\uff0c", "\n"));
     }
 
     @Override
     protected void initEvent() {
+        binding.phone.setOnClickListener(view -> LocalConnectDialog.show(requireActivity(), "settings"));
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.setOnEditorActionListener((textView, actionId, event) -> {

@@ -14,7 +14,7 @@ public class AudioSetting {
     public static final int MIN_DIALOGUE = 0;
     public static final int MAX_DIALOGUE = 100;
     public static final int MIN_BOOST = 0;
-    public static final int MAX_BOOST = 1200;
+    public static final int MAX_BOOST = 2000;
     public static final int MIN_PREAMP = -1200;
     public static final int MAX_PREAMP = 0;
     public static final int MIN_CENTER_GAIN = 0;
@@ -62,14 +62,16 @@ public class AudioSetting {
         short[] levels = AudioPresetLevels.of(AudioEffectPreset.OFF, bands);
         String[] values = Prefers.getString(getCustomLevelsKey(bands)).split(",");
         if (values.length != bands.getCount()) return levels;
-        for (int i = 0; i < values.length; i++) {
-            try {
-                levels[i] = bands.clamp(Integer.parseInt(values[i]));
-            } catch (NumberFormatException ignored) {
-                levels[i] = 0;
-            }
-        }
+        for (int i = 0; i < values.length; i++) levels[i] = parseLevel(bands, values[i]);
         return levels;
+    }
+
+    private static short parseLevel(AudioEffectBands bands, String value) {
+        try {
+            return bands.clamp(Integer.parseInt(value));
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
     }
 
     public static void putCustomLevels(AudioEffectBands bands, short[] levels) {

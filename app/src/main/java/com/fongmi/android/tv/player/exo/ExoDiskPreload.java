@@ -5,13 +5,16 @@ import androidx.media3.common.PriorityTaskManager;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.source.preload.DiskPreloadManager;
 
+import com.fongmi.android.tv.player.media.ConcatenatingUrl;
 import com.fongmi.android.tv.setting.PreloadSetting;
+
+import java.util.Map;
 
 public class ExoDiskPreload {
 
     private final PriorityTaskManager priorityTaskManager;
     private DiskPreloadManager manager;
-    private MediaItem mediaItem;
+    private Map<String, String> headers;
     private ExoPlayer player;
 
     public ExoDiskPreload() {
@@ -19,39 +22,42 @@ public class ExoDiskPreload {
     }
 
     public void start(ExoPlayer player, MediaItem mediaItem) {
-        this.mediaItem = mediaItem;
-        this.player = player;
-        restart();
-    }
-
-    public void stop() {
-        stopManager();
-        player = null;
-        mediaItem = null;
-    }
-
-    public void release() {
         stop();
-    }
-
-    private void restart() {
-        stopManager();
-        if (player == null || mediaItem == null) return;
-        if (!PreloadSetting.isEnabled()) return;
-        manager = createManager(mediaItem);
+        if (!PreloadSetting.isEnabled() || ConcatenatingUrl.matches(mediaItem.localConfiguration.uri.toString())) {
+            releaseManager();
+            return;
+        }
+        Map<String, String> headers = ExoUtil.extractHeaders(mediaItem);
+        if (manager == null || !headers.equals(this.headers)) {
+            releaseManager();
+            manager = createManager(headers);
+            this.headers = headers;
+        }
+        this.player = player;
         player.setPriorityTaskManager(priorityTaskManager);
         manager.start(player, mediaItem, createOptions());
     }
 
-    private void stopManager() {
+    public void stop() {
+        if (manager != null) manager.stop();
+        if (player != null) player.setPriorityTaskManager(null);
+        player = null;
+    }
+
+    public void release() {
+        stop();
+        releaseManager();
+    }
+
+    private void releaseManager() {
         if (manager == null) return;
         manager.release();
         manager = null;
-        if (player != null) player.setPriorityTaskManager(null);
+        headers = null;
     }
 
-    private DiskPreloadManager createManager(MediaItem mediaItem) {
-        return new DiskPreloadManager.Builder(ExoMediaSourceFactory.getCache(), ExoMediaSourceFactory.createUpstreamDataSourceFactory(ExoUtil.extractHeaders(mediaItem)), ExoUtil.buildRenderersFactory()).setPriorityTaskManager(priorityTaskManager).build();
+    private DiskPreloadManager createManager(Map<String, String> headers) {
+        return new DiskPreloadManager.Builder(ExoMediaSourceFactory.getCache(), ExoMediaSourceFactory.createUpstreamDataSourceFactory(headers), ExoUtil.buildRenderersFactory()).setPriorityTaskManager(priorityTaskManager).build();
     }
 
     private DiskPreloadManager.Options createOptions() {

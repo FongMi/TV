@@ -4,7 +4,7 @@ import android.text.TextUtils;
 
 import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.utils.SubtitleArchive;
-import com.fongmi.android.tv.utils.UrlUtil;
+import com.github.catvod.utils.UriUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public final class SubtitleSearchItem {
     }
 
     public boolean isRemote() {
-        String scheme = UrlUtil.scheme(getUrl());
+        String scheme = UriUtil.scheme(getUrl());
         return scheme.equals("http") || scheme.equals("https");
     }
 

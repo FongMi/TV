@@ -7,15 +7,11 @@ import android.view.inputmethod.EditorInfo;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
-import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.databinding.DialogUaBinding;
+import com.fongmi.android.tv.databinding.DialogSingleInputBinding;
 import com.fongmi.android.tv.event.ServerEvent;
 import com.fongmi.android.tv.impl.UaListener;
-import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
-import com.fongmi.android.tv.utils.QRCode;
-import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.utils.Util;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -25,7 +21,7 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class UaDialog extends BaseAlertDialog {
 
-    private DialogUaBinding binding;
+    private DialogSingleInputBinding binding;
     private boolean append = true;
 
     public static void show(FragmentActivity activity) {
@@ -34,7 +30,7 @@ public class UaDialog extends BaseAlertDialog {
 
     @Override
     protected ViewBinding getBinding() {
-        return binding = DialogUaBinding.inflate(getLayoutInflater());
+        return binding = DialogSingleInputBinding.inflate(getLayoutInflater());
     }
 
     @Override
@@ -47,12 +43,11 @@ public class UaDialog extends BaseAlertDialog {
         String text = Setting.getUa();
         binding.text.setText(text);
         binding.text.setSelection(TextUtils.isEmpty(text) ? 0 : text.length());
-        binding.code.setImageBitmap(QRCode.getBitmap(Server.get().getAddress(4), 200, 0));
-        binding.info.setText(ResUtil.getString(R.string.push_info, Server.get().getAddress()).replace("\uff0c", "\n"));
     }
 
     @Override
     protected void initEvent() {
+        binding.phone.setOnClickListener(view -> LocalConnectDialog.show(requireActivity(), "settings"));
         binding.positive.setOnClickListener(this::onPositive);
         binding.negative.setOnClickListener(this::onNegative);
         binding.text.addTextChangedListener(new CustomTextListener() {

@@ -8,10 +8,10 @@ import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Core;
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.setting.LiveSetting;
-import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.ResUtil;
-import com.fongmi.android.tv.utils.UrlUtil;
+import com.github.catvod.net.Download;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.UriUtil;
 import com.google.gson.JsonObject;
 import com.orhanobut.logger.Logger;
 import com.tvbus.engine.Listener;
@@ -30,7 +30,7 @@ public class TVBus implements Source.Extractor, Listener {
 
     @Override
     public boolean match(Uri uri) {
-        return "tvbus".equals(UrlUtil.scheme(uri));
+        return "tvbus".equals(UriUtil.scheme(uri));
     }
 
     private void init(Core core) {
@@ -46,7 +46,7 @@ public class TVBus implements Source.Extractor, Listener {
     }
 
     private String getPath(String url) {
-        File so = new File(Path.so(), UrlUtil.path(url));
+        File so = new File(Path.so(), UriUtil.path(url));
         if (!Path.exists(so)) Download.create(url, so).get();
         return so.getAbsolutePath();
     }

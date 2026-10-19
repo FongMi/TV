@@ -35,14 +35,10 @@ public final class PlaybackIntent {
     public static void choose(Activity activity, String url, Map<String, String> headers, boolean isVod, long position, CharSequence title) {
         try {
             if (url == null || url.isEmpty()) return;
-            List<String> list = new ArrayList<>();
-            headers.forEach((key, value) -> {
-                list.add(key);
-                list.add(value);
-            });
+            List<String> list = headerPairs(headers);
             Uri data = url.startsWith("file://") || url.startsWith("/") ? FileUtil.getShareUri(url) : Uri.parse(url);
             Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             intent.setDataAndType(data, "video/*");
             intent.putExtra("title", title).putExtra("return_result", isVod);
             intent.putExtra("headers", list.toArray(String[]::new));
@@ -61,6 +57,15 @@ public final class PlaybackIntent {
             if ("user".equals(endBy)) seekTo.accept(position);
         } catch (Exception ignored) {
         }
+    }
+
+    private static List<String> headerPairs(Map<String, String> headers) {
+        List<String> pairs = new ArrayList<>();
+        headers.forEach((key, value) -> {
+            pairs.add(key);
+            pairs.add(value);
+        });
+        return pairs;
     }
 
     private static Bundle toBundle(Map<String, String> headers) {

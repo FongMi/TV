@@ -36,19 +36,27 @@ public interface VodPlaybackHost {
 
     boolean hasPlaybackSession();
 
-    boolean isFullscreenForPlayback();
-
     boolean isLivePlayback();
 
     boolean canTrackPlaybackProgress();
 
+    default boolean isIsoNavigationPlayback() {
+        return false;
+    }
+
     boolean canPreloadNext();
+
+    boolean isPlayerPlaying();
 
     long getPlayerPosition();
 
     long getPlayerDuration();
 
     void usePushId(String id);
+
+    default void openPush(String target) {
+        throw new UnsupportedOperationException();
+    }
 
     void onPlaybackRequested();
 
@@ -60,9 +68,22 @@ public interface VodPlaybackHost {
 
     void replay(long position);
 
+    void seekPlayback(long position);
+
+    default void setPlaybackEnding(long endingMs) {
+    }
+
+    default boolean isPlaybackEndingManaged() {
+        return false;
+    }
+
     void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata);
 
-    boolean preloadPlayback(Result result, long startPositionMs, MediaMetadata metadata);
+    boolean preloadPlayback(Result result, long startPositionMs, MediaMetadata metadata, VodPlayRequest request);
+
+    default boolean seekToPreloaded(VodPlayRequest request) {
+        return false;
+    }
 
     void clearPreload();
 
@@ -115,8 +136,6 @@ public interface VodPlaybackHost {
     void showSwitchLine(Flag flag);
 
     void showSwitchSource(Vod item);
-
-    void showEpisodeReady(Episode item);
 
     void showNoNext(boolean reversed);
 

@@ -9,18 +9,20 @@ import com.fongmi.android.tv.event.ConfigEvent;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.Notify;
-import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Header;
 import com.github.catvod.bean.Proxy;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Task;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.io.InterruptedIOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -31,6 +33,7 @@ abstract class BaseConfig {
     public static final int WALL = 2;
 
     private final AtomicInteger taskId = new AtomicInteger(0);
+    private final Object loadLock = new Object();
 
     protected boolean sync;
     protected volatile Config config;
@@ -43,6 +46,9 @@ abstract class BaseConfig {
     protected abstract void load(Config config) throws Throwable;
 
     protected abstract boolean isLoaded();
+
+    protected void cancelLoad() {
+    }
 
     public synchronized void ensureLoaded() {
         try {
@@ -60,7 +66,8 @@ abstract class BaseConfig {
     }
 
     public boolean needSync(String url) {
-        return sync || config == null || TextUtils.isEmpty(config.getUrl()) || url.equals(config.getUrl());
+        Config selected = getConfig();
+        return sync || selected.isEmpty() || url.equals(selected.getUrl());
     }
 
     public Config getConfig() {
@@ -80,10 +87,24 @@ abstract class BaseConfig {
     }
 
     public void load(Callback callback) {
-        int id = taskId.incrementAndGet();
-        if (future != null && !future.isDone()) future.cancel(true);
-        future = Task.submit(() -> loadConfig(id, config, callback));
+        synchronized (loadLock) {
+            int id = taskId.incrementAndGet();
+            if (future != null && !future.isDone()) {
+                cancelLoad();
+                future.cancel(true);
+            }
+            future = Task.submit(() -> loadConfig(id, config, callback));
+        }
         callback.start();
+    }
+
+    public void cancel() {
+        synchronized (loadLock) {
+            taskId.incrementAndGet();
+            cancelLoad();
+            OkHttp.cancel(getTag());
+            if (future != null && !future.isDone()) future.cancel(true);
+        }
     }
 
     protected void loadConfig(int id, Config config, Callback callback) {
@@ -92,25 +113,38 @@ abstract class BaseConfig {
             OkHttp.cancel(getTag());
             load(config);
             if (taskId.get() != id) return;
-            if (config.equals(this.config)) config.update();
-            App.post(() -> Notify.show(config.getNotice()));
-            App.post(callback::success);
+            completeLoad(id, config, callback);
         } catch (Throwable e) {
-            e.printStackTrace();
             if (isCanceled(e)) return;
+            e.printStackTrace();
             if (taskId.get() != id) return;
-            if (TextUtils.isEmpty(config.getUrl())) App.post(() -> callback.error(""));
-            else App.post(() -> callback.error(Notify.getError(R.string.error_config_get, e)));
-        } finally {
-            if (taskId.get() == id) postEvent();
+            App.post(() -> {
+                if (taskId.get() == id) callback.error(TextUtils.isEmpty(config.getUrl()) ? "" : Notify.getError(R.string.error_config_get, e));
+            });
         }
+        if (taskId.get() == id) postEvent();
+    }
+
+    private void completeLoad(int id, Config config, Callback callback) {
+        if (config.equals(this.config)) config.update();
+        String notice = config.getNotice();
+        App.post(() -> {
+            if (taskId.get() != id) return;
+            Notify.show(notice);
+            callback.success();
+        });
     }
 
     protected boolean isCanceled(Throwable e) {
-        if ("Canceled".equals(e.getMessage())) return true;
-        if (e instanceof InterruptedException) return true;
-        if (e instanceof InterruptedIOException) return true;
-        return e.getCause() instanceof InterruptedIOException;
+        if (Thread.currentThread().isInterrupted()) return true;
+        boolean canceled = false;
+        boolean timedOut = false;
+        for (Throwable current = e; current != null; current = current.getCause()) {
+            if (current instanceof InterruptedException || current instanceof CancellationException) return true;
+            canceled |= current instanceof InterruptedIOException || "Canceled".equals(current.getMessage());
+            timedOut |= current instanceof SocketTimeoutException;
+        }
+        return canceled && !timedOut;
     }
 
     protected JsonArray fetchArray(JsonObject object, String key) {

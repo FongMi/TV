@@ -1,7 +1,10 @@
 package com.fongmi.android.tv.utils;
 
+import com.github.catvod.net.Download;
+import com.github.catvod.utils.Archive;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.UriUtil;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -36,7 +39,7 @@ public final class SubtitleArchive {
 
     public static List<File> unzip(File archive, File dir) {
         Path.clear(dir);
-        if (!FileUtil.zipDecompress(archive, dir, MAX_ENTRIES, MAX_EXTRACTED_BYTES)) Path.clear(dir);
+        if (!Archive.zipDecompress(archive, dir, MAX_ENTRIES, MAX_EXTRACTED_BYTES)) Path.clear(dir);
         return findSubtitles(dir);
     }
 
@@ -76,16 +79,7 @@ public final class SubtitleArchive {
     private static boolean hasExtension(String text, String extension) {
         if (text == null || text.isEmpty()) return false;
         String lower = text.trim().toLowerCase(Locale.ROOT);
-        if (lower.contains("://")) lower = stripUrlSuffix(lower);
+        if (lower.contains("://")) lower = UriUtil.stripQueryAndFragment(lower);
         return lower.endsWith(extension);
-    }
-
-    private static String stripUrlSuffix(String url) {
-        if (url == null || url.isEmpty()) return "";
-        int query = url.indexOf('?');
-        int fragment = url.indexOf('#');
-        int end = query < 0 ? url.length() : query;
-        if (fragment >= 0) end = Math.min(end, fragment);
-        return url.substring(0, end);
     }
 }

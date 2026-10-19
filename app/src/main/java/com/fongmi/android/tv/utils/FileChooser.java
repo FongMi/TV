@@ -24,10 +24,13 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.ui.activity.FileActivity;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Task;
+import com.github.catvod.utils.UriUtil;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Consumer;
 
 public final class FileChooser {
@@ -56,7 +59,7 @@ public final class FileChooser {
 
     public void show(String mimeType, String[] mimeTypes) {
         Intent intent = createIntent(mimeType, mimeTypes);
-        launcher.launch(useInternal(intent) ? intent.setClass(App.get(), FileActivity.class) : Intent.createChooser(intent, ""));
+        launcher.launch(useInternal(intent) ? intent.setClass(App.get(), FileActivity.class) : intent);
     }
 
     private static Intent createIntent(String mimeType, String[] mimeTypes) {
@@ -72,8 +75,7 @@ public final class FileChooser {
     private static boolean useInternal(Intent intent) {
         if (Util.isLeanback()) return true;
         List<ResolveInfo> resolveInfos = App.get().getPackageManager().queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
-        for (ResolveInfo resolveInfo : resolveInfos) if (isUsable(resolveInfo)) return false;
-        return true;
+        return resolveInfos.stream().noneMatch(FileChooser::isUsable);
     }
 
     private static boolean isUsable(ResolveInfo resolveInfo) {
@@ -90,25 +92,29 @@ public final class FileChooser {
     }
 
     public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback) {
-        if (!isFileSource(uri)) return;
-        Task.execute(() -> resolveFileUri(uri, callback));
+        getFileUri(uri, callback, () -> {});
     }
 
-    private static void resolveFileUri(Uri uri, Consumer<Uri> callback) {
+    public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback, Runnable onFailure) {
+        if (!isFileSource(uri)) return;
+        Task.execute(() -> resolveFileUri(uri, callback, onFailure));
+    }
+
+    private static void resolveFileUri(Uri uri, Consumer<Uri> callback, Runnable onFailure) {
         try {
-            deliver(callback, resolveFileUri(uri));
-        } catch (IOException | SecurityException e) {
-            App.post(() -> Notify.show(Notify.getError(R.string.error_file_open, e)));
+            Uri file = resolveFileUri(uri);
+            App.post(() -> callback.accept(file));
+        } catch (IOException | SecurityException | IllegalArgumentException e) {
+            App.post(() -> {
+                Notify.show(Notify.getError(R.string.error_file_open, e));
+                onFailure.run();
+            });
         }
     }
 
     private static Uri resolveFileUri(Uri uri) throws IOException {
         File file = getLocalFile(uri);
         return file == null ? materialize(uri, getCacheFile(uri)) : Uri.fromFile(file);
-    }
-
-    private static void deliver(Consumer<Uri> callback, Uri uri) {
-        App.post(() -> callback.accept(uri));
     }
 
     @Nullable
@@ -203,7 +209,7 @@ public final class FileChooser {
     }
 
     private static Uri materialize(Uri uri, File target) throws IOException {
-        FileUtil.copyAtomically(uri, target);
+        Path.writeAtomically(target, uri);
         return Uri.fromFile(target);
     }
 
@@ -223,5 +229,17 @@ public final class FileChooser {
         if (uri == null) return false;
         String scheme = uri.getScheme();
         return ContentResolver.SCHEME_CONTENT.equalsIgnoreCase(scheme) || ContentResolver.SCHEME_FILE.equalsIgnoreCase(scheme);
+    }
+
+    public static boolean isLiveSource(@Nullable Intent intent) {
+        if (intent == null || !isFileSource(intent.getData())) return false;
+        String path = UriUtil.path(intent.getData()).toLowerCase(Locale.ROOT);
+        if (path.endsWith(".m3u")) return true;
+        if (!"text/plain".equalsIgnoreCase(intent.getType())) return false;
+        String extension = path.substring(path.lastIndexOf('.') + 1);
+        return switch (extension) {
+            case "strm", "m3u8", "mpd", "torrent", "mp4", "mkv", "flv", "mp3", "m4a", "aac", "ts", "webm", "mov", "avi", "wav", "ogg", "wmv", "iso", "m2ts" -> false;
+            default -> true;
+        };
     }
 }

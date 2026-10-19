@@ -31,9 +31,9 @@
             android:text="@string/play_exo" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/decode"
+            android:id="@+id/decoder"
             style="@style/Control"
-            android:text="@string/play_decode" />
+            android:text="@string/decoder_action" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/reset"
@@ -106,6 +106,13 @@
             tools:visibility="visible" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/disc_menu"
+            style="@style/Control"
+            android:text="@string/play_disc_menu"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/opening"
             style="@style/Control"
             android:text="@string/play_op" />
@@ -114,6 +121,10 @@
             android:id="@+id/ending"
             style="@style/Control"
             android:text="@string/play_ed" />
+
+        <com.fongmi.android.tv.ui.custom.PlaybackButtonsView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </HorizontalScrollView>

@@ -7,9 +7,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
+import com.github.catvod.utils.UriUtil;
 
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -62,7 +62,7 @@ public class Danmaku {
     }
 
     public Uri getUri() {
-        return isEmpty() ? null : UrlUtil.uri(getUrl());
+        return isEmpty() ? null : UriUtil.uri(getUrl());
     }
 
     @Override

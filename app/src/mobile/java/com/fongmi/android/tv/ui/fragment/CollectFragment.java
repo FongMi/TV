@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -25,6 +26,7 @@ import com.fongmi.android.tv.databinding.FragmentCollectBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.FolderActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
+import com.fongmi.android.tv.ui.activity.WebActivity;
 import com.fongmi.android.tv.ui.adapter.CollectAdapter;
 import com.fongmi.android.tv.ui.adapter.SearchAdapter;
 import com.fongmi.android.tv.ui.base.BaseFragment;
@@ -81,12 +83,14 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
 
     @Override
     protected void initEvent() {
-        mBinding.toolbar.setOnClickListener(v -> {
-            Bundle result = new Bundle();
-            result.putBoolean("edit", true);
-            getParentFragmentManager().setFragmentResult("result", result);
-            getParentFragmentManager().popBackStack();
-        });
+        mBinding.toolbar.setOnClickListener(this::onEdit);
+    }
+
+    private void onEdit(View view) {
+        Bundle result = new Bundle();
+        result.putBoolean("edit", true);
+        getParentFragmentManager().setFragmentResult("result", result);
+        getParentFragmentManager().popBackStack();
     }
 
     private void setRecyclerView() {
@@ -103,6 +107,7 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class).init();
         mViewModel.getSearch().observe(this, this::setCollect);
         mViewModel.getResult().observe(this, this::setSearch);
+        mViewModel.getAction().observe(getViewLifecycleOwner(), result -> WebActivity.handleAction(requireActivity(), result));
     }
 
     private void setSites() {
@@ -157,7 +162,8 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
 
     @Override
     public void onItemClick(Vod item) {
-        if (item.isFolder()) FolderActivity.start(requireActivity(), item.getSiteKey(), Result.folder(item));
+        if (item.isAction()) mViewModel.action(item.getSiteKey(), item.getAction());
+        else if (item.isFolder()) FolderActivity.start(requireActivity(), item.getSiteKey(), Result.folder(item));
         else VideoActivity.collect(requireActivity(), item.getSiteKey(), item.getId(), item.getName(), item.getPic());
     }
 

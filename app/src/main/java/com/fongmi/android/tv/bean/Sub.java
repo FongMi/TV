@@ -9,8 +9,8 @@ import androidx.media3.common.C;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.track.TrackUtil;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.utils.Trans;
+import com.github.catvod.utils.UriUtil;
 import com.google.gson.annotations.SerializedName;
 
 public class Sub {
@@ -27,7 +27,7 @@ public class Sub {
     private int flag;
 
     public static Sub from(String url) {
-        return from(UrlUtil.path(url), url);
+        return from(UriUtil.path(url), url);
     }
 
     public static Sub from(String name, String url) {
@@ -85,7 +85,7 @@ public class Sub {
     }
 
     public Uri getUri() {
-        return isEmpty() ? null : UrlUtil.uri(getUrl());
+        return isEmpty() ? null : UriUtil.uri(getUrl());
     }
 
     public void trans() {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.button.MaterialButton xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/text"
+    style="@style/Widget.Material3.Button.TextButton"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:focusable="true"
+    android:gravity="start|center_vertical"
+    android:insetBottom="0dp"
+    android:insetTop="0dp"
+    android:minHeight="48dp"
+    android:paddingHorizontal="16dp"
+    android:textAppearance="?attr/textAppearanceBodyLarge"
+    android:textColor="?attr/colorOnSurface"
+    app:cornerRadius="12dp" />

@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogPlayerEngineBinding;
@@ -21,27 +22,20 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
 
     private DialogPlayerEngineBinding binding;
     private PlayerManager player;
-    private TextView target;
 
     public static void setText(TextView view) {
         setText(view, null);
     }
 
     public static void setText(TextView view, PlayerManager player) {
-        if (view == null) return;
-        view.setText(PlaybackAction.getEngineText(player));
+        PlaybackAction.setPlaybackMode(player, view);
     }
 
-    public static void show(FragmentActivity activity, TextView view, PlayerManager player) {
-        for (Fragment fragment : activity.getSupportFragmentManager().getFragments()) if (fragment instanceof PlayerEngineDialog) return;
-        PlayerEngineDialog dialog = new PlayerEngineDialog();
-        dialog.player = player;
-        dialog.target = view;
-        dialog.show(activity.getSupportFragmentManager(), null);
-    }
-
-    private static int getCurrentEngine(PlayerManager player) {
-        return PlaybackAction.getEngine(player);
+    public static void show(FragmentActivity activity) {
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof PlayerEngineDialog) return;
+        new PlayerEngineDialog().show(manager, null);
     }
 
     @Override
@@ -51,8 +45,16 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
 
     @Override
     protected void initView() {
-        setSelected();
-        getSelectedView().requestFocus();
+        PlaybackDialog.observe(this, this::bindPlayer);
+    }
+
+    private void bindPlayer(PlayerManager player) {
+        this.player = player;
+        if (player == null) return;
+        int engine = PlaybackAction.getEngine(player);
+        binding.exo.setSelected(engine == PlayerSetting.ENGINE_EXO);
+        binding.mpv.setSelected(engine == PlayerSetting.ENGINE_MPV);
+        (engine == PlayerSetting.ENGINE_MPV ? binding.mpv : binding.exo).requestFocus();
     }
 
     @Override
@@ -77,20 +79,16 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
     }
 
     private void selectEngine(int engine) {
-        if (player == null) PlayerSetting.putEngine(engine);
-        else player.setEngine(engine);
-        setText(target, player);
+        if (!PlaybackDialog.isCurrentPlayer(this, player)) return;
+        player.setEngine(engine);
         dismiss();
     }
 
-    private void setSelected() {
-        int engine = getCurrentEngine(player);
-        binding.exo.setSelected(engine == PlayerSetting.ENGINE_EXO);
-        binding.mpv.setSelected(engine == PlayerSetting.ENGINE_MPV);
-    }
-
-    private View getSelectedView() {
-        return getCurrentEngine(player) == PlayerSetting.ENGINE_MPV ? binding.mpv : binding.exo;
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        player = null;
+        super.onDestroyView();
     }
 
     private PlaybackActivity getPlaybackActivity() {

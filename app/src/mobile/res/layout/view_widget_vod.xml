@@ -34,6 +34,21 @@
         tools:text="Speed 3.0x"
         tools:visibility="visible" />
 
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/scale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/shape_widget"
+        android:fontFeatureSettings="tnum"
+        android:gravity="center"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:visibility="gone"
+        tools:text="Zoom 125%"
+        tools:visibility="visible" />
+
     <androidx.appcompat.widget.LinearLayoutCompat
         android:id="@+id/seek"
         android:layout_width="wrap_content"
@@ -47,7 +62,7 @@
         tools:visibility="visible">
 
         <androidx.appcompat.widget.AppCompatImageView
-            android:id="@+id/action"
+            android:id="@+id/statusIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"

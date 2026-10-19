@@ -2,12 +2,14 @@ package com.fongmi.android.tv.api.parser;
 
 import androidx.media3.common.MimeTypes;
 
+import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.bean.Catchup;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.ClearKey;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
+import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
@@ -16,6 +18,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.Response;
 
 public class LiveParser {
 
@@ -54,6 +58,14 @@ public class LiveParser {
 
     private static String getText(Live live) throws Exception {
         if (!live.getApi().isEmpty()) return live.spider().liveContent(live.getUrl());
+        BaseLoader.get().requireProxy(live.getUrl());
+        if (live.getUrl().startsWith("proxy://")) {
+            try (Response response = OkHttp.newCall(UrlUtil.convert(live.getUrl()), live.getHeaders()).execute()) {
+                String text = response.body().string();
+                if (!response.isSuccessful()) throw new ExtractException(text);
+                return text;
+            }
+        }
         return OkHttp.string(UrlUtil.convert(live.getUrl()), live.getHeaders());
     }
 

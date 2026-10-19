@@ -13,6 +13,14 @@
         android:orientation="vertical"
         android:padding="24dp">
 
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:text="@string/player_preload_setting"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
+
         <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/preload"
             android:layout_width="match_parent"

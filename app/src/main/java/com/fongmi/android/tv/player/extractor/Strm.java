@@ -2,9 +2,9 @@ package com.fongmi.android.tv.player.extractor;
 
 import android.net.Uri;
 
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.UriUtil;
 import com.google.common.net.HttpHeaders;
 
 import java.io.File;
@@ -15,7 +15,7 @@ public class Strm implements Source.Extractor {
 
     @Override
     public boolean match(Uri uri) {
-        return UrlUtil.path(uri).endsWith(".strm");
+        return UriUtil.path(uri).endsWith(".strm");
     }
 
     @Override
@@ -31,13 +31,5 @@ public class Strm implements Source.Extractor {
             boolean text = content.contains(".strm") || content.contains(".txt");
             return text ? res.body().string().split("\\R", 2)[0] : url;
         }
-    }
-
-    @Override
-    public void stop() {
-    }
-
-    @Override
-    public void exit() {
     }
 }

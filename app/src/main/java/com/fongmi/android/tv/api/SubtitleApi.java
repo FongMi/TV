@@ -8,11 +8,11 @@ import com.fongmi.android.tv.bean.SubtitleSearchItem;
 import com.fongmi.android.tv.bean.SubtitleSearchPage;
 import com.fongmi.android.tv.impl.ApiCallback;
 import com.fongmi.android.tv.setting.SubtitleSetting;
-import com.fongmi.android.tv.utils.Download;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.SubtitleArchive;
-import com.fongmi.android.tv.utils.Task;
+import com.github.catvod.net.Download;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Task;
 import com.github.catvod.utils.Trans;
 
 import java.io.File;

@@ -5,10 +5,10 @@ import android.util.Log;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Backup;
 import com.fongmi.android.tv.impl.Callback;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Formatters;
-import com.fongmi.android.tv.utils.Task;
+import com.github.catvod.utils.Archive;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Task;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,11 +54,11 @@ public final class BackupManager {
     private static boolean save() {
         Backup backup = Backup.create();
         File file = new File(Path.backup(), LocalDate.now().format(Formatters.DATE) + BACKUP_EXTENSION);
-        return !backup.getConfig().isEmpty() && FileUtil.gzipCompress(backup.toString().getBytes(StandardCharsets.UTF_8), file);
+        return !backup.getConfig().isEmpty() && Archive.gzipCompress(backup.toString().getBytes(StandardCharsets.UTF_8), file);
     }
 
     private static boolean restore(File file) {
-        Backup backup = Backup.objectFrom(FileUtil.readGzip(file));
+        Backup backup = Backup.objectFrom(Archive.readGzip(file));
         boolean valid = !backup.getConfig().isEmpty();
         if (valid) backup.restore();
         return valid;

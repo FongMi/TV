@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusable="false"
+        android:overScrollMode="never">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.flexbox.FlexboxLayout
+                style="@style/PlaybackDialogHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:alignItems="center"
+                app:flexWrap="wrap"
+                app:justifyContent="flex_end">
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/title"
+                    style="@style/PlaybackDialogTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/playback_dialog_spacing"
+                    android:text="@string/content_title"
+                    app:layout_flexGrow="1"
+                    app:layout_flexShrink="0" />
+
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    app:layout_flexShrink="0">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/search"
+                        style="@style/PlaybackContentAction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="@string/content_search"
+                        android:focusable="true"
+                        android:nextFocusRight="@id/current"
+                        android:text="@string/content_search_action" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/current"
+                        style="@style/PlaybackContentCurrentAction"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/playback_dialog_spacing"
+                        android:contentDescription="@string/content_current"
+                        android:focusable="true"
+                        android:nextFocusLeft="@id/search"
+                        android:text="@string/content_current" />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </com.google.android.flexbox.FlexboxLayout>
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/tabs"
+                style="@style/PlaybackDialogTabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/subtitles"
+                    style="@style/PlaybackContentTab"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:nextFocusDown="@id/keyword"
+                    android:nextFocusRight="@id/danmaku"
+                    android:nextFocusUp="@id/search"
+                    android:text="@string/play_track_text" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/danmaku"
+                    style="@style/PlaybackContentTab"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:nextFocusDown="@id/keyword"
+                    android:nextFocusLeft="@id/subtitles"
+                    android:nextFocusUp="@id/search"
+                    android:text="@string/danmaku" />
+
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/keyword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/playback_dialog_inset"
+                android:layout_marginTop="@dimen/playback_dialog_spacing"
+                android:layout_marginBottom="@dimen/playback_dialog_spacing"
+                android:background="@drawable/shape_danmaku_search_keyword"
+                android:hint="@string/content_search"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:minHeight="48dp"
+                android:nextFocusDown="@id/recycler"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/playback_dialog_inset"
+                android:paddingVertical="@dimen/playback_dialog_spacing"
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.fongmi.android.tv.ui.custom.PlaybackContentRecyclerView
+            android:id="@+id/recycler"
+            style="@style/PlaybackDialogBody"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false"
+            android:nextFocusRight="@id/current"
+            android:overScrollMode="never"
+            android:paddingHorizontal="@dimen/playback_dialog_inset"
+            android:paddingTop="@dimen/playback_dialog_spacing"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:padding="@dimen/playback_dialog_inset"
+            android:text="@string/content_empty"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp" />
+
+    </FrameLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

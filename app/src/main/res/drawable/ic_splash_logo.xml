@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:name="splash_logo"
+    android:width="432dp"
+    android:height="432dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <group
+        android:scaleX="0.48"
+        android:scaleY="0.48"
+        android:translateX="133.12"
+        android:translateY="133.12">
+        <group
+            android:name="logo_motion"
+            android:pivotX="256"
+            android:pivotY="256">
+            <group android:name="logo_top_motion">
+                <group>
+                    <clip-path android:pathData="M41.374,132.082L256,8.167L470.626,132.082L256,255.997Z" />
+                    <path
+                        android:name="logo_top_accent"
+                        android:fillColor="#2DD4AA"
+                        android:pathData="M470.626,132.082L437.945,205.418L223.319,78.583L256,8.167Z" />
+                    <path
+                        android:name="logo_top_tip"
+                        android:fillColor="#4CF5CB"
+                        android:pathData="M256,8.167L256,78.583L223.319,27.035Z" />
+                    <path
+                        android:name="logo_top_right"
+                        android:fillColor="#4CF5CB"
+                        android:pathData="M437.945,150.95L256,321.358L190.638,183.63L256,45.902Z" />
+                    <path
+                        android:name="logo_top_left"
+                        android:fillColor="#A3FBE5"
+                        android:pathData="M256,45.902L256,321.358L41.374,132.082L223.319,27.035Z" />
+                </group>
+                <path
+                    android:name="logo_top_trace"
+                    android:fillColor="#00000000"
+                    android:pathData="M256,255.997L41.374,132.082L256,8.167L470.626,132.082Z"
+                    android:strokeAlpha="0"
+                    android:strokeColor="#3B82C4"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"
+                    android:strokeWidth="11"
+                    android:trimPathEnd="0" />
+            </group>
+            <group android:name="logo_left_motion">
+                <group>
+                    <clip-path android:pathData="M41.374,132.082L256,255.997L256,503.827L41.374,379.912Z" />
+                    <path
+                        android:name="logo_left_accent"
+                        android:fillColor="#68AEF4"
+                        android:pathData="M256,255.997L310.468,373.43L256,503.827L41.374,379.912L111.054,243.51Z" />
+                    <path
+                        android:name="logo_left_face"
+                        android:fillColor="#8FE1EA"
+                        android:pathData="M256,255.997L41.374,379.912L41.374,132.082Z" />
+                </group>
+                <path
+                    android:name="logo_left_trace"
+                    android:fillColor="#00000000"
+                    android:pathData="M256,255.997L256,503.827L41.374,379.912L41.374,132.082Z"
+                    android:strokeAlpha="0"
+                    android:strokeColor="#3B82C4"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"
+                    android:strokeWidth="11"
+                    android:trimPathEnd="0" />
+            </group>
+            <group android:name="logo_right_motion">
+                <group>
+                    <clip-path android:pathData="M470.626,132.082L470.626,379.912L256,503.827L256,255.997Z" />
+                    <path
+                        android:name="logo_right_accent"
+                        android:fillColor="#FFE08F"
+                        android:pathData="M470.626,379.912L437.945,398.779L396.549,284.789Z" />
+                    <path
+                        android:name="logo_right_face"
+                        android:fillColor="#FFEAB2"
+                        android:pathData="M437.945,273.895L437.945,398.779L256,503.827L256,255.997Z" />
+                    <path
+                        android:name="logo_right_edge"
+                        android:fillColor="#FFD159"
+                        android:pathData="M470.626,132.082L470.626,379.912L437.945,361.044L416.158,255.997L437.945,150.95Z" />
+                    <path
+                        android:name="logo_right_inner"
+                        android:fillColor="#FFE08F"
+                        android:pathData="M437.945,150.95L437.945,361.044L256,255.997Z" />
+                </group>
+                <path
+                    android:name="logo_right_trace"
+                    android:fillColor="#00000000"
+                    android:pathData="M256,255.997L470.626,132.082L470.626,379.912L256,503.827Z"
+                    android:strokeAlpha="0"
+                    android:strokeColor="#3B82C4"
+                    android:strokeLineCap="round"
+                    android:strokeLineJoin="round"
+                    android:strokeWidth="11"
+                    android:trimPathEnd="0" />
+            </group>
+            <path
+                android:name="logo_outline"
+                android:fillColor="#00000000"
+                android:pathData="M256,8.167L470.626,132.082L470.626,379.912L256,503.827L41.374,379.912L41.374,132.082ZM41.374,132.082L256,255.997L470.626,132.082M256,255.997L256,503.827"
+                android:strokeAlpha="0"
+                android:strokeColor="#276AAD"
+                android:strokeLineCap="round"
+                android:strokeLineJoin="round"
+                android:strokeWidth="11" />
+        </group>
+    </group>
+</vector>

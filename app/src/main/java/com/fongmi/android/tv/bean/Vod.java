@@ -14,6 +14,7 @@ import com.fongmi.android.tv.impl.Diffable;
 import com.fongmi.android.tv.utils.Sniffer;
 import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.utils.Trans;
+import com.github.catvod.utils.UriUtil;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
 
@@ -133,6 +134,13 @@ public class Vod implements Parcelable, Diffable<Vod> {
 
     public String getName() {
         return TextUtils.isEmpty(vodName) ? "" : Html.fromHtml(vodName, Html.FROM_HTML_MODE_LEGACY).toString().trim();
+    }
+
+    public String getName(String fallback) {
+        String name = getName();
+        if (TextUtils.isEmpty(fallback)) return name;
+        String scheme = UriUtil.scheme(name);
+        return name.isEmpty() || (scheme.equals("http") || scheme.equals("https")) && !UriUtil.host(name).isEmpty() ? fallback : name;
     }
 
     public void setName(String vodName) {
@@ -280,7 +288,8 @@ public class Vod implements Parcelable, Diffable<Vod> {
     }
 
     public void checkName(String name) {
-        if (getName().isEmpty()) setName(name);
+        String title = getName(name);
+        if (!title.equals(getName())) setName(title);
     }
 
     public Style getStyle(Style style) {

@@ -50,8 +50,14 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
 
     public void setSelected(int position) {
         if (position == -1) return;
-        for (int i = 0; i < mItems.size(); i++) mItems.get(i).setSelected(i == position);
-        notifyItemRangeChanged(0, getItemCount());
+        for (int i = 0; i < mItems.size(); i++) updateSelection(i, i == position);
+    }
+
+    private void updateSelection(int position, boolean shouldSelect) {
+        Channel item = mItems.get(position);
+        if (item.isSelected() == shouldSelect) return;
+        item.setSelected(shouldSelect);
+        notifyItemChanged(position, Boolean.TRUE);
     }
 
     public int setSelected(Channel channel) {
@@ -80,6 +86,12 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.ViewHold
         holder.binding.getRoot().setSelected(item.isSelected());
         holder.binding.getRoot().setOnClickListener(view -> listener.onItemClick(item));
         holder.binding.getRoot().setOnLongClickListener(view -> listener.onLongClick(item));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
+        if (!payloads.isEmpty() && payloads.stream().allMatch(Boolean.TRUE::equals)) holder.binding.getRoot().setSelected(mItems.get(position).isSelected());
+        else onBindViewHolder(holder, position);
     }
 
     @Override

@@ -1,5 +1,9 @@
 package com.fongmi.android.tv.setting;
 
+import static androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL;
+import static androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT;
+import static androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
+
 import com.github.catvod.utils.Prefers;
 
 public class PlayerSetting {
@@ -9,7 +13,7 @@ public class PlayerSetting {
     public static final int RENDER_SURFACE = 0;
     public static final int RENDER_TEXTURE = 1;
     public static final int MIN_SCALE = 0;
-    public static final int MAX_SCALE = 4;
+    public static final int MAX_SCALE = 2;
     private static final int MIN_SIZE = 0;
     private static final int MAX_SIZE = 3;
     private static final int MIN_BUFFER = 1;
@@ -89,6 +93,10 @@ public class PlayerSetting {
 
     public static void putScale(int scale) {
         Prefers.put("scale", Math.clamp(scale, MIN_SCALE, MAX_SCALE));
+    }
+
+    public static int getScaleMode(int index) {
+        return index == 1 ? RESIZE_MODE_FILL : index == 2 ? RESIZE_MODE_ZOOM : RESIZE_MODE_FIT;
     }
 
     public static int getBackground() {

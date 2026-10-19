@@ -1,6 +1,11 @@
 package com.fongmi.android.tv.player.exo;
 
 import androidx.media3.common.PlaybackException;
+import androidx.media3.datasource.HttpDataSource.InvalidResponseCodeException;
+
+import com.github.catvod.Proxy;
+
+import java.nio.charset.StandardCharsets;
 
 public class ExoErrorMessageProvider {
 
@@ -10,7 +15,7 @@ public class ExoErrorMessageProvider {
             case PlaybackException.ERROR_CODE_UNSPECIFIED -> "Unspecified";
             case PlaybackException.ERROR_CODE_FAILED_RUNTIME_CHECK -> "Failed Runtime Check";
             case PlaybackException.ERROR_CODE_IO_UNSPECIFIED -> "IO Unspecified";
-            case PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> "Bad HTTP Status";
+            case PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> httpError(e);
             case PlaybackException.ERROR_CODE_IO_INVALID_HTTP_CONTENT_TYPE -> "Invalid HTTP Content Type";
             case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> "Network Connection Failed";
             case PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> "Network Connection Timeout";
@@ -37,5 +42,24 @@ public class ExoErrorMessageProvider {
             case PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED -> "DRM License Acquisition Failed";
             default -> e.getErrorCodeName();
         };
+    }
+
+    private String httpError(PlaybackException e) {
+        for (Throwable cause = e.getCause(); cause != null; cause = cause.getCause()) {
+            if (!(cause instanceof InvalidResponseCodeException error)) continue;
+            String message = "HTTP " + error.responseCode;
+            String detail = proxyMessage(error);
+            return detail.isEmpty() ? message : message + ": " + detail;
+        }
+        return "Bad HTTP Status";
+    }
+
+    private String proxyMessage(InvalidResponseCodeException error) {
+        if (!error.dataSpec.uri.toString().startsWith(Proxy.getUrl(true) + "?")) return "";
+        boolean marked = error.headerFields.entrySet().stream().anyMatch(entry -> "X-TV-Proxy-Error".equalsIgnoreCase(entry.getKey()) && entry.getValue().contains("1"));
+        boolean plain = error.headerFields.entrySet().stream().anyMatch(entry -> "Content-Type".equalsIgnoreCase(entry.getKey()) && entry.getValue().stream().anyMatch(value -> "text/plain".equalsIgnoreCase(value.split(";", 2)[0].trim())));
+        if (!marked || !plain) return "";
+        String message = new String(error.responseBody, 0, Math.min(error.responseBody.length, 1024), StandardCharsets.UTF_8).replaceAll("https?://\\S+", "[URL]").replaceAll("\\s+", " ").trim();
+        return message.substring(0, Math.min(message.length(), 240));
     }
 }

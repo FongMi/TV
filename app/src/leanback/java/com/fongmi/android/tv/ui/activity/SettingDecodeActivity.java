@@ -40,8 +40,6 @@ public class SettingDecodeActivity extends BaseActivity {
     protected void initEvent() {
         mBinding.aac.setOnClickListener(this::setAAC);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
-        mBinding.audioPrefer.setOnClickListener(this::setAudioPrefer);
-        mBinding.videoPrefer.setOnClickListener(this::setVideoPrefer);
         mBinding.dolbyVisionOutput.setOnClickListener(this::setDolbyVisionOutput);
         mBinding.audioPassThrough.setOnClickListener(this::setAudioPassThrough);
     }
@@ -50,15 +48,11 @@ public class SettingDecodeActivity extends BaseActivity {
         boolean exo = PlayerSetting.isExo();
         mBinding.aac.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(exo ? View.VISIBLE : View.GONE);
-        mBinding.audioPrefer.setVisibility(exo ? View.VISIBLE : View.GONE);
-        mBinding.videoPrefer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
     private void refresh() {
         mBinding.aacText.setText(Setting.getSwitch(DecodeSetting.isPreferAAC()));
         mBinding.tunnelText.setText(Setting.getSwitch(DecodeSetting.isTunnel()));
-        mBinding.audioPreferText.setText(Setting.getSwitch(DecodeSetting.isAudioPrefer()));
-        mBinding.videoPreferText.setText(Setting.getSwitch(DecodeSetting.isVideoPrefer()));
         mBinding.dolbyVisionOutputText.setText(ResUtil.getStringArray(R.array.select_dolby_vision_output)[DecodeSetting.getDolbyVisionOutputPolicy()]);
         mBinding.audioPassThroughText.setText(Setting.getSwitch(DecodeSetting.isAudioPassThrough()));
     }
@@ -72,16 +66,6 @@ public class SettingDecodeActivity extends BaseActivity {
     private void setAudioPassThrough(View view) {
         DecodeSetting.putAudioPassThrough(!DecodeSetting.isAudioPassThrough());
         mBinding.audioPassThroughText.setText(Setting.getSwitch(DecodeSetting.isAudioPassThrough()));
-    }
-
-    private void setAudioPrefer(View view) {
-        DecodeSetting.putAudioPrefer(!DecodeSetting.isAudioPrefer());
-        mBinding.audioPreferText.setText(Setting.getSwitch(DecodeSetting.isAudioPrefer()));
-    }
-
-    private void setVideoPrefer(View view) {
-        DecodeSetting.putVideoPrefer(!DecodeSetting.isVideoPrefer());
-        mBinding.videoPreferText.setText(Setting.getSwitch(DecodeSetting.isVideoPrefer()));
     }
 
     private void setDolbyVisionOutput(View view) {

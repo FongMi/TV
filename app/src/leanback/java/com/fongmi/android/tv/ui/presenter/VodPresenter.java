@@ -18,6 +18,8 @@ import com.fongmi.android.tv.ui.holder.VodListHolder;
 import com.fongmi.android.tv.ui.holder.VodOvalHolder;
 import com.fongmi.android.tv.ui.holder.VodRectHolder;
 
+import java.util.Arrays;
+
 public class VodPresenter extends Presenter {
 
     private final OnClickListener listener;
@@ -32,6 +34,10 @@ public class VodPresenter extends Presenter {
         this.listener = listener;
         this.style = style;
         this.size = Product.getSpec(style);
+    }
+
+    public boolean matches(Style style) {
+        return this.style.equals(style) && Arrays.equals(size, Product.getSpec(style));
     }
 
     public interface OnClickListener {

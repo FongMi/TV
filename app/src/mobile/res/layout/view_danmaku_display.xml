@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        style="@style/PlaybackDialogFirstRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="12dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_scroll"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showScrollSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_top"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showTopSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_bottom"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showBottomSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_reverse"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showReverseSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_positioned"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showPositionedSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_subtitle"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showSubtitleSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/danmaku_show_special"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout style="@style/PlaybackDialogSwitchContainer">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/showSpecialSwitch"
+                style="@style/PlaybackDialogSwitch" />
+
+        </FrameLayout>
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+</androidx.appcompat.widget.LinearLayoutCompat>

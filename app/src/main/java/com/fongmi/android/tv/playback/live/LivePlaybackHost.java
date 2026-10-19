@@ -32,7 +32,13 @@ public interface LivePlaybackHost {
 
     void onCatchupRequested();
 
+    void preparePlaybackForRefresh();
+
     void stopPlaybackForRefresh();
+
+    default void openPush(String target) {
+        throw new UnsupportedOperationException();
+    }
 
     void startPlayback(Result result, long position, MediaMetadata metadata);
 
@@ -49,8 +55,6 @@ public interface LivePlaybackHost {
     void renderEpgSelection(EpgData data);
 
     void renderPlaybackMetadata(MediaMetadata metadata);
-
-    void showCatchupReady(EpgData data);
 
     void showProgress();
 }

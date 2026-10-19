@@ -5,13 +5,14 @@ import android.net.Uri;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
+import androidx.media3.common.MimeTypes;
 
 import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.setting.Setting;
-import com.fongmi.android.tv.utils.UrlUtil;
+import com.github.catvod.utils.UriUtil;
 import com.google.common.net.HttpHeaders;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class PlaySpec {
     private String key;
     private String url;
     private Drm drm;
+    private long endingMs;
+    private int isoEditionIndex = C.INDEX_UNSET;
 
     private PlaySpec(String key, String url, Map<String, String> headers, String format, Drm drm, List<Sub> subs, List<Danmaku> danmakus, MediaMetadata metadata) {
         this.key = key;
@@ -65,6 +68,15 @@ public class PlaySpec {
         return key;
     }
 
+    public long getEnding() {
+        return endingMs;
+    }
+
+    public PlaySpec setEnding(long endingMs) {
+        this.endingMs = Math.max(0, endingMs);
+        return this;
+    }
+
     public void setKey(String key) {
         this.key = key;
     }
@@ -78,7 +90,15 @@ public class PlaySpec {
     }
 
     public Uri getUri() {
-        return UrlUtil.uri(url);
+        return UriUtil.uri(url);
+    }
+
+    public int getIsoEditionIndex() {
+        return isoEditionIndex;
+    }
+
+    public void setIsoEditionIndex(int isoEditionIndex) {
+        this.isoEditionIndex = isoEditionIndex;
     }
 
     public Map<String, String> getHeaders() {
@@ -89,7 +109,14 @@ public class PlaySpec {
         this.headers = headers;
     }
 
+    public void refresh() {
+        headers = new HashMap<>(headers == null ? Map.of() : headers);
+        headers.keySet().removeIf(HttpHeaders.CACHE_CONTROL::equalsIgnoreCase);
+        headers.put(HttpHeaders.CACHE_CONTROL, "no-cache");
+    }
+
     public String getFormat() {
+        if ((format == null || format.isEmpty()) && url != null && url.contains("/proxy/mpd/")) return MimeTypes.APPLICATION_MPD;
         return format;
     }
 
@@ -153,7 +180,7 @@ public class PlaySpec {
         else selectDanmaku(item);
     }
 
-    private void clearDanmaku() {
+    public void clearDanmaku() {
         danmakus.forEach(item -> item.setSelected(false));
     }
 

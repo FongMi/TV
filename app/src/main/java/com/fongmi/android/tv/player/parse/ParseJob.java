@@ -9,40 +9,48 @@ import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.bean.Parse;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.impl.ParseCallback;
-import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.ui.custom.CustomWebView;
-import com.fongmi.android.tv.utils.Task;
+import com.fongmi.android.tv.ui.custom.ParseWebView;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.WebViewUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Json;
-import com.github.catvod.utils.Util;
+import com.github.catvod.utils.Task;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
+import okhttp3.Call;
 import okhttp3.Response;
 
 public class ParseJob implements ParseCallback {
 
     private final AtomicBoolean done = new AtomicBoolean();
-    private final List<CustomWebView> webViews;
+    private final Set<Call> calls = ConcurrentHashMap.newKeySet();
+    private final List<ParseWebView> webViews;
+    private ScheduledFuture<?> timeout;
     private ExecutorService executor;
     private ExecutorService infinite;
     private ParseCallback callback;
     private Parse parse;
+    private Map<String, String> parseHeaders;
+    private String parseClick;
 
     private ParseJob(ParseCallback callback) {
         this.executor = Executors.newSingleThreadExecutor();
@@ -66,61 +74,64 @@ public class ParseJob implements ParseCallback {
         if (result.getPlayUrl().startsWith("json:")) parse = Parse.get(1, result.getPlayUrl().substring(5));
         if (result.getPlayUrl().startsWith("parse:")) parse = VodConfig.get().getParse(result.getPlayUrl().substring(6));
         if (parse == null || parse.isEmpty()) parse = Parse.get(0, result.getPlayUrl());
-        parse.setHeader(result.getHeader());
-        parse.setClick(getClick(result));
+        parseHeaders = resolveHeaders(parse, result);
+        String click = VodConfig.get().getSite(result.getKey()).getClick();
+        parseClick = TextUtils.isEmpty(click) ? result.getClick() : click;
     }
 
-    private String getClick(Result result) {
-        String click = VodConfig.get().getSite(result.getKey()).getClick();
-        if (!TextUtils.isEmpty(click)) return click;
-        return result.getClick();
+    static Map<String, String> resolveHeaders(Parse parse, Result result) {
+        Map<String, String> configured = parse.getHeader();
+        return new HashMap<>(configured.isEmpty() ? result.getHeader() : configured);
     }
 
     private void execute(Result result) {
-        Future<?> task = executor.submit(getTask(result));
-        Task.schedule(() -> {
+        FutureTask<?> task = new FutureTask<>(() -> parseResult(result), null);
+        timeout = Task.scheduler().schedule(() -> {
             if (task.cancel(true)) onParseError();
         }, Constant.TIMEOUT_PARSE_DEF, TimeUnit.MILLISECONDS);
+        executor.execute(task);
     }
 
-    private Runnable getTask(Result result) {
-        return () -> {
-            try {
-                doInBackground(result.getKey(), result.getUrl().v(), result.getFlag());
-            } catch (Throwable e) {
-                onParseError();
-            }
-        };
+    private void parseResult(Result result) {
+        try {
+            doInBackground(result.getKey(), result.getUrl().v(), result.getFlag());
+        } catch (Throwable e) {
+            onParseError();
+        }
     }
 
     private void doInBackground(String key, String webUrl, String flag) throws Throwable {
         switch (parse.getType()) {
-            case 0:
-                startWeb(key, parse, webUrl);
-                break;
-            case 1:
-                jsonParse(parse, webUrl, true);
-                break;
-            case 2:
-                jsonExtend(webUrl);
-                break;
-            case 3:
-                jsonMix(webUrl, flag);
-                break;
-            case 4:
-                superParse(webUrl, flag);
-                break;
+            case 0 -> startWeb(key, parse, webUrl, this);
+            case 1 -> jsonParse(parse, webUrl, true);
+            case 2 -> jsonExtend(webUrl);
+            case 3 -> jsonMix(webUrl, flag);
+            case 4 -> superParse(webUrl, flag);
         }
     }
 
     private void jsonParse(Parse item, String webUrl, boolean fatal) throws Exception {
-        try (Response res = OkHttp.newCall(item.getUrl() + webUrl, item.getHeader()).execute()) {
-            JsonObject object = Json.parse(res.body().string()).getAsJsonObject();
-            String url = Json.safeString(object, "url");
-            JsonObject data = object.getAsJsonObject("data");
-            if (url.isEmpty()) url = Json.safeString(data, "url");
-            checkResult(getHeader(object), url, item.getName(), fatal);
+        Map<String, String> headers = getHeaders(item);
+        Call call = OkHttp.newCall(item.getUrl() + webUrl, headers);
+        calls.add(call);
+        try {
+            if (done.get()) return;
+            try (Response res = call.execute()) {
+                readJsonResult(res, headers, item, fatal);
+            }
+        } catch (IOException e) {
+            if (!call.isCanceled()) throw e;
+        } finally {
+            calls.remove(call);
         }
+    }
+
+    private void readJsonResult(Response response, Map<String, String> headers, Parse item, boolean fatal) throws IOException {
+        JsonObject object = Json.parse(response.body().string()).getAsJsonObject();
+        String url = Json.safeString(object, "url");
+        JsonObject data = object.getAsJsonObject("data");
+        if (url.isEmpty()) url = Json.safeString(data, "url");
+        checkResult(getHeader(object, headers), url, item.getName(), fatal);
     }
 
     private void jsonExtend(String webUrl) throws Throwable {
@@ -138,10 +149,20 @@ public class ParseJob implements ParseCallback {
     private void superParse(String webUrl, String flag) throws Exception {
         List<Parse> json = VodConfig.get().getParses(1, flag);
         List<Parse> webs = VodConfig.get().getParses(0, flag);
-        int count = json.size() + (webs.isEmpty() ? 0 : 1);
-        CountDownLatch latch = new CountDownLatch(count);
+        CountDownLatch latch = new CountDownLatch(json.size() + webs.size());
         for (Parse item : json) infinite.execute(() -> jsonParse(latch, item, webUrl));
-        if (!webs.isEmpty()) startWeb(webs, webUrl);
+        ParseCallback webCallback = new ParseCallback() {
+            @Override
+            public void onParseSuccess(Map<String, String> headers, String url, String from) {
+                ParseJob.this.onParseSuccess(headers, url, from);
+            }
+
+            @Override
+            public void onParseError() {
+                latch.countDown();
+            }
+        };
+        for (Parse item : webs) startWeb("", item, webUrl, webCallback);
         latch.await();
         onParseError();
     }
@@ -157,76 +178,83 @@ public class ParseJob implements ParseCallback {
     }
 
     private void checkResult(Map<String, String> headers, String url, String from, boolean fatal) {
-        if (url.length() > 40) onParseSuccess(headers, url, from);
+        if (!url.isEmpty()) onParseSuccess(headers, url, from);
         else if (fatal) onParseError();
     }
 
     private void checkResult(Result result) {
-        result.setHeader(parse.getHeader());
+        result.setHeader(new HashMap<>(parseHeaders));
         if (result.getUrl().isEmpty()) onParseError();
         else if (result.needParse()) startWeb(result.getHeader(), UrlUtil.convert(result.getUrl().v()));
         else onParseSuccess(result.getHeader(), result.getUrl().v(), result.getJxFrom());
     }
 
-    private void startWeb(List<Parse> items, String webUrl) {
-        StringBuilder sb = new StringBuilder();
-        for (Parse item : items) sb.append(item.getUrl()).append(";");
-        startWeb(new HashMap<>(), Server.get().getAddress("/parse?jxs=" + Util.substring(sb.toString()) + "&url=" + webUrl));
-    }
-
-    private void startWeb(String key, Parse item, String webUrl) {
-        startWeb(key, item.getName(), item.getHeader(), item.getUrl() + webUrl, item.getClick());
+    private void startWeb(String key, Parse item, String webUrl, ParseCallback callback) {
+        startWeb(key, item.getName(), getHeaders(item), item.getUrl() + webUrl, item == parse ? parseClick : item.getClick(), callback);
     }
 
     private void startWeb(Map<String, String> headers, String url) {
-        startWeb("", "", headers, url, "");
+        startWeb("", "", headers, url, "", this);
     }
 
-    private void startWeb(String key, String from, Map<String, String> headers, String url, String click) {
+    private void startWeb(String key, String from, Map<String, String> headers, String url, String click, ParseCallback callback) {
         if (!WebViewUtil.support()) {
-            onParseError();
-        } else {
-            App.post(() -> webViews.add(CustomWebView.create(App.get()).start(key, from, headers, url, click, this, !url.contains("player/?url="))));
+            callback.onParseError();
+            return;
         }
+        App.post(() -> {
+            if (done.get()) return;
+            webViews.add(ParseWebView.create(App.get()).start(key, from, headers, url, click, callback, !url.contains("player/?url=")));
+        });
     }
 
-    private Map<String, String> getHeader(JsonObject object) {
+    private Map<String, String> getHeaders(Parse item) {
+        return item == parse ? parseHeaders : new HashMap<>(item.getHeader());
+    }
+
+    private Map<String, String> getHeader(JsonObject object, Map<String, String> fallback) {
         Map<String, String> headers = new HashMap<>();
-        for (Map.Entry<String, JsonElement> entry : object.entrySet()) if (!entry.getValue().isJsonNull() && (entry.getKey().equalsIgnoreCase(HttpHeaders.USER_AGENT) || entry.getKey().equalsIgnoreCase(HttpHeaders.REFERER) || entry.getKey().equalsIgnoreCase(HttpHeaders.COOKIE) || entry.getKey().equalsIgnoreCase("ua"))) headers.put(UrlUtil.fixHeader(entry.getKey()), entry.getValue().getAsString());
-        return headers.isEmpty() ? parse.getHeader() : headers;
+        for (Map.Entry<String, JsonElement> entry : object.entrySet()) {
+            String name = entry.getKey();
+            if (!entry.getValue().isJsonNull() && (name.equalsIgnoreCase(HttpHeaders.USER_AGENT) || name.equalsIgnoreCase(HttpHeaders.REFERER) || name.equalsIgnoreCase(HttpHeaders.COOKIE) || name.equalsIgnoreCase("ua"))) headers.put(UrlUtil.fixHeader(name), entry.getValue().getAsString());
+        }
+        return headers.isEmpty() ? fallback : headers;
     }
 
     @Override
     public void onParseSuccess(Map<String, String> headers, String url, String from) {
-        if (!done.compareAndSet(false, true)) return;
-        App.post(() -> {
-            if (callback != null) callback.onParseSuccess(headers, url, from);
-            stop();
-        });
+        complete(callback -> callback.onParseSuccess(headers, url, from));
     }
 
     @Override
     public void onParseError() {
-        if (!done.compareAndSet(false, true)) return;
-        App.post(() -> {
-            if (callback != null) callback.onParseError();
-            stop();
-        });
+        complete(ParseCallback::onParseError);
     }
 
-    private void stopWeb() {
-        for (CustomWebView webView : webViews) webView.stop(false);
-        for (CustomWebView webView : webViews) webView.destroy();
-        if (!webViews.isEmpty()) webViews.clear();
+    private void complete(Consumer<ParseCallback> result) {
+        if (!done.compareAndSet(false, true)) return;
+        App.post(() -> deliverResult(result));
+    }
+
+    private void deliverResult(Consumer<ParseCallback> result) {
+        try {
+            if (callback != null) result.accept(callback);
+        } finally {
+            stop();
+        }
     }
 
     public void stop() {
+        done.set(true);
+        callback = null;
+        if (timeout != null) timeout.cancel(false);
+        for (Call call : calls) call.cancel();
+        calls.clear();
         if (executor != null) executor.shutdownNow();
         if (infinite != null) infinite.shutdownNow();
         infinite = null;
         executor = null;
-        callback = null;
-        done.set(true);
-        stopWeb();
+        for (ParseWebView webView : webViews) webView.release();
+        webViews.clear();
     }
 }

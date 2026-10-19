@@ -28,8 +28,9 @@
         android:visibility="gone"
         tools:visibility="visible">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/search"
+            android:contentDescription="@string/dialog_action_site_searchable"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="@drawable/selector_chip_round"
@@ -41,8 +42,9 @@
             android:src="@drawable/ic_site_search"
             app:tint="@color/white" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/change"
+            android:contentDescription="@string/dialog_action_site_changeable"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
@@ -55,8 +57,9 @@
             android:src="@drawable/ic_site_change"
             app:tint="@color/white" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/select"
+            android:contentDescription="@string/dialog_action_select_all"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
@@ -68,8 +71,9 @@
             android:padding="8dp"
             android:src="@drawable/ic_site_select" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/cancel"
+            android:contentDescription="@string/dialog_action_clear_all"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_marginTop="16dp"
@@ -81,7 +85,7 @@
             android:padding="8dp"
             android:src="@drawable/ic_site_cancel" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/mode"
             android:layout_width="40dp"
             android:layout_height="40dp"

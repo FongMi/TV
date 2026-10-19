@@ -4,9 +4,9 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
+import com.github.catvod.utils.UriUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +39,7 @@ public class Url {
     }
 
     public Uri uri() {
-        return UrlUtil.uri(v());
+        return UriUtil.uri(v());
     }
 
     public String v() {

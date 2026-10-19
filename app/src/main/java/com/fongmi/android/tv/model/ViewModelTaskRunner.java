@@ -1,6 +1,6 @@
 package com.fongmi.android.tv.model;
 
-import com.fongmi.android.tv.utils.Task;
+import com.github.catvod.utils.Task;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -41,6 +41,12 @@ final class ViewModelTaskRunner<T extends Enum<T>> {
                     if (taskId.get() == currentId) onError.accept(error);
                 }
         ), MoreExecutors.directExecutor());
+    }
+
+    void cancel(T type) {
+        Objects.requireNonNull(taskIds.get(type)).incrementAndGet();
+        ListenableFuture<?> future = futures.remove(type);
+        if (future != null) future.cancel(true);
     }
 
     void cancelAll() {

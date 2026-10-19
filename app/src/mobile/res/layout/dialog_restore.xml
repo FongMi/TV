@@ -28,6 +28,7 @@
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:nestedScrollingEnabled="false"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:overScrollMode="never"

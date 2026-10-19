@@ -14,8 +14,9 @@ import com.fongmi.android.tv.Product;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Diffable;
 import com.fongmi.android.tv.server.Server;
-import com.fongmi.android.tv.utils.UrlUtil;
 import com.fongmi.android.tv.utils.Util;
+import com.github.catvod.utils.Prefers;
+import com.github.catvod.utils.UriUtil;
 import com.google.gson.annotations.SerializedName;
 
 import org.jupnp.model.meta.RemoteDevice;
@@ -109,6 +110,26 @@ public class Device implements Diffable<Device>, Comparable<Device> {
         this.name = name;
     }
 
+    public boolean canRename() {
+        return isApp() && !getUuid().isBlank() && !getUuid().matches("0+");
+    }
+
+    public String getAlias() {
+        return canRename() ? Prefers.getString("device_alias_" + getUuid()) : "";
+    }
+
+    public String getDisplayName() {
+        String alias = getAlias();
+        return alias.isEmpty() ? getName() : alias;
+    }
+
+    public void setAlias(String alias) {
+        if (!canRename()) throw new IllegalStateException("Invalid device identity");
+        String key = "device_alias_" + getUuid();
+        if (alias.trim().isEmpty()) Prefers.remove(key);
+        else Prefers.put(key, alias.trim());
+    }
+
     public String getIp() {
         return TextUtils.isEmpty(ip) ? "" : ip;
     }
@@ -158,7 +179,7 @@ public class Device implements Diffable<Device>, Comparable<Device> {
     }
 
     public String getHost() {
-        return isDLNA() ? getUuid() : UrlUtil.host(getIp());
+        return isDLNA() ? getUuid() : UriUtil.host(getIp());
     }
 
     public Device save() {
@@ -191,7 +212,7 @@ public class Device implements Diffable<Device>, Comparable<Device> {
 
     @Override
     public boolean isSameContent(Device other) {
-        return getName().equals(other.getName()) && getType() == other.getType();
+        return getName().equals(other.getName()) && getType() == other.getType() && getIp().equals(other.getIp());
     }
 
     @Override

@@ -30,13 +30,13 @@ import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.CollectActivity;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
+import com.fongmi.android.tv.ui.activity.WebActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
 import com.fongmi.android.tv.ui.custom.CustomSelector;
 import com.fongmi.android.tv.ui.presenter.FilterPresenter;
 import com.fongmi.android.tv.ui.presenter.VodPresenter;
-import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.common.collect.Lists;
 
@@ -50,6 +50,7 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private FragmentTypeBinding mBinding;
     private ArrayObjectAdapter mAdapter;
     private ArrayObjectAdapter mLast;
+    private VodPresenter mVodPresenter;
     private CustomScroller mScroller;
     private SiteViewModel mViewModel;
     private List<Filter> mFilters;
@@ -136,15 +137,11 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
         mViewModel.getResult().observe(getViewLifecycleOwner(), this::setAdapter);
-        mViewModel.getAction().observe(getViewLifecycleOwner(), result -> Notify.show(result.getMsg()));
+        mViewModel.getAction().observe(getViewLifecycleOwner(), result -> WebActivity.handleAction(requireActivity(), result));
     }
 
     private void setFilters() {
-        for (Filter filter : mFilters) {
-            if (mExtends.containsKey(filter.getKey())) {
-                filter.setSelected(mExtends.get(filter.getKey()));
-            }
-        }
+        for (Filter filter : mFilters) if (mExtends.containsKey(filter.getKey())) filter.setSelected(mExtends.get(filter.getKey()));
     }
 
     private void setClick(ArrayObjectAdapter adapter, String key, Value item) {
@@ -199,15 +196,20 @@ public class TypeFragment extends BaseFragment implements CustomScroller.Callbac
     }
 
     private void addGrid(List<Vod> items, Style style) {
+        if (mVodPresenter == null || !mVodPresenter.matches(style)) {
+            mVodPresenter = new VodPresenter(this, style);
+            mLast = null;
+        }
         if (checkLastSize(items, style)) return;
         List<ListRow> rows = new ArrayList<>();
-        VodPresenter presenter = new VodPresenter(this, style);
-        for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) {
-            mLast = new ArrayObjectAdapter(presenter);
-            mLast.addAll(0, part);
-            rows.add(new ListRow(mLast));
-        }
+        for (List<Vod> part : Lists.partition(items, Product.getColumn(style))) rows.add(createVideoRow(part));
         mAdapter.addAll(mAdapter.size(), rows);
+    }
+
+    private ListRow createVideoRow(List<Vod> items) {
+        mLast = new ArrayObjectAdapter(mVodPresenter);
+        mLast.addAll(0, items);
+        return new ListRow(mLast);
     }
 
     private ListRow getRow(Filter filter) {

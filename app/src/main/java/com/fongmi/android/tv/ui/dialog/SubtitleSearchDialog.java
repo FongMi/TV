@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.dialog;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.media3.common.MediaMetadata;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewbinding.ViewBinding;
@@ -45,6 +47,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
 
     private DialogSubtitleSearchBinding binding;
     private PlayerManager player;
+    private boolean keywordInitialized;
     private String keyword;
     private int nextPos;
 
@@ -58,14 +61,23 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
         return new SubtitleSearchDialog();
     }
 
-    public SubtitleSearchDialog player(PlayerManager player) {
-        this.player = player;
-        return this;
+    public void show(FragmentActivity activity) {
+        FragmentManager manager = activity.getSupportFragmentManager();
+        if (manager.isStateSaved()) return;
+        for (Fragment fragment : manager.getFragments()) if (fragment instanceof SubtitleSearchDialog) return;
+        show(manager, null);
     }
 
-    public void show(FragmentActivity activity) {
-        for (Fragment f : activity.getSupportFragmentManager().getFragments()) if (f instanceof SubtitleSearchDialog) return;
-        show(activity.getSupportFragmentManager(), null);
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        keywordInitialized = savedInstanceState != null && savedInstanceState.getBoolean("keywordInitialized");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean("keywordInitialized", keywordInitialized);
     }
 
     @Override
@@ -80,8 +92,19 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
         binding.recycler.setHasFixedSize(false);
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 16));
         binding.recycler.addOnScrollListener(scroller);
-        Util.showKeyboard(binding.keyword);
+        PlaybackDialog.observe(this, this::bindPlayer);
+    }
+
+    private void bindPlayer(PlayerManager player) {
+        if (this.player != null && player == null) {
+            SubtitleApi.cancel();
+            showResults(adapter.getItemCount() == 0);
+        }
+        this.player = player;
+        if (player == null || keywordInitialized) return;
         setKeyword(getTitle());
+        keywordInitialized = true;
+        Util.showKeyboard(binding.keyword);
     }
 
     @Override
@@ -105,6 +128,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
 
     @Override
     public void onItemClick(SubtitleSearchItem item) {
+        if (!PlaybackDialog.isCurrentPlayer(this, player)) return;
         if (item.hasUrl()) applySub(item);
         else detail(item);
     }
@@ -115,14 +139,13 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     }
 
     private String getKeyword() {
-        CharSequence text = binding.keyword.getText();
-        return text == null ? "" : text.toString().trim();
+        return binding.keyword.getText().toString().trim();
     }
 
     private void setKeyword(CharSequence text) {
         if (text == null) text = "";
         binding.keyword.setText(text);
-        binding.keyword.setSelection(text.length());
+        binding.keyword.setSelection(binding.keyword.length());
     }
 
     private void onSetting(View view) {
@@ -142,6 +165,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     }
 
     private void search() {
+        if (!PlaybackDialog.isCurrentPlayer(this, player)) return;
         if (!SubtitleApi.hasToken()) return;
         Util.hideKeyboard(binding.keyword);
         showProgress();
@@ -172,6 +196,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     }
 
     private void applySub(Sub sub) {
+        if (!PlaybackDialog.isCurrentPlayer(this, player)) return;
         player.setSub(sub);
         dismiss();
     }
@@ -184,7 +209,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     }
 
     private boolean loadMore() {
-        boolean load = hasMore();
+        boolean load = PlaybackDialog.isCurrentPlayer(this, player) && hasMore();
         if (load) requestSearch();
         return load;
     }
@@ -254,12 +279,10 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
             SubtitleApi.cancel();
             showResults(false);
             return true;
-        } else if (!states.isEmpty()) {
-            restore(states.pop());
-            return true;
-        } else {
-            return false;
         }
+        if (states.isEmpty()) return false;
+        restore(states.pop());
+        return true;
     }
 
     private void restore(State state) {
@@ -284,6 +307,7 @@ public final class SubtitleSearchDialog extends BaseBottomSheetDialog implements
     public void onDestroyView() {
         states.clear();
         binding = null;
+        player = null;
         SubtitleApi.cancel();
         super.onDestroyView();
     }

@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 
 import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.github.catvod.utils.Prefers;
 
@@ -107,11 +108,11 @@ public class DanmakuSetting {
 
     @Nullable
     public static ExternalFont.Item getFont() {
-        return ExternalFont.find(Prefers.getString("danmaku_font", ""));
+        return ExternalFont.find(Prefers.getString("danmaku_font", ""), MpvConfigFile.getSubtitleFontsDirectory());
     }
 
     public static void putFont(@Nullable ExternalFont.Item font) {
-        Prefers.put("danmaku_font", font == null ? "" : font.fileName());
+        Prefers.put("danmaku_font", font == null ? "" : font.storageKey());
     }
 
     @Nullable

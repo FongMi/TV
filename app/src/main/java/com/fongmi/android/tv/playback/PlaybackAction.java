@@ -13,9 +13,8 @@ import com.fongmi.android.tv.utils.ResUtil;
 
 public final class PlaybackAction {
 
-    public static void setPlaybackMode(PlayerManager player, TextView engine, TextView decode) {
-        setText(engine, getEngineText(player));
-        setText(decode, getDecodeText(player));
+    public static void setPlaybackMode(PlayerManager player, TextView engine) {
+        if (engine != null) engine.setText(getEngineText(player));
     }
 
     public static float toggleSpeed(PlayerManager player, TextView view) {
@@ -24,20 +23,21 @@ public final class PlaybackAction {
         return speed;
     }
 
-    public static void startSpeedPress(PlayerManager player, TextView view) {
-        float speed = player.setSpeed(SpeedSetting.getLongPress());
-        showSpeedPress(view, speed);
+    public static boolean startSpeedPress(PlayerManager player, TextView view) {
+        if (!player.startSpeedPress(SpeedSetting.getLongPress())) return false;
+        if (view != null) setSpeedHint(view, player.getSpeed());
+        return true;
+    }
+
+    public static void endSpeedPress(PlayerManager player, TextView view) {
+        player.endSpeedPress();
+        hideSpeedHint(view);
     }
 
     public static void showSpeedHint(TextView view, float speed) {
         if (view == null) return;
         setSpeedHint(view, speed);
         view.animate().alpha(0.0f).setStartDelay(900).setDuration(180).withEndAction(() -> clearSpeedHint(view)).start();
-    }
-
-    public static void showSpeedPress(TextView view, float speed) {
-        if (view == null) return;
-        setSpeedHint(view, speed);
     }
 
     public static void hideSpeedHint(TextView view) {
@@ -74,8 +74,8 @@ public final class PlaybackAction {
         setVisible(chapter, hasChapter(player));
     }
 
-    public static String getEngineText(PlayerManager player) {
-        return ResUtil.getStringArray(R.array.select_engine)[getEngine(player)];
+    public static void setWebPlaybackMode(boolean active, View... nativeOnlyViews) {
+        for (View view : nativeOnlyViews) setVisible(view, !active);
     }
 
     public static int getEngine(PlayerManager player) {
@@ -83,8 +83,8 @@ public final class PlaybackAction {
         return player.getEngine();
     }
 
-    private static String getDecodeText(PlayerManager player) {
-        return player == null ? "" : player.getDecodeText();
+    public static String getEngineText(PlayerManager player) {
+        return ResUtil.getStringArray(R.array.select_engine)[getEngine(player)];
     }
 
     private static boolean hasTextTrack(PlayerManager player) {
@@ -92,11 +92,11 @@ public final class PlaybackAction {
     }
 
     private static boolean hasAudioTrack(PlayerManager player) {
-        return player != null && player.haveTrack(C.TRACK_TYPE_AUDIO);
+        return player != null && (player.haveTrack(C.TRACK_TYPE_AUDIO) || player.getDecoderMode(C.TRACK_TYPE_AUDIO) != null);
     }
 
     private static boolean hasVideoTrack(PlayerManager player) {
-        return player != null && player.haveTrack(C.TRACK_TYPE_VIDEO);
+        return player != null && (player.haveTrack(C.TRACK_TYPE_VIDEO) || player.getDecoderMode(C.TRACK_TYPE_VIDEO) != null);
     }
 
     private static boolean hasSpeed(PlayerManager player) {
@@ -109,10 +109,6 @@ public final class PlaybackAction {
 
     private static boolean hasChapter(PlayerManager player) {
         return player != null && player.haveChapter();
-    }
-
-    private static void setText(TextView view, CharSequence text) {
-        if (view != null) view.setText(text);
     }
 
     private static void setVisible(View view, boolean visible) {

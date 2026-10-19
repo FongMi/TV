@@ -21,8 +21,9 @@
         app:strokeColor="@color/selector_stroke"
         tools:text="https://fongmi.github.io/cat.json" />
 
-    <androidx.appcompat.widget.AppCompatImageView
+    <com.fongmi.android.tv.ui.custom.DialogActionView
         android:id="@+id/delete"
+        android:contentDescription="@string/dialog_action_delete_config"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"

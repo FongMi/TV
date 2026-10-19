@@ -26,7 +26,8 @@ public class CustomEditText extends TextInputEditText {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (consumeVerticalKey(keyCode, event)) return true;
         View next = findNextFocus(event);
-        return next != null ? next.requestFocus() : super.onKeyDown(keyCode, event);
+        if (next != null && next.requestFocus()) return true;
+        return super.onKeyDown(keyCode, event);
     }
 
     private boolean consumeVerticalKey(int keyCode, KeyEvent event) {
@@ -38,12 +39,13 @@ public class CustomEditText extends TextInputEditText {
     }
 
     private View findNextFocus(KeyEvent event) {
-        if (getParent() == null) return null;
         int direction = getFocusDirection(event);
-        return direction == 0 ? null : getParent().focusSearch(this, direction);
+        View next = direction == 0 ? null : focusSearch(direction);
+        return next == this ? null : next;
     }
 
     private int getFocusDirection(KeyEvent event) {
+        if (!event.hasNoModifiers()) return 0;
         if (KeyUtil.isUpKey(event)) return FOCUS_UP;
         if (KeyUtil.isDownKey(event)) return FOCUS_DOWN;
         if (KeyUtil.isLeftKey(event) && isSelectionAtStart()) return FOCUS_LEFT;
@@ -70,11 +72,11 @@ public class CustomEditText extends TextInputEditText {
     }
 
     private boolean isSelectionAtStart() {
-        return getSelectionStart() == 0;
+        return getSelectionStart() == 0 && getSelectionEnd() == 0;
     }
 
     private boolean isSelectionAtEnd() {
-        return getText() == null || getSelectionStart() == getText().length();
+        return getText() == null || getSelectionStart() == getText().length() && getSelectionEnd() == getText().length();
     }
 
     private void scrollByLine(int direction) {

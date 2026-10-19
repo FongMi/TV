@@ -22,6 +22,7 @@ import com.fongmi.android.tv.databinding.FragmentTypeBinding;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.activity.VideoActivity;
 import com.fongmi.android.tv.ui.activity.VodActivity;
+import com.fongmi.android.tv.ui.activity.WebActivity;
 import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.custom.CustomRowPresenter;
 import com.fongmi.android.tv.ui.custom.CustomScroller;
@@ -83,6 +84,7 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
 
     private void setViewModel() {
         mViewModel = new ViewModelProvider(this).get(SiteViewModel.class);
+        mViewModel.getAction().observe(getViewLifecycleOwner(), result -> WebActivity.handleAction(requireActivity(), result));
         mViewModel.getResult().observe(this, result -> {
             mScroller.endLoading(result);
             addVideo(result.getList());
@@ -107,16 +109,22 @@ public class CollectFragment extends BaseFragment implements CustomScroller.Call
         if (checkLastSize(items) || getActivity() == null || getActivity().isFinishing()) return;
         List<ListRow> rows = new ArrayList<>();
         VodPresenter presenter = new VodPresenter(this);
-        for (List<Vod> part : Lists.partition(items, Product.getColumn())) {
-            mLast = new ArrayObjectAdapter(presenter);
-            mLast.addAll(0, part);
-            rows.add(new ListRow(mLast));
-        }
+        for (List<Vod> part : Lists.partition(items, Product.getColumn())) rows.add(createVideoRow(part, presenter));
         mAdapter.addAll(mAdapter.size(), rows);
+    }
+
+    private ListRow createVideoRow(List<Vod> items, VodPresenter presenter) {
+        mLast = new ArrayObjectAdapter(presenter);
+        mLast.addAll(0, items);
+        return new ListRow(mLast);
     }
 
     @Override
     public void onItemClick(Vod item) {
+        if (item.isAction()) {
+            mViewModel.action(item.getSiteKey(), item.getAction());
+            return;
+        }
         requireActivity().setResult(Activity.RESULT_OK);
         if (item.isFolder()) VodActivity.start(requireActivity(), item.getSiteKey(), Result.folder(item));
         else VideoActivity.collect(requireActivity(), item.getSiteKey(), item.getId(), item.getName(), item.getPic());
