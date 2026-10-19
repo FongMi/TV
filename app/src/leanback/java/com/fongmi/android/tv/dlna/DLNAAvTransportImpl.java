@@ -11,7 +11,10 @@ import com.fongmi.android.tv.ui.activity.CastActivity;
 import com.google.gson.reflect.TypeToken;
 
 import org.jupnp.model.types.UnsignedIntegerFourBytes;
+import org.jupnp.model.types.ErrorCode;
 import org.jupnp.support.avtransport.AbstractAVTransportService;
+import org.jupnp.support.avtransport.AVTransportErrorCode;
+import org.jupnp.support.avtransport.AVTransportException;
 import org.jupnp.support.avtransport.lastchange.AVTransportVariable;
 import org.jupnp.support.contentdirectory.DIDLParser;
 import org.jupnp.support.model.DIDLContent;
@@ -29,6 +32,9 @@ import org.jupnp.support.model.TransportSettings;
 import org.jupnp.support.model.TransportState;
 import org.jupnp.support.model.TransportStatus;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Locale;
@@ -37,6 +43,7 @@ import java.util.Map;
 public class DLNAAvTransportImpl extends AbstractAVTransportService {
 
     private final Context context;
+    private final Runnable onChange;
 
     private volatile PlayerManager player;
     private volatile PlayMode currentPlayMode = PlayMode.NORMAL;
@@ -51,41 +58,99 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
     private volatile long pendingSeekMs = -1;
     private volatile long cachedPosition = -1;
     private volatile long cachedDuration = -1;
+    private volatile String cachedSpeed = "1";
+    private TransportState pendingState;
+    private boolean launching;
+    private boolean playerPrepared;
+    private long generation;
 
-    public DLNAAvTransportImpl(Context context) {
+    public DLNAAvTransportImpl(Context context, Runnable onChange) {
         this.context = context;
+        this.onChange = onChange;
     }
 
-    public void setPlayerManager(PlayerManager player) {
+    public synchronized void setPlayerManager(PlayerManager player) {
         this.player = player;
         if (player == null) reset();
     }
 
-    public void setDlnaActive(boolean active) {
+    public synchronized void setDlnaActive(boolean active) {
         this.dlnaActive = active;
+        if (!active) generation++;
     }
 
-    public void reset() {
+    public synchronized boolean isDlnaActive() {
+        return dlnaActive;
+    }
+
+    public synchronized void reset() {
+        generation++;
+        dlnaActive = false;
+        launching = false;
+        playerPrepared = false;
+        pendingState = null;
         nextURI = "";
         currentURI = "";
         nextMetaData = "";
         pendingSeekMs = -1;
         cachedPosition = -1;
         cachedDuration = -1;
+        cachedSpeed = "1";
         currentMetaData = "";
         currentPlayMode = PlayMode.NORMAL;
         fireStateChange(RenderState.IDLE);
     }
 
-    public void updatePositionCache(long position, long duration) {
+    public synchronized void updatePositionCache(String uri, long position, long duration) {
+        if (!isCurrentURI(uri)) return;
         cachedPosition = position;
         cachedDuration = duration;
     }
 
-    public long consumePendingSeekMs() {
-        long ms = pendingSeekMs;
-        pendingSeekMs = -1;
-        return ms;
+    public synchronized void updateState(String uri, long position, long duration, float speed, RenderState state) {
+        if (!isCurrentURI(uri)) return;
+        updatePositionCache(uri, position, duration);
+        BigDecimal value = new BigDecimal(Float.toString(speed)).stripTrailingZeros();
+        cachedSpeed = value.scale() <= 0 ? value.toPlainString() : value.unscaledValue() + "/" + BigInteger.TEN.pow(value.scale());
+        if (state != null) fireStateChange(state);
+    }
+
+    public synchronized boolean isCurrentURI(String uri) {
+        return !currentURI.isEmpty() && currentURI.equals(uri);
+    }
+
+    public synchronized boolean ownsPlayer() {
+        return dlnaActive && playerPrepared && player != null && isCurrentURI(player.getKey()) && !player.isEmpty();
+    }
+
+    public synchronized void onPrepared(String uri) {
+        if (!isCurrentURI(uri)) return;
+        playerPrepared = true;
+        applyPendingCommands();
+    }
+
+    public synchronized void applyPendingCommands() {
+        if (!ownsPlayer()) return;
+        launching = false;
+        player.setRepeatOne(currentPlayMode == PlayMode.REPEAT_ONE);
+        if (pendingSeekMs >= 0 && player.getPlaybackState() == Player.STATE_READY) {
+            player.seekTo(pendingSeekMs);
+            pendingSeekMs = -1;
+        }
+        TransportState state = pendingState;
+        pendingState = null;
+        if (state == TransportState.STOPPED) player.stop();
+        else if (state == TransportState.PAUSED_PLAYBACK) player.pause();
+        else if (state == TransportState.PLAYING) player.play();
+    }
+
+    private void postCommand(Runnable action) {
+        long expectedGeneration = generation;
+        App.post(() -> {
+            synchronized (DLNAAvTransportImpl.this) {
+                if (generation == expectedGeneration) action.run();
+            }
+        });
     }
 
     @Override
@@ -94,14 +159,30 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
     }
 
     @Override
-    public synchronized void setAVTransportURI(UnsignedIntegerFourBytes instanceId, String currentURI, String currentURIMetaData) {
+    public synchronized void setAVTransportURI(UnsignedIntegerFourBytes instanceId, String currentURI, String currentURIMetaData) throws AVTransportException {
+        validateURI(currentURI);
+        String previousURI = this.currentURI;
+        generation++;
         this.nextURI = "";
         this.nextMetaData = "";
         this.dlnaActive = false;
         this.pendingSeekMs = -1;
+        this.pendingState = TransportState.PLAYING;
+        this.launching = true;
+        this.playerPrepared = false;
+        this.cachedPosition = -1;
+        this.cachedDuration = -1;
+        this.cachedSpeed = "1";
         this.currentURI = currentURI != null ? currentURI : "";
         this.currentMetaData = currentURIMetaData != null ? currentURIMetaData : "";
-        startCastActivity(new CastAction(this.currentURI, this.currentMetaData, parseHeaders(this.currentMetaData)));
+        fireStateChange(this.currentURI.isEmpty() ? RenderState.IDLE : RenderState.PREPARING);
+        if (this.currentURI.isEmpty()) {
+            postCommand(() -> {
+                if (!previousURI.isEmpty() && player != null && previousURI.equals(player.getKey())) player.stop();
+            });
+        } else {
+            postCommand(() -> startCastActivity(new CastAction(this.currentURI, this.currentMetaData, parseHeaders(this.currentMetaData))));
+        }
     }
 
     private Map<String, String> parseHeaders(String metaData) {
@@ -114,33 +195,35 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
     }
 
     @Override
-    public synchronized void setNextAVTransportURI(UnsignedIntegerFourBytes instanceId, String nextURI, String nextURIMetaData) {
+    public synchronized void setNextAVTransportURI(UnsignedIntegerFourBytes instanceId, String nextURI, String nextURIMetaData) throws AVTransportException {
+        validateURI(nextURI);
         this.nextURI = nextURI != null ? nextURI : "";
         this.nextMetaData = nextURIMetaData != null ? nextURIMetaData : "";
+        fireMediaChange();
     }
 
     @Override
-    public MediaInfo getMediaInfo(UnsignedIntegerFourBytes instanceId) {
+    public synchronized MediaInfo getMediaInfo(UnsignedIntegerFourBytes instanceId) {
         String nURI = nextURI.isEmpty() ? "" : nextURI;
         String nMeta = nextURI.isEmpty() ? "" : nextMetaData;
         String durStr = cachedDuration > 0 ? formatMs(cachedDuration) : "00:00:00";
-        return new MediaInfo(currentURI, currentMetaData, nURI, nMeta, new UnsignedIntegerFourBytes(1), durStr, StorageMedium.NETWORK);
+        return new MediaInfo(currentURI, currentMetaData, nURI, nMeta, new UnsignedIntegerFourBytes(currentURI.isEmpty() ? 0 : 1), durStr, StorageMedium.NETWORK);
     }
 
     @Override
-    public TransportInfo getTransportInfo(UnsignedIntegerFourBytes instanceId) {
-        String speed = (player != null && dlnaActive) ? String.valueOf(player.getSpeed()) : "1";
-        return new TransportInfo(currentState, TransportStatus.OK, speed);
+    public synchronized TransportInfo getTransportInfo(UnsignedIntegerFourBytes instanceId) {
+        return new TransportInfo(currentState, TransportStatus.OK, cachedSpeed);
     }
 
     @Override
-    public PositionInfo getPositionInfo(UnsignedIntegerFourBytes instanceId) {
+    public synchronized PositionInfo getPositionInfo(UnsignedIntegerFourBytes instanceId) {
         long posMs = cachedPosition;
         long durMs = cachedDuration;
-        if (posMs < 0) return new PositionInfo(1, currentMetaData, currentURI);
+        int track = currentURI.isEmpty() ? 0 : 1;
+        if (posMs < 0) return new PositionInfo(track, currentMetaData, currentURI);
         String relTime = formatMs(posMs);
         String durStr = durMs > 0 ? formatMs(durMs) : "00:00:00";
-        return new PositionInfo(1, durStr, currentMetaData, currentURI, relTime, relTime, Integer.MAX_VALUE, Integer.MAX_VALUE);
+        return new PositionInfo(track, durStr, currentMetaData, currentURI, relTime, relTime, Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     @Override
@@ -154,31 +237,37 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
     }
 
     @Override
-    public void stop(UnsignedIntegerFourBytes instanceId) {
+    public synchronized void stop(UnsignedIntegerFourBytes instanceId) {
+        pendingState = TransportState.STOPPED;
         fireStateChange(RenderState.STOPPED);
-        App.post(() -> {
-            if (player != null && dlnaActive) player.stop();
-        });
+        postCommand(this::applyPendingCommands);
     }
 
     @Override
-    public void play(UnsignedIntegerFourBytes instanceId, String speed) {
-        App.post(() -> {
-            if (player == null || !dlnaActive) return;
-            int state = player.getPlaybackState();
-            if (!currentURI.isEmpty() && (state == Player.STATE_ENDED || state == Player.STATE_IDLE)) {
-                startCastActivity(new CastAction(currentURI, currentMetaData, parseHeaders(currentMetaData)));
-            } else {
-                player.play();
-            }
-        });
+    public synchronized void play(UnsignedIntegerFourBytes instanceId, String speed) throws AVTransportException {
+        if (currentURI.isEmpty()) throw new AVTransportException(AVTransportErrorCode.TRANSITION_NOT_AVAILABLE);
+        pendingState = TransportState.PLAYING;
+        postCommand(this::onPlay);
+    }
+
+    private void onPlay() {
+        if (pendingState != TransportState.PLAYING) {
+            applyPendingCommands();
+            return;
+        }
+        if (ownsPlayer() && player.getPlaybackState() != Player.STATE_ENDED && player.getPlaybackState() != Player.STATE_IDLE) {
+            applyPendingCommands();
+        } else if (!launching) {
+            launching = true;
+            fireStateChange(RenderState.PREPARING);
+            startCastActivity(new CastAction(currentURI, currentMetaData, parseHeaders(currentMetaData)));
+        }
     }
 
     @Override
-    public void pause(UnsignedIntegerFourBytes instanceId) {
-        App.post(() -> {
-            if (player != null && dlnaActive) player.pause();
-        });
+    public synchronized void pause(UnsignedIntegerFourBytes instanceId) {
+        pendingState = TransportState.PAUSED_PLAYBACK;
+        postCommand(this::applyPendingCommands);
     }
 
     @Override
@@ -187,38 +276,31 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
     }
 
     @Override
-    public void seek(UnsignedIntegerFourBytes instanceId, String unit, String target) {
-        if (!SeekMode.REL_TIME.toString().equals(unit) && !SeekMode.ABS_TIME.toString().equals(unit)) return;
-        long ms = parseTimeToMs(target);
-        if (dlnaActive) {
-            PlayerManager local = player;
-            if (local != null) App.post(() -> local.seekTo(ms));
-        } else {
-            pendingSeekMs = ms;
-        }
+    public synchronized void seek(UnsignedIntegerFourBytes instanceId, String unit, String target) throws AVTransportException {
+        if (!SeekMode.REL_TIME.toString().equals(unit) && !SeekMode.ABS_TIME.toString().equals(unit)) throw new AVTransportException(AVTransportErrorCode.SEEKMODE_NOT_SUPPORTED);
+        pendingSeekMs = parseTimeToMs(target);
+        postCommand(this::applyPendingCommands);
     }
 
     @Override
-    public void next(UnsignedIntegerFourBytes instanceId) {
+    public synchronized void next(UnsignedIntegerFourBytes instanceId) {
         if (!canNext()) return;
         CastAction action = popNext();
-        if (action != null) startCastActivity(action);
+        postCommand(() -> startCastActivity(action));
     }
 
     @Override
-    public void previous(UnsignedIntegerFourBytes instanceId) {
-        App.post(() -> {
-            if (player != null && dlnaActive) player.seekTo(0);
-        });
+    public synchronized void previous(UnsignedIntegerFourBytes instanceId) {
+        pendingSeekMs = 0;
+        postCommand(this::applyPendingCommands);
     }
 
     @Override
-    public void setPlayMode(UnsignedIntegerFourBytes instanceId, String newPlayMode) {
+    public synchronized void setPlayMode(UnsignedIntegerFourBytes instanceId, String newPlayMode) {
         boolean repeat = PlayMode.REPEAT_ONE.name().equals(newPlayMode);
         currentPlayMode = repeat ? PlayMode.REPEAT_ONE : PlayMode.NORMAL;
-        App.post(() -> {
-            if (player != null && dlnaActive) player.setRepeatOne(repeat);
-        });
+        fireMediaChange();
+        postCommand(this::applyPendingCommands);
     }
 
     @Override
@@ -228,6 +310,7 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
 
     @Override
     protected TransportAction[] getCurrentTransportActions(UnsignedIntegerFourBytes instanceId) {
+        if (currentURI.isEmpty()) return new TransportAction[0];
         return switch (currentState) {
             case PLAYING -> withNext(TransportAction.Pause, TransportAction.Stop, TransportAction.Seek);
             case PAUSED_PLAYBACK -> withNext(TransportAction.Play, TransportAction.Stop, TransportAction.Seek);
@@ -259,19 +342,46 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
 
     public synchronized CastAction popNext() {
         if (nextURI.isEmpty()) return null;
+        generation++;
+        dlnaActive = false;
         currentURI = nextURI;
         currentMetaData = nextMetaData;
         nextURI = "";
         nextMetaData = "";
+        cachedPosition = -1;
+        cachedDuration = -1;
+        pendingSeekMs = -1;
+        pendingState = TransportState.PLAYING;
+        playerPrepared = false;
+        launching = true;
+        cachedSpeed = "1";
+        fireMediaChange();
         return new CastAction(currentURI, currentMetaData, parseHeaders(currentMetaData));
     }
 
-    public void fireStateChange(RenderState state) {
+    public synchronized void fireStateChange(RenderState state) {
+        currentState = toTransportState(state);
+        getLastChange().setEventedValue(getDefaultInstanceID(), new AVTransportVariable.TransportState(currentState));
+        fireMediaChange();
+    }
+
+    private void fireMediaChange() {
+        getLastChange().setEventedValue(getDefaultInstanceID(),
+                new AVTransportVariable.AVTransportURI(URI.create(currentURI)),
+                new AVTransportVariable.AVTransportURIMetaData(currentMetaData),
+                new AVTransportVariable.NextAVTransportURI(URI.create(nextURI)),
+                new AVTransportVariable.NextAVTransportURIMetaData(nextMetaData),
+                new AVTransportVariable.TransportPlaySpeed(cachedSpeed),
+                new AVTransportVariable.CurrentPlayMode(currentPlayMode),
+                new AVTransportVariable.CurrentTransportActions(getCurrentTransportActions(getDefaultInstanceID())));
+        onChange.run();
+    }
+
+    private void validateURI(String uri) throws AVTransportException {
         try {
-            currentState = toTransportState(state);
-            getLastChange().setEventedValue(AbstractAVTransportService.getDefaultInstanceID(), new AVTransportVariable.TransportState(currentState));
-            getLastChange().fire(propertyChangeSupport);
-        } catch (Exception ignored) {
+            if (uri != null) URI.create(uri);
+        } catch (IllegalArgumentException e) {
+            throw new AVTransportException(ErrorCode.ARGUMENT_VALUE_INVALID, "Invalid transport URI");
         }
     }
 
@@ -285,16 +395,17 @@ public class DLNAAvTransportImpl extends AbstractAVTransportService {
         };
     }
 
-    private long parseTimeToMs(String time) {
+    private long parseTimeToMs(String time) throws AVTransportException {
         try {
+            if (time == null || !time.matches("[0-9]+:[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?")) throw new NumberFormatException();
             String[] parts = time.split(":");
-            if (parts.length != 3) return 0;
             int dot = parts[2].indexOf('.');
             long secs = Long.parseLong(dot >= 0 ? parts[2].substring(0, dot) : parts[2]);
             long frac = dot >= 0 ? Math.round(Double.parseDouble("0" + parts[2].substring(dot)) * 1000) : 0;
-            return (Long.parseLong(parts[0]) * 3600 + Long.parseLong(parts[1]) * 60 + secs) * 1000 + frac;
-        } catch (Exception ignored) {
-            return 0;
+            long seconds = Math.addExact(Math.multiplyExact(Long.parseLong(parts[0]), 3600), Long.parseLong(parts[1]) * 60 + secs);
+            return Math.addExact(Math.multiplyExact(seconds, 1000), frac);
+        } catch (NumberFormatException | ArithmeticException e) {
+            throw new AVTransportException(AVTransportErrorCode.ILLEGAL_SEEK_TARGET);
         }
     }
 

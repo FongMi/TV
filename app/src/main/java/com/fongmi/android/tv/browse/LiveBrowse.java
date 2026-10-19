@@ -5,19 +5,23 @@ import android.text.TextUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.MediaMetadata;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.LiveApi;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
+import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.Group;
+import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.google.common.collect.ImmutableList;
 
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 import java.util.stream.IntStream;
 
 class LiveBrowse {
@@ -25,57 +29,116 @@ class LiveBrowse {
     static final String LIVE_GROUP = "LG:";
     static final String LIVE_CH = "LC:";
 
-    private static final Map<String, String> liveNavMap = new ConcurrentHashMap<>();
-    private static final Map<String, Integer> liveCountMap = new ConcurrentHashMap<>();
-    private static final Map<String, LiveEntry> livePosMap = new ConcurrentHashMap<>();
+    @NonNull
+    static ImmutableList<MediaItem> getGroups() {
+        return liveHome().getGroups().stream().filter(group -> !group.isHidden() && !group.isKeep()).map(group -> BrowseTree.folder(LIVE_GROUP + group.getName(), group.getName(), R.drawable.ic_browse_folder)).collect(ImmutableList.toImmutableList());
+    }
 
-    static void clear() {
-        livePosMap.clear();
-        liveNavMap.clear();
-        liveCountMap.clear();
+    static List<MediaItem> search(String keyword) {
+        Set<Channel> seen = new HashSet<>();
+        ImmutableList.Builder<MediaItem> items = ImmutableList.builder();
+        Live live = liveHome();
+        for (Group group : live.getGroups()) {
+            if (group.isHidden() || group.isKeep()) continue;
+            List<Channel> channels = group.getChannel();
+            for (int i = 0; i < channels.size(); i++) {
+                Channel channel = channels.get(i);
+                if (!BrowseSearch.key(channel.getName()).contains(keyword) && !BrowseSearch.key(channel.getShow()).contains(keyword) && !BrowseSearch.key(channel.getNumber()).contains(keyword)) continue;
+                if (seen.add(channel)) items.add(channelItem(live, group.getName(), channel, i));
+            }
+        }
+        return items.build();
     }
 
     @NonNull
-    static ImmutableList<MediaItem> getGroups() {
-        return liveHome().getGroups().stream().map(group -> BrowseTree.folder(LIVE_GROUP + group.getName(), group.getName())).collect(ImmutableList.toImmutableList());
+    static ImmutableList<MediaItem> getFavorites() {
+        Set<String> names = new HashSet<>();
+        Set<String> keeps = new HashSet<>();
+        Keep.getLive().forEach(keep -> keeps.add(keep.getKey()));
+        ImmutableList.Builder<MediaItem> items = ImmutableList.builder();
+        Live live = liveHome();
+        for (Group group : live.getGroups()) {
+            if (group.isHidden() || group.isKeep()) continue;
+            List<Channel> channels = group.getChannel();
+            for (int i = 0; i < channels.size(); i++) {
+                Channel channel = channels.get(i);
+                if (keeps.contains(channel.getName()) && names.add(channel.getName())) items.add(channelItem(live, group.getName(), channel, i));
+            }
+        }
+        return items.build();
+    }
+
+    @Nullable
+    static MediaMetadata loadMetadata(String mediaId) {
+        LiveEntry entry = findEntry(mediaId);
+        if (entry == null) return null;
+        Live live = entry.live;
+        Channel channel = entry.channel;
+        if (channel.getData(live.getZoneId()).getList().isEmpty() && !live.getEpgXml().isEmpty()) LiveApi.parseXml(live);
+        LiveApi.getEpg(channel, live.getZoneId());
+        return metadata(entry.live, mediaId, channel);
+    }
+
+    private static MediaMetadata metadata(Live live, String mediaId, Channel channel) {
+        Epg epg = channel.getData(live.getZoneId());
+        int current = epg.getInRange();
+        String details = current < 0 ? "" : epg.getList().get(current).format();
+        return BrowseTree.playable(mediaId, channel.getShow(), details, BrowseTree.artwork(channel.getLogo(), R.drawable.ic_browse_tv)).mediaMetadata.buildUpon().setArtist(details).build();
     }
 
     @NonNull
     static ImmutableList<MediaItem> getChannels(@NonNull String parentId) {
-        String groupName = parentId.substring(LIVE_GROUP.length());
-        Group group = liveHome().getGroups().stream().filter(item -> item.getName().equals(groupName)).findFirst().orElse(null);
-        if (group == null) {
-            liveCountMap.put(groupName, 0);
-            return ImmutableList.of();
-        }
-        liveNavMap.keySet().removeIf(key -> key.startsWith(groupName + '|'));
-        livePosMap.values().removeIf(entry -> entry.groupName.equals(groupName));
+        Live live = liveHome();
+        Group group = findGroup(live, parentId.substring(LIVE_GROUP.length()));
+        if (group == null) return ImmutableList.of();
         List<Channel> channels = group.getChannel();
-        liveCountMap.put(groupName, channels.size());
-        return IntStream.range(0, channels.size()).mapToObj(i -> indexChannel(groupName, channels.get(i), i)).collect(ImmutableList.toImmutableList());
+        return IntStream.range(0, channels.size()).mapToObj(i -> channelItem(live, group.getName(), channels.get(i), i)).collect(ImmutableList.toImmutableList());
     }
 
-    private static MediaItem indexChannel(@NonNull String groupName, @NonNull Channel channel, int index) {
-        String key = liveNavKey(groupName, index);
-        String id = LIVE_CH + key;
-        liveNavMap.put(key, id);
-        livePosMap.put(id, new LiveEntry(channel, groupName, index));
-        return BrowseTree.playable(id, channel.getNumber() + " " + channel.getShow(), null, channel.getLogo());
+    private static MediaItem channelItem(Live live, String groupName, Channel channel, int index) {
+        String id = LIVE_CH + groupName + '|' + index;
+        return new MediaItem.Builder().setMediaId(id)
+                .setMediaMetadata(metadata(live, id, channel).buildUpon().setTitle(channel.getNumber() + " " + channel.getShow()).build()).build();
     }
 
     @Nullable
     static MediaItem getItem(@NonNull String mediaId) {
-        if (mediaId.startsWith(LIVE_GROUP)) return BrowseTree.folder(mediaId, mediaId.substring(LIVE_GROUP.length()));
-        LiveEntry entry = livePosMap.get(mediaId);
+        if (mediaId.startsWith(LIVE_GROUP)) {
+            String name = mediaId.substring(LIVE_GROUP.length());
+            return liveHome().getGroups().stream().filter(group -> !group.isHidden() && group.getName().equals(name)).findFirst().map(group -> BrowseTree.folder(mediaId, name, R.drawable.ic_browse_folder)).orElse(null);
+        }
+        LiveEntry entry = findEntry(mediaId);
         if (entry == null) return null;
-        Channel channel = entry.channel();
-        return BrowseTree.playable(mediaId, channel.getNumber() + " " + channel.getShow(), null, channel.getLogo());
+        return channelItem(entry.live, entry.group.getName(), entry.channel, entry.index);
     }
 
     @Nullable
     static MediaItem resolve(@NonNull String mediaId) throws Exception {
-        LiveEntry entry = livePosMap.get(mediaId);
-        return resolveChannel(entry != null ? entry.channel() : null, mediaId);
+        LiveEntry entry = findEntry(mediaId);
+        return entry == null ? null : resolveChannel(entry, mediaId);
+    }
+
+    @Nullable
+    private static LiveEntry findEntry(@NonNull String mediaId) {
+        if (!mediaId.startsWith(LIVE_CH)) return null;
+        int separator = mediaId.lastIndexOf('|');
+        if (separator < LIVE_CH.length()) return null;
+        Live live = liveHome();
+        Group group = findGroup(live, mediaId.substring(LIVE_CH.length(), separator));
+        if (group == null) return null;
+        int index;
+        try {
+            index = Integer.parseInt(mediaId.substring(separator + 1));
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        List<Channel> channels = group.getChannel();
+        return index < 0 || index >= channels.size() ? null : new LiveEntry(live, group, channels.get(index), index);
+    }
+
+    @Nullable
+    private static Group findGroup(Live live, String name) {
+        return live.getGroups().stream().filter(group -> !group.isHidden() && group.getName().equals(name)).findFirst().orElse(null);
     }
 
     @Nullable
@@ -88,38 +151,37 @@ class LiveBrowse {
 
     @Nullable
     private static MediaItem navigateChannel(@NonNull String mediaId, int delta) throws Exception {
-        LiveEntry current = livePosMap.get(mediaId);
+        LiveEntry current = findEntry(mediaId);
         if (current == null) return null;
-        Integer count = liveCountMap.get(current.groupName);
-        if (count == null || count == 0) return null;
-        int target = BrowseTree.wrapIndex(current.index, delta, count);
-        String nextId = liveNavMap.get(liveNavKey(current.groupName, target));
-        if (nextId == null) return null;
-        LiveEntry next = livePosMap.get(nextId);
-        return resolveChannel(next != null ? next.channel() : null, nextId);
+        List<Channel> channels = current.group.getChannel();
+        int target = BrowseTree.wrapIndex(current.index, delta, channels.size());
+        String id = LIVE_CH + current.group.getName() + '|' + target;
+        return resolveChannel(new LiveEntry(current.live, current.group, channels.get(target), target), id);
     }
 
     @Nullable
     private static String ensureLoaded() {
-        String keep = liveHome().getKeep();
+        Live live = liveHome();
+        String keep = live.getKeep();
         if (TextUtils.isEmpty(keep)) return null;
         String[] splits = keep.split(AppDatabase.SYMBOL);
         if (splits.length < 2) return null;
         String groupName = splits[0];
         String channelName = splits[1];
-        getChannels(LIVE_GROUP + groupName);
-        Integer count = liveCountMap.get(groupName);
-        if (count == null || count == 0) return null;
-        return livePosMap.entrySet().stream().filter(e -> e.getValue().groupName().equals(groupName) && e.getValue().channel().getName().equals(channelName)).map(Map.Entry::getKey).findFirst().orElse(null);
+        Group group = findGroup(live, groupName);
+        if (group == null) return null;
+        List<Channel> channels = group.getChannel();
+        for (int i = 0; i < channels.size(); i++) if (channels.get(i).getName().equals(channelName)) return LIVE_CH + groupName + '|' + i;
+        return null;
     }
 
     @Nullable
-    private static MediaItem resolveChannel(@Nullable Channel channel, @NonNull String mediaId) throws Exception {
-        if (channel == null || TextUtils.isEmpty(channel.getCurrent())) return null;
+    private static MediaItem resolveChannel(LiveEntry entry, @NonNull String mediaId) throws Exception {
+        Channel channel = entry.channel;
+        if (TextUtils.isEmpty(channel.getCurrent())) return null;
         Result result = LiveApi.getUrl(channel);
         if (TextUtils.isEmpty(result.getRealUrl())) return null;
-        BrowseTree.putBrowseResult(mediaId, result);
-        return BrowseTree.stream(mediaId, result.getRealUrl(), channel.getShow(), null, channel.getLogo());
+        return BrowseTree.stream(new BrowsePlayback(mediaId, result, null, channel.getName()), channel.getShow(), null, channel.getLogo()).buildUpon().setMediaMetadata(metadata(entry.live, mediaId, channel)).build();
     }
 
     private static Live liveHome() {
@@ -127,11 +189,6 @@ class LiveBrowse {
         return LiveConfig.get().getHome();
     }
 
-    @NonNull
-    private static String liveNavKey(@NonNull String groupName, int index) {
-        return groupName + '|' + index;
-    }
-
-    private record LiveEntry(Channel channel, String groupName, int index) {
+    private record LiveEntry(Live live, Group group, Channel channel, int index) {
     }
 }

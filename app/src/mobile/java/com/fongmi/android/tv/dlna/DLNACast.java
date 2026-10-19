@@ -4,7 +4,8 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.CastVideo;
 import com.fongmi.android.tv.bean.Device;
-import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.impl.Callback;
+import com.fongmi.android.tv.utils.ResUtil;
 
 import org.jupnp.controlpoint.ControlPoint;
 import org.jupnp.model.action.ActionInvocation;
@@ -23,17 +24,14 @@ import org.jupnp.support.model.item.VideoItem;
 
 import java.util.Locale;
 
-public record DLNACast(CastVideo video, Runnable runnable) {
+public record DLNACast(CastVideo video, Callback callback) {
 
     public void cast(Device item) {
         DLNACastManager mgr = DLNACastManager.get();
         ControlPoint control = mgr.getControlPoint();
         RemoteService service = mgr.findAVTransport(item);
-        if (service != null && control != null) {
-            control.execute(uriAction(control, service));
-        } else {
-            App.post(() -> Notify.show(R.string.device_offline));
-        }
+        if (service != null && control != null) control.execute(uriAction(control, service));
+        else App.post(() -> callback.error(ResUtil.getString(R.string.device_offline)));
     }
 
     private String buildMetaData() {
@@ -57,7 +55,7 @@ public record DLNACast(CastVideo video, Runnable runnable) {
 
             @Override
             public void failure(ActionInvocation i, UpnpResponse r, String msg) {
-                App.post(() -> Notify.show(msg));
+                App.post(() -> callback.error(msg));
             }
         };
     }
@@ -67,12 +65,12 @@ public record DLNACast(CastVideo video, Runnable runnable) {
             @Override
             public void success(ActionInvocation i) {
                 if (video.position() > 0) control.execute(seekAction(service));
-                App.post(runnable);
+                else App.post(callback::success);
             }
 
             @Override
             public void failure(ActionInvocation i, UpnpResponse r, String msg) {
-                App.post(() -> Notify.show(msg));
+                App.post(() -> callback.error(msg));
             }
         };
     }
@@ -81,10 +79,12 @@ public record DLNACast(CastVideo video, Runnable runnable) {
         return new Seek(service, SeekMode.REL_TIME, formatMs(video.position())) {
             @Override
             public void success(ActionInvocation i) {
+                App.post(callback::success);
             }
 
             @Override
             public void failure(ActionInvocation i, UpnpResponse r, String m) {
+                App.post(() -> callback.error(m));
             }
         };
     }

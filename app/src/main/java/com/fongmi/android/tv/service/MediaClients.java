@@ -20,10 +20,11 @@ class MediaClients {
     }
 
     void connect(@NonNull MediaSession.ControllerInfo controller, @NonNull String packageName) {
-        if (!isSelf(controller, packageName)) controllers.merge(controller.getPackageName(), 1, Integer::sum);
+        if (controller.getControllerVersion() != MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION && !isSelf(controller, packageName)) controllers.merge(controller.getPackageName(), 1, Integer::sum);
     }
 
     void disconnect(@NonNull MediaSession.ControllerInfo controller) {
+        if (controller.getControllerVersion() == MediaSession.ControllerInfo.LEGACY_CONTROLLER_VERSION) return;
         controllers.computeIfPresent(controller.getPackageName(), (key, count) -> count > 1 ? count - 1 : null);
     }
 

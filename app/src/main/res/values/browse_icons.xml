@@ -1,0 +1,6 @@
+<resources>
+
+    <item name="ic_browse_keep" type="drawable">@drawable/media3_icon_heart_filled</item>
+    <item name="ic_browse_resume" type="drawable">@drawable/exo_ic_play_circle_filled</item>
+
+</resources>

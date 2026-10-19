@@ -30,7 +30,8 @@ import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.service.DLNARendererService;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.PlayerSetting;
-import com.fongmi.android.tv.ui.custom.CustomKeyDownVod;
+import com.fongmi.android.tv.ui.custom.VodInput;
+import com.fongmi.android.tv.ui.dialog.DecoderSettingDialog;
 import com.fongmi.android.tv.ui.dialog.PlayerEngineDialog;
 import com.fongmi.android.tv.ui.dialog.SpeedSettingDialog;
 import com.fongmi.android.tv.ui.dialog.TrackDialog;
@@ -43,18 +44,19 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 import org.jupnp.support.contentdirectory.DIDLParser;
 
-public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.Listener {
+public class CastActivity extends PlaybackActivity implements VodInput.Listener {
 
     private final Object mDlnaOwner = new Object();
     private ActivityCastBinding mBinding;
     private DLNARendererService mRenderer;
-    private CustomKeyDownVod mKeyDown;
+    private VodInput mInput;
     private String mPlaybackKey;
     private CastAction mAction;
     private Runnable mR1;
     private Runnable mR2;
     private Clock mClock;
     private boolean bound;
+    private boolean restoring;
     private long position;
     private int scale;
 
@@ -90,7 +92,6 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
 
     @Override
     protected void onServiceConnected() {
-        mBinding.control.action.decode.setText(player().getDecodeText());
         setAction(getIntent());
     }
 
@@ -98,18 +99,19 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (!intent.hasExtra(CastAction.KEY_EXTRA)) return;
+        restoring = false;
         setIntent(intent);
-        if (mRenderer != null) mRenderer.activateDlna(mDlnaOwner);
         setAction(intent);
     }
 
     @Override
     protected void initView(Bundle savedInstanceState) {
         super.initView(savedInstanceState);
+        restoring = savedInstanceState != null;
         bound = bindService(new Intent(this, DLNARendererService.class), mRendererConnection, Context.BIND_AUTO_CREATE);
         mClock = Clock.create(mBinding.widget.clock);
-        mKeyDown = CustomKeyDownVod.create(this);
-        mKeyDown.setFull(true);
+        mInput = VodInput.create(this, this);
+        mInput.setFullscreen(true);
         mR1 = this::hideControl;
         mR2 = this::setTraffic;
         setVideoView();
@@ -125,9 +127,9 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
         mBinding.control.action.reset.setOnClickListener(view -> onReset());
         mBinding.control.action.player.setOnClickListener(view -> onPlayer());
-        mBinding.control.action.decode.setOnClickListener(view -> onDecode());
+        mBinding.control.action.decoder.setOnClickListener(view -> onDecoder());
         mBinding.control.action.speed.setOnLongClickListener(view -> onSpeedLong());
-        mBinding.video.setOnTouchListener((view, event) -> mKeyDown.onTouchEvent(event));
+        mBinding.video.setOnTouchListener((view, event) -> mInput.onTouchEvent(event));
     }
 
     private void setVideoView() {
@@ -150,40 +152,53 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         if (mAction == null) return;
         mBinding.widget.title.setText(getName());
         mBinding.widget.title.setSelected(true);
-        resetMedia();
-        start();
+        if (canRestorePlayback()) restorePlayback();
+        else startMedia();
+        restoring = false;
     }
 
-    private void resetMedia() {
+    private boolean canRestorePlayback() {
+        return restoring && mAction.getCurrentURI().equals(player().getKey()) && !player().isEmpty();
+    }
+
+    private void restorePlayback() {
+        mPlaybackKey = mAction.getCurrentURI();
+        if (mRenderer != null) mRenderer.activateDlna(mDlnaOwner, mPlaybackKey);
+        setPlaybackMode();
+        setTrackVisible();
+        notifyPrepared();
+    }
+
+    private void startMedia() {
         hideError();
         hideControl();
         player().setSpeed(1.0f);
         player().setRepeatOne(false);
+        start();
     }
 
     private void start() {
         mPlaybackKey = mAction.getCurrentURI();
+        if (mRenderer != null) mRenderer.activateDlna(mDlnaOwner, mPlaybackKey);
         startPlayer(mPlaybackKey, mAction.result(), false, Constant.TIMEOUT_PLAY, buildMetadata());
     }
 
     private void setPlaybackMode() {
         PlayerEngineDialog.setText(mBinding.control.action.player, player());
-        mBinding.control.action.decode.setText(player().getDecodeText());
     }
 
     private void setScale(int scale) {
-        mBinding.player.setResizeMode(scale);
+        mBinding.player.setResizeMode(PlayerSetting.getScaleMode(scale));
         mBinding.control.action.scale.setText(ResUtil.getStringArray(R.array.select_scale)[scale]);
     }
 
     private void onScale() {
-        String[] array = ResUtil.getStringArray(R.array.select_scale);
-        scale = scale == array.length - 1 ? 0 : ++scale;
+        scale = (scale + 1) % ResUtil.getStringArray(R.array.select_scale).length;
         setScale(scale);
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().player(player()).show(this);
+        SpeedSettingDialog.create().show(this);
         hideControl();
     }
 
@@ -199,18 +214,17 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void onPlayer() {
-        PlayerEngineDialog.show(this, mBinding.control.action.player, player());
+        PlayerEngineDialog.show(this);
         hideControl();
     }
 
-    private void onDecode() {
-        if (player().isEmpty()) return;
-        position = player().getPosition();
-        player().toggleDecode();
+    private void onDecoder() {
+        DecoderSettingDialog.create().show(this);
+        hideControl();
     }
 
     private void onTrack(View view) {
-        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).player(player()).view(mBinding.player.getSubtitleView()).show(this);
+        TrackDialog.create().type(Integer.parseInt(view.getTag().toString())).show(this);
         hideControl();
     }
 
@@ -268,7 +282,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     }
 
     private void hideCenter() {
-        mBinding.widget.action.setImageResource(R.drawable.ic_widget_play);
+        mBinding.widget.statusIcon.setImageResource(R.drawable.ic_widget_play);
         hideInfo();
     }
 
@@ -308,10 +322,9 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         controller().play();
     }
 
-    private void consumePendingSeek() {
+    private void notifyPrepared() {
         if (service() == null || player().isEmpty() || mRenderer == null) return;
-        long seekMs = mRenderer.consumePendingSeekMs();
-        if (seekMs >= 0) player().seekTo(seekMs);
+        mRenderer.onPrepared(mPlaybackKey);
     }
 
     private final ServiceConnection mRendererConnection = new ServiceConnection() {
@@ -319,8 +332,8 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         public void onServiceConnected(ComponentName name, IBinder binder) {
             if (!bound) return;
             mRenderer = ((DLNARendererService.LocalBinder) binder).getService();
-            mRenderer.activateDlna(mDlnaOwner);
-            consumePendingSeek();
+            mRenderer.activateDlna(mDlnaOwner, mPlaybackKey);
+            notifyPrepared();
         }
 
         @Override
@@ -340,7 +353,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
     protected void onPrepare() {
         setPosition();
         setPlaybackMode();
-        consumePendingSeek();
+        notifyPrepared();
     }
 
     @Override
@@ -360,6 +373,12 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         player().reset();
         player().stop();
         showError(msg);
+    }
+
+    @Override
+    protected boolean onRefresh() {
+        onReset();
+        return true;
     }
 
     @Override
@@ -390,8 +409,7 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mAction = next;
         mBinding.widget.title.setText(getName());
         mBinding.widget.title.setSelected(true);
-        resetMedia();
-        start();
+        startMedia();
     }
 
     @Override
@@ -401,18 +419,15 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
 
     @Override
     protected void onPlayingChanged(boolean isPlaying) {
-        if (isPlaying) {
-            hideCenter();
-        } else if (isPaused()) {
-            showInfo();
-        }
+        if (isPlaying) hideCenter();
+        else if (isPaused()) showInfo();
     }
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         if (KeyUtil.isMenuKey(event)) onToggle();
         if (isVisible(mBinding.control.getRoot())) setR1Callback();
-        if (isGone(mBinding.control.getRoot()) && mKeyDown.hasEvent(event) && service() != null) return mKeyDown.onKeyDown(event);
+        if (isGone(mBinding.control.getRoot()) && service() != null && mInput.onKeyEvent(event)) return true;
         return super.dispatchKeyEvent(event);
     }
 
@@ -422,27 +437,25 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
         mBinding.widget.center.setVisibility(View.VISIBLE);
         mBinding.widget.duration.setText(player().getDurationTime());
         mBinding.widget.position.setText(player().getPositionTime(time));
-        mBinding.widget.action.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
+        mBinding.widget.statusIcon.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
         hideProgress();
     }
 
     @Override
     public void onSeekEnd(long time) {
         if (player().isEmpty()) return;
-        mKeyDown.reset();
         seekTo(time);
     }
 
     @Override
-    public void onSpeedUp() {
-        if (!player().isPlaying()) return;
-        PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
+    public boolean onSpeedPressStart() {
+        if (!player().isPlaying()) return false;
+        return PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
-    public void onSpeedEnd() {
-        PlaybackAction.hideSpeedHint(mBinding.widget.message);
-        player().setSpeed(1.0f);
+    public void onSpeedPressEnd() {
+        PlaybackAction.endSpeedPress(player(), mBinding.widget.message);
     }
 
     @Override
@@ -486,17 +499,13 @@ public class CastActivity extends PlaybackActivity implements CustomKeyDownVod.L
 
     @Override
     protected void onBackInvoked() {
-        if (isVisible(mBinding.control.getRoot())) {
-            hideControl();
-        } else if (isVisible(mBinding.widget.center)) {
-            hideCenter();
-        } else {
-            super.onBackInvoked();
-        }
+        if (isVisible(mBinding.control.getRoot())) hideControl();
+        else if (isVisible(mBinding.widget.center)) hideCenter();
+        else super.onBackInvoked();
     }
 
     private void releaseRenderer() {
-        if (mRenderer != null) mRenderer.deactivateDlna(mDlnaOwner);
+        if (mRenderer != null && !isChangingConfigurations()) mRenderer.deactivateDlna(mDlnaOwner, mPlaybackKey);
         if (bound) unbindService(mRendererConnection);
         mRenderer = null;
         bound = false;
