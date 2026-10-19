@@ -4,18 +4,27 @@
     tools:ignore="ScopedStorage">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_LOCAL_NETWORK" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="29" />
     <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <uses-permission android:name="android.permission.REQUEST_DELETE_PACKAGES" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <queries>
+        <package android:name="com.fongmi.runtime.bdj" />
+        <package android:name="com.fongmi.runtime.python" />
+        <package android:name="com.fongmi.runtime.nodejs" />
+        <package android:name="com.fongmi.runtime.quickjs" />
+        <package android:name="com.fongmi.runtime.thunder" />
+        <package android:name="com.fongmi.runtime.mpv" />
         <intent>
             <action android:name="android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION" />
             <data android:scheme="package" />
@@ -82,6 +91,22 @@
             android:process=":error_activity"
             android:theme="@style/Theme.Crash" />
 
+        <activity
+            android:name=".ui.activity.RestartActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:process=":restart"
+            android:theme="@android:style/Theme.NoDisplay" />
+
+        <activity
+            android:name=".ui.activity.WebActivity"
+            android:enableOnBackInvokedCallback="true"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation|keyboard|keyboardHidden"
+            android:launchMode="singleTop"
+            android:windowSoftInputMode="adjustResize" />
+
+        <receiver android:name=".utils.RuntimeInstaller" android:exported="false" />
+
         <receiver
             android:name=".receiver.ActionReceiver"
             android:exported="false">
@@ -105,9 +130,22 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name=".service.UpdateService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
         <meta-data
             android:name="com.google.android.gms.car.application"
             android:resource="@xml/automotive_app_desc" />
+
+        <meta-data android:name="com.fongmi.runtime.catalog" android:value="${runtimeCatalog}" />
+
+        <service
+            android:name=".api.node.NodeService"
+            android:exported="false"
+            android:process=":nodejs"
+            android:stopWithTask="true" />
 
     </application>
 </manifest>

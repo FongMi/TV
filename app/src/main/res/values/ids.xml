@@ -1,0 +1,6 @@
+<resources>
+
+    <item name="remove" type="id" />
+    <item name="test" type="id" />
+
+</resources>

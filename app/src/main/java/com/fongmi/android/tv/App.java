@@ -1,21 +1,32 @@
 package com.fongmi.android.tv;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Process;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.os.HandlerCompat;
+import androidx.media3.mpvplayer.MpvLibrary;
 
+import com.fongmi.android.tv.player.mpv.MpvUtil;
+import com.fongmi.android.tv.receiver.RuntimeReceiver;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.RuntimeInstaller;
 import com.fongmi.hook.Hook;
-import com.github.catvod.Init;
+import com.github.catvod.Runtime;
+import com.github.catvod.utils.RuntimeModule;
 import com.google.gson.Gson;
+
+import java.io.IOException;
 
 public class App extends Application implements Application.ActivityLifecycleCallbacks {
 
@@ -25,7 +36,7 @@ public class App extends Application implements Application.ActivityLifecycleCal
     private final Gson gson;
     private final long time;
 
-    private Activity activity;
+    private volatile Activity activity;
     private Hook hook;
 
     public App() {
@@ -75,14 +86,45 @@ public class App extends Application implements Application.ActivityLifecycleCal
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
-        Init.set(base);
+        Runtime.set(base);
+        Runtime.setActivity(App::activity);
+        Runtime.setToast(text -> App.post(() -> Notify.show(text)));
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
+        initRuntime();
         Notify.createChannel();
         registerActivityLifecycleCallbacks(this);
+    }
+
+    private void initRuntime() {
+        MpvLibrary.setLibraryLoader(MpvUtil::loadRuntime);
+        RuntimeModule.refresh();
+        cleanRuntime();
+        RuntimeReceiver.register(this);
+    }
+
+    private void cleanRuntime() {
+        if (!isMainProcess()) return;
+        for (RuntimeModule module : RuntimeModule.values()) if (module != RuntimeModule.NODEJS) cleanRuntime(module);
+    }
+
+    private void cleanRuntime(RuntimeModule module) {
+        try {
+            module.clean();
+        } catch (IOException e) {
+            Log.w("RuntimeModule", "Unable to clean runtime cache", e);
+        }
+    }
+
+    private boolean isMainProcess() {
+        String name = getBaseContext().getPackageName();
+        if (Build.VERSION.SDK_INT >= 28) return name.equals(Application.getProcessName());
+        var processes = getSystemService(ActivityManager.class).getRunningAppProcesses();
+        if (processes != null) for (var process : processes) if (process.pid == Process.myPid()) return name.equals(process.processName);
+        return false;
     }
 
     @Override
@@ -98,6 +140,9 @@ public class App extends Application implements Application.ActivityLifecycleCal
     @Override
     public void onActivityResumed(@NonNull Activity activity) {
         if (activity != activity()) this.activity = activity;
+        RuntimeModule.refresh();
+        RuntimeInstaller.resumeUpdate(activity);
+        Updater.get().notifyModules();
     }
 
     @Override

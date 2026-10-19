@@ -1,0 +1,5 @@
+<resources>
+
+    <bool name="enable_predictive_back">false</bool>
+
+</resources>

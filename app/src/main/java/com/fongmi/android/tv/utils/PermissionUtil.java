@@ -23,6 +23,17 @@ public class PermissionUtil {
         else post(activity, () -> PermissionX.init(activity).permissions(Manifest.permission.RECORD_AUDIO).request(new PermissionCallback(callback)));
     }
 
+    public static void requestLocalNetwork(FragmentActivity activity, Consumer<Boolean> callback) {
+        if (Build.VERSION.SDK_INT < 37 || isGranted(activity, Manifest.permission.ACCESS_LOCAL_NETWORK)) callback.accept(true);
+        else post(activity, () -> PermissionX.init(activity).permissions(Manifest.permission.ACCESS_LOCAL_NETWORK).request(new PermissionCallback(callback)));
+    }
+
+    public static void requestLocalNetwork(Fragment fragment, Consumer<Boolean> callback) {
+        FragmentActivity activity = fragment.requireActivity();
+        if (Build.VERSION.SDK_INT < 37 || isGranted(activity, Manifest.permission.ACCESS_LOCAL_NETWORK)) callback.accept(true);
+        else post(fragment, () -> PermissionX.init(fragment).permissions(Manifest.permission.ACCESS_LOCAL_NETWORK).request(new PermissionCallback(callback)));
+    }
+
     public static void requestFile(FragmentActivity activity, Consumer<Boolean> callback) {
         boolean requestAllFiles = canRequestAllFiles(activity);
         if (hasFilePermission(activity, requestAllFiles)) callback.accept(true);

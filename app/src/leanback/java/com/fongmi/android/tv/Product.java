@@ -31,8 +31,4 @@ public class Product {
         int height = (int) (width / style.getRatio());
         return new int[]{width, height};
     }
-
-    public static int getEms() {
-        return Math.min(Math.round((float) ResUtil.getScreenWidth() / ResUtil.sp2px(24)), 35);
-    }
 }

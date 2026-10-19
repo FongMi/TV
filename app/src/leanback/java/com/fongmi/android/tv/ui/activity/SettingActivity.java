@@ -106,6 +106,7 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
         mBinding.cache.setOnClickListener(this::onCache);
         mBinding.backup.setOnClickListener(this::onBackup);
         mBinding.player.setOnClickListener(this::onPlayer);
+        mBinding.module.setOnClickListener(view -> ModuleActivity.start(this));
         mBinding.danmaku.setOnClickListener(this::onDanmaku);
         mBinding.restore.setOnClickListener(this::onRestore);
         mBinding.version.setOnClickListener(this::onVersion);
@@ -124,11 +125,8 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
 
     @Override
     public void setConfig(Config config) {
-        if (config.getUrl().startsWith("file")) {
-            PermissionUtil.requestFile(this, allGranted -> load(config));
-        } else {
-            load(config);
-        }
+        if (config.getUrl().startsWith("file")) PermissionUtil.requestFile(this, allGranted -> load(config));
+        else load(config);
     }
 
     private void load(Config config) {
@@ -229,7 +227,7 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
     }
 
     private void onVersion(View view) {
-        Updater.create().force().start(this);
+        Updater.get().start(this, true);
     }
 
     private void setWallDefault(View view) {

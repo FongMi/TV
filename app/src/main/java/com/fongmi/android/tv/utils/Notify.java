@@ -14,7 +14,10 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ViewProgressBinding;
+import com.fongmi.android.tv.exception.ExtractException;
+import com.github.catvod.utils.RuntimeModule;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class Notify {
@@ -38,8 +41,20 @@ public class Notify {
     }
 
     public static String getError(int resId, Throwable e) {
+        String message = getError(e);
+        if (message != null) return message;
         if (TextUtils.isEmpty(e.getMessage())) return ResUtil.getString(resId);
         return ResUtil.getString(resId) + "\n" + e.getMessage();
+    }
+
+    public static String getError(Throwable e) {
+        RuntimeModule.MissingException missing = RuntimeModule.MissingException.find(e);
+        if (missing != null) {
+            String title = missing.module == RuntimeModule.THUNDER ? ResUtil.getString(R.string.module_thunder) : missing.module.title;
+            return ResUtil.getString(R.string.error_module_missing, title);
+        }
+        for (Throwable current = e; current != null; current = current.getCause()) if (current instanceof ExtractException) return current.getMessage();
+        return null;
     }
 
     public static void show(Notification notification) {

@@ -1,44 +1,41 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.view.View;
+import android.os.Bundle;
 
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
+import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
-import com.fongmi.android.tv.impl.UpdateListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.Locale;
+import java.text.NumberFormat;
 
 public class UpdateDialog extends BaseAlertDialog {
 
+    public static final String TAG = "update";
+
     private DialogUpdateBinding binding;
-    private UpdateListener listener;
-    private String title;
-    private String desc;
 
     public static UpdateDialog create() {
-        return new UpdateDialog();
+        UpdateDialog dialog = new UpdateDialog();
+        dialog.setArguments(new Bundle());
+        return dialog;
     }
 
     public UpdateDialog title(String title) {
-        this.title = title;
+        requireArguments().putString("title", title);
         return this;
     }
 
     public UpdateDialog desc(String desc) {
-        this.desc = desc;
-        return this;
-    }
-
-    public UpdateDialog listener(UpdateListener listener) {
-        this.listener = listener;
+        requireArguments().putString("desc", desc);
         return this;
     }
 
     public UpdateDialog show(FragmentActivity activity) {
-        show(activity.getSupportFragmentManager(), null);
+        show(activity.getSupportFragmentManager(), TAG);
         return this;
     }
 
@@ -54,25 +51,43 @@ public class UpdateDialog extends BaseAlertDialog {
 
     @Override
     protected void initView() {
-        binding.version.setText(title);
-        binding.desc.setText(desc);
+        binding.version.setText(requireArguments().getString("title"));
+        binding.desc.setText(requireArguments().getString("desc"));
     }
 
     @Override
     protected void initEvent() {
-        binding.confirm.setOnClickListener(this::onConfirm);
-        binding.cancel.setOnClickListener(this::onCancel);
+        binding.confirm.setOnClickListener(Updater.get()::onConfirm);
+        binding.cancel.setOnClickListener(Updater.get()::onCancel);
     }
 
-    public void setProgress(int progress) {
-        binding.confirm.setText(String.format(Locale.getDefault(), "%1$d%%", progress));
+    @Override
+    public void onStart() {
+        super.onStart();
+        Updater.get().attach(this);
     }
 
-    private void onConfirm(View view) {
-        listener.onConfirm(view);
+    @Override
+    public void onStop() {
+        Updater.get().detach(this);
+        super.onStop();
     }
 
-    private void onCancel(View view) {
-        listener.onCancel(view);
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        super.onDestroyView();
+    }
+
+    public void setState(boolean downloading, int progress, boolean ready) {
+        if (binding == null) return;
+        boolean verifying = downloading && (progress < 0 || progress >= 100);
+        String text = getString(ready ? R.string.update_install : R.string.update_confirm);
+        if (Updater.get().isPaused()) text = getString(R.string.transfer_resume);
+        if (downloading) text = verifying ? getString(R.string.update_verifying) : NumberFormat.getPercentInstance().format(progress / 100.0);
+        binding.confirm.setText(text);
+        binding.confirm.setContentDescription(downloading && !verifying ? text + " · " + getString(R.string.pause) : text);
+        binding.confirm.setEnabled(!verifying);
+        binding.cancel.setText(downloading ? R.string.update_background : R.string.dialog_negative);
     }
 }

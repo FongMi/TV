@@ -42,10 +42,12 @@
     <string name="play_speed_hint">倍速 <xliff:g name="speed">%1$s</xliff:g></string>
     <string name="play_reset">刷新</string>
     <string name="play_replay">重播</string>
-    <string name="play_decode">硬解</string>
     <string name="play_timer">定時</string>
     <string name="play_edition">標題</string>
     <string name="play_chapter">章節</string>
+    <string name="play_disc_menu">主選單</string>
+    <string name="play_disc_menu_unavailable">目前無法開啟此光碟選單。若為 BD-J，請先到「設定 → 模組管理」安裝 Java 執行環境。</string>
+    <string name="play_disc_menu_timeout">選單尚未開啟，請再試一次</string>
     <string name="play_scale">原始</string>
     <string name="play_config">配置</string>
     <string name="play_change">換源</string>
@@ -57,7 +59,6 @@
     <string name="play_track_video">視軌</string>
     <string name="play_forward_hint">已切換正序播放</string>
     <string name="play_backward_hint">已切換倒序播放</string>
-    <string name="play_ready">準備播放：<xliff:g name="name">%s</xliff:g></string>
     <string name="play_switch_flag">正在切換線路至「<xliff:g name="name">%s</xliff:g>」</string>
     <string name="play_switch_site">正在切換站源至「<xliff:g name="name">%s</xliff:g>」</string>
     <string name="play_switch_parse">正在切换解析至「<xliff:g name="name">%s</xliff:g>」</string>
@@ -150,7 +151,6 @@
 
     <!-- Subtitle Setting -->
     <string name="subtitle_setting">字幕設定</string>
-    <string name="subtitle_search_api_title">Assrt</string>
     <string name="subtitle_search_token_hint">Token</string>
     <string name="subtitle_reset">重置</string>
     <string name="subtitle_tab_appearance">外觀</string>
@@ -158,7 +158,9 @@
     <string name="subtitle_tab_advanced">進階</string>
     <string name="subtitle_offset">字幕偏移</string>
     <string name="subtitle_size">大小</string>
+    <string name="subtitle_brightness">字幕亮度</string>
     <string name="subtitle_position">位置</string>
+    <string name="subtitle_primary_position">主字幕位置</string>
     <string name="subtitle_style">樣式</string>
     <string name="playback_font">字型</string>
     <string name="playback_font_default">系統預設</string>
@@ -170,8 +172,8 @@
     <string name="subtitle_style_system">系統</string>
     <string name="subtitle_style_custom">自訂</string>
     <string name="subtitle_system_setting">系統字幕設定</string>
-    <string name="subtitle_text_color">文字顏色</string>
-    <string name="subtitle_text_opacity">文字透明度</string>
+    <string name="subtitle_text_color">字幕顏色</string>
+    <string name="subtitle_text_opacity">字幕透明度</string>
     <string name="subtitle_edge_style">邊框樣式</string>
     <string name="subtitle_edge_none">無</string>
     <string name="subtitle_edge_outline">描邊</string>
@@ -187,6 +189,8 @@
     <string name="subtitle_secondary_off">關閉</string>
     <string name="subtitle_secondary_auto">自動</string>
     <string name="subtitle_secondary_select">指定</string>
+    <string name="subtitle_primary_role">主</string>
+    <string name="subtitle_secondary_role">副</string>
     <string name="subtitle_secondary_track_select">副字幕</string>
     <string name="subtitle_secondary_position">副字幕位置</string>
     <string name="subtitle_color_white">白色</string>
@@ -254,6 +258,7 @@
     <string name="parse_from">解析來自：<xliff:g name="name">%s</xliff:g></string>
 
     <!-- Push -->
+    <string name="local">本地</string>
     <string name="push">推送</string>
 
     <!-- Setting -->
@@ -261,6 +266,7 @@
     <string name="setting_live">直播</string>
     <string name="setting_wall">壁紙</string>
     <string name="setting_player">播放設定</string>
+    <string name="setting_module">模組管理</string>
     <string name="setting_danmaku">彈幕設定</string>
     <string name="setting_incognito">無痕模式</string>
     <string name="setting_theme_color">主題色彩</string>
@@ -277,6 +283,44 @@
     <string name="setting_off">關</string>
     <string name="setting_on">開</string>
 
+    <string name="module_bdj">BD-J</string>
+    <string name="module_version">版本：%1$s</string>
+    <string name="module_installing">安裝中…</string>
+    <string name="module_cancelling">取消中…</string>
+    <string name="module_cancelled">已取消</string>
+    <string name="module_complete">已安裝</string>
+    <string name="module_failed">失敗：%1$s</string>
+    <string name="module_cancel">取消</string>
+    <string name="module_failed_title">操作失敗</string>
+    <string name="module_check">檢查</string>
+    <string name="module_test">檢測</string>
+    <string name="module_untested">尚未檢測</string>
+    <string name="module_testing">檢測中…</string>
+    <string name="module_test_passed">檢測通過</string>
+    <string name="module_test_failed">檢測失敗</string>
+    <string name="module_test_changed">模組已變更，請重新檢測</string>
+    <string name="module_environment_ready">環境就緒</string>
+    <string name="module_checking">檢查中…</string>
+    <string name="module_current">已安裝</string>
+    <string name="module_available">可更新</string>
+    <string name="module_not_installed">未安裝</string>
+    <string name="error_module_missing">%1$s 未安裝，請至模組管理下載</string>
+    <string name="module_unsupported">此裝置不支援</string>
+    <string name="module_restart">請重新啟動</string>
+    <string name="module_restart_action">重啟</string>
+    <string name="module_waiting">準備中…</string>
+    <string name="module_downloading">下載中…</string>
+    <string name="module_download">下載</string>
+    <string name="module_update">更新</string>
+    <string name="module_update_notice">%1$s 有新版本，請至模組管理更新</string>
+
+    <string name="module_unavailable">暫未提供</string>
+    <string name="module_confirm_install">請在系統畫面確認安裝，長按可取消</string>
+    <string name="module_remove">移除</string>
+    <string name="module_removing">移除中…</string>
+    <string name="module_confirm_remove">請在系統畫面確認移除</string>
+    <string name="module_removed">已移除</string>
+
     <!-- Backup & Restore -->
     <string name="restore_select">選擇備份</string>
     <string name="restore_success">還原成功</string>
@@ -289,7 +333,6 @@
     <string name="player_engine">播放引擎</string>
     <string name="player_debug">偵錯</string>
     <string name="player_render">視訊輸出</string>
-    <string name="player_scale">縮放比例</string>
     <string name="player_libass">字幕特效</string>
     <string name="player_background">背景播放</string>
     <string name="player_audio_pass_through">音訊直通</string>
@@ -312,9 +355,9 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
-    <string name="player_mpv_conf_priority_hint">介面設定優先，重進播放頁生效。</string>
-    <string name="player_mpv_conf_conflict_hint">介面設定將覆蓋：%1$s</string>
-    <string name="player_mpv_conf_import_success">已匯入 mpv.conf</string>
+    <string name="player_mpv_conf_priority_hint">重進播放頁載入 mpv.conf；片源參數、腳本與介面之後仍可改寫，最後寫入者生效。volume 作為介面音量基準。</string>
+    <string name="player_mpv_conf_conflict_hint">介面會管理：%1$s。片源參數、腳本與介面以最後寫入者為準；volume 作為介面音量基準。</string>
+    <string name="player_mpv_conf_import_success">已載入 mpv.conf，按確定後儲存</string>
     <string name="player_mpv_conf_import_failed">無法匯入 mpv.conf</string>
     <string name="player_mpv_conf_save_failed">無法儲存 mpv.conf</string>
     <string name="player_ua">User-Agent</string>
@@ -343,8 +386,10 @@
     <string name="dialog_config_url">請輸入網址…</string>
 
     <!-- Error -->
+    <string name="file_export_success">檔案已導出</string>
     <string name="error_config_get">配置取得失敗</string>
     <string name="error_file_open">無法開啟檔案</string>
+    <string name="error_file_save">無法儲存檔案</string>
     <string name="error_play_next">已經是最後一集了！</string>
     <string name="error_play_prev">已經是第一集了！</string>
     <string name="error_play_parse">播放網址解析失敗</string>
@@ -352,6 +397,8 @@
     <string name="error_play_url">播放網址載入失敗</string>
     <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
+    <string name="bdj_preparing">正在準備 BD-J 選單</string>
+    <string name="error_bdj_prepare">ISO 選單檢查或 BD-J 準備失敗：%1$s</string>
     <string name="error_audio_effect_unsupported">目前播放方式不支援音質設定</string>
     <string name="error_audio_effect_tunnel">Tunnel 模式下不支援音質設定</string>
     <string name="error_audio_effect_passthrough">音訊直通音軌不支援音質設定</string>
@@ -369,6 +416,13 @@
     <string name="update_version">發現新版本 <xliff:g name="name">%s</xliff:g></string>
     <string name="update_check">正在檢查更新…</string>
     <string name="update_confirm">更新</string>
+    <string name="update_background">背景下載</string>
+    <string name="update_downloading">正在下載更新…</string>
+    <string name="update_verifying">正在驗證更新…</string>
+    <string name="update_verify_failed">更新檔案驗證失敗</string>
+    <string name="update_install">安裝</string>
+    <string name="update_ready">更新下載完成，點選以安裝。</string>
+    <string name="update_interrupted">更新下載已停止</string>
 
     <!-- Crash -->
     <string name="crash_info">發生意外錯誤\n抱歉給您帶來不便</string>
@@ -387,11 +441,6 @@
     <string name="times">倍</string>
     <string name="lines">行</string>
 
-    <string-array name="select_decode">
-        <item>軟解</item>
-        <item>硬解</item>
-    </string-array>
-
     <string-array name="select_dolby_vision_output">
         <item>自動</item>
         <item>開</item>
@@ -407,10 +456,8 @@
 
     <string-array name="select_scale">
         <item>原始</item>
-        <item>16:9</item>
-        <item>4:3</item>
         <item>填充</item>
-        <item>裁剪</item>
+        <item>裁切</item>
     </string-array>
 
     <string-array name="audio_effect_stability_levels">
@@ -427,5 +474,122 @@
         <item>選擇視軌</item>
         <item>選擇字幕</item>
     </string-array>
+
+    <string name="content_title">瀏覽列表</string>
+    <string name="content_search">搜尋內容</string>
+    <string name="content_search_action">搜尋</string>
+    <string name="content_current">回到目前</string>
+    <string name="content_empty">尚無已載入的內容</string>
+    <string name="content_subtitle_unsupported">此字幕軌暫不支援瀏覽</string>
+    <string name="content_subtitle_loading">正在載入字幕…</string>
+    <string name="content_subtitle_partial">目前僅有已讀取的字幕，內容會隨播放更新</string>
+    <string name="content_subtitle_truncated">字幕已達記憶體上限，目前僅能搜尋保留的內容</string>
+    <string name="content_subtitle_error">無法建立字幕文字索引</string>
+    <string name="content_subtitle_unselected">請先選擇字幕軌</string>
+    <string name="content_no_match">沒有符合的內容</string>
+    <string name="content_following">跟隨播放</string>
+    <string name="content_browsing">瀏覽中</string>
+    <string name="content_remote_hint">按右鍵移至「回到目前」</string>
+    <string name="content_image_subtitle">[圖片字幕]</string>
+    <string name="content_retry">重試字幕</string>
+    <string name="content_retry_loading">載入中…</string>
+    <string name="subtitle_offset_primary">主字幕偏移</string>
+    <string name="subtitle_offset_secondary">副字幕偏移</string>
+    <string name="subtitle_offset_both">主副字幕偏移</string>
+    <string name="subtitle_offset_link">一起偏移</string>
+    <string name="subtitle_offset_reset">重設字幕時間</string>
+    <string name="subtitle_offset_limit">字幕偏移須在正負 300 秒內。</string>
+
+    <string name="decoder_setting">解碼設定</string>
+    <string name="decoder_action">解碼</string>
+    <string name="decoder_tab_video">影片</string>
+    <string name="decoder_tab_audio">音訊</string>
+    <string name="decoder_mode_auto">自動</string>
+    <string name="decoder_mode_auto_detail">由播放器自動選擇解碼器</string>
+    <string name="decoder_mode_hardware">硬體</string>
+    <string name="decoder_mode_hardware_detail">僅使用硬體 MediaCodec 解碼</string>
+    <string name="decoder_mode_software">軟解</string>
+    <string name="decoder_mode_software_detail">僅使用軟體 MediaCodec 解碼</string>
+    <string name="decoder_mode_ffmpeg">軟體</string>
+    <string name="decoder_mode_ffmpeg_detail">使用 FFmpeg 軟體解碼</string>
+    <string name="decoder_mode_unavailable">目前播放引擎沒有可切換的解碼模式。</string>
+
+    <string name="dialog_action_search_subtitles">搜尋字幕</string>
+    <string name="dialog_action_load_subtitles">載入字幕</string>
+    <string name="dialog_action_search_danmaku">搜尋彈幕</string>
+    <string name="dialog_action_load_danmaku">載入彈幕</string>
+    <string name="dialog_action_search_settings">搜尋設定</string>
+
+    <string name="mpv_script_buttons">腳本</string>
+    <string name="exo_command_buttons">指令</string>
+    <string name="exo_command">播放指令（例如 seek +90）</string>
+    <string name="exo_command_error">指令操作失敗</string>
+    <string name="exo_command_unavailable">目前播放無法執行此指令。</string>
+    <string name="exo_command_unsupported">Exo 不支援此指令。可用 seek、pause、speed、volume、sub-delay、audio-delay、loop-file、chapter、video-scale-x、video-scale-y。</string>
+    <string name="mpv_script_tab_buttons">按鈕</string>
+    <string name="mpv_script_tab_automatic">自動載入</string>
+    <string name="mpv_script_add">新增</string>
+    <string name="mpv_script_add_button">新增按鈕</string>
+    <string name="mpv_script_empty">尚未建立按鈕。</string>
+    <string name="mpv_script_auto_empty">尚未匯入啟動 Lua。</string>
+    <string name="mpv_script_import">匯入 Lua</string>
+    <string name="mpv_script_delete">刪除</string>
+    <string name="mpv_script_rename">重新命名</string>
+    <string name="mpv_script_replace">替換 Lua</string>
+    <string name="mpv_script_title">名稱</string>
+    <string name="mpv_script_enable">啟用</string>
+    <string name="mpv_script_disable">停用</string>
+    <string name="mpv_script_enabled">已啟用</string>
+    <string name="mpv_script_disabled">已停用</string>
+    <string name="mpv_script_error">MPV 操作失敗</string>
+    <string name="mpv_script_timeout">腳本未回應，已取消排隊操作。</string>
+    <string name="mpv_script_unavailable">請先開始 MPV 播放。</string>
+    <string name="mpv_script_add_command">新增指令按鈕</string>
+    <string name="mpv_script_edit_command">編輯指令</string>
+    <string name="mpv_script_command">MPV 指令</string>
+    <string name="mpv_script_command_detail">輸入名稱與指令。</string>
+    <string name="mpv_script_import_detail">將 Lua 建立為播放按鈕。</string>
+    <string name="mpv_script_action">腳本動作</string>
+    <string name="mpv_script_status">執行狀態</string>
+    <string name="mpv_script_no_status">尚無執行狀態。</string>
+    <string name="mpv_script_running">執行中</string>
+    <string name="mpv_script_done">執行完成</string>
+    <string name="mpv_script_failed">執行失敗</string>
+    <string name="mpv_script_hide">隱藏按鈕</string>
+    <string name="mpv_script_show">顯示按鈕</string>
+    <string name="mpv_script_hidden">已隱藏</string>
+    <string name="mpv_script_move_earlier">往前移</string>
+    <string name="mpv_script_move_later">往後移</string>
+    <string name="mpv_script_loading">載入中</string>
+    <string name="mpv_script_loaded">已載入</string>
+
+    <string name="phone_input">遠端輸入</string>
+    <string name="log_action">日誌</string>
+    <string name="device_open_web">操作</string>
+    <string name="device_view_logs">日誌</string>
+    <string name="device_rename">命名裝置</string>
+    <string name="device_identity_invalid">此裝置沒有有效的識別碼</string>
+    <string name="device_address_invalid">裝置位址無效</string>
+    <string name="device_browser_missing">沒有可用的瀏覽器</string>
+    <string name="server_start_failed">無法啟動裝置連線，請稍後再試。</string>
+    <string name="device_empty">未找到裝置，請確認裝置都在同一網路。</string>
+    <string name="device_network_denied">需要區域網路權限才能搜尋或連線設備。請在應用程式設定中允許，再點重新整理。</string>
+    <string name="device_cast_pending">正在投屏到 %1$s…</string>
+    <string name="device_sync_pending">正在向 %1$s 傳送同步…</string>
+    <string name="device_connect">裝置連線</string>
+    <string name="device_searching">正在搜尋裝置…</string>
+    <string name="device_dlna_searching">正在搜尋投屏裝置，可點重新整理。</string>
+    <string name="device_cast_title">投屏到裝置</string>
+    <string name="device_sync_history_title">同步歷史</string>
+    <string name="device_sync_keep_title">同步收藏</string>
+    <string name="error_mpv_runtime">MPV 無法使用，改用 ExoPlayer：%1$s</string>
+    <string name="transfer_paused">已暫停</string>
+    <string name="transfer_resume">繼續</string>
+    <string name="transfer_detail">%1$s/s · 剩餘 %2$s</string>
+
+    <string name="auto_resume">繼續播放</string>
+    <string name="auto_current_episode">目前播放集</string>
+    <string name="auto_add_favorite">加入收藏</string>
+    <string name="auto_remove_favorite">取消收藏</string>
 
 </resources>

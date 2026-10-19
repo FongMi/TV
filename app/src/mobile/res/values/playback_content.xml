@@ -1,0 +1,17 @@
+<resources>
+
+    <style name="PlaybackContentAction" parent="PlaybackDialogAction" />
+
+    <style name="PlaybackContentCurrentAction" parent="PlaybackContentAction" />
+
+    <style name="PlaybackContentTab" parent="PlaybackDialogTab" />
+
+    <style name="PlaybackContentItem">
+        <item name="android:background">@drawable/shape_accent</item>
+    </style>
+
+    <style name="PlaybackContentText">
+        <item name="android:textColor">@color/selector_control</item>
+    </style>
+
+</resources>

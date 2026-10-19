@@ -1,44 +1,43 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.os.Bundle;
+import android.widget.Button;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.FragmentActivity;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.databinding.DialogUpdateBinding;
-import com.fongmi.android.tv.impl.UpdateListener;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
-import java.util.Locale;
+import java.text.NumberFormat;
 
 public class UpdateDialog extends BaseAlertDialog {
 
+    public static final String TAG = "update";
+
     private DialogUpdateBinding binding;
-    private UpdateListener listener;
-    private String title;
-    private String desc;
 
     public static UpdateDialog create() {
-        return new UpdateDialog();
+        UpdateDialog dialog = new UpdateDialog();
+        dialog.setArguments(new Bundle());
+        return dialog;
     }
 
     public UpdateDialog title(String title) {
-        this.title = title;
+        requireArguments().putString("title", title);
         return this;
     }
 
     public UpdateDialog desc(String desc) {
-        this.desc = desc;
-        return this;
-    }
-
-    public UpdateDialog listener(UpdateListener listener) {
-        this.listener = listener;
+        requireArguments().putString("desc", desc);
         return this;
     }
 
     public UpdateDialog show(FragmentActivity activity) {
-        show(activity.getSupportFragmentManager(), null);
+        show(activity.getSupportFragmentManager(), TAG);
         return this;
     }
 
@@ -49,24 +48,46 @@ public class UpdateDialog extends BaseAlertDialog {
 
     @Override
     protected MaterialAlertDialogBuilder getBuilder() {
-        return builder().setTitle(title).setView(getBinding().getRoot()).setPositiveButton(R.string.update_confirm, null).setNegativeButton(R.string.dialog_negative, null).setCancelable(false);
+        return builder().setTitle(requireArguments().getString("title")).setView(getBinding().getRoot()).setPositiveButton(R.string.update_confirm, null).setNegativeButton(R.string.dialog_negative, null).setCancelable(false);
     }
 
     @Override
     protected void initView() {
-        binding.desc.setText(desc);
+        binding.desc.setText(requireArguments().getString("desc"));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        AlertDialog dialog = (AlertDialog) getDialog();
-        if (dialog != null) dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(view -> listener.onCancel(view));
-        if (dialog != null) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(view -> listener.onConfirm(view));
+        AlertDialog dialog = (AlertDialog) requireDialog();
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener(Updater.get()::onCancel);
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(Updater.get()::onConfirm);
+        Updater.get().attach(this);
     }
 
-    public void setProgress(int progress) {
+    @Override
+    public void onStop() {
+        Updater.get().detach(this);
+        super.onStop();
+    }
+
+    @Override
+    public void onDestroyView() {
+        binding = null;
+        super.onDestroyView();
+    }
+
+    public void setState(boolean downloading, int progress, boolean ready) {
         AlertDialog dialog = (AlertDialog) getDialog();
-        if (dialog != null) dialog.getButton(AlertDialog.BUTTON_POSITIVE).setText(String.format(Locale.getDefault(), "%1$d%%", progress));
+        if (dialog == null) return;
+        boolean verifying = downloading && (progress < 0 || progress >= 100);
+        String text = getString(ready ? R.string.update_install : R.string.update_confirm);
+        if (Updater.get().isPaused()) text = getString(R.string.transfer_resume);
+        if (downloading) text = verifying ? getString(R.string.update_verifying) : NumberFormat.getPercentInstance().format(progress / 100.0);
+        Button confirm = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        confirm.setText(text);
+        confirm.setContentDescription(downloading && !verifying ? text + " · " + getString(R.string.pause) : text);
+        confirm.setEnabled(!verifying);
+        dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setText(downloading ? R.string.update_background : R.string.dialog_negative);
     }
 }
