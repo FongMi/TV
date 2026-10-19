@@ -35,6 +35,7 @@ import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.server.LogSession;
 import com.fongmi.android.tv.setting.DecodeSetting;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -47,6 +48,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     private final ExoDiskPreload preload;
     private final ExoPlayer player;
     private final IsoNavigationPlayerController navigation;
+    private final ExoPlaybackLog playbackLog = new ExoPlaybackLog();
     private final Runnable updateLog = this::updateEventLogger;
     private final Runnable logListener = () -> App.post(updateLog);
     private EventLogger eventLogger;
@@ -67,6 +69,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
         this.subtitles = new ExoSubtitleController(session, navigation.getPlayer());
         this.navigation.getPlayer().addListener(listener);
         this.player.addAnalyticsListener(this);
+        this.player.addAnalyticsListener(playbackLog);
         this.effect.setPlayer(player);
         LogSession.get().addListener(logListener);
         updateEventLogger();
@@ -127,6 +130,11 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     }
 
     @Override
+    public JsonObject getPlaybackLog() {
+        return playbackLog.snapshot();
+    }
+
+    @Override
     public DiscMenuController getDiscMenuController() {
         return navigation;
     }
@@ -153,6 +161,8 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
         }
         subtitles.release();
         player.removeAnalyticsListener(this);
+        player.removeAnalyticsListener(playbackLog);
+        playbackLog.clear();
         preload.release();
         effect.release();
         navigation.close();

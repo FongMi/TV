@@ -60,6 +60,7 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.google.common.net.HttpHeaders;
+import com.google.gson.JsonObject;
 
 import org.json.JSONException;
 
@@ -67,6 +68,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class PlayerManager implements ParseCallback {
 
@@ -80,6 +82,8 @@ public class PlayerManager implements ParseCallback {
     private ParseJob parseJob;
     private PlaySpec spec;
     private Player player;
+    private String playbackId;
+    private long playbackAttempt;
     private float speedBeforePress = Float.NaN;
 
     private long pendingStartPositionMs;
@@ -114,6 +118,37 @@ public class PlayerManager implements ParseCallback {
 
     public Player getPlayer() {
         return player;
+    }
+
+    @Nullable
+    public String getPlaybackId() {
+        return playbackId;
+    }
+
+    public long getPlaybackAttempt() {
+        return playbackAttempt;
+    }
+
+    @Nullable
+    public JsonObject getPlaybackLog() {
+        return engine == null ? null : engine.getPlaybackLog();
+    }
+
+    private void beginPlaybackAttempt(boolean newMedia) {
+        if (newMedia || playbackId == null) resetPlaybackAttempt();
+        playbackAttempt++;
+        logPlaybackAttempt();
+    }
+
+    private void resetPlaybackAttempt() {
+        playbackId = UUID.randomUUID().toString();
+        playbackAttempt = 0;
+    }
+
+    private void logPlaybackAttempt() {
+        if (!LogSession.get().isRunning()) return;
+        String playerId = Integer.toHexString(System.identityHashCode(player));
+        Log.i("TV-Playback", "player=" + playerId + " event=playbackAttempt playbackId=" + playbackId + " attempt=" + playbackAttempt);
     }
 
     @Nullable
@@ -690,6 +725,7 @@ public class PlayerManager implements ParseCallback {
         PlaybackSnapshot snapshot = PlaybackSnapshot.capture(this);
         replaceEngine(PlayerEngineFactory.create(PlayerEngine.Type.EXO, listener));
         engine.prepareForNewMedia();
+        beginPlaybackAttempt(false);
         engine.start(spec.checkUa(), snapshot.positionMs());
         snapshot.restorePlayerState(this);
     }
@@ -813,6 +849,7 @@ public class PlayerManager implements ParseCallback {
         if (newMedia) mpvDrmExoFallback = false;
         boolean playWhenReady = player.getPlayWhenReady();
         ensureEngine(spec.checkUa());
+        beginPlaybackAttempt(newMedia);
         if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;
         queuedPreload = null;
@@ -983,6 +1020,7 @@ public class PlayerManager implements ParseCallback {
     private void applyPreloadTransition(PendingPreload preload, PlaySpec next, long oldPositionMs, long duration) {
         queuedPreload = null;
         spec = next;
+        beginPlaybackAttempt(true);
         endSpeedPress();
         initTrack = false;
         pendingTrackRestore.clear();
@@ -1096,7 +1134,7 @@ public class PlayerManager implements ParseCallback {
         @Override
         public void onPlayerError(@NonNull PlaybackException e) {
             PlaybackLog.recordError(PlaybackLog.capture(PlayerManager.this), e);
-            if (LogSession.get().isRunning()) Log.e("TV-Playback", "player=" + Integer.toHexString(System.identityHashCode(player)) + " event=playerError code=" + e.getErrorCodeName());
+            if (LogSession.get().isRunning()) Log.e("TV-Playback", "player=" + Integer.toHexString(System.identityHashCode(player)) + " event=playerError playbackId=" + playbackId + " attempt=" + playbackAttempt + " code=" + e.getErrorCodeName());
             if (spec == null) return;
             clearPreload();
             if (engine.getType() == PlayerEngine.Type.MPV && e.errorCode == PlaybackException.ERROR_CODE_DRM_LICENSE_ACQUISITION_FAILED && !mpvDrmExoFallback) {

@@ -17,6 +17,7 @@ import androidx.media3.ui.PlayerView;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.effect.PlayerEffect;
 import com.fongmi.android.tv.player.media.PlaySpec;
+import com.google.gson.JsonObject;
 
 import java.util.List;
 
@@ -34,6 +35,11 @@ public interface PlayerEngine {
     }
 
     Player getPlayer();
+
+    @Nullable
+    default JsonObject getPlaybackLog() {
+        return null;
+    }
 
     int getAudioChannelCount();
 

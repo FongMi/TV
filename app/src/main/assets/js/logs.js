@@ -1,5 +1,6 @@
 const LOG_MAX_LINES = 5000;
 const LOG_MAX_BYTES = 512 * 1024;
+const LOG_PLAYER_STATES = ['UNKNOWN', 'IDLE', 'BUFFERING', 'READY', 'ENDED'];
 const logEncoder = new TextEncoder();
 
 function readLogPage(page, after) {
@@ -19,10 +20,11 @@ class LogBuffer {
         this.clear();
     }
 
-    clear() {
+    clear(markMissing = false) {
+        const trimmed = markMissing && (this.trimmed || this.lines.length > 0);
         this.lines = [];
         this.bytes = 0;
-        this.trimmed = false;
+        this.trimmed = trimmed;
         this.revision++;
     }
 
@@ -53,19 +55,76 @@ function readLogInfo(body) {
     return body;
 }
 
+function logReportInfo(info) {
+    const body = JSON.parse(JSON.stringify(info));
+    const current = body.playbackLog;
+    const error = body.lastPlaybackError;
+    if (current && error) {
+        const shared = {};
+        for (const [key, value] of Object.entries(current)) {
+            if (key === 'capturedAtMillis' || key === 'elapsedRealtimeMs' || JSON.stringify(value) !== JSON.stringify(error[key])) continue;
+            shared[key] = value;
+            delete current[key];
+            delete error[key];
+        }
+        if (Object.keys(shared).length) body.sharedPlayerFields = shared;
+    }
+    const urlFrom = body.sharedPlayerFields?.url !== undefined ? 'sharedPlayerFields' : 'playbackLog';
+    const source = body[urlFrom];
+    if (source && typeof source.url === 'string' && body.playback?.url === source.url && body.playback.urlTruncated === source.urlTruncated) {
+        delete body.playback.url;
+        delete body.playback.urlTruncated;
+        body.playback.urlFrom = urlFrom;
+    }
+    return '{\n' + Object.entries(body).map(([key, value]) => '  ' + JSON.stringify(key) + ': ' + JSON.stringify(value)).join(',\n') + '\n}';
+}
+
+function logPlayerSummary(snapshot) {
+    if (!snapshot) return 'not captured';
+    const parts = [];
+    if (snapshot.capturedAtMillis !== undefined) parts.push('capturedAt=' + new Date(snapshot.capturedAtMillis).toISOString());
+    if (snapshot.playerPresent === false) parts.push('no player available');
+    if (snapshot.playbackId) parts.push('playbackId=' + snapshot.playbackId + '; attempt=' + snapshot.playbackAttempt);
+    if (snapshot.engine) parts.push('engine=' + snapshot.engine);
+    if (snapshot.playerId) parts.push('playerId=' + snapshot.playerId);
+    if (snapshot.playbackState !== undefined) parts.push('state=' + (LOG_PLAYER_STATES[snapshot.playbackState] || 'UNKNOWN') + ' (' + snapshot.playbackState + ')');
+    if (snapshot.positionMs !== undefined) parts.push('positionMs=' + snapshot.positionMs);
+    if (snapshot.errorCodeName || snapshot.errorCode !== undefined) parts.push('error=' + (snapshot.errorCodeName || snapshot.errorCode));
+    return parts.join('; ') || 'recorded without player details';
+}
+
+function logReportFences(lines) {
+    const lengths = new Array(lines.length + 1).fill(3);
+    for (let i = lines.length - 1; i >= 0; i--) {
+        lengths[i] = lengths[i + 1];
+        for (const match of lines[i].text.matchAll(/^ {0,3}(`{3,})/gm)) lengths[i] = Math.max(lengths[i], match[1].length + 1);
+    }
+    return lengths;
+}
+
+function logReportRetention(lineCount, missing) {
+    return '- Log entries: ' + lineCount + '\n- Earlier entries missing: ' + missing + '\n\n';
+}
+
 function logReportText(buffer, info, gap, capturedAt) {
-    let header = 'TV logs\nExported: ' + new Date().toISOString() + '\nStatus captured: ' + capturedAt + '\n';
-    header += 'Collection scope: Android log permissions apply; requested buffers do not guarantee system-service logs.\n';
-    header += 'Initial history: bounded logcat tail; entries before collection may be unavailable.\n';
-    header += 'Page retention: ' + LOG_MAX_LINES + ' lines / ' + LOG_MAX_BYTES + ' bytes\n\n' + JSON.stringify(info, null, 2) + '\n\n';
+    let header = '# TV Playback Log Report\n\n';
+    header += '- Format version: 1\n- Exported: ' + new Date().toISOString() + '\n- Status received: ' + capturedAt + '\n\n';
+    header += '## Summary\n\n- Current player: ' + logPlayerSummary(info.playbackLog) + '\n';
+    header += '- Last error snapshot: ' + (info.lastPlaybackError === null ? 'none retained in this app process' : logPlayerSummary(info.lastPlaybackError)) + '\n\n';
+    header += '## Report Data\n\n```json\n' + logReportInfo(info) + '\n```\n\n## Raw Logcat\n\n';
     const lines = buffer.lines;
+    const fences = logReportFences(lines);
     let start = 0;
     let bytes = buffer.bytes;
-    const headerBytes = logEncoder.encode(header).length + 256;
-    if (headerBytes > LOG_MAX_BYTES) throw new Error('Log info too large');
-    while (start < lines.length && bytes + headerBytes > LOG_MAX_BYTES) bytes -= lines[start++].bytes;
-    header += 'Log entries: ' + (lines.length - start) + '\nEarlier entries missing: ' + (gap || buffer.trimmed || start > 0) + '\n\n--- Logs ---\n';
-    return header + lines.slice(start).map(line => line.text).join('\n') + '\n';
+    const fixedBytes = logEncoder.encode(header + 'text\n\n').length;
+    let retention = logReportRetention(lines.length, gap || buffer.trimmed);
+    while (bytes + fixedBytes + logEncoder.encode(retention).length + fences[start] * 2 > LOG_MAX_BYTES) {
+        if (start === lines.length) throw new Error('Log info too large');
+        bytes -= lines[start++].bytes;
+        retention = logReportRetention(lines.length - start, true);
+    }
+    const fence = '`'.repeat(fences[start]);
+    return header + retention + fence + 'text\n' + lines.slice(start).map(line => line.text + '\n').join('') + fence + '\n';
 }
 
 function downloadLog(blob, filename) {
@@ -79,7 +138,7 @@ function downloadLog(blob, filename) {
 
 async function shareLogReport(blob, filename) {
     if (typeof File !== 'undefined' && typeof navigator.share === 'function' && typeof navigator.canShare === 'function') {
-        const file = new File([blob], filename, { type: 'text/plain' });
+        const file = new File([blob], filename, { type: blob.type });
         if (navigator.canShare({ files: [file] })) {
             await navigator.share({ title: t('logTitle'), files: [file] });
             return 'logShared';
@@ -376,7 +435,7 @@ function initLogs() {
         if (!paused) render(true);
     });
     document.getElementById('log_clear').addEventListener('click', () => {
-        reader.buffer.clear();
+        reader.buffer.clear(true);
         update();
         render();
     });
@@ -390,8 +449,8 @@ function initLogs() {
         download.disabled = share.disabled = true;
         exportStatus.hidden = true;
         try {
-            const blob = new Blob([logReportText(reader.buffer, info, reader.gap, capturedAt)], { type: 'text/plain;charset=utf-8' });
-            const filename = 'tv-log-' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt';
+            const blob = new Blob([logReportText(reader.buffer, info, reader.gap, capturedAt)], { type: 'text/markdown;charset=utf-8' });
+            const filename = 'tv-log-' + new Date().toISOString().replace(/[:.]/g, '-') + '.md';
             let status = 'logReportDownloaded';
             if (shareFile) status = await shareLogReport(blob, filename);
             else downloadLog(blob, filename);
