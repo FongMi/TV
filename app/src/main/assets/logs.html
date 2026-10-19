@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <title data-i18n="logTitle">應用日誌</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" href="css/ui.css">
+    <link rel="stylesheet" href="css/logs.css">
+    <script src="js/i18n.js" defer></script>
+    <script src="js/choices.js" defer></script>
+    <script src="js/logs.js" defer></script>
+</head>
+
+<body class="logs-page">
+    <main class="logs-app">
+        <header class="logs-header">
+            <div class="page-heading">
+                <span class="page-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3h16v18H4V3zm2 2v14h12V5H6zm2 3h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/></svg></span>
+                <h1 data-i18n="logTitle">應用日誌</h1>
+            </div>
+            <a class="md-btn md-btn-outlined md-icon-button" href="/?tab=settings" data-i18n-label="logBack" aria-label="返回操作頁" title="返回操作頁"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></a>
+        </header>
+        <section class="md-card logs-connection">
+            <div class="logs-status">
+                <p id="log_status" role="status" aria-live="polite" data-state="logConnecting" data-i18n="logConnecting">連線中…</p>
+                <p id="log_remaining"></p>
+                <button id="log_stop" class="md-btn md-btn-outlined" type="button" hidden data-i18n="logStop">停止擷取</button>
+                <button id="log_retry" class="md-btn md-btn-outlined" type="button" hidden data-i18n="logRestart">重新擷取</button>
+            </div>
+            <p id="log_gap" class="logs-warning" hidden data-i18n="logGap">部分較早的日誌已被覆蓋。</p>
+            <p id="log_trimmed" class="logs-hint" hidden data-i18n="logTrimmed">本頁僅保留最近的日誌，較早的內容已移除。</p>
+        </section>
+        <section class="md-card logs-viewer" aria-labelledby="log_content_heading">
+            <div class="logs-viewer-heading">
+                <div>
+                    <h2 id="log_content_heading" data-i18n="logContent">日誌內容</h2>
+                    <p id="log_count" class="logs-hint"></p>
+                </div>
+                <label class="logs-follow"><input id="log_follow" type="checkbox" checked /><span data-i18n="logFollow">跟隨最新</span></label>
+            </div>
+            <div class="logs-filters">
+                <div class="md-field">
+                    <label for="log_search" data-i18n="logSearch">搜尋文字</label>
+                    <input id="log_search" class="md-input" type="search" />
+                </div>
+                <div class="md-field logs-level">
+                    <label for="log_level" data-i18n="logLevel">等級</label>
+                    <button id="log_level" class="md-input" type="button" value="" data-i18n="logAll">全部</button>
+                </div>
+            </div>
+            <div class="logs-toolbar">
+                <button id="log_pause" class="md-btn md-btn-outlined md-icon-button" type="button" aria-pressed="false" data-i18n-label="logPause" aria-label="暫停顯示" title="暫停顯示"><svg class="button-icon icon-pause" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#pause"/></svg><svg class="button-icon icon-resume" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#play"/></svg></button>
+                <button id="log_clear" class="md-btn md-btn-outlined md-icon-button" type="button" data-i18n-label="logClear" aria-label="清空本頁" title="清空本頁"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#delete"/></svg></button>
+                <button id="log_download" class="md-btn md-btn-tonal md-icon-button" type="button" disabled data-i18n-label="logDownload" aria-label="下載日誌" title="下載日誌"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#download"/></svg></button>
+                <button id="log_share" class="md-btn md-btn-filled md-icon-button" type="button" disabled data-i18n-label="logShare" aria-label="分享日誌" title="分享日誌"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#share"/></svg></button>
+                <button id="log_report_retry" class="md-btn md-btn-outlined md-icon-button" type="button" hidden data-i18n-label="logReportRetry" aria-label="重新讀取資訊" title="重新讀取資訊"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button>
+            </div>
+            <p id="log_export_status" class="logs-hint" role="status" aria-live="polite" hidden></p>
+            <pre id="log_text" class="logs-text" tabindex="0" aria-labelledby="log_content_heading" data-i18n="logEmpty">尚無日誌</pre>
+        </section>
+        <p class="logs-hint" data-i18n="logPauseHint">擷取期間會開啟詳細播放日誌。暫停顯示或關閉本頁不會停止擷取，請使用「停止擷取」。下載與分享包含全部保留日誌。</p>
+    </main>
+</body>
+</html>

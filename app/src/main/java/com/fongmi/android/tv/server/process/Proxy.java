@@ -3,7 +3,10 @@ package com.fongmi.android.tv.server.process;
 import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.server.impl.Process;
+import com.fongmi.android.tv.utils.Notify;
+import com.github.catvod.utils.RuntimeModule;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.Objects;
@@ -31,17 +34,47 @@ public class Proxy implements Process {
             params.putAll(files);
             return createResponse(BaseLoader.get().proxy(params));
         } catch (Throwable e) {
+            RuntimeModule.MissingException missing = RuntimeModule.MissingException.find(e);
+            if (missing != null) return markError(Nano.error(Status.SERVICE_UNAVAILABLE, Notify.getError(missing)));
             e.printStackTrace();
-            return Nano.error(Objects.toString(e.getMessage(), e.toString()));
+            return markError(Nano.error(Objects.toString(e.getMessage(), e.toString())));
         }
     }
 
-    private static Response createResponse(Object[] rs) {
-        if (rs == null || rs.length == 0) return Nano.error(INVALID_RESPONSE);
-        if (rs[0] instanceof Response response) return response;
-        if (rs.length < 3) return Nano.error(INVALID_RESPONSE);
-        Response response = NanoHTTPD.newChunkedResponse(toStatus((Integer) rs[0]), (String) rs[1], (InputStream) rs[2]);
-        if (rs.length > 3 && rs[3] != null) for (Map.Entry<String, String> entry : ((Map<String, String>) rs[3]).entrySet()) response.addHeader(entry.getKey(), entry.getValue());
+    static Response createResponse(Object[] rs) {
+        if (rs == null || rs.length == 0) return markError(Nano.error(INVALID_RESPONSE));
+        if (rs[0] instanceof Response response) return markError(response);
+        if (rs.length < 3) return markError(Nano.error(INVALID_RESPONSE));
+        InputStream stream = (InputStream) rs[2];
+        try {
+            Response response = NanoHTTPD.newChunkedResponse(toStatus((Integer) rs[0]), (String) rs[1], stream);
+            addHeaders(response, rs.length > 3 ? rs[3] : null);
+            return markError(response);
+        } catch (RuntimeException | Error error) {
+            closeFailedStream(stream, error);
+            throw error;
+        }
+    }
+
+    private static void addHeaders(Response response, Object headers) {
+        if (headers == null) return;
+        for (Map.Entry<String, String> entry : ((Map<String, String>) headers).entrySet()) {
+            String name = entry.getKey();
+            if (!name.equalsIgnoreCase("Content-Length") && !name.equalsIgnoreCase("Transfer-Encoding")) response.addHeader(name, entry.getValue());
+        }
+    }
+
+    private static void closeFailedStream(InputStream stream, Throwable error) {
+        if (stream == null) return;
+        try {
+            stream.close();
+        } catch (IOException | RuntimeException | Error failure) {
+            if (failure != error) error.addSuppressed(failure);
+        }
+    }
+
+    private static Response markError(Response response) {
+        if (response.getStatus().getRequestStatus() >= 400) response.addHeader("X-TV-Proxy-Error", "1");
         return response;
     }
 

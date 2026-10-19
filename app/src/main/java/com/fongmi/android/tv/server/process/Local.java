@@ -6,8 +6,8 @@ import static fi.iki.elonen.NanoHTTPD.newFixedLengthResponse;
 
 import com.fongmi.android.tv.server.Nano;
 import com.fongmi.android.tv.server.impl.Process;
-import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Formatters;
+import com.github.catvod.utils.Archive;
 import com.github.catvod.utils.Path;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Locale;
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.zip.CRC32;
 
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
+import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 import fi.iki.elonen.NanoHTTPD.Response.Status;
 
@@ -32,17 +34,20 @@ public class Local implements Process {
 
     @Override
     public boolean isRequest(IHTTPSession session, String url) {
-        return isFile(url) || url.equals("/upload") || url.equals("/newFolder") || url.equals("/delFolder") || url.equals("/delFile");
+        return isFile(url) || url.equals("/upload") || url.equals("/newFolder") || url.equals("/delFolder") || url.equals("/delFile") || url.equals("/rename") || url.equals("/move");
     }
 
     @Override
     public Response doResponse(IHTTPSession session, String url, Map<String, String> files) {
+        if ((url.equals("/rename") || url.equals("/move")) && session.getMethod() != Method.POST) return Nano.error(Status.METHOD_NOT_ALLOWED, "POST required");
         try {
             if (isFile(url)) return getFile(session, url);
             Map<String, String> params = session.getParms();
             if (url.equals("/upload")) upload(params, files);
             else if (url.equals("/newFolder")) newFolder(params);
             else if (url.equals("/delFolder") || url.equals("/delFile")) delete(params);
+            else if (url.equals("/rename")) rename(params);
+            else if (url.equals("/move")) move(params);
             else return null;
             return Nano.ok();
         } catch (Exception e) {
@@ -66,19 +71,21 @@ public class Local implements Process {
         if (files.isEmpty()) throw new IllegalArgumentException("Missing upload file");
         File directory = resolvePath(requirePath(params));
         if (!directory.isDirectory()) throw new FileNotFoundException("Upload directory not found");
-        for (Map.Entry<String, String> entry : files.entrySet()) {
-            File source = new File(entry.getValue());
-            String name = requireName(params.get(entry.getKey()));
-            if (!source.isFile() || !source.canRead()) throw new FileNotFoundException("Upload file not found");
-            storeUpload(source, directory, name);
-        }
+        for (Map.Entry<String, String> entry : files.entrySet()) upload(directory, params, entry);
+    }
+
+    private void upload(File directory, Map<String, String> params, Map.Entry<String, String> entry) throws IOException {
+        File source = new File(entry.getValue());
+        String name = requireName(params.get(entry.getKey()));
+        if (!source.isFile() || !source.canRead()) throw new FileNotFoundException("Upload file not found");
+        storeUpload(source, directory, name);
     }
 
     private void storeUpload(File source, File directory, String name) throws IOException {
         if (name.toLowerCase(Locale.ROOT).endsWith(".zip")) {
-            if (!FileUtil.zipDecompress(source, directory)) throw new IOException("Unable to extract archive");
+            if (!Archive.zipDecompress(source, directory)) throw new IOException("Unable to extract archive");
         } else {
-            FileUtil.copyAtomically(source, resolveChild(directory, name));
+            Path.writeAtomically(resolveChild(directory, name), source);
         }
     }
 
@@ -99,11 +106,32 @@ public class Local implements Process {
         File root = Path.root();
         String rootPath = root.getAbsolutePath();
         JsonArray files = new JsonArray();
-        Path.list(directory).forEach(file -> files.add(buildFileInfo(file, rootPath)));
+        for (File file : Path.list(directory)) if (!file.isDirectory() || !file.getName().equals(".tv-downloads")) files.add(buildFileInfo(file, rootPath));
         JsonObject info = new JsonObject();
         info.addProperty("parent", parentOf(directory, root, rootPath));
         info.add("files", files);
         return Nano.ok(info.toString());
+    }
+
+    private void rename(Map<String, String> params) throws IOException {
+        File source = resolveDeletePath(requirePath(params));
+        moveFile(source, resolveChild(source.getParentFile(), requireName(params.get("name"))));
+    }
+
+    private void move(Map<String, String> params) throws IOException {
+        File source = resolveDeletePath(requirePath(params));
+        String target = params.get("target");
+        if (target == null) throw new IllegalArgumentException("Missing target directory");
+        File directory = resolvePath(target);
+        if (!directory.isDirectory()) throw new FileNotFoundException("Target directory not found");
+        moveFile(source, resolveChild(directory, source.getName()));
+    }
+
+    private static void moveFile(File source, File target) throws IOException {
+        if (!source.exists()) throw new FileNotFoundException("File not found");
+        if (target.exists()) throw new IOException("Target already exists");
+        if (target.getCanonicalFile().toPath().startsWith(source.getCanonicalFile().toPath())) throw new IOException("Cannot move into itself");
+        Files.move(source.toPath(), target.toPath());
     }
 
     private JsonObject buildFileInfo(File file, String rootPath) {
@@ -160,7 +188,18 @@ public class Local implements Process {
         return name;
     }
 
-    private static File resolvePath(String path) throws IOException {
+    static File resolveTarget(File root, String path, String name) throws IOException {
+        if (path == null) throw new IllegalArgumentException("Missing path");
+        while (path.startsWith("/")) path = path.substring(1);
+        File directory = new File(root, path).getCanonicalFile();
+        File target = new File(directory, requireName(name)).getCanonicalFile();
+        if (!directory.toPath().startsWith(root.getCanonicalFile().toPath()) || !target.toPath().startsWith(directory.toPath())) throw new SecurityException("Path outside shared storage");
+        if (!directory.isDirectory()) throw new IOException("Target directory not found");
+        return target;
+    }
+
+    static File resolvePath(String path) throws IOException {
+        if (path == null) throw new IllegalArgumentException("Missing path");
         return resolve(new File(Path.root(), relativePath(path)));
     }
 

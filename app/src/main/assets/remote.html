@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="referrer" content="no-referrer">
+    <title data-i18n="remoteKeys">遙控器</title>
+    <link rel="stylesheet" href="css/ui.css">
+    <link rel="stylesheet" href="css/remote.css">
+    <script src="js/i18n.js" defer></script>
+    <script src="js/navigation.js" defer></script>
+    <script src="js/remote-keys.js" defer></script>
+</head>
+<body class="keypad-page">
+    <main class="keypad-app">
+        <header class="keypad-header">
+            <div class="page-heading">
+                <span class="page-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="icons.svg#remote"/></svg></span>
+                <h1 data-i18n="remoteKeys">遙控器</h1>
+            </div>
+            <a id="remote_return" class="md-btn md-btn-outlined md-icon-button" href="/?tab=play" data-i18n-label="logBack" aria-label="返回操作頁" title="返回操作頁"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></a>
+        </header>
+        <p id="remote_key_status" class="keypad-status" role="status" aria-live="polite" data-i18n="remoteReady">就緒</p>
+        <section class="md-card keypad-shell" aria-label="遙控器" data-i18n-label="remoteKeys">
+            <div class="keypad-pad" role="group" data-i18n-label="remoteDirections" aria-label="方向鍵">
+                <button class="md-btn remote-icon-button" type="button" data-key="up" disabled data-i18n-label="remoteUp" aria-label="向上" title="向上"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#chevron"/></svg></button>
+                <button class="md-btn remote-icon-button" type="button" data-key="left" disabled data-i18n-label="remoteLeft" aria-label="向左" title="向左"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#chevron"/></svg></button>
+                <button class="md-btn md-btn-filled" type="button" data-key="ok" disabled data-i18n-label="confirm" aria-label="確認" title="確認">OK</button>
+                <button class="md-btn remote-icon-button" type="button" data-key="right" disabled data-i18n-label="remoteRight" aria-label="向右" title="向右"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#chevron"/></svg></button>
+                <button class="md-btn remote-icon-button" type="button" data-key="down" disabled data-i18n-label="remoteDown" aria-label="向下" title="向下"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#chevron"/></svg></button>
+            </div>
+            <div class="keypad-actions">
+                <button class="md-btn md-btn-outlined" type="button" data-key="back" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg><span data-i18n="remoteBack">返回</span></button>
+                <button class="md-btn md-btn-outlined" type="button" data-key="menu" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#menu"/></svg><span data-i18n="remoteMenu">選單</span></button>
+            </div>
+            <details class="keypad-numbers">
+                <summary class="disclosure-heading"><span data-i18n="remoteNumbers">數字鍵</span></summary>
+                <div class="keypad-number-grid" role="group" data-i18n-label="remoteNumbers" aria-label="數字鍵">
+                    <button class="md-btn md-btn-outlined" type="button" data-key="1" disabled>1</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="2" disabled>2</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="3" disabled>3</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="4" disabled>4</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="5" disabled>5</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="6" disabled>6</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="7" disabled>7</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="8" disabled>8</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="9" disabled>9</button>
+                    <button class="md-btn md-btn-outlined" type="button" data-key="0" disabled>0</button>
+                </div>
+            </details>
+        </section>
+    </main>
+</body>
+</html>

@@ -5,38 +5,75 @@
     android:layout_height="wrap_content"
     android:background="@drawable/shape_accent"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingHorizontal="12dp"
+    android:paddingVertical="8dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:importantForAccessibility="no"
         tools:src="@drawable/ic_cast_tv" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_weight="1"
         android:orientation="vertical">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
             android:singleLine="true"
             android:textColor="?attr/colorOnSurface"
             android:textSize="14sp"
-            tools:text="Google Chrome Cast" />
+            tools:text="TCL Smart TV Pro" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/host"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
+            android:ellipsize="end"
             android:singleLine="true"
             android:textColor="?attr/colorOnSurface"
             android:textSize="12sp"
-            tools:text="127.0.0.1" />
+            tools:text="192.168.68.74" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/actions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <com.fongmi.android.tv.ui.custom.DialogActionView
+            android:id="@+id/web"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/device_open_web"
+            android:padding="2dp"
+            android:src="@drawable/ic_action_web" />
+
+        <com.fongmi.android.tv.ui.custom.DialogActionView
+            android:id="@+id/logs"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="16dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/device_view_logs"
+            android:padding="2dp"
+            android:src="@drawable/ic_action_content" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>

@@ -1,0 +1,25 @@
+.keypad-page { background: var(--md-surface-low); }
+.keypad-app { display: flex; flex-direction: column; gap: var(--md-section-gap); width: 100%; max-width: 460px; margin: 0 auto; padding: max(var(--md-card-padding), env(safe-area-inset-top)) max(var(--md-page-padding), env(safe-area-inset-right)) max(var(--md-card-padding), env(safe-area-inset-bottom)) max(var(--md-page-padding), env(safe-area-inset-left)); }
+.keypad-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.keypad-header h1 { font: var(--md-title-large); }
+.keypad-status { min-height: 20px; color: var(--md-on-surface-variant); font-size: 14px; line-height: 20px; overflow-wrap: anywhere; }
+.keypad-status[data-error="true"] { color: var(--md-error); }
+.keypad-shell { display: flex; flex-direction: column; gap: var(--md-section-gap); }
+.keypad-pad { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, 1fr); gap: 8px; align-self: center; width: min(100%, 272px); aspect-ratio: 1; padding: 16px; border: 1px solid var(--md-outline-variant); border-radius: 50%; background: var(--md-surface-container-high); }
+.keypad-pad .md-btn { width: 100%; height: 100%; min-width: 0; min-height: 44px; padding: 0; border-radius: 50%; }
+.keypad-pad svg { width: 24px; height: 24px; }
+.keypad-pad [data-key="up"] { grid-area: 1 / 2; }
+.keypad-pad [data-key="left"] { grid-area: 2 / 1; }
+.keypad-pad [data-key="ok"] { grid-area: 2 / 2; font-size: 18px; }
+.keypad-pad [data-key="right"] { grid-area: 2 / 3; }
+.keypad-pad [data-key="down"] { grid-area: 3 / 2; }
+.keypad-pad [data-key="up"] svg { transform: rotate(-90deg); }
+.keypad-pad [data-key="left"] svg { transform: rotate(180deg); }
+.keypad-pad [data-key="down"] svg { transform: rotate(90deg); }
+.keypad-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.keypad-actions .md-btn { min-width: 0; }
+.keypad-number-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
+.keypad-number-grid .md-btn { height: 48px; font-size: 22px; font-weight: 400; }
+.keypad-number-grid [data-key="0"] { grid-column: 2; }
+.keypad-shell [data-key] { touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.keypad-shell [data-pressed="true"]::after { opacity: 0.12; }

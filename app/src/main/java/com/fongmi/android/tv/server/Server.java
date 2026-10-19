@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.server;
 
 import com.fongmi.android.tv.service.PlaybackService;
-import com.fongmi.android.tv.utils.Task;
 import com.github.catvod.Proxy;
+import com.github.catvod.utils.Task;
 import com.github.catvod.utils.Util;
 
 public class Server {
@@ -30,8 +30,8 @@ public class Server {
         return getAddress(false);
     }
 
-    public String getAddress(int tab) {
-        return getAddress(false) + "?tab=" + tab;
+    public String getPageAddress(String tab) {
+        return getAddress(false) + "/?tab=" + tab;
     }
 
     public String getAddress(String path) {
@@ -42,25 +42,34 @@ public class Server {
         return "http://" + (local ? "127.0.0.1" : Util.getIp()) + ":" + Proxy.getPort();
     }
 
-    public synchronized void start() {
-        if (nano != null) return;
-        for (int i = 9978; i < 9999; i++) {
-            try {
-                nano = new Nano(i);
-                nano.start(500);
-                Proxy.set(i);
-                break;
-            } catch (Throwable e) {
-                nano = null;
-            }
+    public synchronized boolean start() {
+        if (nano != null) return true;
+        for (int i = 9978; i < 9999; i++) if (start(i)) return true;
+        return false;
+    }
+
+    private boolean start(int port) {
+        try {
+            nano = new Nano(port, this);
+            nano.start(500);
+            Proxy.set(port);
+            return true;
+        } catch (Throwable e) {
+            if (nano != null) nano.stop();
+            nano = null;
+            return false;
         }
     }
 
-    public void stop() {
-        Task.execute(() -> {
-            if (nano != null) nano.stop();
-            service = null;
-            nano = null;
-        });
+    boolean isCurrent(Nano current) {
+        return nano == current;
+    }
+
+    public synchronized void stop() {
+        LogSession.get().stop();
+        Nano current = nano;
+        service = null;
+        nano = null;
+        if (current != null) Task.execute(current::stop);
     }
 }

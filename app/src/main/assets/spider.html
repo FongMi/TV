@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="referrer" content="no-referrer">
+    <title data-i18n="spiderTitle">爬蟲測試</title>
+    <link rel="stylesheet" href="css/ui.css">
+    <link rel="stylesheet" href="css/spider.css">
+    <script src="js/i18n.js" defer></script>
+    <script src="js/choices.js" defer></script>
+    <script src="js/spider-editor.js" defer></script>
+    <script src="js/spider.js" defer></script>
+</head>
+<body class="spider-page">
+    <main class="spider-app">
+        <header class="spider-header">
+            <div class="page-heading">
+                <span class="page-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 5-7 7 7 7 1.4-1.4L3.8 12l5.6-5.6L8 5zm8 0-1.4 1.4 5.6 5.6-5.6 5.6L16 19l7-7-7-7zM14 3l-4 18h2l4-18h-2z"/></svg></span>
+                <h1 data-i18n="spiderTitle">爬蟲測試</h1>
+            </div>
+            <div class="md-tabs spider-tabs" role="tablist" aria-label="爬蟲測試">
+                <button id="spider_test_tab" class="md-btn" type="button" role="tab" aria-selected="true" aria-controls="spider_test_panel" data-i18n="spiderTest">測試</button>
+                <button id="spider_edit_tab" class="md-btn" type="button" role="tab" aria-selected="false" aria-controls="spider_edit_panel" data-i18n="spiderEdit" disabled>編輯</button>
+            </div>
+            <div class="spider-header-actions">
+                <button id="spider_back" class="md-btn md-btn-outlined md-icon-button" type="button" data-i18n-label="logBack" aria-label="返回操作頁" title="返回操作頁"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></button>
+            </div>
+        </header>
+        <div class="spider-file-actions">
+            <p id="spider_status" class="spider-status" role="status" aria-live="polite" data-i18n="spiderConnecting">連線中…</p>
+            <button id="spider_reconnect" class="md-btn md-btn-outlined md-icon-button" type="button" hidden data-i18n-label="logRetry" aria-label="重新連線" title="重新連線"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button>
+        </div>
+        <div id="spider_test_panel" class="spider-workspace" role="tabpanel" aria-labelledby="spider_test_tab">
+            <section class="md-card spider-controls" aria-label="來源">
+                <div class="md-field">
+                    <label for="spider_api" data-i18n="spiderSource">來源</label>
+                    <div class="spider-source-input">
+                        <input id="spider_api" class="md-input" type="text" autocomplete="off" spellcheck="false" placeholder="https://…/spider.py" disabled />
+                        <button id="spider_recent" class="md-btn md-btn-outlined md-icon-button" type="button" disabled data-i18n-label="spiderRecent" aria-label="最近" title="最近"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#history"/></svg></button>
+                    </div>
+                </div>
+                <div class="spider-file-actions">
+                    <button id="spider_files" class="md-btn md-btn-tonal" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#folder"/></svg><span data-i18n="spiderFiles">App 檔案</span></button>
+                    <button id="spider_upload" class="md-btn md-btn-outlined" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#upload"/></svg><span data-i18n="spiderImport">本機檔案</span></button>
+                    <input id="spider_uploader" type="file" accept="*/*" hidden />
+                </div>
+                <div class="md-field"><div class="spider-label"><label for="spider_jar">jar</label><button id="spider_csp" class="md-btn md-btn-outlined" type="button" data-i18n="spiderCsp" hidden disabled>選擇 CSP</button></div><input id="spider_jar" class="md-input" type="text" autocomplete="off" spellcheck="false" disabled /></div>
+                <div class="md-field"><label for="spider_ext">ext</label><textarea id="spider_ext" class="md-input" rows="2" autocomplete="off" spellcheck="false" disabled></textarea></div>
+                <div class="md-field"><label for="spider_method" data-i18n="spiderMethod">方法</label><button id="spider_method" class="md-input" type="button" value="home" disabled>home</button></div>
+                <div id="spider_parameters" class="spider-parameters"></div>
+                <section id="spider_arguments" class="spider-control-section" aria-labelledby="spider_arguments_title" hidden>
+                    <div class="md-field">
+                        <div class="spider-label"><label id="spider_arguments_title" class="spider-section-title" for="spider_args">JSON</label><div class="spider-file-actions"><button id="spider_format_args" class="md-btn md-btn-outlined md-icon-button" type="button" disabled data-i18n-label="spiderFormat" aria-label="格式化" title="格式化"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#code"/></svg></button><button id="spider_help" type="button" class="md-btn md-btn-outlined md-icon-button" data-i18n-label="spiderArgsHelp" aria-label="參數說明" title="參數說明"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#help"/></svg></button></div></div>
+                        <textarea id="spider_args" class="md-input spider-json" rows="3" spellcheck="false" disabled>[true]</textarea>
+                    </div>
+                </section>
+                <div class="spider-file-actions">
+                    <button id="spider_load" class="md-btn md-btn-outlined" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#download"/></svg><span id="spider_load_label" data-i18n="spiderLoad">載入</span></button>
+                    <button id="spider_run" class="md-btn md-btn-filled" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#play"/></svg><span data-i18n="spiderRun">執行</span></button>
+                    <button id="spider_cancel" class="md-btn md-btn-outlined md-icon-button" type="button" hidden data-i18n-label="cancel" aria-label="取消" title="取消"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#close"/></svg></button>
+                    <button id="spider_more" class="md-btn md-btn-outlined md-icon-button" type="button" disabled data-i18n-label="spiderMore" aria-label="更多" title="更多"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#more"/></svg></button>
+                </div>
+            </section>
+            <section class="md-card spider-result-card" aria-labelledby="spider_result_title">
+                <div class="spider-result-header">
+                    <h2 id="spider_result_title" data-i18n="spiderResult">結果</h2>
+                    <div class="spider-file-actions">
+                        <button id="spider_items" class="md-btn md-btn-tonal" type="button" data-i18n="spiderBrowse" disabled>瀏覽</button>
+                        <button id="spider_compare" class="md-btn md-btn-outlined" type="button" data-i18n="spiderCompare" disabled>比較</button>
+                        <button id="spider_copy" class="md-btn md-btn-outlined md-icon-button" type="button" disabled data-i18n-label="spiderCopy" aria-label="複製" title="複製"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#copy"/></svg></button>
+                    </div>
+                </div>
+                <div id="spider_feedback" class="spider-file-actions" hidden>
+                    <span id="spider_validation" class="spider-file-path" role="status"></span>
+                    <button id="spider_check" class="md-btn md-btn-outlined" type="button" data-i18n="spiderCheck" hidden>查看檢查</button>
+                    <button id="spider_location" class="md-btn md-btn-tonal" type="button" data-i18n="spiderLocate" hidden>查看程式</button>
+                    <button id="spider_playback" class="md-btn md-btn-filled" type="button" data-i18n="spiderPlayback" hidden>在 App 播放</button>
+                </div>
+                <details id="spider_inspector" class="spider-inspector" hidden>
+                    <summary data-i18n="spiderInspect">檢視內容</summary>
+                    <div class="spider-form">
+                        <div class="md-field"><label for="spider_result_search" data-i18n="spiderSearchResult">搜尋內容</label><input id="spider_result_search" class="md-input" type="search" autocomplete="off" spellcheck="false" /></div>
+                        <p id="spider_search_count" class="spider-file-path" role="status" aria-live="polite" hidden></p>
+                        <div id="spider_result_tree" class="spider-tree"></div>
+                    </div>
+                </details>
+                <pre id="spider_result" tabindex="0" data-i18n="spiderEmpty">尚無結果</pre>
+            </section>
+        </div>
+        <section id="spider_edit_panel" class="md-card spider-editor-card" role="tabpanel" aria-labelledby="spider_edit_tab" hidden>
+            <div class="spider-result-header spider-editor-header">
+                <div class="spider-editor-heading"><h2 id="spider_filename"></h2><span id="spider_save_status" role="status" aria-live="polite"></span><button id="spider_retest" class="md-btn md-btn-filled md-icon-button spider-editor-retest" type="button" disabled data-i18n-label="spiderRetest" aria-label="重測" title="重測"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button><button id="spider_format" class="md-btn md-btn-outlined md-icon-button spider-editor-format" type="button" disabled data-i18n-label="spiderFormat" aria-label="格式化" title="格式化"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#code"/></svg></button><button id="spider_fullscreen" class="md-btn md-btn-outlined md-icon-button" type="button" disabled aria-pressed="false" data-i18n-label="spiderFullscreen" aria-label="全螢幕" title="全螢幕"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#fullscreen"/></svg></button></div>
+                <div class="spider-file-actions"><button id="spider_reopen" class="md-btn md-btn-tonal" type="button" data-i18n="spiderReopen" hidden>重新開啟</button><button id="spider_versions" class="md-btn md-btn-outlined md-icon-button" type="button" data-i18n-label="spiderVersions" aria-label="版本" title="版本"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#history"/></svg></button><button id="spider_save" class="md-btn md-btn-outlined" type="button"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#save"/></svg><span data-i18n="spiderCheckpoint">保存版本</span></button></div>
+            </div>
+            <p id="spider_editor_status" class="spider-file-path" role="status" aria-live="polite"></p>
+            <p id="spider_java_note" class="spider-file-path" data-i18n="spiderJavaSource" hidden>Java 原始碼僅供編輯；測試請載入 JAR。</p>
+            <div id="spider_editor"></div>
+            <div id="spider_symbols" class="spider-editor-tools" role="group" data-i18n-label="spiderSymbols" aria-label="常用符號"></div>
+        </section>
+        <dialog id="spider_dialog" class="md-dialog spider-dialog" aria-labelledby="spider_dialog_title">
+            <h2 id="spider_dialog_title" class="md-dialog-title"></h2>
+            <div id="spider_dialog_body" class="md-dialog-body"></div>
+            <div id="spider_dialog_actions" class="md-dialog-actions"><button id="spider_suite_cancel" class="md-dialog-btn" type="button" data-i18n="cancel" hidden>取消</button><button id="spider_dialog_close" class="md-dialog-btn" type="button" data-i18n="close">關閉</button></div>
+        </dialog>
+    </main>
+</body>
+</html>

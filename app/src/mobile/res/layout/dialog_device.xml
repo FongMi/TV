@@ -16,6 +16,7 @@
         android:paddingBottom="16dp">
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -23,7 +24,7 @@
             android:textColor="?attr/colorOnSurface"
             android:textSize="16sp" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/mode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -34,16 +35,18 @@
             android:visibility="gone"
             tools:visibility="visible" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/scan"
+            android:contentDescription="@string/dialog_action_scan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_action_scan" />
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <com.fongmi.android.tv.ui.custom.DialogActionView
             android:id="@+id/refresh"
+            android:contentDescription="@string/live_refresh"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?attr/selectableItemBackgroundBorderless"
@@ -51,10 +54,52 @@
 
     </androidx.appcompat.widget.LinearLayoutCompat>
 
-    <androidx.recyclerview.widget.RecyclerView
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/empty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp"
+        android:text="@string/device_empty"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="14sp"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/pendingLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="24dp"
+        android:visibility="gone">
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:indeterminate="true"
+            app:indicatorSize="24dp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/pendingText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:accessibilityLiveRegion="polite"
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp" />
+
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.fongmi.android.tv.ui.custom.CustomRecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false"
         android:clipChildren="false"
         android:clipToPadding="false"
         android:overScrollMode="never"

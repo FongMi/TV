@@ -2,201 +2,447 @@
 <html lang="zh-Hant">
 
 <head>
-    <title>影視</title>
+    <title data-i18n="title">影視</title>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0,viewport-fit=cover">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
     <meta name="color-scheme" content="light dark">
     <link rel="stylesheet" href="css/ui.css">
     <script src="js/jquery.min.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/choices.js" defer></script>
+    <script src="js/navigation.js" defer></script>
     <script src="js/script.js" defer></script>
+    <script src="js/input.js" defer></script>
+    <script src="js/sha256.min.js" defer></script>
+    <script src="js/upload.js" defer></script>
+    <script src="js/download.js" defer></script>
+    <script src="js/device.js" defer></script>
+    <script src="js/remote.js" defer></script>
 </head>
 
 <body>
+    <!-- Playback icons from AndroidX Media3 (Apache-2.0). -->
+    <svg class="remote-icons" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"><defs>
+            <path id="remote-icon-repeat_off" d="M280,880L120,720L280,560L336,618L274,680L680,680L680,520L760,520L760,760L274,760L336,822L280,880ZM200,440L200,200L686,200L624,138L680,80L840,240L680,400L624,342L686,280L280,280L280,440L200,440Z"/>
+            <path id="remote-icon-repeat_one" d="M460,600L460,420L400,420L400,360L520,360L520,600L460,600ZM280,880L120,720L280,560L336,618L274,680L680,680L680,520L760,520L760,760L274,760L336,822L280,880ZM200,440L200,200L686,200L624,138L680,80L840,240L680,400L624,342L686,280L280,280L280,440L200,440Z"/>
+            <path id="remote-icon-previous" d="M220,720L220,240L300,240L300,720L220,720ZM740,720L380,480L740,240L740,720Z"/>
+            <path id="remote-icon-pause" d="M560,760L560,200L720,200L720,760L560,760ZM240,760L240,200L400,200L400,760L240,760Z"/>
+            <path id="remote-icon-play" d="M320,760L320,200L760,480L320,760Z"/>
+            <path id="remote-icon-next" d="M660,720L660,240L740,240L740,720L660,720ZM220,720L220,240L580,480L220,720Z"/>
+            <path id="remote-icon-stop" d="M240,720L240,240L720,240L720,720L240,720Z"/>
+            <path id="file-icon-actions" d="M298,698L242,642L363,520L80,520L80,440L363,440L242,318L298,262L516,480L298,698ZM520,680L520,600L880,600L880,680L520,680ZM520,360L520,280L880,280L880,360L520,360ZM640,520L640,440L880,440L880,520L640,520Z"/>
+    </defs></svg>
     <div id="app">
+        <header class="app-header">
+            <span class="page-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M21 3H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h5v2h8v-2h5a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm0 14H3V5h18v12z"/></svg></span>
+            <div class="app-title">
+                <h1 data-i18n="title">影視</h1>
+                <button class="md-btn device-info-button" type="button" onclick="openDialog('deviceInfoDialog')" aria-haspopup="dialog" aria-controls="deviceInfoDialog" aria-describedby="device_status" data-i18n-label="deviceInfo" aria-label="裝置資訊" title="裝置資訊"><span id="device_status" role="status" data-i18n="deviceConnecting">連線中</span></button>
+            </div>
+            <div class="app-header-actions">
+                <button id="device_retry" class="md-btn md-btn-tonal md-icon-button" type="button" data-i18n-label="logRetry" aria-label="重新連線" title="重新連線" hidden><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button>
+                <a id="remote_open" class="md-btn md-btn-tonal md-icon-button" href="remote.html" data-i18n-label="remoteKeys" aria-label="遙控器" title="遙控器"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#remote"/></svg></a>
+            </div>
+        </header>
         <!-- Content -->
-        <div class="app-body">
-            <!-- 搜尋 -->
-            <div id="panel1" class="tab-panel active">
-                <div class="panel-content">
-                    <div class="md-field">
-                        <input id="keyword" class="md-input" type="text" placeholder="請輸入關鍵字..." />
+        <main class="app-body">
+            <div id="panel1" class="tab-panel input-panel active">
+                <div id="input_tabs" class="md-tabs input-tabs" role="tablist" aria-labelledby="input_tab_search input_tab_push">
+                    <button id="input_tab_search" class="md-btn" type="button" role="tab" aria-selected="true" aria-controls="input_search" onclick="showInput('search')" data-i18n="search">搜尋</button>
+                    <button id="input_tab_push" class="md-btn" type="button" role="tab" aria-selected="false" aria-controls="input_push" tabindex="-1" onclick="showInput('push')" data-i18n="push">推送</button>
+                </div>
+                <div id="input_search" class="input-page" role="tabpanel" aria-labelledby="input_tab_search">
+                    <div class="md-card panel-content">
+                        <div class="panel-intro"><h2 data-i18n="search">搜尋</h2></div>
+                        <div class="submit-row">
+                            <div class="md-field">
+                                <label for="keyword" data-i18n="keyword">關鍵字</label>
+                                <input id="keyword" class="md-input" type="text" />
+                            </div>
+                            <button id="action_search" class="md-btn md-btn-filled panel-action" onclick="search()"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#search"/></svg><span data-i18n="search">搜尋</span></button>
+                        </div>
                     </div>
-                    <button class="md-btn md-btn-filled md-btn-full" onclick="search()">確定</button>
+                    <details class="md-card input-library">
+                        <summary class="disclosure-heading"><span data-i18n="recentSearch">最近搜尋</span></summary>
+                        <div class="library-sections"><div id="search_history"></div><p class="panel-hint history-hint" data-i18n="historyHint">紀錄保存在此瀏覽器。</p></div>
+                    </details>
+                </div>
+                <div id="input_push" class="input-page" role="tabpanel" aria-labelledby="input_tab_push" hidden>
+                    <div class="md-card panel-content">
+                        <div class="panel-intro"><h2 data-i18n="push">推送</h2></div>
+                        <div class="submit-row">
+                            <div class="md-field">
+                                <label for="push_url" data-i18n="playbackUrl">播放網址</label>
+                                <input id="push_url" class="md-input" type="text" />
+                            </div>
+                            <button id="action_push" class="md-btn md-btn-filled panel-action" onclick="push()"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#send"/></svg><span data-i18n="push">推送</span></button>
+                        </div>
+                    </div>
+                    <details id="input_library" class="md-card input-library">
+                        <summary class="disclosure-heading"><span data-i18n="recentPush">最近推送</span></summary>
+                        <div class="library-sections"><div id="push_history"></div><p class="panel-hint history-hint" data-i18n="historyHint">紀錄保存在此瀏覽器。</p></div>
+                    </details>
                 </div>
             </div>
-            <!-- 推送 -->
             <div id="panel2" class="tab-panel">
-                <div class="panel-content">
-                    <div class="md-field">
-                        <input id="push_url" class="md-input" type="text" placeholder="請輸入播放網址..." />
+                <section id="remote_card" class="md-card remote-card" aria-labelledby="remote_title">
+                    <div class="remote-overview">
+                        <div class="remote-media">
+                            <div id="remote_artwork_frame" class="remote-artwork" hidden>
+                                <img id="remote_artwork" alt="" referrerpolicy="no-referrer" hidden />
+                                <svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-play"/></svg>
+                            </div>
+                            <div class="remote-heading"><h2 id="remote_title" data-i18n="remoteTitle">播放</h2><span id="remote_state" role="status" aria-live="polite" data-i18n="remoteIdle">目前沒有播放</span></div>
+                        </div>
+                        <div id="remote_progress" class="remote-progress" hidden>
+                            <span id="remote_elapsed">0:00</span>
+                            <div class="remote-slider">
+                                <input id="remote_bar" type="range" min="0" max="1" step="1" value="0" aria-label="播放進度" disabled />
+                                <div id="remote_track" class="remote-track" aria-hidden="true"><div class="remote-wave"></div></div>
+                            </div>
+                            <span id="remote_duration">0:00</span>
+                        </div>
                     </div>
-                    <button class="md-btn md-btn-filled md-btn-full" onclick="push()">確定</button>
+                    <div id="remote_actions" class="remote-actions" hidden>
+                        <button id="remote_repeat" class="md-btn remote-icon-button" type="button" aria-label="循環播放" title="循環播放" aria-pressed="false" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-repeat_off"/></svg></button>
+                        <button id="remote_prev" class="md-btn remote-icon-button" type="button" aria-label="上集" title="上集" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-previous"/></svg></button>
+                        <button id="remote_toggle" class="md-btn md-btn-filled" type="button" aria-label="暫停" title="暫停" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-pause"/></svg></button>
+                        <button id="remote_next" class="md-btn remote-icon-button" type="button" aria-label="下集" title="下集" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-next"/></svg></button>
+                        <button id="remote_stop" class="md-btn remote-icon-button" type="button" aria-label="停止" title="停止" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-stop"/></svg></button>
+                    </div>
+                    <button id="remote_retry" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="logRetry" aria-label="重新連線" title="重新連線"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button>
+                </section>
+                <div class="remote-tools">
+                    <details id="remote_extra" class="md-card input-library remote-extra" hidden>
+                        <summary class="disclosure-heading"><span data-i18n="morePlayback">更多播放操作</span></summary>
+                        <div class="library-sections remote-extra-content">
+                            <div class="remote-seek-actions">
+                                <button id="remote_back30" class="md-btn md-btn-tonal md-icon-button" type="button" disabled data-i18n-label="back30" aria-label="快退 30 秒" title="快退 30 秒"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back30"/></svg></button>
+                                <button id="remote_back10" class="md-btn md-btn-tonal md-icon-button" type="button" disabled data-i18n-label="back10" aria-label="快退 10 秒" title="快退 10 秒"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back10"/></svg></button>
+                                <button id="remote_forward10" class="md-btn md-btn-tonal md-icon-button" type="button" disabled data-i18n-label="forward10" aria-label="快進 10 秒" title="快進 10 秒"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#forward10"/></svg></button>
+                                <button id="remote_forward30" class="md-btn md-btn-tonal md-icon-button" type="button" disabled data-i18n-label="forward30" aria-label="快進 30 秒" title="快進 30 秒"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#forward30"/></svg></button>
+                            </div>
+                            <fieldset id="remote_speed" class="remote-speed-field">
+                                <legend data-i18n="playbackSpeed">播放速度</legend>
+                                <div class="remote-speed-options">
+                                    <button class="md-btn md-btn-outlined" type="button" value="0.5" aria-pressed="false" disabled>0.5×</button>
+                                    <button class="md-btn md-btn-outlined" type="button" value="1" aria-pressed="false" disabled>1.0×</button>
+                                    <button class="md-btn md-btn-outlined" type="button" value="2" aria-pressed="false" disabled>2.0×</button>
+                                    <button class="md-btn md-btn-outlined" type="button" value="3" aria-pressed="false" disabled>3.0×</button>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </details>
                 </div>
             </div>
-            <!-- 彈幕 -->
             <div id="panel3" class="tab-panel">
-                <div class="panel-content">
-                    <div class="field-row">
+                <div class="md-tabs input-tabs" role="tablist" aria-labelledby="media_tab_subtitles media_tab_danmaku">
+                    <button id="media_tab_subtitles" class="md-btn" type="button" role="tab" aria-selected="true" aria-controls="media_subtitles" onclick="showMedia('subtitles')" data-i18n="subtitles">字幕</button>
+                    <button id="media_tab_danmaku" class="md-btn" type="button" role="tab" aria-selected="false" aria-controls="media_danmaku" tabindex="-1" onclick="showMedia('danmaku')" data-i18n="danmaku">彈幕</button>
+                </div>
+                <p id="media_status" class="panel-hint" role="status" aria-live="polite" data-i18n="mediaPlaybackRequired">請先播放影片。</p>
+                <section id="media_subtitles" class="md-card panel-content" role="tabpanel" aria-labelledby="media_tab_subtitles">
+                    <div class="panel-intro"><h2 data-i18n="subtitles">字幕</h2></div>
+                    <input id="subtitle_uploader" type="file" accept=".srt,.ssa,.ass" hidden />
+                    <button id="remote_subtitle" class="md-btn md-btn-outlined" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#upload"/></svg><span data-i18n="localFile">本機檔案</span></button>
+                </section>
+                <div id="media_danmaku" class="input-page" role="tabpanel" aria-labelledby="media_tab_danmaku" hidden>
+                    <section class="md-card panel-content">
+                        <div class="panel-intro"><h2 data-i18n="danmaku">彈幕</h2></div>
                         <div class="md-field">
-                            <button class="md-btn md-btn-tonal md-btn-full" onclick="showDanmakuModeDialog()">
-                                <span id="danmaku_mode_label">滾動</span>
-                                <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-                            </button>
+                            <label for="danmaku_url" data-i18n="danmakuUrl">彈幕網址</label>
+                            <input id="danmaku_url" class="md-input" type="url" inputmode="url" />
                         </div>
-                        <div class="md-field">
-                            <button class="md-btn md-btn-tonal md-btn-full" onclick="showDanmakuSizeDialog()">
-                                <span id="danmaku_size_label">預設</span>
-                                <svg style="margin-left:auto;flex-shrink:0" width="18" height="18" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M7 10l5 5 5-5z" fill="currentColor"/></svg>
-                            </button>
+                        <div class="media-actions">
+                            <button id="danmaku_upload" class="md-btn md-btn-outlined" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#upload"/></svg><span data-i18n="localFile">本機檔案</span></button>
+                            <button id="danmaku_apply" class="md-btn md-btn-filled" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#send"/></svg><span data-i18n="applyMedia">套用</span></button>
                         </div>
-                    </div>
-                    <div class="md-field">
-                        <input id="danmaku_text" class="md-input" type="text" placeholder="請輸入彈幕內容..." />
-                    </div>
-                    <button class="md-btn md-btn-filled md-btn-full" onclick="sendDanmaku()">發送</button>
+                        <input id="danmaku_uploader" type="file" accept="text/*,.xml,.json" hidden />
+                    </section>
+                    <details class="md-card input-library">
+                        <summary class="disclosure-heading"><span data-i18n="sendDanmaku">發送彈幕</span></summary>
+                        <div class="library-sections media-compose">
+                            <div class="field-row danmaku-options">
+                                <div class="md-field">
+                                    <label id="danmakuModeLabel" for="danmaku_mode" data-i18n="mode">模式</label>
+                                    <button id="danmaku_mode" class="md-btn md-btn-tonal md-btn-full" aria-labelledby="danmakuModeLabel danmaku_mode_label" aria-haspopup="dialog" aria-controls="danmakuModeDialog" onclick="showDanmakuModeDialog()">
+                                        <span id="danmaku_mode_label" data-i18n="scroll">滾動</span>
+                                        <svg class="select-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="icons.svg#chevron"/></svg>
+                                    </button>
+                                </div>
+                                <div class="md-field">
+                                    <label id="danmakuSizeLabel" for="danmaku_size" data-i18n="size">大小</label>
+                                    <button id="danmaku_size" class="md-btn md-btn-tonal md-btn-full" aria-labelledby="danmakuSizeLabel danmaku_size_label" aria-haspopup="dialog" aria-controls="danmakuSizeDialog" onclick="showDanmakuSizeDialog()">
+                                        <span id="danmaku_size_label" data-i18n="default">預設</span>
+                                        <svg class="select-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="icons.svg#chevron"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="md-field">
+                                <label for="danmaku_text" data-i18n="danmakuText">彈幕內容</label>
+                                <input id="danmaku_text" class="md-input" type="text" />
+                            </div>
+                            <button id="action_danmaku" class="md-btn md-btn-filled panel-action" onclick="sendDanmaku()"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#send"/></svg><span data-i18n="send">發送</span></button>
+                        </div>
+                    </details>
                 </div>
             </div>
             <!-- 設定 -->
             <div id="panel4" class="tab-panel">
-                <div class="panel-content">
-                    <div class="field-row">
-                        <div class="md-field short">
-                            <input id="setting_name" class="md-input" type="text" placeholder="名稱" />
+                <div class="md-card panel-content">
+                    <div class="panel-intro"><h2 data-i18n="settings">設定</h2><p data-i18n="settingHint">傳送至裝置目前的輸入視窗。</p></div>
+                    <div class="setting-fields">
+                        <div class="md-field">
+                            <label for="setting_name" data-i18n="name">名稱</label>
+                            <input id="setting_name" class="md-input" type="text" />
                         </div>
                         <div class="md-field">
-                            <input id="setting_text" class="md-input" type="text" placeholder="配置" />
+                            <label for="setting_text" data-i18n="config">配置</label>
+                            <input id="setting_text" class="md-input" type="text" />
                         </div>
                     </div>
-                    <button onclick="setting()" class="md-btn md-btn-filled md-btn-full">確定</button>
+                    <button id="action_setting" onclick="setting()" class="md-btn md-btn-filled panel-action"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#send"/></svg><span data-i18n="send">發送</span></button>
+                </div>
+                <div class="md-card panel-content">
+                    <a class="panel-link" href="logs.html">
+                        <span class="panel-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3h16v18H4V3zm2 2v14h12V5H6zm2 3h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/></svg></span>
+                        <span class="panel-link-text"><span data-i18n="logTitle">應用日誌</span></span>
+                        <svg class="select-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="icons.svg#chevron"/></svg>
+                    </a>
+                    <a class="panel-link" href="spider.html">
+                        <span class="panel-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 5-7 7 7 7 1.4-1.4L3.8 12l5.6-5.6L8 5zm8 0-1.4 1.4 5.6 5.6-5.6 5.6L16 19l7-7-7-7zM14 3l-4 18h2l4-18h-2z"/></svg></span>
+                        <span class="panel-link-text"><span data-i18n="spiderTitle">爬蟲測試</span></span>
+                        <svg class="select-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="icons.svg#chevron"/></svg>
+                    </a>
                 </div>
             </div>
             <!-- 本地 -->
             <div id="panel5" class="tab-panel">
-                <input type="file" id="file_uploader" onchange="onFileSelected()" multiple />
-                <div class="md-toolbar">
-                    <button class="md-btn md-btn-tonal" onclick="uploadFile()">上傳檔案</button>
-                    <button class="md-btn md-btn-tonal" onclick="showNewFolderDialog()">新增資料夾</button>
+                <div class="md-card panel-content files-panel">
+                    <div class="files-header">
+                        <div class="files-title">
+                            <div class="panel-intro"><h2 data-i18n="local">本地</h2></div>
+                            <span id="file_selection_count" class="panel-hint" role="status" hidden></span>
+                            <button id="file_select" class="md-btn md-btn-tonal md-icon-button" type="button" onclick="setFileSelection(true)" disabled data-i18n-label="select" aria-label="選取" title="選取"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#select"/></svg></button>
+                            <button id="file_selection_cancel" class="md-btn md-btn-tonal md-icon-button" type="button" onclick="setFileSelection(false)" data-i18n-label="cancel" aria-label="取消" title="取消" hidden><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#close"/></svg></button>
+                        </div>
+                        <input type="file" id="file_uploader" onchange="onFileSelected()" multiple />
+                        <div id="file_upload_actions" class="file-toolbar">
+                            <button class="md-btn md-btn-tonal" type="button" onclick="openDialog('downloadDialog')" data-i18n-label="downloadFromUrl" aria-label="網址下載" title="網址下載"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#download"/></svg><span data-i18n="downloadStart">下載</span></button>
+                            <button class="md-btn md-btn-tonal md-icon-button" onclick="uploadFile()" data-i18n-label="uploadFile" aria-label="上傳檔案" title="上傳檔案"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#upload"/></svg></button>
+                            <button class="md-btn md-btn-tonal md-icon-button" onclick="showNewFolderDialog()" data-i18n-label="newFolder" aria-label="新增資料夾" title="新增資料夾"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#new-folder"/></svg></button>
+                        </div>
+                        <div id="file_selection" class="file-selection" hidden>
+                            <div class="file-toolbar">
+                                <button id="file_select_all" class="md-btn md-btn-tonal" type="button" onclick="selectAllFiles()" data-i18n="selectAll">全選</button>
+                                <button id="file_move_selected" class="md-btn md-btn-tonal md-icon-button" type="button" onclick="showFileChangeDialog('move', Array.from(selectedFiles.values()))" disabled data-i18n-label="move" aria-label="搬移" title="搬移"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#move"/></svg></button>
+                                <button id="file_delete_selected" class="md-btn md-btn-outlined md-icon-button" type="button" onclick="showBatchDelete()" disabled data-i18n-label="delete" aria-label="刪除" title="刪除"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#delete"/></svg></button>
+                            </div>
+                            <p id="file_batch_status" class="panel-hint" role="status" hidden></p>
+                        </div>
+                    </div>
+                    <div class="file-browser">
+                        <div class="file-location">
+                            <nav id="file_breadcrumbs" class="file-breadcrumbs" aria-label="路徑"><button id="file_up" class="md-btn remote-icon-button file-parent" type="button" onclick="listFile(currentRoot.slice(0, currentRoot.lastIndexOf('/')), true)" aria-label="上層" title="上層" disabled><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.42-1.41L7.83 13H20v-2z"/></svg><span id="file_path" role="status"></span></button></nav>
+                            <button id="file_refresh" class="md-btn remote-icon-button file-refresh" type="button" onclick="listFile(currentRoot)" aria-label="重新整理" title="重新整理"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M17.65,6.35C16.2,4.9 14.21,4 12,4c-4.42,0 -7.99,3.58 -7.99,8s3.57,8 7.99,8c3.73,0 6.84,-2.55 7.73,-6h-2.08c-0.82,2.33 -3.04,4 -5.65,4 -3.31,0 -6,-2.69 -6,-6s2.69,-6 6,-6c1.66,0 3.14,0.69 4.22,1.78L13,11h7V4l-2.35,2.35z"/></svg></button>
+                        </div>
+                        <div id="file_list"></div>
+                    </div>
                 </div>
-                <div id="file_list"></div>
+            </div>
+        </main>
+        <div class="transfer-statuses">
+            <section id="upload_status" class="upload-status" aria-labelledby="upload_message" hidden>
+                <p id="upload_message" role="status" aria-live="polite"></p>
+                <p id="upload_detail" class="panel-hint"></p>
+                <p id="upload_error" class="transfer-error" role="status" hidden></p>
+                <progress id="upload_progress" max="100" value="0" aria-labelledby="upload_message"></progress>
+                <div id="upload_files" class="transfer-files"></div>
+                <div class="upload-actions">
+                    <button id="upload_pause" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="transferPause" aria-label="暫停" title="暫停"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#pause"/></svg></button>
+                    <button id="upload_resume" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="uploadResume" aria-label="繼續" title="繼續"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#play"/></svg></button>
+                    <button id="upload_cancel" class="md-btn md-btn-tonal md-icon-button" type="button" data-i18n-label="cancel" aria-label="取消" title="取消"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#close"/></svg></button>
+                    <button id="upload_dismiss" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="close" aria-label="關閉" title="關閉"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#close"/></svg></button>
+                </div>
+            </section>
+            <section id="download_status" class="upload-status" aria-labelledby="download_message" hidden>
+                <p id="download_message" role="status" aria-live="polite"></p>
+                <p id="download_detail" class="panel-hint"></p>
+                <p id="download_error" class="transfer-error" role="status" hidden></p>
+                <progress id="download_progress" max="100" aria-labelledby="download_message"></progress>
+                <div class="upload-actions">
+                    <button id="download_pause" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="transferPause" aria-label="暫停" title="暫停"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#pause"/></svg></button>
+                    <button id="download_resume" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="uploadResume" aria-label="繼續" title="繼續"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#play"/></svg></button>
+                    <button id="download_cancel" class="md-btn md-btn-outlined md-icon-button" type="button" hidden data-i18n-label="cancel" aria-label="取消" title="取消"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#close"/></svg></button>
+                    <button id="download_dismiss" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="close" aria-label="關閉" title="關閉"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#close"/></svg></button>
+                </div>
+            </section>
+        </div>
+        <div id="downloadDialog" class="md-dialog-overlay">
+            <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="downloadDialogTitle">
+                <div id="downloadDialogTitle" class="md-dialog-title" data-i18n="downloadFromUrl">網址下載</div>
+                <div class="md-dialog-body">
+                    <div class="md-field"><label for="download_url" data-i18n="downloadUrl">下載網址</label><input id="download_url" class="md-input" type="url" inputmode="url" autocomplete="off" /></div>
+                    <div class="md-field"><label for="download_name" data-i18n="downloadName">檔名（可留空）</label><input id="download_name" class="md-input" type="text" autocomplete="off" /></div>
+                    <p id="download_dialog_error" class="transfer-error" role="status" hidden></p>
+                </div>
+                <div class="md-dialog-actions">
+                    <button class="md-dialog-btn" type="button" onclick="closeDialog('downloadDialog')" data-i18n="cancel">取消</button>
+                    <button id="download_start" class="md-dialog-btn" type="button" data-i18n="downloadStart">下載</button>
+                </div>
             </div>
         </div>
-        <!-- M3 Navigation Bar -->
         <nav class="md-nav-bar">
-            <div id="tab1" class="md-nav-item active" onclick="showPanel(1)">
+            <button id="tab2" class="md-nav-item" type="button" aria-pressed="false" aria-controls="panel2" onclick="showPanel(2)">
+                <div class="md-nav-indicator"><svg aria-hidden="true" class="md-nav-icon" viewBox="0 0 960 960"><use href="#remote-icon-play"/></svg></div>
+                <span class="md-nav-label" data-i18n="remoteTitle">播放</span>
+            </button>
+            <button id="tab1" class="md-nav-item active" type="button" aria-pressed="true" aria-controls="panel1" onclick="showPanel(1)">
+                <div class="md-nav-indicator"><svg aria-hidden="true" class="md-nav-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg></div>
+                <span class="md-nav-label" data-i18n="input">輸入</span>
+            </button>
+            <button id="tab3" class="md-nav-item" type="button" aria-pressed="false" aria-controls="panel3" onclick="showPanel(3)">
                 <div class="md-nav-indicator">
-                    <svg class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <svg aria-hidden="true" class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
                 </div>
-                <span class="md-nav-label">搜尋</span>
-            </div>
-            <div id="tab2" class="md-nav-item" onclick="showPanel(2)">
+                <span class="md-nav-label" data-i18n="subtitles">字幕</span>
+            </button>
+            <button id="tab4" class="md-nav-item" type="button" aria-pressed="false" aria-controls="panel4" onclick="showPanel(4)">
                 <div class="md-nav-indicator">
-                    <svg class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z"/></svg>
+                    <svg aria-hidden="true" class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.43 12.98c.04-.32.07-.64.07-.98 0-.34-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.09-.16-.26-.25-.44-.25-.06 0-.12.01-.17.03l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.06-.02-.12-.03-.18-.03-.17 0-.34.09-.43.25l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98 0 .33.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.09.16.26.25.44.25.06 0 .12-.01.17-.03l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.06.02.12.03.18.03.17 0 .34-.09.43-.25l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zm-1.98-1.71c.04.31.05.52.05.73 0 .21-.02.43-.05.73l-.14 1.13.89.7 1.08.84-.7 1.21-1.27-.51-1.04-.42-.9.68c-.43.32-.84.56-1.25.73l-1.06.43-.16 1.13-.2 1.35h-1.4l-.19-1.35-.16-1.13-1.06-.43c-.43-.18-.83-.41-1.23-.71l-.91-.7-1.06.43-1.27.51-.7-1.21 1.08-.84.89-.7-.14-1.13c-.03-.31-.05-.54-.05-.74s.02-.43.05-.73l.14-1.13-.89-.7-1.08-.84.7-1.21 1.27.51 1.04.42.9-.68c.43-.32.84-.56 1.25-.73l1.06-.43.16-1.13.2-1.35h1.39l.19 1.35.16 1.13 1.06.43c.43.18.83.41 1.23.71l.91.7 1.06-.43 1.27-.51.7 1.21-1.07.85-.89.7.14 1.13zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
                 </div>
-                <span class="md-nav-label">推送</span>
-            </div>
-            <div id="tab3" class="md-nav-item" onclick="showPanel(3)">
+                <span class="md-nav-label" data-i18n="settings">設定</span>
+            </button>
+            <button id="tab5" class="md-nav-item" type="button" aria-pressed="false" aria-controls="panel5" onclick="showPanel(5)">
                 <div class="md-nav-indicator">
-                    <svg class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z"/></svg>
+                    <svg aria-hidden="true" class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9.17 6l2 2H20v10H4V6h5.17M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
                 </div>
-                <span class="md-nav-label">彈幕</span>
-            </div>
-            <div id="tab4" class="md-nav-item" onclick="showPanel(4)">
-                <div class="md-nav-indicator">
-                    <svg class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M19.43 12.98c.04-.32.07-.64.07-.98 0-.34-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.09-.16-.26-.25-.44-.25-.06 0-.12.01-.17.03l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.06-.02-.12-.03-.18-.03-.17 0-.34.09-.43.25l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98 0 .33.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.09.16.26.25.44.25.06 0 .12-.01.17-.03l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.06.02.12.03.18.03.17 0 .34-.09.43-.25l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zm-1.98-1.71c.04.31.05.52.05.73 0 .21-.02.43-.05.73l-.14 1.13.89.7 1.08.84-.7 1.21-1.27-.51-1.04-.42-.9.68c-.43.32-.84.56-1.25.73l-1.06.43-.16 1.13-.2 1.35h-1.4l-.19-1.35-.16-1.13-1.06-.43c-.43-.18-.83-.41-1.23-.71l-.91-.7-1.06.43-1.27.51-.7-1.21 1.08-.84.89-.7-.14-1.13c-.03-.31-.05-.54-.05-.74s.02-.43.05-.73l.14-1.13-.89-.7-1.08-.84.7-1.21 1.27.51 1.04.42.9-.68c.43-.32.84-.56 1.25-.73l1.06-.43.16-1.13.2-1.35h1.39l.19 1.35.16 1.13 1.06.43c.43.18.83.41 1.23.71l.91.7 1.06-.43 1.27-.51.7 1.21-1.07.85-.89.7.14 1.13zM12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
-                </div>
-                <span class="md-nav-label">設定</span>
-            </div>
-            <div id="tab5" class="md-nav-item" onclick="showPanel(5)">
-                <div class="md-nav-indicator">
-                    <svg class="md-nav-icon" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M9.17 6l2 2H20v10H4V6h5.17M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                </div>
-                <span class="md-nav-label">本地</span>
-            </div>
+                <span class="md-nav-label" data-i18n="local">本地</span>
+            </button>
         </nav>
     </div>
     <!-- Dialog: 彈幕模式 -->
     <div id="danmakuModeDialog" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">模式</div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="danmakuModeDialogTitle">
+            <div class="md-dialog-title" id="danmakuModeDialogTitle" data-i18n="mode">模式</div>
             <div class="md-dialog-list">
-                <div class="md-dialog-list-item active" data-val="1" onclick="setDanmakuMode(1,'滾動')"><span>滾動</span></div>
-                <div class="md-dialog-list-item" data-val="5" onclick="setDanmakuMode(5,'頂部')"><span>頂部</span></div>
-                <div class="md-dialog-list-item" data-val="4" onclick="setDanmakuMode(4,'底部')"><span>底部</span></div>
-                <div class="md-dialog-list-item" data-val="6" onclick="setDanmakuMode(6,'反向')"><span>反向</span></div>
+                <button type="button" class="md-dialog-list-item active" aria-pressed="true" data-val="1" onclick="setDanmakuMode(1)"><span data-i18n="scroll">滾動</span></button>
+                <button type="button" class="md-dialog-list-item" aria-pressed="false" data-val="5" onclick="setDanmakuMode(5)"><span data-i18n="top">頂部</span></button>
+                <button type="button" class="md-dialog-list-item" aria-pressed="false" data-val="4" onclick="setDanmakuMode(4)"><span data-i18n="bottom">底部</span></button>
+                <button type="button" class="md-dialog-list-item" aria-pressed="false" data-val="6" onclick="setDanmakuMode(6)"><span data-i18n="reverse">反向</span></button>
             </div>
+            <div class="md-dialog-actions"><button type="button" onclick="closeDialog('danmakuModeDialog')" class="md-dialog-btn" data-i18n="cancel">取消</button></div>
         </div>
     </div>
     <!-- Dialog: 彈幕大小 -->
     <div id="danmakuSizeDialog" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">大小</div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="danmakuSizeDialogTitle">
+            <div class="md-dialog-title" id="danmakuSizeDialogTitle" data-i18n="size">大小</div>
             <div class="md-dialog-list">
-                <div class="md-dialog-list-item" data-val="18" onclick="setDanmakuSize(18,'小')"><span>小</span></div>
-                <div class="md-dialog-list-item active" data-val="25" onclick="setDanmakuSize(25,'預設')"><span>預設</span></div>
-                <div class="md-dialog-list-item" data-val="36" onclick="setDanmakuSize(36,'大')"><span>大</span></div>
+                <button type="button" class="md-dialog-list-item" aria-pressed="false" data-val="18" onclick="setDanmakuSize(18)"><span data-i18n="small">小</span></button>
+                <button type="button" class="md-dialog-list-item active" aria-pressed="true" data-val="25" onclick="setDanmakuSize(25)"><span data-i18n="default">預設</span></button>
+                <button type="button" class="md-dialog-list-item" aria-pressed="false" data-val="36" onclick="setDanmakuSize(36)"><span data-i18n="large">大</span></button>
             </div>
+            <div class="md-dialog-actions"><button type="button" onclick="closeDialog('danmakuSizeDialog')" class="md-dialog-btn" data-i18n="cancel">取消</button></div>
+        </div>
+    </div>
+    <div id="deviceInfoDialog" class="md-dialog-overlay">
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="deviceInfoTitle">
+            <div id="deviceInfoTitle" class="md-dialog-title" data-i18n="deviceInfo">裝置資訊</div>
+            <div class="md-dialog-body"><p id="device_name" data-i18n="deviceConnecting">連線中</p></div>
+            <div class="md-dialog-actions"><button type="button" class="md-dialog-btn" onclick="closeDialog('deviceInfoDialog')" data-i18n="close">關閉</button></div>
         </div>
     </div>
     <!-- Dialog: 本地路徑 -->
     <div id="fileInfoDialog" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">本地路徑</div>
-            <div class="md-dialog-body" id="fileUrl"></div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="fileInfoDialogTitle">
+            <div class="md-dialog-title" id="fileInfoDialogTitle" data-i18n="localPath">本地路徑</div>
+            <div class="md-dialog-body">
+                <p id="fileUrl"></p>
+                <div class="md-dialog-list file-dialog-actions">
+                    <button id="file_use" onclick="pushFile(1)" class="md-dialog-list-item"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#send"/></svg><span data-i18n="use">使用</span></button>
+                    <button onclick="showFileChangeDialog('rename')" class="md-dialog-list-item"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#edit"/></svg><span data-i18n="rename">重新命名</span></button>
+                    <button onclick="showFileChangeDialog('move')" class="md-dialog-list-item"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#move"/></svg><span data-i18n="move">搬移</span></button>
+                    <button onclick="deleteSelectedFile()" class="md-dialog-list-item error"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#delete"/></svg><span data-i18n="delete">刪除</span></button>
+                </div>
+            </div>
             <div class="md-dialog-actions">
-                <button onclick="pushFile(0)" class="md-dialog-btn">關閉</button>
-                <button onclick="pushFile(1)" class="md-dialog-btn">使用</button>
+                <button onclick="pushFile(0)" class="md-dialog-btn" data-i18n="close">關閉</button>
             </div>
         </div>
     </div>
     <!-- Dialog: 確認上傳 -->
     <div id="uploadTip" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">確認上傳？</div>
-            <div class="md-dialog-body" id="uploadTipContent"></div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="uploadTipTitle">
+            <div class="md-dialog-title" id="uploadTipTitle" data-i18n="uploadConfirm">確認上傳？</div>
+            <div class="md-dialog-body"><ul id="uploadTipContent" class="dialog-file-list"></ul></div>
             <div class="md-dialog-actions">
-                <button onclick="confirmUpload(0)" class="md-dialog-btn">取消</button>
-                <button onclick="confirmUpload(1)" class="md-dialog-btn">確定</button>
+                <button onclick="confirmUpload(0)" class="md-dialog-btn" data-i18n="cancel">取消</button>
+                <button onclick="confirmUpload(1)" class="md-dialog-btn" data-i18n="confirm">確定</button>
             </div>
         </div>
     </div>
     <!-- Dialog: 新增資料夾 -->
     <div id="newFolder" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">新增資料夾</div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="newFolderTitle">
+            <div class="md-dialog-title" id="newFolderTitle" data-i18n="newFolder">新增資料夾</div>
             <div class="md-dialog-body">
-                <input id="newFolderContent" class="md-input" type="text" placeholder="請輸入資料夾名稱..." />
+                <label for="newFolderContent" data-i18n="name">名稱</label><input id="newFolderContent" class="md-input" type="text" />
             </div>
             <div class="md-dialog-actions">
-                <button onclick="confirmNewFolder(0)" class="md-dialog-btn">取消</button>
-                <button onclick="confirmNewFolder(1)" class="md-dialog-btn">確定</button>
+                <button onclick="confirmNewFolder(0)" class="md-dialog-btn" data-i18n="cancel">取消</button>
+                <button onclick="confirmNewFolder(1)" class="md-dialog-btn" data-i18n="confirm">確定</button>
             </div>
         </div>
     </div>
     <!-- Dialog: 刪除資料夾 -->
     <div id="delFolder" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">刪除資料夾</div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="delFolderTitle">
+            <div class="md-dialog-title" id="delFolderTitle" data-i18n="deleteFolder">刪除資料夾</div>
             <div class="md-dialog-body" id="delFolderContent"></div>
             <div class="md-dialog-actions">
-                <button onclick="confirmDelFolder(0)" class="md-dialog-btn">取消</button>
-                <button onclick="confirmDelFolder(1)" class="md-dialog-btn error">刪除</button>
+                <button onclick="confirmDelFolder(0)" class="md-dialog-btn" data-i18n="cancel">取消</button>
+                <button onclick="confirmDelFolder(1)" class="md-dialog-btn error" data-i18n="delete">刪除</button>
             </div>
         </div>
     </div>
     <!-- Dialog: 刪除檔案 -->
     <div id="delFile" class="md-dialog-overlay">
-        <div class="md-dialog">
-            <div class="md-dialog-title">刪除檔案</div>
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="delFileTitle">
+            <div class="md-dialog-title" id="delFileTitle" data-i18n="deleteFile">刪除檔案</div>
             <div class="md-dialog-body" id="delFileContent"></div>
             <div class="md-dialog-actions">
-                <button onclick="confirmDelFile(0)" class="md-dialog-btn">取消</button>
-                <button onclick="confirmDelFile(1)" class="md-dialog-btn error">刪除</button>
+                <button onclick="confirmDelFile(0)" class="md-dialog-btn" data-i18n="cancel">取消</button>
+                <button onclick="confirmDelFile(1)" class="md-dialog-btn error" data-i18n="delete">刪除</button>
             </div>
+        </div>
+    </div>
+    <div id="fileChangeDialog" class="md-dialog-overlay">
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="fileChangeTitle">
+            <div class="md-dialog-title" id="fileChangeTitle"></div>
+            <div class="md-dialog-body">
+                <div id="fileRenameField"><label for="fileChangeValue" data-i18n="name">名稱</label><input id="fileChangeValue" class="md-input" type="text" /></div>
+                <div id="fileMovePicker" class="folder-picker" hidden>
+                    <p class="panel-hint" data-i18n="targetFolder">目標資料夾</p>
+                    <div class="folder-location"><span id="fileMovePath" role="status"></span><button id="fileMoveUp" class="md-dialog-btn md-icon-button" type="button" onclick="loadMoveFolders(moveTarget.slice(0, moveTarget.lastIndexOf('/')))" disabled data-i18n-label="upFolder" aria-label="上層" title="上層"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></button></div>
+                    <div id="fileMoveFolders" class="folder-list"></div>
+                    <p id="fileMoveStatus" class="panel-hint" role="status"></p>
+                    <button id="fileMoveRetry" class="md-dialog-btn md-icon-button" type="button" onclick="loadMoveFolders(moveTarget)" hidden data-i18n-label="refreshFiles" aria-label="重新整理" title="重新整理"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button>
+                </div>
+            </div>
+            <div class="md-dialog-actions"><button onclick="closeDialog('fileChangeDialog')" class="md-dialog-btn" data-i18n="cancel">取消</button><button id="fileChangeConfirm" onclick="confirmFileChange()" class="md-dialog-btn" data-i18n="confirm">確定</button></div>
+        </div>
+    </div>
+    <div id="batchDeleteDialog" class="md-dialog-overlay">
+        <div class="md-dialog" role="dialog" aria-modal="true" aria-labelledby="batchDeleteTitle">
+            <div id="batchDeleteTitle" class="md-dialog-title" data-i18n="deleteSelected">刪除選取項目？</div>
+            <div class="md-dialog-body"><ul id="batchDeleteList" class="dialog-file-list"></ul><p id="batchDeleteHint" class="panel-hint" data-i18n="batchDeleteHint">資料夾內容也會一併刪除。</p></div>
+            <div class="md-dialog-actions"><button class="md-dialog-btn" type="button" onclick="confirmBatchDelete(false)" data-i18n="cancel">取消</button><button class="md-dialog-btn error" type="button" onclick="confirmBatchDelete(true)" data-i18n="delete">刪除</button></div>
         </div>
     </div>
     <!-- Snackbar: 警告 -->
     <div id="warnToast">
-        <div class="md-snackbar" id="warnToastContent"></div>
+        <div class="md-snackbar" id="warnToastContent" role="status" aria-live="polite"></div>
     </div>
     <!-- Loading -->
     <div id="loadingToast">

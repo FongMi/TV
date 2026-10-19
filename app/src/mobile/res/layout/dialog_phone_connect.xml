@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.AppCompatImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/code"
+    android:layout_width="220dp"
+    android:layout_height="220dp"
+    android:minWidth="220dp"
+    android:minHeight="220dp"
+    android:background="@drawable/shape_qrcode"
+    android:clipToOutline="true"
+    android:contentDescription="@string/device_connect"
+    android:scaleType="fitCenter" />
