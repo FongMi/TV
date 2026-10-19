@@ -1,0 +1,154 @@
+import com.fongmi.gradle.AbiApkPackaging
+import com.fongmi.gradle.PrepareRuntimeIconTask
+import com.fongmi.gradle.PrepareRuntimeTask
+
+plugins {
+    alias libs.plugins.android.application
+    alias libs.plugins.android.library apply false
+}
+
+def module = providers.gradleProperty('tvRuntimeModule').getOrElse('')
+def profile = AbiApkPackaging.RUNTIME_PROFILES[module]
+def engines = [python: 'chaquo', nodejs: 'nodejs', quickjs: 'quickjs', thunder: 'thunder']
+def engine = engines[module]
+if (!profile) throw new GradleException('Set -PtvRuntimeModule=python|nodejs|quickjs|thunder|bdj|mpv')
+
+def repository = layout.projectDirectory.dir('..')
+def appDirectory = repository.dir('app')
+
+def localProps = new Properties()
+providers.fileContents(repository.file('local.properties')).asText.get().with { localProps.load(new StringReader(it)) }
+
+def requestedVersionCode = providers.gradleProperty("${profile.property}VersionCode").map { it.toInteger() }.get()
+def requestedVersionName = providers.gradleProperty("${profile.property}VersionName").get()
+if (requestedVersionCode <= 0 || requestedVersionName.trim().isEmpty()) throw new GradleException('Runtime version must have a positive code and non-empty name')
+layout.buildDirectory.set(layout.projectDirectory.dir("build/${module}"))
+
+subprojects {
+    layout.buildDirectory.set(rootProject.layout.buildDirectory.dir("libraries/${project.name}"))
+}
+
+def icon = tasks.register('prepareRuntimeIcon', PrepareRuntimeIconTask) { task ->
+    task.iconFile.set(repository.file("app/src/main/res/drawable/ic_module_${module}.xml"))
+    task.resourceDirectory.set(layout.buildDirectory.dir('generated/icon'))
+}
+
+configurations {
+    quickjsNative {
+        canBeConsumed = false
+        canBeResolved = true
+        transitive = false
+    }
+}
+
+android {
+    namespace = profile.packageName
+    enableKotlin = false
+    compileSdk = libs.versions.compileSdk.get().toInteger()
+    buildToolsVersion = libs.versions.buildTools.get()
+
+    defaultConfig {
+        applicationId = profile.packageName
+        minSdk = libs.versions.minSdk.get().toInteger()
+        targetSdk = libs.versions.targetSdk.get().toInteger()
+        versionCode = requestedVersionCode
+        versionName = requestedVersionName
+        manifestPlaceholders = [runtimeLabel: profile.label, runtimeIcon: "ic_module_${module}".toString(), runtimeHasCode: engine != null]
+    }
+
+    flavorDimensions = ['abi']
+
+    productFlavors {
+        arm64 {
+            dimension 'abi'
+            ndk {
+                abiFilters 'arm64-v8a'
+            }
+        }
+        arm32 {
+            dimension 'abi'
+            ndk {
+                abiFilters 'armeabi-v7a'
+            }
+        }
+    }
+
+    buildFeatures {
+        buildConfig = false
+    }
+
+    compileOptions {
+        coreLibraryDesugaringEnabled = engine != null
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    signingConfigs {
+        release {
+            storeFile = appDirectory.file(localProps.getProperty('storeFile')).asFile
+            keyAlias = localProps.getProperty('keyAlias')
+            storePassword = localProps.getProperty('storePassword')
+            keyPassword = localProps.getProperty('storePassword')
+            enableV1Signing = true
+            enableV2Signing = true
+            enableV3Signing = false
+            enableV4Signing = false
+        }
+    }
+
+    buildTypes.configureEach {
+        signingConfig = signingConfigs.release
+        minifyEnabled = true
+        shrinkResources = true
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    }
+
+    packaging.jniLibs {
+        useLegacyPackaging = false
+        keepDebugSymbols.add(module == 'nodejs' ? '**/libnode.so' : '**/*.so')
+        excludes.add('**/libc++_shared.so')
+    }
+
+    androidResources {
+        noCompress += ['imy', 'zip']
+    }
+}
+
+dependencies {
+    compileOnly project(':catvod')
+    if (engine != null) implementation project(":${engine}")
+    if (engine != null) coreLibraryDesugaring libs.desugar
+    if (module == 'quickjs') quickjsNative files(repository.file('quickjs/libs/runtime-release.aar'))
+}
+
+androidComponents.onVariants(androidComponents.selector().all()) { variant ->
+    def flavor = variant.productFlavors.find { it.first == 'abi' }.second
+    def abi = AbiApkPackaging.ABI_FLAVORS[flavor]
+    def bridgeArchive = engine != null ? project(":${engine}").layout.buildDirectory.file("outputs/aar/${engine}-${variant.buildType}.aar") : null
+    def archive = module == 'quickjs' ? layout.file(configurations.quickjsNative.elements.map { it.first().asFile }) : null
+    if (module in ['nodejs', 'thunder']) archive = bridgeArchive
+    if (module == 'python') {
+        archive = repository.file("chaquo/runtime/build/outputs/aar/python-runtime-${flavor}-${variant.buildType}.aar")
+        dependencies.add("${variant.name}Implementation", files(archive))
+    } else if (module == 'bdj') {
+        archive = appDirectory.dir(providers.gradleProperty('tvBdjRuntimeDirectory')).map { it.file("j2re-zero-${abi}.zip") }
+    } else if (module == 'mpv') {
+        archive = repository.file('app/libs/lib-mpvplayer-release.aar')
+    }
+    def payload = tasks.register("prepare${variant.name.capitalize()}Runtime", PrepareRuntimeTask) { task ->
+        task.module.set(module)
+        task.abi.set(abi)
+        task.versionCode.set(requestedVersionCode)
+        task.versionName.set(requestedVersionName)
+        task.inputArchive.set(archive)
+        if (engine != null) task.dependsOn(":${engine}:bundle${variant.buildType.capitalize()}Aar")
+        if (module == 'quickjs') task.bridgeArchive.set(bridgeArchive)
+        if (module == 'python') task.cxxAar.set(repository.file('app/libs/lib-mpvplayer-release.aar'))
+        if (module == 'mpv') task.ffmpegAar.set(repository.file('app/libs/lib-decoder-ffmpeg-release.aar'))
+        task.outputDirectory.set(layout.buildDirectory.dir("generated/${variant.name}/payload"))
+    }
+    if (!(module in ['python', 'nodejs', 'thunder'])) variant.sources.jniLibs.addGeneratedSourceDirectory(payload, { it.jniDirectory })
+    variant.sources.assets.addGeneratedSourceDirectory(payload, { it.assetsDirectory })
+    variant.sources.res.addGeneratedSourceDirectory(icon, { it.resourceDirectory })
+    variant.outputs.each { it.outputFileName.set("runtime-${module}-${abi.replace('-', '_')}.apk") }
+}

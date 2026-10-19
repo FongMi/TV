@@ -1,0 +1,218 @@
+import json
+from threading import Lock
+
+
+_loader_type = None
+_loader_lock = Lock()
+_listener_type = None
+_listener_lock = Lock()
+
+
+def _invalid_constant(value):
+    raise ValueError("Invalid JSON constant: " + value)
+
+
+def _milliseconds(value, name):
+    if isinstance(value, bool) or not isinstance(value, int):
+        raise TypeError("%s requires integer milliseconds" % name)
+    if value < 0 or value > 9223372036854775807:
+        raise ValueError("%s milliseconds must be between 0 and Long.MAX_VALUE" % name)
+    return value
+
+
+def _cache_options(options, name):
+    _milliseconds(options.get("ttl"), name)
+    for flag in ("stale", "persist"):
+        if flag in options and not isinstance(options[flag], bool):
+            raise TypeError("%s %s requires a boolean" % (name, flag))
+
+
+def _loader_class():
+    global _loader_type
+    with _loader_lock:
+        if _loader_type is None:
+            from java import dynamic_proxy
+            from java.util.concurrent import Callable
+
+            class Loader(dynamic_proxy(Callable)):
+                def __init__(self, loader):
+                    super().__init__()
+                    self._loader = loader
+
+                def call(self):
+                    return json.dumps(self._loader(), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+
+            _loader_type = Loader
+        return _loader_type
+
+
+def _listener_class():
+    global _listener_type
+    with _listener_lock:
+        if _listener_type is None:
+            from java import dynamic_proxy, jclass
+
+            class Listener(dynamic_proxy(jclass("com.github.catvod.net.NetSocket$Listener"))):
+                def __init__(self, callback):
+                    super().__init__()
+                    self._callback = callback
+
+                def accept(self, socket, event):
+                    metadata, content = event.parts()
+                    value = json.loads(metadata)
+                    if value["type"] == "message":
+                        value["content"] = bytes(content) if value["binary"] else content
+                    self._callback(SocketAdapter(socket), value)
+
+            _listener_type = Listener
+        return _listener_type
+
+
+class SocketAdapter:
+    def __init__(self, native):
+        self._native = native
+
+    def send(self, data):
+        if not isinstance(data, (str, bytes, bytearray)):
+            raise TypeError("send requires text or bytes")
+        return self._native.send(data)
+
+    def close(self):
+        self._native.close()
+
+    def cancel(self):
+        self._native.cancel()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+
+class NetAdapter:
+    def __init__(self, native, user_agent=None):
+        self._native = native
+        self._user_agent = user_agent
+
+    def session(self):
+        return NetAdapter(self._native.session(), self._user_agent)
+
+    def getUserAgent(self):
+        return "" if self._user_agent is None else self._user_agent.getUserAgent()
+
+    def sleep(self, ms):
+        self._native.sleep(_milliseconds(ms, "sleep"))
+
+    def cached(self, key, options, loader):
+        return json.loads(self.cachedText(key, options, loader))
+
+    def cachedText(self, key, options, loader):
+        if not isinstance(key, str) or not key:
+            raise ValueError("cached requires a nonempty string key")
+        if not isinstance(options, dict):
+            raise TypeError("cached requires an options dict")
+        _cache_options(options, "cached")
+        if not callable(loader):
+            raise TypeError("cached requires a callable loader")
+        options = json.dumps(options)
+        value = self._native.cachedValue(key, options)
+        if value is None:
+            value = self._native.cached(key, options, _loader_class()(loader))
+        return value
+
+    def clearCache(self, key=None):
+        self._native.clearCache(key)
+
+    def refresh(self, key, options, loader):
+        if not isinstance(key, str) or not key or not isinstance(options, dict) or not callable(loader):
+            raise ValueError("refresh requires a key, options and callable loader")
+        _cache_options(options, "refresh")
+        self._native.refresh(key, json.dumps(options), _loader_class()(loader))
+
+    def peek(self, key):
+        value = self._native.peek(key)
+        return None if value is None else json.loads(value)
+
+    def json(self, url, options=None):
+        options = {} if options is None else options
+        text = self._native.jsonText(url, json.dumps(options, ensure_ascii=False, allow_nan=False))
+        return json.loads(text, parse_constant=_invalid_constant)
+
+    def getCookie(self, url):
+        return self._native.getCookie(url)
+
+    def setCookie(self, url, cookie):
+        return self._native.setCookie(url, cookie)
+
+    def close(self):
+        self._native.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+    def req(self, url, options=None):
+        return self._request(self._native.reqParts, url, options)
+
+    def batch(self, requests, limit=4):
+        if (not isinstance(requests, list) or isinstance(limit, bool)
+                or not isinstance(limit, int) or limit < 1):
+            raise ValueError("batch requires a request list and positive limit")
+        for item in requests:
+            if (not isinstance(item, dict) or not isinstance(item.get("url"), str)
+                    or item.get("options") is not None and not isinstance(item["options"], dict)):
+                raise ValueError("Invalid batch request")
+        values = self._native.batchParts(json.dumps(requests, ensure_ascii=False, allow_nan=False), limit)
+        return [self._parts(value, item.get("options") or {}) for value, item in zip(values, requests)]
+
+    def download(self, url, path, options=None):
+        from java.io import File
+        settings = json.dumps({} if options is None else options, ensure_ascii=False, allow_nan=False)
+        self._native.download(url, settings, File(str(path)))
+
+    def ws(self, url, options=None):
+        return self._request(self._native.wsParts, url, options)
+
+    def connect(self, url, options, callback):
+        if not callable(callback):
+            raise TypeError("connect requires a callable listener")
+        options = {} if options is None else options
+        settings = json.dumps(options, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+        return SocketAdapter(self._native.connect(url, settings, _listener_class()(callback)))
+
+    @staticmethod
+    def _request(method, url, options):
+        options = {} if options is None else options
+        settings = json.dumps(options, ensure_ascii=False, separators=(",", ":"))
+        return NetAdapter._parts(method(url, settings), options)
+
+    @staticmethod
+    def _parts(parts, options):
+        metadata, content = parts
+        result = json.loads(metadata)
+        if "error" not in result:
+            if options.get("buffer") == 3:
+                content = bytes(content)
+            elif not isinstance(content, str):
+                content = list(content)
+        result["content"] = content
+        return result
+
+
+class LocalAdapter:
+    def __init__(self, native):
+        self._native = native
+
+    def get(self, key, default=None):
+        value = self._native.get(key)
+        return default if value is None else json.loads(value)
+
+    def set(self, key, value):
+        value = json.dumps(value, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+        self._native.set(key, value)
+
+    def delete(self, key):
+        self._native.delete(key)

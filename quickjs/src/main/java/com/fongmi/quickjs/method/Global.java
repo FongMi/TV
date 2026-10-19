@@ -2,295 +2,362 @@ package com.fongmi.quickjs.method;
 
 import android.net.Uri;
 
-import androidx.annotation.Keep;
-import androidx.annotation.NonNull;
-
-import com.fongmi.quickjs.bean.Req;
+import com.fongmi.quickjs.QuickJS;
+import com.fongmi.quickjs.WebPlatform;
+import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.utils.Connect;
-import com.github.catvod.utils.Crypto;
+import com.fongmi.quickjs.utils.HtmlQuery;
 import com.github.catvod.Proxy;
+import com.github.catvod.crawler.SpiderDebug;
+import com.github.catvod.net.Net;
+import com.github.catvod.net.NetOptions;
+import com.github.catvod.utils.Crypto;
+import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Local;
 import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.UriUtil;
-import com.whl.quickjs.wrapper.JSFunction;
-import com.whl.quickjs.wrapper.JSMethod;
-import com.whl.quickjs.wrapper.JSObject;
-import com.whl.quickjs.wrapper.QuickJSContext;
+import com.google.gson.JsonElement;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Supplier;
 
 public class Global {
 
-    private final Map<Integer, Timeout> timers;
-    private final ExecutorService executor;
-    private final AtomicInteger timerId;
-    private final QuickJSContext ctx;
-    private final Timer timer;
+    private final WebPlatform web;
+    private final Network network;
+    private final Cache cache;
+    private final Streams streams;
+    private final Sockets sockets;
+    private final QuickJS ctx;
+    private final Host host;
+    private final String siteKey;
+    private final Map<QuickJS.Callback, Invocation> callbacks = new HashMap<>();
+    private Invocation invocation;
 
     private volatile boolean destroyed;
 
-    private Global(QuickJSContext ctx, ExecutorService executor) {
-        this.executor = executor;
-        this.timerId = new AtomicInteger();
-        this.timers = new ConcurrentHashMap<>();
-        this.timer = new Timer("quickjs-timer", true);
+    private Global(QuickJS ctx, Host host, String siteKey, String api) {
+        this.host = host;
+        Net net = new Net(host, siteKey);
+        Local local = new Local(siteKey);
+        this.siteKey = siteKey;
         this.ctx = ctx;
+        ctx.setAsyncScopeCapture(this::captureInvocation).join();
+        this.web = new WebPlatform(ctx, SpiderDebug::log, api);
+        this.network = new Network(this, net, web);
+        this.cache = new Cache(this, network, local);
+        this.streams = new Streams(this, network);
+        this.sockets = new Sockets(this, network);
         setProperty();
+        ctx.onClose(this::destroy).join();
     }
 
-    public static Global create(QuickJSContext ctx, ExecutorService executor) {
-        return new Global(ctx, executor);
+    public static Global create(QuickJS ctx, Host host, String siteKey, String api) {
+        return new Global(ctx, host, siteKey, api);
+    }
+
+    private static Object argument(Object[] args, int index) {
+        return index < args.length ? args[index] : null;
+    }
+
+    private static String string(Object[] args, int index) {
+        return (String) argument(args, index);
+    }
+
+    private static Integer integer(Object[] args, int index) {
+        Number value = (Number) argument(args, index);
+        return value == null ? null : value.intValue();
+    }
+
+    static String errorMessage(Throwable error) {
+        if (error == null) return null;
+        if (error instanceof CompletionException && error.getCause() != null) error = error.getCause();
+        return error.getMessage() == null ? error.getClass().getSimpleName() : error.getMessage();
     }
 
     public void destroy() {
+        if (destroyed) return;
         destroyed = true;
-        for (Timeout timeout : timers.values()) timeout.cancelAndRelease();
-        timers.clear();
-        timer.cancel();
+        network.cancelSleeps();
+        try {
+            network.close();
+        } finally {
+            release();
+        }
+    }
+
+    private void release() {
+        network.release();
+        cache.release();
+        releaseCallbacks();
+        sockets.release();
+        web.close();
+    }
+
+    private void releaseCallbacks() {
+        for (QuickJS.Callback callback : callbacks.keySet()) callback.close();
+        callbacks.clear();
+    }
+
+    public void cancelRequests() {
+        sockets.markClosing();
+        network.cancelSleeps();
+        network.close();
+    }
+
+    private Boolean closeSession(Integer id) {
+        Net session = network.removeSession(id);
+        sockets.markClosing(session);
+        network.cancelSleeps(session);
+        session.close();
+        return true;
+    }
+
+    public void beginCall(Invocation current) {
+        invocation = current;
+        current.enter();
+    }
+
+    public void endCall() {
+        if (invocation != null) invocation.leave();
+        invocation = null;
     }
 
     private void setProperty() {
-        for (Method method : getClass().getMethods()) {
-            if (!method.isAnnotationPresent(JSMethod.class)) continue;
-            ctx.getGlobalObject().setProperty(method.getName(), args -> {
-                try {
-                    return method.invoke(this, args);
-                } catch (Exception e) {
-                    return null;
-                }
-            });
-        }
+        bindHost();
+        bindNetwork();
+        bindCache();
+        bindUtilities();
+        bindSocketsAndDownloads();
     }
 
-    private boolean submit(Runnable runnable) {
+    private void bindHost() {
+        ctx.bind("s2t", args -> s2t(string(args, 0))).join();
+        ctx.bind("t2s", args -> t2s(string(args, 0))).join();
+        ctx.bind("openWeb", args -> openWeb((QuickJS.Json) argument(args, 0))).join();
+        ctx.bind("getCookie", args -> getCookie(string(args, 0))).join();
+        ctx.bind("setCookie", args -> setCookie(string(args, 0), string(args, 1))).join();
+        ctx.bind("getUserAgent", args -> getUserAgent()).join();
+        ctx.bind("getPort", args -> getPort()).join();
+        ctx.bind("getProxy", args -> getProxy((Boolean) argument(args, 0))).join();
+        ctx.bind("_proxyUrl", args -> _proxyUrl((QuickJS.Json) argument(args, 0))).join();
+        ctx.bind("js2Proxy", args -> js2Proxy((Boolean) argument(args, 0), integer(args, 1), string(args, 2), string(args, 3), (QuickJS.Json) argument(args, 4))).join();
+    }
+
+    private void bindNetwork() {
+        ctx.bind("_netSession", args -> network.openSession()).join();
+        ctx.bind("_netGetCookie", args -> network.getCookie(string(args, 0), integer(args, 1))).join();
+        ctx.bind("_netSetCookie", args -> network.setCookie(string(args, 0), string(args, 1), integer(args, 2))).join();
+        ctx.bind("_netClose", args -> closeSession(integer(args, 0))).join();
+        ctx.bind("__http", args -> network.http(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
+        ctx.bindAsync("_httpAsync", args -> network.requestAsync(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
+        ctx.bindAsync("_stream", args -> streams.proxy(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
+        ctx.bindAsync("_openStream", args -> streams.open(string(args, 0), (QuickJS.Json) argument(args, 1), true), this::captureInvocation).join();
+        ctx.bindAsync("_streamRead", args -> streams.read(string(args, 0), integer(args, 1)), this::captureInvocation).join();
+        ctx.bind("_streamClose", args -> invocation != null && invocation.discardStream(string(args, 0))).join();
+        ctx.bind("__ws", args -> network.webSocket(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
+        ctx.bindAsync("_sleep", args -> network.sleep(((Number) argument(args, 0)).doubleValue(), integer(args, 1)), this::captureInvocation).join();
+    }
+
+    private void bindCache() {
+        ctx.bind("_cached", args -> cache.load(string(args, 0), string(args, 1), integer(args, 2), (QuickJS.Callback) argument(args, 3), (QuickJS.Callback) argument(args, 4), (Boolean) argument(args, 5))).join();
+        ctx.bind("_peek", args -> cache.peek(string(args, 0), integer(args, 1))).join();
+        ctx.bind("_clearCache", args -> cache.clear(string(args, 0), integer(args, 1))).join();
+        ctx.bind("_local", args -> cache.local(string(args, 0), string(args, 1), string(args, 2))).join();
+        ctx.bind("_cacheResolve", args -> cache.resolve(integer(args, 0), string(args, 1), string(args, 2))).join();
+    }
+
+    private void bindUtilities() {
+        ctx.bind("joinUrl", args -> joinUrl(string(args, 0), string(args, 1))).join();
+        ctx.bind("htmlQuery", this::htmlQuery).join();
+        ctx.bind("md5X", args -> md5X(string(args, 0))).join();
+        ctx.bind("sha256X", args -> sha256X(string(args, 0))).join();
+        ctx.bind("randomX", args -> randomX(integer(args, 0))).join();
+        ctx.bind("aesX", args -> aesX(string(args, 0), (Boolean) argument(args, 1), string(args, 2), (Boolean) argument(args, 3), string(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
+        ctx.bind("desX", args -> desX(string(args, 0), (Boolean) argument(args, 1), string(args, 2), (Boolean) argument(args, 3), string(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
+        ctx.bind("rsaX", args -> rsaX(string(args, 0), (Boolean) argument(args, 1), (Boolean) argument(args, 2), string(args, 3), (Boolean) argument(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
+    }
+
+    private void bindSocketsAndDownloads() {
+        ctx.bind("_connect", args -> sockets.connect(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
+        ctx.bind("_socketSend", args -> sockets.send(integer(args, 0), string(args, 1), (byte[]) argument(args, 2))).join();
+        ctx.bind("_socketClose", args -> {
+            sockets.close(integer(args, 0), (Boolean) argument(args, 1));
+            return null;
+        }).join();
+        ctx.bind("_download", args -> {
+            network.download(string(args, 0), string(args, 1), (QuickJS.Json) argument(args, 2), (QuickJS.Callback) argument(args, 3));
+            return null;
+        }).join();
+    }
+
+    private QuickJS.Json htmlQuery(Object[] args) throws IOException {
+        QuickJS.Json plan = (QuickJS.Json) argument(args, 1);
+        Invocation current = invocation;
+        long start = System.nanoTime();
         try {
-            if (destroyed) return false;
-            if (executor.isShutdown()) return false;
-            executor.submit(runnable);
-            return true;
-        } catch (Throwable ignored) {
-            return false;
+            return new QuickJS.Json(HtmlQuery.query(string(args, 0), plan == null ? null : plan.text()));
+        } finally {
+            if (current != null) current.recordHtml(System.nanoTime() - start);
         }
     }
 
-    @Keep
-    @JSMethod
+    boolean submit(Runnable runnable) {
+        if (destroyed) return false;
+        CompletableFuture<Void> future = ctx.execute(runnable);
+        future.whenComplete((result, error) -> {
+            if (error != null && !destroyed) SpiderDebug.log(error);
+        });
+        return !future.isCompletedExceptionally();
+    }
+
     public String s2t(String text) {
         return Trans.s2t(false, text);
     }
 
-    @Keep
-    @JSMethod
     public String t2s(String text) {
         return Trans.t2s(false, text);
     }
 
-    @Keep
-    @JSMethod
+    public Boolean openWeb(QuickJS.Json options) {
+        return options != null && host.openWeb(options.text());
+    }
+
+    public String getCookie(String url) {
+        return host.getCookie(url);
+    }
+
+    public Boolean setCookie(String url, String cookie) {
+        return host.setCookie(url, cookie);
+    }
+
+    public String getUserAgent() {
+        return host.getUserAgent();
+    }
+
     public Integer getPort() {
         return Proxy.getPort();
     }
 
-    @Keep
-    @JSMethod
     public String getProxy(Boolean local) {
         return Proxy.getUrl(local) + "?do=js";
     }
 
-    @Keep
-    @JSMethod
-    public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, JSObject headers) {
-        return getProxy(!dynamic) + String.format("&from=catvod&siteType=%s&siteKey=%s&header=%s&url=%s", siteType, siteKey, Uri.encode(headers.stringify()), Uri.encode(url));
-    }
-
-    @Keep
-    @JSMethod
-    public Integer setTimeout(JSFunction func, Integer delay) {
-        Timeout timeout = createTimeout(func);
-        if (timeout == null) return 0;
-        return schedule(timeout, delay) ? timeout.id : 0;
-    }
-
-    @Keep
-    @JSMethod
-    public Object clearTimeout(Integer id) {
-        cancel(id);
-        return null;
-    }
-
-    @Keep
-    @JSMethod
-    public JSObject _http(String url, JSObject options) {
-        JSFunction complete = options.getJSFunction("complete");
-        if (complete == null) return req(url, options);
-        requestAsync(url, options, complete);
-        return null;
-    }
-
-    @Keep
-    @JSMethod
-    public JSObject req(String url, JSObject options) {
-        try {
-            Req req = Req.objectFrom(options.stringify());
-            Response res = Connect.to(url, req).execute();
-            return Connect.success(ctx, req, res);
-        } catch (Exception e) {
-            return Connect.error(ctx);
+    public String _proxyUrl(QuickJS.Json params) {
+        Uri.Builder url = Uri.parse(Proxy.getUrl(true)).buildUpon().appendQueryParameter("do", "js").appendQueryParameter("siteKey", siteKey);
+        if (params != null) {
+            for (Map.Entry<String, JsonElement> entry : Json.strict(params.text()).getAsJsonObject().entrySet()) {
+                if (entry.getKey().equals("do") || entry.getKey().equals("siteKey")) throw new IllegalArgumentException("Reserved proxy parameter");
+                url.appendQueryParameter(entry.getKey(), entry.getValue().getAsString());
+            }
         }
+        return url.build().toString();
     }
 
-    @Keep
-    @JSMethod
+    public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, QuickJS.Json headers) {
+        return getProxy(!dynamic) + String.format("&from=catvod&siteType=%s&siteKey=%s&header=%s&url=%s", siteType, siteKey, Uri.encode(headers.text()), Uri.encode(url));
+    }
+
     public String joinUrl(String parent, String child) {
         return UriUtil.resolve(parent, child);
     }
 
-    @Keep
-    @JSMethod
     public String md5X(String text) {
         return Crypto.md5(text);
     }
 
-    @Keep
-    @JSMethod
+    public String sha256X(String text) {
+        return Crypto.sha256(text);
+    }
+
+    public String randomX(Integer size) {
+        return Crypto.randomUrlSafe(size == null ? 0 : size);
+    }
+
     public String aesX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
         return Crypto.aes(mode, encrypt, input, inBase64, key, iv, outBase64);
     }
 
-    @Keep
-    @JSMethod
     public String desX(String mode, boolean encrypt, String input, boolean inBase64, String key, String iv, boolean outBase64) {
         return Crypto.des(mode, encrypt, input, inBase64, key, iv, outBase64);
     }
 
-    @Keep
-    @JSMethod
     public String rsaX(String mode, boolean pub, boolean encrypt, String input, boolean inBase64, String key, boolean outBase64) {
         return Crypto.rsa(mode, pub, encrypt, input, inBase64, key, outBase64);
     }
 
-    private void requestAsync(String url, JSObject options, JSFunction complete) {
-        complete.hold();
-        try {
-            Req req = Req.objectFrom(options.stringify());
-            Connect.to(url, req).enqueue(getCallback(complete, req));
-        } catch (Throwable e) {
-            completeError(complete);
-        }
+    void complete(QuickJS.Callback complete, NetOptions req, Net.Result result) {
+        submit(() -> invoke(complete, () -> complete.call(Connect.result(req, result))));
     }
 
-    private Callback getCallback(JSFunction complete, Req req) {
-        return new Callback() {
-            @Override
-            public void onResponse(@NonNull Call call, @NonNull Response res) {
-                completeSuccess(complete, req, res);
-            }
+    void complete(QuickJS.Callback complete, Object... args) {
+        submit(() -> invoke(complete, () -> complete.call(args)));
+    }
 
-            @Override
-            public void onFailure(@NonNull Call call, @NonNull IOException e) {
-                completeError(complete);
-            }
+    void hold(QuickJS.Callback callback) {
+        callbacks.put(callback, invocation);
+    }
+
+    void hold(QuickJS.Callback callback, Invocation current) {
+        callbacks.put(callback, current);
+    }
+
+    Invocation current() {
+        return invocation;
+    }
+
+    Invocation setInvocation(Invocation current) {
+        Invocation previous = invocation;
+        invocation = current;
+        return previous;
+    }
+
+    boolean isDestroyed() {
+        return destroyed;
+    }
+
+    void checkInvocation() {
+        if (invocation != null && invocation.isCanceled()) throw new CancellationException("Spider call canceled");
+    }
+
+    private QuickJS.AsyncScope captureInvocation() {
+        Invocation current = invocation;
+        return () -> {
+            Invocation previous = invocation;
+            invocation = current;
+            if (current != null) current.enter();
+            return () -> {
+                if (current != null) current.leave();
+                invocation = previous;
+            };
         };
     }
 
-    private void completeSuccess(JSFunction complete, Req req, Response res) {
-        boolean posted = postCallback(complete, () -> complete.call(Connect.success(ctx, req, res)));
-        if (!posted) res.close();
-    }
-
-    private void completeError(JSFunction complete) {
-        postCallback(complete, () -> complete.call(Connect.error(ctx)));
-    }
-
-    private boolean postCallback(JSFunction callback, Runnable runnable) {
-        boolean posted = submit(() -> callAndRelease(callback, runnable));
-        if (!posted) callback.release();
-        return posted;
-    }
-
-    private void callAndRelease(JSFunction callback, Runnable runnable) {
+    void invoke(QuickJS.Callback callback, Supplier<CompletableFuture<Object>> callable) {
+        Invocation previous = invocation;
+        Invocation current = callbacks.get(callback);
+        invocation = current;
         try {
-            if (!destroyed) runnable.run();
+            if (!destroyed) callable.get().whenComplete((result, error) -> {
+                if (error == null) return;
+                if (current != null) current.fail(error);
+                SpiderDebug.log(error);
+            });
         } finally {
-            callback.release();
+            invocation = previous;
+            release(callback);
         }
     }
 
-    private Timeout createTimeout(JSFunction func) {
-        if (func == null || destroyed) return null;
-        Timeout timeout = new Timeout(timerId.incrementAndGet(), func);
-        timers.put(timeout.id, timeout);
-        func.hold();
-        return timeout;
-    }
-
-    private boolean schedule(Timeout timeout, Integer delay) {
-        try {
-            timer.schedule(timeout, getDelay(delay));
-            return true;
-        } catch (Throwable e) {
-            cancel(timeout.id);
-            return false;
-        }
-    }
-
-    private int getDelay(Integer delay) {
-        return Math.max(0, delay == null ? 0 : delay);
-    }
-
-    private void cancel(Integer id) {
-        if (id == null) return;
-        Timeout timeout = timers.remove(id);
-        if (timeout != null) timeout.cancelAndRelease();
-    }
-
-    private class Timeout extends TimerTask {
-
-        private final JSFunction func;
-        private final int id;
-        private volatile boolean canceled;
-        private boolean released;
-
-        private Timeout(int id, JSFunction func) {
-            this.func = func;
-            this.id = id;
-        }
-
-        @Override
-        public void run() {
-            if (submit(this::fire)) return;
-            Global.this.cancel(id);
-        }
-
-        private void fire() {
-            if (canceled) return;
-            try {
-                func.call();
-            } finally {
-                Global.this.cancel(id);
-            }
-        }
-
-        private synchronized void cancelAndRelease() {
-            canceled = true;
-            cancel();
-            release();
-        }
-
-        private synchronized void release() {
-            if (released) return;
-            released = true;
-            func.release();
+    void release(QuickJS.Callback callback) {
+        if (callbacks.containsKey(callback)) {
+            callbacks.remove(callback);
+            callback.close();
         }
     }
 }

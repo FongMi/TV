@@ -11,3 +11,5 @@ dependencies {
     implementation localGroovy()
     implementation libs.commons.compress
 }
+
+if (file('test.gradle').isFile()) apply from: 'test.gradle'

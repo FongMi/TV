@@ -1,7 +1,0 @@
-lxml
-ujson
-pyquery
-requests
-cachetools
-pycryptodome
-beautifulsoup4

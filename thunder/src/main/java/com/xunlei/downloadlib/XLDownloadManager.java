@@ -3,13 +3,15 @@ package com.xunlei.downloadlib;
 import android.content.Context;
 import android.os.Build;
 
-import com.github.catvod.Init;
+import com.github.catvod.Runtime;
 import com.github.catvod.utils.Prefers;
+import com.github.catvod.utils.RuntimeModule;
 import com.xunlei.downloadlib.android.XLUtil;
 import com.xunlei.downloadlib.parameter.BtIndexSet;
 import com.xunlei.downloadlib.parameter.BtSubTaskDetail;
 import com.xunlei.downloadlib.parameter.BtTaskParam;
 import com.xunlei.downloadlib.parameter.EmuleTaskParam;
+import com.xunlei.downloadlib.parameter.ErrorCode;
 import com.xunlei.downloadlib.parameter.GetDownloadLibVersion;
 import com.xunlei.downloadlib.parameter.GetFileName;
 import com.xunlei.downloadlib.parameter.GetTaskId;
@@ -18,6 +20,7 @@ import com.xunlei.downloadlib.parameter.MagnetTaskParam;
 import com.xunlei.downloadlib.parameter.P2spTaskParam;
 import com.xunlei.downloadlib.parameter.ThunderUrlInfo;
 import com.xunlei.downloadlib.parameter.TorrentInfo;
+import com.xunlei.downloadlib.parameter.XLConstant;
 import com.xunlei.downloadlib.parameter.XLTaskInfo;
 import com.xunlei.downloadlib.parameter.XLTaskLocalUrl;
 
@@ -27,25 +30,38 @@ public class XLDownloadManager {
     private Context context;
 
     public XLDownloadManager() {
-        this.context = Init.context();
+        this.context = Runtime.context();
         this.loader = new XLLoader();
         this.init();
     }
 
+    static void checkErrorCode(int code) {
+        if (code != XLConstant.XLErrorCode.NO_ERROR) throw new IllegalStateException(ErrorCode.get(code));
+    }
+
     public void init() {
+        RuntimeModule.THUNDER.require();
         InitParam param = new InitParam(context.getFilesDir().getPath());
-        loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), getGuid(), param.mStatSavePath, param.mStatCfgSavePath, 0, param.mPermissionLevel, param.mQueryConfOnInit);
+        int code = loader.init(param.getSoKey(), "com.android.providers.downloads", param.mAppVersion, "", getPeerId(), XLUtil.getGuid(), param.mStatSavePath, param.mStatCfgSavePath, 0, param.mPermissionLevel, param.mQueryConfOnInit);
+        checkErrorCode(code);
+        configureLibrary();
+    }
+
+    private void configureLibrary() {
         getDownloadLibVersion(new GetDownloadLibVersion());
         setOSVersion(Build.VERSION.INCREMENTAL + "_alpha");
-        setLocalProperty("PhoneModel", Build.MODEL);
+        loader.setLocalProperty("PhoneModel", Build.MODEL);
         setStatReportSwitch(false);
         setSpeedLimit(-1, -1);
     }
 
     public void release() {
-        if (loader != null) loader.unInit();
-        context = null;
-        loader = null;
+        try {
+            if (loader != null) loader.unInit();
+        } finally {
+            context = null;
+            loader = null;
+        }
     }
 
     private String getPeerId() {
@@ -54,16 +70,12 @@ public class XLDownloadManager {
         return uuid;
     }
 
-    private String getGuid() {
-        return XLUtil.getGuid();
-    }
-
     public void releaseTask(long taskId) {
         loader.releaseTask(taskId);
     }
 
     public void startTask(long taskId) {
-        loader.startTask(taskId);
+        checkErrorCode(loader.startTask(taskId));
     }
 
     public void stopTask(long taskId) {
@@ -71,11 +83,11 @@ public class XLDownloadManager {
     }
 
     public void getTaskInfo(long taskId, int i, XLTaskInfo taskInfo) {
-        loader.getTaskInfo(taskId, i, taskInfo);
+        checkErrorCode(loader.getTaskInfo(taskId, i, taskInfo));
     }
 
     public void getLocalUrl(String filePath, XLTaskLocalUrl localUrl) {
-        loader.getLocalUrl(filePath, localUrl);
+        checkErrorCode(loader.getLocalUrl(filePath, localUrl));
     }
 
     public void getDownloadLibVersion(GetDownloadLibVersion version) {
@@ -84,10 +96,6 @@ public class XLDownloadManager {
 
     public void setStatReportSwitch(boolean value) {
         loader.setStatReportSwitch(value);
-    }
-
-    private void setLocalProperty(String key, String value) {
-        loader.setLocalProperty(key, value);
     }
 
     public void setOSVersion(String str) {
@@ -107,42 +115,49 @@ public class XLDownloadManager {
     }
 
     public int createP2spTask(P2spTaskParam param, GetTaskId taskId) {
+        RuntimeModule.THUNDER.require();
         return loader.createP2spTask(param.mUrl, param.mRefUrl, param.mCookie, param.mUser, param.mPass, param.mFilePath, param.mFileName, param.mCreateMode, param.mSeqId, taskId);
     }
 
     public int createBtMagnetTask(MagnetTaskParam param, GetTaskId taskId) {
+        RuntimeModule.THUNDER.require();
         return loader.createBtMagnetTask(param.mUrl, param.mFilePath, param.mFileName, taskId);
     }
 
     public int createEmuleTask(EmuleTaskParam param, GetTaskId taskId) {
+        RuntimeModule.THUNDER.require();
         return loader.createEmuleTask(param.mUrl, param.mFilePath, param.mFileName, param.mCreateMode, param.mSeqId, taskId);
     }
 
     public int createBtTask(BtTaskParam param, GetTaskId taskId) {
+        RuntimeModule.THUNDER.require();
         return loader.createBtTask(param.mTorrentPath, param.mFilePath, param.mMaxConcurrent, param.mCreateMode, param.mSeqId, taskId);
     }
 
     public void getTorrentInfo(TorrentInfo info) {
-        loader.getTorrentInfo(info.getFile().getAbsolutePath(), info);
+        RuntimeModule.THUNDER.require();
+        checkErrorCode(loader.getTorrentInfo(info.getFile().getAbsolutePath(), info));
     }
 
     public void getBtSubTaskInfo(long taskId, int index, BtSubTaskDetail detail) {
-        loader.getBtSubTaskInfo(taskId, index, detail);
+        checkErrorCode(loader.getBtSubTaskInfo(taskId, index, detail));
     }
 
     public void deselectBtSubTask(long taskId, BtIndexSet btIndexSet) {
-        loader.deselectBtSubTask(taskId, btIndexSet);
+        checkErrorCode(loader.deselectBtSubTask(taskId, btIndexSet));
     }
 
     public String parserThunderUrl(String url) {
+        RuntimeModule.THUNDER.require();
         ThunderUrlInfo thunderUrlInfo = new ThunderUrlInfo();
-        loader.parserThunderUrl(url, thunderUrlInfo);
+        checkErrorCode(loader.parserThunderUrl(url, thunderUrlInfo));
         return thunderUrlInfo.mUrl;
     }
 
     public String getFileNameFromUrl(String url) {
+        RuntimeModule.THUNDER.require();
         GetFileName getFileName = new GetFileName();
-        loader.getFileNameFromUrl(url, getFileName);
+        checkErrorCode(loader.getFileNameFromUrl(url, getFileName));
         return getFileName.getFileName();
     }
 

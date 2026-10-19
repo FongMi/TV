@@ -1,26 +1,47 @@
 package com.github.catvod.crawler;
 
+import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 
+import com.github.catvod.Proxy;
+import com.github.catvod.Runtime;
+import com.github.catvod.net.Net;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Local;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import okhttp3.Dns;
-import okhttp3.OkHttpClient;
 
 public abstract class Spider {
 
     public String siteKey;
+    public Net net;
+    public Local local;
 
     public static Dns safeDns() {
         return OkHttp.dns();
     }
 
-    public static OkHttpClient client() {
-        return OkHttp.client();
+    public Activity getActivity() {
+        return Runtime.activity();
+    }
+
+    public String getProxyUrl() {
+        return getProxyUrl(Collections.emptyMap());
+    }
+
+    public String getProxyUrl(Map<String, String> params) {
+        Uri.Builder url = Uri.parse(Proxy.getUrl(true)).buildUpon().appendQueryParameter("do", "jar").appendQueryParameter("siteKey", siteKey);
+        for (Map.Entry<String, String> entry : params.entrySet()) {
+            if (entry.getKey().equals("do") || entry.getKey().equals("siteKey")) throw new IllegalArgumentException("Reserved proxy parameter");
+            url.appendQueryParameter(entry.getKey(), entry.getValue());
+        }
+        return url.build().toString();
     }
 
     public void init(Context context) throws Exception {

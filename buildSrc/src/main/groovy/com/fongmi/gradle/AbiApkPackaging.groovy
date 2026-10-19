@@ -1,77 +1,88 @@
 package com.fongmi.gradle
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
 
 class AbiApkPackaging {
 
-    private static final Map<String, String> ABI_PAIRS = ['arm64-v8a': 'armeabi-v7a', 'armeabi-v7a': 'arm64-v8a'].asImmutable()
+    static final Map<String, String> ABI_FLAVORS = [arm64: 'arm64-v8a', arm32: 'armeabi-v7a'].asImmutable()
+    static final List<String> PYTHON_LIBRARIES = ['libchaquopy_java.so', 'libcrypto_chaquopy.so', 'libcrypto_python.so', 'libpython3.10.so', 'libpython3.so', 'libsqlite3_chaquopy.so', 'libsqlite3_python.so', 'libssl_chaquopy.so', 'libssl_python.so'].asImmutable()
+    static final List<String> THUNDER_LIBRARIES = ['libxl_stat.so', 'libxl_thunder_sdk.so'].asImmutable()
+    static final List<String> MPV_LIBRARIES = ['libmpv.so', 'libplayer.so'].asImmutable()
+    static final Map<String, Map> RUNTIME_PROFILES = [
+        python: [packageName: 'com.fongmi.runtime.python', compatibilityId: 'catvod-python-plugin-v2', entryClass: 'com.fongmi.chaquo.RuntimeEntry', library: 'libchaquopy_java.so', label: 'Python', property: 'tvPython'],
+        nodejs: [packageName: 'com.fongmi.runtime.nodejs', compatibilityId: 'catvod-nodejs-plugin-v2', entryClass: 'com.fongmi.nodejs.RuntimeEntry', library: 'libnode.so', label: 'Node.js', property: 'tvNodeJs'],
+        quickjs: [packageName: 'com.fongmi.runtime.quickjs', compatibilityId: 'fongmi-quickjs-ng-0.17-v11', entryClass: 'com.fongmi.quickjs.RuntimeEntry', library: 'libquickjs-wrapper.so', label: 'QuickJS', property: 'tvQuickJs'],
+        thunder: [packageName: 'com.fongmi.runtime.thunder', compatibilityId: 'catvod-thunder-plugin-v1', entryClass: 'com.xunlei.downloadlib.RuntimeEntry', library: 'libxl_thunder_sdk.so', label: 'Thunder', property: 'tvThunder'],
+        bdj: [packageName: 'com.fongmi.runtime.bdj', compatibilityId: 'libbluray-1.4.1-openjdk8-zero-v1', archive: 'assets/bdj/runtime.zip', label: 'BD-J', property: 'tvBdj'],
+        mpv: [packageName: 'com.fongmi.runtime.mpv', compatibilityId: 'mpv-jni-ffmpeg-shared-v1', library: 'libplayer.so', label: 'mpv', property: 'tvMpv']
+    ].asImmutable()
 
     static void configure(Project project, Object apkArtifact) {
-        def android = project.extensions.getByName('android')
+        rejectRetiredModes(project)
         def components = project.extensions.getByName('androidComponents')
-        configureAbis(android)
-        components.onVariants(components.selector().withBuildType('release')) { variant ->
-            def device = configureOutputFileNames(variant)
-            configureFinalizer(project, android, components, variant, apkArtifact)
-            configureReleaseExport(project, variant, device)
+        configureDebugResourceCacheKey(project, components)
+        components.onVariants(components.selector().all()) { variant ->
+            def device = variant.productFlavors.find { it.first == 'device' }?.second
+            if (!device) throw new GradleException("Missing device flavor for ${variant.name}")
+            def abis = configureOutputs(variant, device)
+            configureNativeLibraries(project, variant, abis)
+            if (variant.buildType == 'release') configureReleaseExport(project, variant, device, apkArtifact)
+        }
+    }
+
+    private static List<String> configureOutputs(def variant, String device) {
+        return variant.outputs.collect { output -> configureOutput(variant, device, output) }
+    }
+
+    private static String configureOutput(def variant, String device, def output) {
+        def abi = output.filters.find { it.filterType.toString() == 'ABI' }?.identifier
+        if (!ABI_FLAVORS.containsValue(abi)) throw new GradleException("Missing or unsupported ABI for ${variant.name}")
+        output.outputFileName.set(hostFileName(device, abi, variant.buildType))
+        return abi
+    }
+
+    private static void configureNativeLibraries(Project project, def variant, List<String> abis) {
+        variant.packaging.jniLibs.excludes.addAll((THUNDER_LIBRARIES + MPV_LIBRARIES + [RUNTIME_PROFILES.nodejs.library, RUNTIME_PROFILES.quickjs.library]).collect { "**/${it}".toString() })
+        variant.packaging.jniLibs.keepDebugSymbols.add('**/libc++_shared.so')
+        def validation = project.tasks.register("verify${variant.name.capitalize()}MpvNative", VerifyMpvNativeTask) { task ->
+            task.mpvArchive.set(project.layout.projectDirectory.file('libs/lib-mpvplayer-release.aar'))
+            task.ffmpegArchive.set(project.layout.projectDirectory.file('libs/lib-decoder-ffmpeg-release.aar'))
+            task.abis.set(abis)
+        }
+        project.tasks.matching { it.name == "merge${variant.name.capitalize()}NativeLibs" }.configureEach { it.dependsOn(validation) }
+    }
+
+    private static void configureReleaseExport(Project project, def variant, String device, Object apkArtifact) {
+        project.tasks.register("export${device.capitalize()}ReleaseApks", Copy) { task ->
+            task.from(variant.artifacts.get(apkArtifact)) { include '*.apk' }
+            task.into(project.rootProject.layout.projectDirectory.dir('Release/apk'))
         }
     }
 
     static String otherAbi(String abi) {
-        return ABI_PAIRS[abi]
+        if (!ABI_FLAVORS.containsValue(abi)) throw new GradleException("Unsupported ABI ${abi}")
+        return ABI_FLAVORS.values().find { it != abi }
     }
 
-    private static void configureAbis(def android) {
-        android.splits.abi {
-            enable = true
-            reset()
-            include(*ABI_PAIRS.keySet().toList())
-            universalApk = false
-        }
+    static String hostFileName(String device, String abi, String buildType) {
+        return buildType == 'release' ? "${device}-${abi.replace('-', '_')}.apk" : "app-${device}-${abi}-${buildType}.apk"
     }
 
-    private static String configureOutputFileNames(def variant) {
-        def flavors = variant.productFlavors.collectEntries { [(it.first): it.second] }
-        def device = flavors['device'] ?: 'device'
-        variant.outputs.each { output ->
-            def abi = output.filters.find { it.filterType.name() == 'ABI' }?.identifier?.replace('-', '_') ?: 'universal'
-            output.outputFileName.set("${device}-${abi}.apk")
-        }
-        return device
+    private static void rejectRetiredModes(Project project) {
+        if (project.providers.gradleProperty('tvRuntimeStandalone').isPresent()) throw new GradleException('tvRuntimeStandalone has been removed; build the app and independent runtime APKs')
+        for (def name : ['tvRuntimeSplits', 'tvQuickJsStandalone']) if (project.providers.gradleProperty(name).map { it.toBoolean() }.getOrElse(false)) throw new GradleException("${name} has been removed; build independent runtime APKs instead")
     }
 
-    private static void configureFinalizer(Project project, def android, def components, def variant, Object apkArtifact) {
-        def windows = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')
-        def buildToolsDir = components.sdkComponents.sdkDirectory.get().dir("build-tools/${android.buildToolsVersion}").asFile
-        def signingConfig = android.signingConfigs.release
-        def finalizeTask = project.tasks.register("finalize${variant.name.capitalize()}Apks", FinalizeApksTask) { task ->
-            task.zipalignFile.set(new File(buildToolsDir, windows ? 'zipalign.exe' : 'zipalign'))
-            task.apksignerJar.set(new File(buildToolsDir, 'lib/apksigner.jar'))
-            task.javaExecutable.set(new File(System.getProperty('java.home'), windows ? 'bin/java.exe' : 'bin/java'))
-            task.signingStoreFile.set(signingConfig.storeFile)
-            task.keyAlias.set(signingConfig.keyAlias)
-            task.storePassword.set(signingConfig.storePassword)
-            task.keyPassword.set(signingConfig.keyPassword)
-        }
-        def request = variant.artifacts.use(finalizeTask)
-                .wiredWithDirectories({ task -> task.inputDirectory }, { task -> task.outputDirectory })
-                .toTransformMany(apkArtifact)
-        finalizeTask.configure { task ->
-            task.transformationRequest.set(request)
-        }
-    }
-
-    private static void configureReleaseExport(Project project, def variant, String device) {
-        def taskName = "assemble${variant.name.capitalize()}"
-        def apkDirectory = project.layout.buildDirectory.dir("outputs/apk/${device}/release").get().asFile
-        project.tasks.matching { it.name == taskName }.configureEach {
-            doLast {
-                project.copy {
-                    from project.fileTree(dir: apkDirectory, include: "${device}-*.apk")
-                    into project.rootProject.file('Release/apk')
-                    eachFile { it.path = it.name }
-                    includeEmptyDirs = false
-                }
+    private static void configureDebugResourceCacheKey(Project project, def components) {
+        def injectedApi = project.providers.gradleProperty('android.injected.build.api').orElse('')
+        def injectedAbis = project.providers.gradleProperty('android.injected.build.abi').orElse('')
+        components.onVariants(components.selector().withBuildType('debug')) { variant ->
+            def taskName = "process${variant.name.capitalize()}Resources"
+            project.tasks.named({ it == taskName } as org.gradle.api.specs.Spec).configureEach { task ->
+                task.inputs.property('androidInjectedBuildApi', injectedApi)
+                task.inputs.property('androidInjectedBuildAbis', injectedAbis)
             }
         }
     }

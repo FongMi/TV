@@ -4,12 +4,12 @@ import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
 
-import com.github.catvod.Init;
+import com.github.catvod.Runtime;
 
 public class Prefers {
 
     public static SharedPreferences getPrefers() {
-        return PreferenceManager.getDefaultSharedPreferences(Init.context());
+        return PreferenceManager.getDefaultSharedPreferences(Runtime.context());
     }
 
     public static String getString(String key) {
@@ -73,20 +73,18 @@ public class Prefers {
     }
 
     public static void put(String key, Object obj) {
-        if (obj == null) return;
-        if (obj instanceof String val) {
-            getPrefers().edit().putString(key, val).apply();
-        } else if (obj instanceof Boolean val) {
-            getPrefers().edit().putBoolean(key, val).apply();
-        } else if (obj instanceof Float val) {
-            getPrefers().edit().putFloat(key, val).apply();
-        } else if (obj instanceof Integer val) {
-            getPrefers().edit().putInt(key, val).apply();
-        } else if (obj instanceof Long val) {
-            getPrefers().edit().putLong(key, val).apply();
-        } else if (obj instanceof Number val) {
-            if (val.toString().contains(".")) put(key, val.floatValue());
-            else put(key, val.intValue());
+        switch (obj) {
+            case String val -> getPrefers().edit().putString(key, val).apply();
+            case Boolean val -> getPrefers().edit().putBoolean(key, val).apply();
+            case Float val -> getPrefers().edit().putFloat(key, val).apply();
+            case Integer val -> getPrefers().edit().putInt(key, val).apply();
+            case Long val -> getPrefers().edit().putLong(key, val).apply();
+            case Number val -> {
+                if (val.toString().contains(".")) put(key, val.floatValue());
+                else put(key, val.intValue());
+            }
+            case null, default -> {
+            }
         }
     }
 

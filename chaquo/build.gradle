@@ -1,6 +1,5 @@
 plugins {
-    id 'com.android.library'
-    id 'com.chaquo.python'
+    alias libs.plugins.android.library
 }
 
 android {
@@ -9,21 +8,9 @@ android {
     compileSdk libs.versions.compileSdk.get().toInteger()
 
     defaultConfig {
+        consumerProguardFiles 'consumer-rules.pro'
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
-        ndk { abiFilters "arm64-v8a", "armeabi-v7a" }
-        python {
-            version = "3.10"
-            pip {
-                install("-r", "requirements.txt")
-            }
-        }
-    }
-
-    sourceSets {
-        main {
-            python.srcDirs = ["src/main/python"]
-        }
     }
 
     compileOptions {
@@ -34,6 +21,7 @@ android {
 }
 
 dependencies {
-    implementation project(':catvod')
+    api "com.chaquo.python.runtime:chaquopy_java:${libs.versions.python.get()}@jar"
+    compileOnly project(':catvod')
     coreLibraryDesugaring libs.desugar
 }

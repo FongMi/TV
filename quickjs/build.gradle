@@ -10,6 +10,7 @@ android {
     defaultConfig {
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
+        consumerProguardFiles 'consumer-rules.pro'
     }
 
     compileOptions {
@@ -20,8 +21,10 @@ android {
 }
 
 dependencies {
-    implementation project(':catvod')
-    implementation libs.quickjs.android
-    implementation libs.quickjs.java
+    testImplementation libs.junit
+    implementation libs.jsoup
+    compileOnly project(':catvod')
+    testImplementation project(':catvod')
+    api files('libs/wrapper-java.jar')
     coreLibraryDesugaring libs.desugar
 }

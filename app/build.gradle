@@ -19,8 +19,9 @@ android {
         applicationId "com.fongmi.android.tv"
         minSdk libs.versions.minSdk.get().toInteger()
         targetSdk libs.versions.targetSdk.get().toInteger()
-        versionCode 563
-        versionName "5.6.3"
+        versionCode 577
+        versionName "5.7.7"
+        manifestPlaceholders.runtimeCatalog = providers.gradleProperty('tvRuntimeCatalog').getOrElse('https://github.com/FongMi/Release/releases/download/module/catalog.json')
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = ["room.schemaLocation": "$projectDir/schemas".toString(), "eventBusIndex": "com.fongmi.android.tv.event.EventIndex"]
@@ -39,6 +40,15 @@ android {
         }
     }
 
+    splits {
+        abi {
+            enable = true
+            reset()
+            include "arm64-v8a", "armeabi-v7a"
+            universalApk = false
+        }
+    }
+
     buildFeatures {
         buildConfig = true
         viewBinding = true
@@ -54,11 +64,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            signingConfig = signingConfigs.release
+        }
         release {
             minifyEnabled = true
             shrinkResources = true
             signingConfig = signingConfigs.release
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro', 'proguard-rules-media.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -88,8 +101,6 @@ AbiApkPackaging.configure(project, SingleArtifact.APK.INSTANCE)
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.aar"])
     implementation project(':catvod')
-    implementation project(':chaquo')
-    implementation project(':quickjs')
     implementation libs.appcompat
     implementation libs.lifecycle.service
     implementation libs.media
@@ -123,3 +134,5 @@ dependencies {
     annotationProcessor libs.glide.compiler
     coreLibraryDesugaring libs.desugar
 }
+
+if (file('test.gradle').isFile()) apply from: 'test.gradle'

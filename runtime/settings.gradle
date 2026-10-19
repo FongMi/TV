@@ -1,0 +1,37 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = 'https://jitpack.io'
+        }
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url = 'https://jitpack.io'
+        }
+    }
+    versionCatalogs {
+        libs {
+            from(files('../gradle/libs.versions.toml'))
+        }
+    }
+}
+
+rootProject.name = 'runtime'
+
+include ':catvod'
+project(':catvod').projectDir = file('../catvod')
+def engines = [python: 'chaquo', nodejs: 'nodejs', quickjs: 'quickjs', thunder: 'thunder']
+def engine = engines[providers.gradleProperty('tvRuntimeModule').getOrElse('')]
+if (engine != null) {
+    include ":${engine}"
+    project(":${engine}").projectDir = file("../${engine}")
+}

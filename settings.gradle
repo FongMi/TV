@@ -23,5 +23,7 @@ dependencyResolutionManagement {
 include ':app'
 include ':catvod'
 include ':chaquo'
+include ':nodejs'
 include ':quickjs'
+include ':thunder'
 rootProject.name = "TV"

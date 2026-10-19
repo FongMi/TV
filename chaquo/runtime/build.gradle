@@ -1,0 +1,79 @@
+import com.android.build.api.artifact.SingleArtifact
+import com.fongmi.gradle.AbiApkPackaging
+import com.fongmi.gradle.PreparePythonAarTask
+import com.fongmi.gradle.PythonAppAssetsTask
+
+plugins {
+    alias libs.plugins.android.library
+    alias libs.plugins.chaquo.python
+}
+
+def repository = layout.projectDirectory.dir('../..')
+def appDirectory = repository.dir('app')
+def localProps = new Properties()
+providers.fileContents(repository.file('local.properties')).asText.get().with { localProps.load(new StringReader(it)) }
+def patchelf
+def patchelfPath = providers.gradleProperty('tvPatchelf').getOrElse(localProps.getProperty('tvPatchelf', ''))
+if (!patchelfPath.isEmpty()) {
+    patchelf = appDirectory.file(patchelfPath)
+} else {
+    def names = System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows') ? ['patchelf.exe', 'patchelf'] : ['patchelf']
+    for (def directory : providers.environmentVariable('PATH').getOrElse('').split(File.pathSeparator)) {
+        if (directory.isEmpty()) continue
+        patchelf = names.collect { new File(directory, it) }.find { it.isFile() && it.canExecute() }
+        if (patchelf != null) break
+    }
+    if (patchelf == null) throw new GradleException('Python runtime packaging requires patchelf; set -PtvPatchelf=<executable> or add it to PATH')
+}
+
+android {
+    namespace = 'com.fongmi.chaquo.runtime'
+    compileSdk libs.versions.compileSdk.get().toInteger()
+
+    defaultConfig {
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
+    }
+
+    flavorDimensions = ["abi"]
+
+    productFlavors {
+        arm64 {
+            dimension "abi"
+            ndk {
+                abiFilters "arm64-v8a"
+            }
+        }
+        arm32 {
+            dimension "abi"
+            ndk {
+                abiFilters "armeabi-v7a"
+            }
+        }
+    }
+}
+
+chaquopy {
+    defaultConfig {
+        version = "3.10"
+        pip {
+            install("-r", "requirements.txt")
+        }
+    }
+}
+
+def appAssets = tasks.register('packagePythonAppAssets', PythonAppAssetsTask) {
+    from repository.dir('chaquo/src/main/python')
+    assetsDirectory.set(layout.buildDirectory.dir('generated/pythonAppAssets'))
+}
+
+androidComponents.onVariants(androidComponents.selector().all()) { variant ->
+    def flavor = variant.productFlavors.find { it.first == 'abi' }.second
+    def prepared = tasks.register("prepare${variant.name.capitalize()}PythonAar", PreparePythonAarTask) { task ->
+        task.abi.set(AbiApkPackaging.ABI_FLAVORS[flavor])
+        task.cxxAar.set(repository.file('app/libs/lib-mpvplayer-release.aar'))
+        task.patchelfFile.set(patchelf)
+        task.appArchive.set(appAssets.flatMap { it.archiveFile })
+    }
+    variant.artifacts.use(prepared).wiredWithFiles({ it.inputArchive }, { it.outputArchive }).toTransform(SingleArtifact.AAR.INSTANCE)
+}

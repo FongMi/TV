@@ -1,114 +1,123 @@
-import os
-import requests
-from importlib.machinery import SourceFileLoader
 import json
+import os
+from urllib.parse import urlsplit
+from urllib.request import url2pathname
+
+from _tv_loader import Runtime, SourceNotFoundError
+from _tv_net import LocalAdapter, NetAdapter
 
 
-def spider(cache, api):
-    name = os.path.basename(api)
-    path = cache + '/' + name
-    download(path, api)
-    name = name.split('.')[0]
-    return SourceFileLoader(name, path).load_module().Spider()
+def spider(cache, api, site_key="", net=None):
+    return Runtime(cache, api, site_key, lambda url: readSource(url, net, inline=url == api)).create()
 
 
-def download(path, api):
-    if api.startswith('http'):
-        writeFile(path, redirect(api).content)
-    else:
-        writeFile(path, str.encode(api))
+def readSource(api, net=None, inline=True):
+    parsed = urlsplit(api)
+    if parsed.scheme in ('http', 'https'):
+        return readRemote(api, net)
+    if parsed.scheme == 'file':
+        api = url2pathname(parsed.path)
+        if parsed.netloc:
+            api = '//%s%s' % (parsed.netloc, api)
+    if not inline or parsed.scheme == 'file' or os.path.isfile(api):
+        try:
+            with open(api, 'rb') as stream:
+                return stream.read()
+        except FileNotFoundError as error:
+            raise SourceNotFoundError(error.errno, error.strerror, error.filename) from error
+    return api.encode()
 
 
-def writeFile(path, content):
-    with open(path, 'wb') as f:
-        f.write(content)
-
-
-def redirect(url):
-    rsp = requests.get(url, allow_redirects=False, verify=False)
-    if 'Location' in rsp.headers:
-        return redirect(rsp.headers['Location'])
-    else:
-        return rsp
+def readRemote(api, net):
+    if net is None:
+        raise RuntimeError("Remote Python source requires a network owner")
+    response = NetAdapter(net).req(api, {"timeout": 10000, "callTimeout": 10000, "buffer": 3})
+    if response.get("error"):
+        raise RuntimeError(response["error"])
+    if response["code"] == 404:
+        raise SourceNotFoundError("HTTP 404")
+    if not 200 <= response["code"] < 300:
+        raise RuntimeError("HTTP " + str(response["code"]))
+    return response["content"]
 
 
 def str2json(content):
     return json.loads(content)
 
 
-def getDependence(ru):
-    result = ru.getDependence()
-    return result
-
-
-def getName(ru):
-    result = ru.getName()
-    return result
+def json2str(content):
+    return json.dumps(content, ensure_ascii=False, allow_nan=False)
 
 
 def init(ru, extend):
-    ru.init(extend)
+    try:
+        runtime = getattr(ru, '_tv_runtime', None)
+        if runtime is not None:
+            runtime.prepare(ru)
+        ru.init(extend)
+    except BaseException:
+        release(ru)
+        raise
+
+
+def bindNet(ru, net, user_agent=None, local=None):
+    ru.net = NetAdapter(net, user_agent)
+    ru.local = LocalAdapter(local)
 
 
 def homeContent(ru, filter):
-    result = ru.homeContent(filter)
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.homeContent(filter))
 
 
 def homeVideoContent(ru):
-    result = ru.homeVideoContent()
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.homeVideoContent())
 
 
 def categoryContent(ru, tid, pg, filter, extend):
-    result = ru.categoryContent(tid, pg, filter, str2json(extend))
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.categoryContent(tid, pg, filter, str2json(extend)))
 
 
 def detailContent(ru, array):
-    result = ru.detailContent(str2json(array))
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.detailContent(str2json(array)))
 
 
 def searchContent(ru, key, quick, pg="1"):
-    result = ru.searchContent(key, quick, pg)
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.searchContent(key, quick, pg))
 
 
 def playerContent(ru, flag, id, vipFlags):
-    result = ru.playerContent(flag, id, str2json(vipFlags))
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.playerContent(flag, id, str2json(vipFlags)))
+
+
+def isVideoFormat(ru, url):
+    return bool(ru.isVideoFormat(url))
+
+
+def manualVideoCheck(ru):
+    return bool(ru.manualVideoCheck())
 
 
 def liveContent(ru, url):
-    result = ru.liveContent(url)
-    return result
+    value = ru.liveContent(url)
+    return value if isinstance(value, str) else json2str(value)
 
 
 def localProxy(ru, param):
-    result = ru.localProxy(str2json(param))
-    return result
+    return ru.localProxy(str2json(param))
 
 
 def action(ru, action):
-    result = ru.action(action)
-    formatJo = json.dumps(result, ensure_ascii=False)
-    return formatJo
+    return json2str(ru.action(action))
 
 
 def destroy(ru):
-    ru.destroy()
+    try:
+        ru.destroy()
+    finally:
+        release(ru)
 
 
-def run():
-    pass
-
-
-if __name__ == '__main__':
-    run()
+def release(ru):
+    runtime = getattr(ru, '_tv_runtime', None)
+    if runtime is not None:
+        runtime.close()

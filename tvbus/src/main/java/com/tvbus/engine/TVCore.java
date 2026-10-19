@@ -3,7 +3,7 @@ package com.tvbus.engine;
 import android.content.Context;
 import android.text.TextUtils;
 
-import com.github.catvod.Init;
+import com.github.catvod.Runtime;
 
 import java.util.List;
 
@@ -137,7 +137,7 @@ public class TVCore implements Runnable {
     @Override
     public void run() {
         try {
-            init(handle, Init.context());
+            init(handle, Runtime.context());
             run(handle);
         } catch (Throwable ignored) {
         }

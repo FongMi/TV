@@ -1,9 +1,37 @@
 plugins {
     alias libs.plugins.android.application apply false
     alias libs.plugins.android.library apply false
-    alias libs.plugins.chaquo.python apply false
 }
 
 tasks.register('clean', Delete) {
     delete rootProject.layout.buildDirectory
+}
+
+tasks.register('apiJar', Jar) {
+    group = 'build'
+    description = 'Exports the compile-only API for external Java spiders.'
+    def catvodCompile = providers.provider { project(':catvod').tasks.named('compileReleaseJavaWithJavac').get() }
+    dependsOn catvodCompile
+    from(catvodCompile.map { it.destinationDirectory }) {
+        include 'com/github/catvod/Runtime*.class'
+        include 'com/github/catvod/Proxy.class'
+        include 'com/github/catvod/crawler/Spider.class'
+        include 'com/github/catvod/crawler/SpiderDebug.class'
+        include 'com/github/catvod/net/Download*.class'
+        include 'com/github/catvod/net/Net*.class'
+        include 'com/github/catvod/utils/Archive.class'
+        include 'com/github/catvod/utils/Crypto*.class'
+        include 'com/github/catvod/utils/Decoder.class'
+        include 'com/github/catvod/utils/Json.class'
+        include 'com/github/catvod/utils/Local.class'
+        include 'com/github/catvod/utils/Path.class'
+        include 'com/github/catvod/utils/Prefers.class'
+        include 'com/github/catvod/utils/Task*.class'
+        include 'com/github/catvod/utils/UriUtil.class'
+        include 'com/github/catvod/utils/Util.class'
+    }
+    archiveFileName = 'catvod-api.jar'
+    destinationDirectory = layout.buildDirectory.dir('outputs/api')
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
 }

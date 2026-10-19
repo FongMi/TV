@@ -1,0 +1,15 @@
+plugins {
+    id 'groovy'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
+    implementation libs.commons.compress
+}
+
+sourceSets.main.groovy.srcDirs = ['../../buildSrc/src/main/groovy']

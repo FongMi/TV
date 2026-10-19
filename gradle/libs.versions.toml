@@ -1,11 +1,12 @@
 [versions]
-agp = "9.3.1"
-python = "17.0.0"
+agp = "9.4.0"
+python = "17.1.0"
 minSdk = "24"
 targetSdk = "37"
 compileSdk = "37"
+buildTools = "37.0.0"
 
-annotation = "1.10.0"
+annotation = "1.11.0"
 appcompat = "1.8.0"
 biometric = "1.1.0"
 desugar = "2.1.5"
@@ -15,7 +16,7 @@ media = "1.8.0"
 palette = "1.0.0"
 preference = "1.2.1"
 recyclerview = "1.4.0"
-room = "2.8.4"
+room = "2.8.5"
 splashscreen = "1.2.0"
 startup = "1.2.0"
 swiperefreshlayout = "1.2.0"
@@ -30,8 +31,8 @@ flexbox = "3.0.0"
 glide = "5.0.9"
 greenrobot = "3.3.1"
 gson = "2.14.0"
-guava = "33.7.1-android"
-jna = "5.19.1"
+guava = "33.7.2-android"
+jsoup = "1.23.2"
 jupnp = "3.0.5"
 juniversalchardet = "1.0.3"
 junit = "4.13.2"
@@ -43,7 +44,6 @@ nanohttpd = "2.3.1"
 newpipeextractor = "v0.26.5"
 okhttp = "5.5.0"
 permissionx = "1.8.1"
-quickjs = "3.2.3"
 rtmpClient = "v3.2.0.m2"
 sardine = "0.9"
 simpleXml = "2.7.1"
@@ -85,7 +85,7 @@ glide-compiler = { group = "com.github.bumptech.glide", name = "compiler", versi
 glide-okhttp3-integration = { group = "com.github.bumptech.glide", name = "okhttp3-integration", version.ref = "glide" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
-jna = { group = "net.java.dev.jna", name = "jna", version.ref = "jna" }
+jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup" }
 juniversalchardet = { group = "com.googlecode.juniversalchardet", name = "juniversalchardet", version.ref = "juniversalchardet" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 rtmp-client = { group = "com.github.mcxinyu", name = "LibRtmp-Client-for-Android", version.ref = "rtmpClient" }
@@ -98,12 +98,12 @@ newpipeextractor = { group = "com.github.TeamNewPipe", name = "NewPipeExtractor"
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-dnsoverhttps = { group = "com.squareup.okhttp3", name = "okhttp-dnsoverhttps", version.ref = "okhttp" }
 okhttp-logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
+okhttp-mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "okhttp" }
+okhttp-tls = { group = "com.squareup.okhttp3", name = "okhttp-tls", version.ref = "okhttp" }
 org-jupnp = { group = "org.jupnp", name = "org.jupnp", version.ref = "jupnp" }
 org-jupnp-android = { group = "org.jupnp", name = "org.jupnp.android", version.ref = "jupnp" }
 org-jupnp-support = { group = "org.jupnp", name = "org.jupnp.support", version.ref = "jupnp" }
 permissionx = { group = "com.guolindev.permissionx", name = "permissionx", version.ref = "permissionx" }
-quickjs-android = { group = "wang.harlon.quickjs", name = "wrapper-android", version.ref = "quickjs" }
-quickjs-java = { group = "wang.harlon.quickjs", name = "wrapper-java", version.ref = "quickjs" }
 sardine = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardine" }
 simple-xml = { group = "org.simpleframework", name = "simple-xml", version.ref = "simpleXml" }
 smbj = { group = "com.hierynomus", name = "smbj", version.ref = "smbj" }

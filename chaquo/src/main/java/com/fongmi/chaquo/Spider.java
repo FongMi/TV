@@ -2,9 +2,11 @@ package com.fongmi.chaquo;
 
 import android.content.Context;
 
+import androidx.annotation.Keep;
+
 import com.chaquo.python.PyObject;
-import com.github.catvod.utils.Path;
-import com.github.catvod.utils.UriUtil;
+import com.github.catvod.net.Net;
+import com.github.catvod.utils.Local;
 import com.github.catvod.utils.Util;
 import com.google.gson.Gson;
 
@@ -12,27 +14,62 @@ import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class Spider extends com.github.catvod.crawler.Spider {
 
+    private static final Gson GSON = new Gson();
+
     private final PyObject app;
     private final PyObject obj;
-    private final String api;
-    private final Gson gson;
+    private final Net.Cookies cookies;
+    private final UserAgent userAgent;
 
     public Spider(PyObject app, PyObject obj, String api) {
-        this.gson = new Gson();
+        this(app, obj, api, null);
+    }
+
+    public Spider(PyObject app, PyObject obj, String api, Net.Cookies cookies) {
+        this(app, obj, api, cookies, null);
+    }
+
+    public Spider(PyObject app, PyObject obj, String api, Net.Cookies cookies, Supplier<String> userAgent) {
+        this(app, obj, api, cookies, userAgent, null);
+    }
+
+    public Spider(PyObject app, PyObject obj, String api, Net.Cookies cookies, Supplier<String> userAgent, Net net) {
+        this.cookies = cookies;
+        this.userAgent = new UserAgent(userAgent);
         this.app = app;
         this.obj = obj;
-        this.api = api;
+        this.net = net;
     }
 
     @Override
     public void init(Context context, String extend) {
-        PyObject dependence = app.callAttr("getDependence", obj);
-        if (dependence != null) for (PyObject item : dependence.asList()) download(item + ".py");
-        obj.put("siteKey", siteKey);
-        app.callAttr("init", obj, extend);
+        if (net == null) net = new Net(cookies, siteKey);
+        local = new Local(siteKey);
+        try {
+            obj.put("siteKey", siteKey);
+            app.callAttr("bindNet", obj, net, userAgent, local);
+            app.callAttr("init", obj, extend);
+        } catch (RuntimeException | Error e) {
+            releaseSpider(e);
+            throw e;
+        }
+    }
+
+    private void releaseSpider(Throwable failure) {
+        try {
+            net.close();
+        } catch (RuntimeException | Error error) {
+            if (error != failure) failure.addSuppressed(error);
+        }
+        try {
+            app.callAttr("release", obj);
+        } catch (RuntimeException | Error error) {
+            if (error != failure) failure.addSuppressed(error);
+        }
     }
 
     @Override
@@ -47,12 +84,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) {
-        return app.callAttr("categoryContent", obj, tid, pg, filter, gson.toJson(extend)).toString();
+        return app.callAttr("categoryContent", obj, tid, pg, filter, GSON.toJson(extend)).toString();
     }
 
     @Override
     public String detailContent(List<String> ids) {
-        return app.callAttr("detailContent", obj, gson.toJson(ids)).toString();
+        return app.callAttr("detailContent", obj, GSON.toJson(ids)).toString();
     }
 
     @Override
@@ -67,7 +104,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) {
-        return app.callAttr("playerContent", obj, flag, id, gson.toJson(vipFlags)).toString();
+        return app.callAttr("playerContent", obj, flag, id, GSON.toJson(vipFlags)).toString();
     }
 
     @Override
@@ -87,15 +124,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public Object[] proxy(Map<String, String> params) throws Exception {
-        List<PyObject> list = app.callAttr("localProxy", obj, gson.toJson(params)).asList();
+        List<PyObject> list = app.callAttr("localProxy", obj, GSON.toJson(params)).asList();
         boolean base64 = list.size() > 4 && list.get(4).toInt() == 1;
         boolean header = list.size() > 3 && list.get(3) != null;
-        Object[] result = new Object[4];
-        result[0] = list.get(0).toInt();
-        result[1] = list.get(1).toString();
-        result[2] = getStream(list.get(2), base64);
-        result[3] = header ? getHeader(list.get(3)) : null;
-        return result;
+        return new Object[]{list.get(0).toInt(), list.get(1).toString(), getStream(list.get(2), base64), header ? getHeader(list.get(3)) : null};
     }
 
     @Override
@@ -105,9 +137,25 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public void destroy() {
+        Throwable failure = null;
+        try {
+            if (net != null) net.close();
+        } catch (RuntimeException | Error error) {
+            failure = error;
+        }
+        destroyPython(failure);
+        if (failure instanceof RuntimeException error) throw error;
+        if (failure instanceof Error error) throw error;
+    }
+
+    private void destroyPython(Throwable failure) {
         try {
             app.callAttr("destroy", obj);
-        } catch (Exception ignored) {
+        } catch (Exception error) {
+            if (failure != null && failure != error) failure.addSuppressed(error);
+        } catch (Error error) {
+            if (failure == null) throw error;
+            if (failure != error) failure.addSuppressed(error);
         }
     }
 
@@ -129,9 +177,17 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return new ByteArrayInputStream(base64 ? Util.decode(content) : content.getBytes());
     }
 
-    private void download(String name) {
-        String path = Path.py(name).getAbsolutePath();
-        String url = UriUtil.resolve(api, name);
-        app.callAttr("download", path, url);
+    public static final class UserAgent {
+
+        private final Supplier<String> supplier;
+
+        private UserAgent(Supplier<String> supplier) {
+            this.supplier = supplier;
+        }
+
+        @Keep
+        public String getUserAgent() {
+            return supplier == null ? "" : supplier.get();
+        }
     }
 }

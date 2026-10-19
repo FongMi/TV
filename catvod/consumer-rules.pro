@@ -1,0 +1,6 @@
+-keep class com.github.catvod.** { *; }
+-keep class com.fongmi.quickjs.host.Host { *; }
+-keep class com.google.gson.** { *; }
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-keep class * extends com.github.catvod.crawler.Spider
