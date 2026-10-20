@@ -86,6 +86,10 @@ public class Device implements Diffable<Device>, Comparable<Device> {
         AppDatabase.get().getDeviceDao().delete();
     }
 
+    public static void replaceAppDevices(List<Device> devices) {
+        AppDatabase.get().getDeviceDao().replaceAppDevices(devices);
+    }
+
     public Integer getId() {
         return id;
     }

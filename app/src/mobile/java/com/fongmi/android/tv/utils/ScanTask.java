@@ -23,27 +23,31 @@ public class ScanTask {
     private static final Dispatcher dispatcher = new Dispatcher();
 
     private final List<Call> calls;
+    private final List<Device> devices;
     private final OkHttpClient client;
     private final Listener listener;
+    private boolean replaceCache;
     private int generation;
     private int remaining;
 
     public ScanTask(Listener listener) {
         this.client = OkHttp.client(1000).newBuilder().dispatcher(dispatcher).build();
         this.calls = new ArrayList<>();
+        this.devices = new ArrayList<>();
         this.listener = listener;
     }
 
     public void start() {
-        start(getUrl(Server.get().getAddress()));
+        start(getUrl(Server.get().getAddress()), true);
     }
 
     public void start(String url) {
-        start(List.of(RemoteDeviceUrl.origin(url)));
+        start(List.of(RemoteDeviceUrl.origin(url)), false);
     }
 
-    private synchronized void start(List<String> urls) {
+    private synchronized void start(List<String> urls, boolean replaceCache) {
         stop();
+        this.replaceCache = replaceCache && !urls.isEmpty();
         int id = generation;
         remaining = urls.size();
         App.post(() -> notifyStart(id));
@@ -63,6 +67,7 @@ public class ScanTask {
         remaining = 0;
         calls.forEach(Call::cancel);
         calls.clear();
+        devices.clear();
     }
 
     private List<String> getUrl(String local) {
@@ -104,7 +109,10 @@ public class ScanTask {
     }
 
     private synchronized void publish(Device device, int id) {
-        if (generation == id) listener.onFind(device.save());
+        if (generation != id) return;
+        devices.removeIf(item -> item.isSameItem(device));
+        devices.add(device);
+        listener.onFind(replaceCache ? device : device.save());
     }
 
     private synchronized void notifyStart(int id) {
@@ -118,7 +126,9 @@ public class ScanTask {
     }
 
     private synchronized void notifyComplete(int id) {
-        if (generation == id) listener.onScanFinished();
+        if (generation != id) return;
+        if (replaceCache) Device.replaceAppDevices(devices);
+        listener.onScanFinished();
     }
 
     public interface Listener {
