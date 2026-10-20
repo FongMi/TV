@@ -93,38 +93,27 @@ function logPlayerSummary(snapshot) {
     return parts.join('; ') || 'recorded without player details';
 }
 
-function logReportFences(lines) {
-    const lengths = new Array(lines.length + 1).fill(3);
-    for (let i = lines.length - 1; i >= 0; i--) {
-        lengths[i] = lengths[i + 1];
-        for (const match of lines[i].text.matchAll(/^ {0,3}(`{3,})/gm)) lengths[i] = Math.max(lengths[i], match[1].length + 1);
-    }
-    return lengths;
-}
-
 function logReportRetention(lineCount, missing) {
-    return '- Log entries: ' + lineCount + '\n- Earlier entries missing: ' + missing + '\n\n';
+    return 'Log entries: ' + lineCount + '\nEarlier entries missing: ' + missing + '\n\n';
 }
 
 function logReportText(buffer, info, gap, capturedAt) {
-    let header = '# TV Playback Log Report\n\n';
-    header += '- Format version: 1\n- Exported: ' + new Date().toISOString() + '\n- Status received: ' + capturedAt + '\n\n';
-    header += '## Summary\n\n- Current player: ' + logPlayerSummary(info.playbackLog) + '\n';
-    header += '- Last error snapshot: ' + (info.lastPlaybackError === null ? 'none retained in this app process' : logPlayerSummary(info.lastPlaybackError)) + '\n\n';
-    header += '## Report Data\n\n```json\n' + logReportInfo(info) + '\n```\n\n## Raw Logcat\n\n';
+    let header = 'TV Playback Log Report\n\n';
+    header += 'Format version: 1\nExported: ' + new Date().toISOString() + '\nStatus received: ' + capturedAt + '\n\n';
+    header += 'Summary\n\nCurrent player: ' + logPlayerSummary(info.playbackLog) + '\n';
+    header += 'Last error snapshot: ' + (info.lastPlaybackError === null ? 'none retained in this app process' : logPlayerSummary(info.lastPlaybackError)) + '\n\n';
+    header += 'Report Data\n\n' + logReportInfo(info) + '\n\nRaw Logcat\n\n';
     const lines = buffer.lines;
-    const fences = logReportFences(lines);
     let start = 0;
     let bytes = buffer.bytes;
-    const fixedBytes = logEncoder.encode(header + 'text\n\n').length;
+    const fixedBytes = logEncoder.encode(header).length;
     let retention = logReportRetention(lines.length, gap || buffer.trimmed);
-    while (bytes + fixedBytes + logEncoder.encode(retention).length + fences[start] * 2 > LOG_MAX_BYTES) {
+    while (bytes + fixedBytes + logEncoder.encode(retention).length > LOG_MAX_BYTES) {
         if (start === lines.length) throw new Error('Log info too large');
         bytes -= lines[start++].bytes;
         retention = logReportRetention(lines.length - start, true);
     }
-    const fence = '`'.repeat(fences[start]);
-    return header + retention + fence + 'text\n' + lines.slice(start).map(line => line.text + '\n').join('') + fence + '\n';
+    return header + retention + lines.slice(start).map(line => line.text + '\n').join('');
 }
 
 function downloadLog(blob, filename) {
@@ -449,8 +438,8 @@ function initLogs() {
         download.disabled = share.disabled = true;
         exportStatus.hidden = true;
         try {
-            const blob = new Blob([logReportText(reader.buffer, info, reader.gap, capturedAt)], { type: 'text/markdown;charset=utf-8' });
-            const filename = 'tv-log-' + new Date().toISOString().replace(/[:.]/g, '-') + '.md';
+            const blob = new Blob([logReportText(reader.buffer, info, reader.gap, capturedAt)], { type: 'text/plain;charset=utf-8' });
+            const filename = 'tv-log-' + new Date().toISOString().replace(/[:.]/g, '-') + '.txt';
             let status = 'logReportDownloaded';
             if (shareFile) status = await shareLogReport(blob, filename);
             else downloadLog(blob, filename);

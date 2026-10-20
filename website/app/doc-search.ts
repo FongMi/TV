@@ -219,10 +219,10 @@ const entries: Entry[] = [
   },
   {
     title: "日誌下載與分享",
-    description: "下載或分享日誌，含裝置資訊與完整播放網址",
+    description: "下載或分享 .txt 純文字日誌，含裝置資訊、播放摘要與完整播放網址",
     href: "/local#logs",
     names: ["/logs.html", "/log/info", "playback.url", "collection", "playbackLog", "lastPlaybackError", "下載日誌", "分享日誌", "日誌資訊 API", "取得日誌資訊", "重新讀取資訊"],
-    keywords: "應用日誌 logcat 日誌資訊 日誌文字檔 512 KiB query 參數 匯出時間 狀態取樣時間 日誌筆數 缺漏 裝置命名 別名 循環播放",
+    keywords: "應用日誌 logcat 日誌資訊 日誌文字檔 txt 純文字 UTF-8 診斷資料 原始日誌 512 KiB query 參數 匯出時間 狀態取樣時間 日誌筆數 缺漏 裝置命名 別名 循環播放",
   },
   {
     title: "播放狀態 /media",
