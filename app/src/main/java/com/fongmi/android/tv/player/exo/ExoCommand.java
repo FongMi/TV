@@ -45,6 +45,11 @@ public final class ExoCommand {
                 playerView.setVideoTransform(new VideoTransform(horizontal ? scale : current.scaleX,
                         horizontal ? current.scaleY : scale, current.panX, current.panY));
             }
+            case "video-aspect-override" -> {
+                if (playerView == null || playerView.getPlayer() != player || playerView.getVideoSurfaceView() == null) return Result.UNAVAILABLE;
+                float aspectRatio = (float) propertyValue(parsed, playerView.getVideoAspectRatioOverride());
+                playerView.setVideoAspectRatioOverride(aspectRatio);
+            }
             case "seek" -> {
                 if (!player.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM) || !player.isCurrentMediaItemSeekable()) return Result.UNAVAILABLE;
                 long targetMs = seekPosition(parsed, player.getCurrentPosition(), player.getDuration());
@@ -167,7 +172,7 @@ public final class ExoCommand {
 
     private static boolean sameValue(String property, double current, double value) {
         return switch (property) {
-            case "speed", "video-scale-x", "video-scale-y" -> (float) current == (float) value;
+            case "speed", "video-scale-x", "video-scale-y", "video-aspect-override" -> (float) current == (float) value;
             case "volume" -> (float) (current / 100) == (float) (value / 100);
             case "sub-delay", "audio-delay" -> Math.round(current * 1000) == Math.round(value * 1000);
             default -> current == value;
@@ -229,6 +234,7 @@ public final class ExoCommand {
             return null;
         }
         if (property.equals("chapter")) return parseChapterIndex(text);
+        if (property.equals("video-aspect-override")) return parseVideoAspectRatio(text);
         if (!isVideoScale(property) && !property.equals("speed") && !property.equals("volume") && !property.equals("sub-delay") && !property.equals("audio-delay")) return null;
         Parsed parsed = parseNumeric(property, "set", text);
         if (parsed == null) return null;
@@ -238,6 +244,22 @@ public final class ExoCommand {
         if (property.equals("volume") && (value < 0 || value > 100)) return null;
         if ((property.equals("sub-delay") || property.equals("audio-delay")) && !isMillis(value * 1000)) return null;
         return parsed;
+    }
+
+    private static Parsed parseVideoAspectRatio(String text) {
+        String property = "video-aspect-override";
+        if (text.equals("no")) return new Parsed(property, "set", 0);
+        String[] parts = text.split(":", -1);
+        if (parts.length > 2) return null;
+        Parsed numerator = parseNumeric(property, "set", parts[0]);
+        if (numerator == null || numerator.number <= 0) return null;
+        double value = numerator.number;
+        if (parts.length == 2) {
+            Parsed denominator = parseNumeric(property, "set", parts[1]);
+            if (denominator == null || denominator.number <= 0) return null;
+            value /= denominator.number;
+        }
+        return Float.isFinite((float) value) && (float) value > 0 ? new Parsed(property, "set", value) : null;
     }
 
     private static Parsed parseNumeric(String property, String mode, String numericText) {

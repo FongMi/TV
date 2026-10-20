@@ -536,7 +536,7 @@
     <string name="exo_command">Playback command (e.g. seek +90)</string>
     <string name="exo_command_error">Command operation failed</string>
     <string name="exo_command_unavailable">Command unavailable for this playback.</string>
-    <string name="exo_command_unsupported">Unsupported Exo command. Available: seek, pause, speed, volume, sub-delay, audio-delay, loop-file, chapter, video-scale-x, video-scale-y.</string>
+    <string name="exo_command_unsupported">Unsupported Exo command. Available: seek, pause, speed, volume, sub-delay, audio-delay, loop-file, chapter, video-scale-x, video-scale-y, video-aspect-override.</string>
     <string name="mpv_script_tab_buttons">Buttons</string>
     <string name="mpv_script_tab_automatic">Startup</string>
     <string name="mpv_script_add">Add</string>

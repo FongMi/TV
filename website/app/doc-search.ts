@@ -277,7 +277,7 @@ const entries: Entry[] = [
   },
   {
     title: "cycle-values 輪流切換",
-    description: "倍速、音量、延遲、循環與縮放的順序及反向切換",
+    description: "倍速、音量、延遲、循環、縮放與影片比例的順序及反向切換",
     href: "/commands#cycle-values",
     names: ["cycle-values", "!reverse"],
     keywords: "set add cycle pause 輪切 回繞 下一個 數值",

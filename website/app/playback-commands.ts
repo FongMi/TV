@@ -62,6 +62,12 @@ export const playbackProperties = [
     values: "0 < 倍率 ≤ 10000；1 取消縮放",
     description: "高度倍率；1.15 增高 15%。",
   },
+  {
+    name: "video-aspect-override",
+    modes: ["set", "cycle-values"],
+    values: "no、正數小數或寬:高，例如 16:9、4:3、2.35:1",
+    description: "覆寫影片比例；no 恢復來源比例，保留額外縮放與平移。填充模式仍拉伸至播放區域。不接受 0、-1 或超出 float 範圍的比例。",
+  },
 ] as const;
 
 export const playbackExamples = [
@@ -74,6 +80,7 @@ export const playbackExamples = [
   ["切換單片循環", "cycle-values loop-file no inf"],
   ["下一章", "add chapter 1"],
   ["切換影片高度", "cycle-values video-scale-y 1 1.15 1.3"],
+  ["切換影片比例", "cycle-values video-aspect-override no 16:9 4:3 2.35:1"],
 ] as const;
 
 export const seekExamples = [

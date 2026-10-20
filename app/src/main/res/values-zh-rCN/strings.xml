@@ -525,7 +525,7 @@
     <string name="exo_command">播放指令（例如 seek +90）</string>
     <string name="exo_command_error">指令操作失败</string>
     <string name="exo_command_unavailable">当前播放无法执行此指令。</string>
-    <string name="exo_command_unsupported">Exo 不支持此指令。可用 seek、pause、speed、volume、sub-delay、audio-delay、loop-file、chapter、video-scale-x、video-scale-y。</string>
+    <string name="exo_command_unsupported">Exo 不支持此指令。可用 seek、pause、speed、volume、sub-delay、audio-delay、loop-file、chapter、video-scale-x、video-scale-y、video-aspect-override。</string>
     <string name="mpv_script_tab_buttons">按钮</string>
     <string name="mpv_script_tab_automatic">自动加载</string>
     <string name="mpv_script_add">新增</string>
