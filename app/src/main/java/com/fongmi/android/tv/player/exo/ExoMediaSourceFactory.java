@@ -17,6 +17,7 @@ import androidx.media3.datasource.okhttp.OkHttpDataSource;
 import androidx.media3.exoplayer.drm.DrmSessionManagerProvider;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.source.ConcatenatingMediaSource2;
+import androidx.media3.exoplayer.source.ContentTypeResolvingMediaSource;
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import androidx.media3.exoplayer.source.MediaSource;
 import androidx.media3.exoplayer.source.preload.MediaSourceFactorySupplier;
@@ -145,7 +146,7 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
         return builder.build();
     }
 
-    private DefaultMediaSourceFactory createMediaSourceFactory(MediaItem mediaItem) {
+    private MediaSource.Factory createMediaSourceFactory(MediaItem mediaItem) {
         SubtitleTranscript transcript = subtitleTranscriptSession.forMediaItem(mediaItem);
         ExtractorsFactory extractorsFactory = createDefaultExtractorsFactory().setMp4ClearKeys(
                 LocalClearKeyLicense.parse(mediaItem.localConfiguration.drmConfiguration));
@@ -156,7 +157,8 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
             subtitleParserFactory = components.subtitleParserFactory;
         } else subtitleParserFactory = new SubtitleTranscriptParserFactory(transcript);
         DataSource.Factory dataSourceFactory = createDataSourceFactory(ExoUtil.extractHeaders(mediaItem), ExoUtil.extractAuth(mediaItem));
-        return new DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory).setSubtitleParserFactory(subtitleParserFactory);
+        MediaSource.Factory factory = new DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory).setSubtitleParserFactory(subtitleParserFactory);
+        return new ContentTypeResolvingMediaSource.Factory(factory, dataSourceFactory);
     }
 
     static DefaultExtractorsFactory createDefaultExtractorsFactory() {
