@@ -26,18 +26,6 @@
             tools:text="慶餘年第一季：第一集" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/size"
-            style="@style/Shadow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
-            android:layout_alignStart="@+id/title"
-            android:layout_marginBottom="16dp"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            tools:text="1920 x 1080" />
-
-        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/clock"
             style="@style/Shadow"
             android:layout_width="wrap_content"

@@ -13,7 +13,6 @@ import android.view.View;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
 import androidx.media3.common.Player;
-import androidx.media3.common.VideoSize;
 import androidx.media3.ui.PlayerSeekView;
 import androidx.media3.ui.PlayerView;
 import androidx.viewbinding.ViewBinding;
@@ -410,11 +409,6 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
         mBinding.widget.title.setText(getName());
         mBinding.widget.title.setSelected(true);
         startMedia();
-    }
-
-    @Override
-    protected void onSizeChanged(VideoSize size) {
-        mBinding.widget.size.setText(player().getSizeText());
     }
 
     @Override
