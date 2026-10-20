@@ -19,6 +19,7 @@ import com.fongmi.android.tv.setting.LiveSetting;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.bean.Header;
 import com.github.catvod.bean.Proxy;
+import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.Decoder;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.UriUtil;
@@ -122,9 +123,10 @@ public class LiveConfig extends BaseConfig {
 
     @Override
     protected void load(Config config) throws Throwable {
-        String json = Decoder.getJson(UrlUtil.convert(config.getUrl()), TAG);
+        Decoder.Content content = Decoder.load(UrlUtil.convert(config.getUrl()), TAG, Auth.Context.NONE);
+        String json = content.text();
         if (Json.isObj(json)) checkJson(config, Json.parse(json).getAsJsonObject());
-        else parseText(config, json);
+        else parseText(config, content);
     }
 
     @Override
@@ -149,10 +151,11 @@ public class LiveConfig extends BaseConfig {
         load(new Callback());
     }
 
-    private void parseText(Config config, String text) {
+    private void parseText(Config config, Decoder.Content content) {
         Live live = new Live(UriUtil.getName(config.getUrl()), config.getUrl()).sync();
+        live.setAuth(content.successful() ? Auth.capture(config.getUrl(), Map.of(), content.url(), content.authorization()) : null);
         lives = new ArrayList<>(List.of(live));
-        LiveParser.text(live, text);
+        LiveParser.text(live, content.text());
         setHome(config, live, false);
     }
 

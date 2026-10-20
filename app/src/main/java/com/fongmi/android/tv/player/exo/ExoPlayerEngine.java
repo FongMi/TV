@@ -210,7 +210,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
         clearPreloadQueue();
         MediaItem item = MediaItemFactory.from(this.spec);
         MediaSource source = navigation.prepareMediaSource(App.get(),
-                session.createMediaSource(item), ExoMediaSourceFactory.createDataSourceFactory(this.spec.getHeaders()));
+                session.createMediaSource(item), ExoMediaSourceFactory.createDataSourceFactory(this.spec.getHeaders(), this.spec.getAuth()));
         if (source == null) return false;
         endingSource = IsoDiscPreparation.isIso(item) ? null : new EndTrimMediaSource(source, this.spec.getEnding());
         if (endingSource != null) source = endingSource;

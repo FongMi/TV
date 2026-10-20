@@ -12,6 +12,7 @@ import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.setting.Setting;
+import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.UriUtil;
 import com.google.common.net.HttpHeaders;
 
@@ -31,6 +32,7 @@ public class PlaySpec {
     private String key;
     private String url;
     private Drm drm;
+    private Auth.Context auth;
     private long endingMs;
     private int isoEditionIndex = C.INDEX_UNSET;
 
@@ -57,11 +59,15 @@ public class PlaySpec {
     }
 
     public static PlaySpec from(Result result, String key, MediaMetadata metadata) {
-        return new PlaySpec(key, result.getRealUrl(), result.getHeader(), result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
+        PlaySpec spec = new PlaySpec(key, result.getRealUrl(), result.getHeader(), result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
+        spec.auth = result.getAuth();
+        return spec;
     }
 
     public static PlaySpec fromParse(Result result, String key, MediaMetadata metadata) {
-        return new PlaySpec(key, null, null, result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
+        PlaySpec spec = new PlaySpec(key, null, null, result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
+        spec.auth = result.getAuth();
+        return spec;
     }
 
     public String getKey() {
@@ -90,7 +96,11 @@ public class PlaySpec {
     }
 
     public Uri getUri() {
-        return UriUtil.uri(url);
+        return UriUtil.uri(auth == null ? url : auth.getUrl(url, headers == null ? Map.of() : headers));
+    }
+
+    public Auth.Context getAuth() {
+        return auth;
     }
 
     public int getIsoEditionIndex() {
@@ -102,7 +112,12 @@ public class PlaySpec {
     }
 
     public Map<String, String> getHeaders() {
-        return headers;
+        if (auth == null) return headers;
+        Map<String, String> additions = auth.getHeaders(url, headers == null ? Map.of() : headers);
+        if (additions.isEmpty()) return headers;
+        Map<String, String> prepared = headers == null ? new HashMap<>() : new HashMap<>(headers);
+        prepared.putAll(additions);
+        return prepared;
     }
 
     public void setHeaders(Map<String, String> headers) {

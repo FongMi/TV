@@ -44,19 +44,26 @@ public class LiveApi {
 
     @NonNull
     public static Result getUrl(@NonNull Channel item) throws Exception {
-        Source.get().stop();
-        Result result = item.result();
-        result.setUrl(Source.get().fetch(result));
+        Result result = resolveUrl(item);
+        item.applyAuth(result);
         return result;
     }
 
     @NonNull
     public static Result getUrl(@NonNull Channel item, @NonNull EpgData data) throws Exception {
-        Result result = getUrl(item);
+        Result result = resolveUrl(item);
         if (Source.isPush(result.getUrl().v())) return result;
         result.setUrl(item.getCatchup().format(result.getRealUrl(), data));
         BaseLoader.get().requireProxy(result.getRealUrl());
         if (item.isRtsp()) result.getHeader().put("rtsp_range", data.getRange());
+        item.applyAuth(result);
+        return result;
+    }
+
+    private static Result resolveUrl(Channel item) throws Exception {
+        Source.get().stop();
+        Result result = item.result();
+        result.setUrl(Source.get().fetch(result));
         return result;
     }
 

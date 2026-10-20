@@ -3,6 +3,7 @@ package com.github.catvod.utils;
 import android.util.Base64;
 
 import com.github.catvod.net.OkHttp;
+import com.google.common.net.HttpHeaders;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
@@ -10,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import okhttp3.HttpUrl;
+import okhttp3.Request;
 import okhttp3.Response;
 
 public class Decoder {
@@ -18,12 +20,26 @@ public class Decoder {
     private static final Pattern BASE64_PREFIX = Pattern.compile("[A-Za-z0-9]{8}\\*\\*");
 
     public static String getJson(String url, String tag) throws Exception {
-        try (Response res = OkHttp.newCall(url, tag).execute()) {
+        return load(url, tag).text();
+    }
+
+    public static Content load(String url, String tag) throws Exception {
+        return load(url, tag, null);
+    }
+
+    public static Content load(String url, String tag, Auth.Context auth) throws Exception {
+        Request request = new Request.Builder().url(url).tag(tag).tag(Auth.Context.class, auth).build();
+        try (Response res = OkHttp.client().newCall(request).execute()) {
             HttpUrl httpUrl = res.request().url();
             int size = HttpUrl.parse(url).querySize();
             if (httpUrl.querySize() == size) url = httpUrl.toString();
-            return verify(url, res.body().string());
+            String text = verify(url, res.body().string());
+            String authorization = res.isSuccessful() ? res.request().header(HttpHeaders.AUTHORIZATION) : null;
+            return new Content(text, httpUrl.toString(), authorization, res.isSuccessful());
         }
+    }
+
+    public record Content(String text, String url, String authorization, boolean successful) {
     }
 
     private static String verify(String url, String data) throws Exception {

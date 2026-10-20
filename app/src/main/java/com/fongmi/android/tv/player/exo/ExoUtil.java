@@ -34,6 +34,7 @@ import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
+import com.github.catvod.utils.Auth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,6 +65,10 @@ public final class ExoUtil {
         Bundle extras = item.requestMetadata.extras;
         if (extras == null) return new HashMap<>();
         return extras.keySet().stream().filter(key -> extras.getString(key) != null).collect(Collectors.toMap(key -> key, extras::getString));
+    }
+
+    public static Auth.Context extractAuth(MediaItem item) {
+        return item.localConfiguration != null && item.localConfiguration.tag instanceof Auth.Context auth ? auth : null;
     }
 
     static DecodeTrackSelector buildTrackSelector(DecoderManager decoderManager) {

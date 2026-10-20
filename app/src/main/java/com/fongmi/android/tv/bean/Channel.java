@@ -12,6 +12,7 @@ import com.fongmi.android.tv.gson.HeaderAdapter;
 import com.fongmi.android.tv.utils.Formatters;
 import com.fongmi.android.tv.utils.ImgUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.Trans;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonElement;
@@ -71,6 +72,7 @@ public class Channel {
     private int index;
     private List<Epg> dataList;
     private transient boolean epgFromLive;
+    private transient Auth.Context auth;
 
     public Channel() {
     }
@@ -372,6 +374,7 @@ public class Channel {
     }
 
     public void live(Live live) {
+        auth = live.getAuth();
         if (!live.getUa().isEmpty() && getUa().isEmpty()) setUa(live.getUa());
         if (!live.getClick().isEmpty() && getClick().isEmpty()) setClick(live.getClick());
         if (!live.getHeader().isEmpty() && getHeader().isEmpty()) setHeader(live.getHeader());
@@ -412,8 +415,14 @@ public class Channel {
         setDrm(item.getDrm());
         epg = item.getEpg();
         epgFromLive = item.epgFromLive;
+        auth = item.auth;
         setUa(item.getUa());
         return this;
+    }
+
+    public void applyAuth(Result result) {
+        result.setAuth(auth == null ? Auth.Context.NONE : auth);
+        result.addHeaders(result.getAuth().getHeaders(result.getRealUrl(), result.getHeader()));
     }
 
     public Result result() {

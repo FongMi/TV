@@ -66,6 +66,7 @@ public final class MediaItemFactory {
         Uri uri = spec.getUri();
         if (spec.getIsoEditionIndex() != C.INDEX_UNSET) uri = IsoUri.withEditionIndex(uri, spec.getIsoEditionIndex());
         return new MediaItem.Builder().setUri(uri)
+                .setTag(spec.getAuth())
                 .setSubtitleConfigurations(buildSubtitleConfigs(spec.getSubs()))
                 .setDrmConfiguration(buildDrmConfig(spec.getDrm()))
                 .setRequestMetadata(buildRequestMetadata(spec))

@@ -34,6 +34,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.media.ConcatenatingUrl;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.UriUtil;
 
@@ -79,15 +80,19 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
         };
     }
 
-    static DataSource.Factory createUpstreamDataSourceFactory(Map<String, String> headers) {
-        HttpDataSource.Factory factory = new OkHttpDataSource.Factory(OkHttp.player());
+    static DataSource.Factory createUpstreamDataSourceFactory(Map<String, String> headers, Auth.Context auth) {
+        HttpDataSource.Factory factory = new OkHttpDataSource.Factory(OkHttp.player(auth));
         factory.setDefaultRequestProperties(headers == null ? Map.of() : headers);
         return new DefaultDataSource.Factory(App.get(), factory);
     }
 
     public static DataSource.Factory createDataSourceFactory(Map<String, String> headers) {
+        return createDataSourceFactory(headers, null);
+    }
+
+    public static DataSource.Factory createDataSourceFactory(Map<String, String> headers, Auth.Context auth) {
         Cache sharedCache = getCache();
-        CacheDataSource.Factory factory = new CacheDataSource.Factory().setCache(sharedCache).setUpstreamDataSourceFactory(createUpstreamDataSourceFactory(headers)).setCacheWriteDataSinkFactory(null).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
+        CacheDataSource.Factory factory = new CacheDataSource.Factory().setCache(sharedCache).setUpstreamDataSourceFactory(createUpstreamDataSourceFactory(headers, auth)).setCacheWriteDataSinkFactory(null).setFlags(CacheDataSource.FLAG_IGNORE_CACHE_ON_ERROR);
         return ProgressiveIsoCache.withDiskCache(factory, sharedCache);
     }
 
@@ -150,7 +155,7 @@ public class ExoMediaSourceFactory implements MediaSource.Factory {
             extractorsFactory = components.extractorsFactory;
             subtitleParserFactory = components.subtitleParserFactory;
         } else subtitleParserFactory = new SubtitleTranscriptParserFactory(transcript);
-        DataSource.Factory dataSourceFactory = createDataSourceFactory(ExoUtil.extractHeaders(mediaItem));
+        DataSource.Factory dataSourceFactory = createDataSourceFactory(ExoUtil.extractHeaders(mediaItem), ExoUtil.extractAuth(mediaItem));
         return new DefaultMediaSourceFactory(dataSourceFactory, extractorsFactory).setSubtitleParserFactory(subtitleParserFactory);
     }
 

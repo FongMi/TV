@@ -7,6 +7,7 @@ import androidx.media3.exoplayer.source.preload.DiskPreloadManager;
 
 import com.fongmi.android.tv.player.media.ConcatenatingUrl;
 import com.fongmi.android.tv.setting.PreloadSetting;
+import com.github.catvod.utils.Auth;
 
 import java.util.Map;
 
@@ -15,6 +16,7 @@ public class ExoDiskPreload {
     private final PriorityTaskManager priorityTaskManager;
     private DiskPreloadManager manager;
     private Map<String, String> headers;
+    private Auth.Context auth;
     private ExoPlayer player;
 
     public ExoDiskPreload() {
@@ -28,10 +30,12 @@ public class ExoDiskPreload {
             return;
         }
         Map<String, String> headers = ExoUtil.extractHeaders(mediaItem);
-        if (manager == null || !headers.equals(this.headers)) {
+        Auth.Context auth = ExoUtil.extractAuth(mediaItem);
+        if (manager == null || !headers.equals(this.headers) || auth != this.auth) {
             releaseManager();
-            manager = createManager(headers);
+            manager = createManager(headers, auth);
             this.headers = headers;
+            this.auth = auth;
         }
         this.player = player;
         player.setPriorityTaskManager(priorityTaskManager);
@@ -54,10 +58,11 @@ public class ExoDiskPreload {
         manager.release();
         manager = null;
         headers = null;
+        auth = null;
     }
 
-    private DiskPreloadManager createManager(Map<String, String> headers) {
-        return new DiskPreloadManager.Builder(ExoMediaSourceFactory.getCache(), ExoMediaSourceFactory.createUpstreamDataSourceFactory(headers), ExoUtil.buildRenderersFactory()).setPriorityTaskManager(priorityTaskManager).build();
+    private DiskPreloadManager createManager(Map<String, String> headers, Auth.Context auth) {
+        return new DiskPreloadManager.Builder(ExoMediaSourceFactory.getCache(), ExoMediaSourceFactory.createUpstreamDataSourceFactory(headers, auth), ExoUtil.buildRenderersFactory()).setPriorityTaskManager(priorityTaskManager).build();
     }
 
     private DiskPreloadManager.Options createOptions() {

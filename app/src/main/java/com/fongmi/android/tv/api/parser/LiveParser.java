@@ -12,7 +12,9 @@ import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.Json;
+import com.google.common.net.HttpHeaders;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -57,16 +59,18 @@ public class LiveParser {
     }
 
     private static String getText(Live live) throws Exception {
+        live.setAuth(null);
         if (!live.getApi().isEmpty()) return live.spider().liveContent(live.getUrl());
         BaseLoader.get().requireProxy(live.getUrl());
-        if (live.getUrl().startsWith("proxy://")) {
-            try (Response response = OkHttp.newCall(UrlUtil.convert(live.getUrl()), live.getHeaders()).execute()) {
-                String text = response.body().string();
-                if (!response.isSuccessful()) throw new ExtractException(text);
-                return text;
-            }
+        String url = UrlUtil.convert(live.getUrl());
+        if (!url.startsWith("http")) return "";
+        Map<String, String> headers = live.getHeaders();
+        try (Response response = OkHttp.newCall(url, headers, Auth.Context.NONE).execute()) {
+            String text = response.body().string();
+            if (live.getUrl().startsWith("proxy://") && !response.isSuccessful()) throw new ExtractException(text);
+            if (response.isSuccessful()) live.setAuth(Auth.capture(live.getUrl(), headers, response.request().url().toString(), response.request().header(HttpHeaders.AUTHORIZATION)));
+            return text;
         }
-        return OkHttp.string(UrlUtil.convert(live.getUrl()), live.getHeaders());
     }
 
     public static void text(Live live, String text) {

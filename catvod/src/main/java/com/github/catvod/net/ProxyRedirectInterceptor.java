@@ -2,6 +2,8 @@ package com.github.catvod.net;
 
 import androidx.annotation.NonNull;
 
+import com.github.catvod.utils.Auth;
+
 import java.io.IOException;
 import java.net.ProtocolException;
 
@@ -84,7 +86,9 @@ final class ProxyRedirectInterceptor implements Interceptor {
         Request.Builder builder = response.request().newBuilder();
         redirectMethod(builder, response.request(), response.code());
         if (!sameOrigin(response.request().url(), target)) builder.removeHeader("Authorization");
-        return builder.url(target).build();
+        Request redirected = builder.url(target).build();
+        Auth.Context auth = redirected.tag(Auth.Context.class);
+        return auth == null ? redirected : OkHttp.applyAuth(redirected, auth);
     }
 
     private HttpUrl redirectUrl(Response response, boolean followSslRedirects) {
