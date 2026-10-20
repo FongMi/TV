@@ -8,6 +8,7 @@ public final class PinchScale {
     private static final float EDGE_ELASTIC_SCALE = 0.12f;
     private static final float MIN_ELASTIC_SCALE = 0.12f;
     private static final float MAX_ELASTIC_SCALE = 0.20f;
+    private static final float MIN_SCALE = 0.5f;
     private static final float MAX_AXIS_SCALE = 2.0f;
     private static final float MAX_UNIFORM_SCALE = 5.0f;
 
@@ -57,9 +58,13 @@ public final class PinchScale {
         rawFactor *= factor;
         float minBase = current == Axis.HORIZONTAL ? baseScaleX : current == Axis.VERTICAL ? baseScaleY : Math.min(baseScaleX, baseScaleY);
         float maxBase = current == Axis.HORIZONTAL ? baseScaleX : current == Axis.VERTICAL ? baseScaleY : Math.max(baseScaleX, baseScaleY);
-        float minFactor = Math.min(1.0f, minBase) / minBase;
+        float minScaleX = getMinScale(baseScaleX);
+        float minScaleY = getMinScale(baseScaleY);
+        float minFactor = current == Axis.HORIZONTAL ? minScaleX / baseScaleX : current == Axis.VERTICAL ? minScaleY / baseScaleY : Math.max(minScaleX / baseScaleX, minScaleY / baseScaleY);
         float maxScale = Math.max(current == Axis.BOTH ? MAX_UNIFORM_SCALE : MAX_AXIS_SCALE, maxBase);
-        float maxFactor = maxScale / maxBase;
+        float maxScaleX = getMaxScale(baseScaleX, maxScale);
+        float maxScaleY = getMaxScale(baseScaleY, maxScale);
+        float maxFactor = current == Axis.HORIZONTAL ? maxScaleX / baseScaleX : current == Axis.VERTICAL ? maxScaleY / baseScaleY : Math.min(maxScaleX / baseScaleX, maxScaleY / baseScaleY);
         float edgeFactorX = edgeScaleX / baseScaleX;
         float edgeFactorY = edgeScaleY / baseScaleY;
         float edgeFactor = current == Axis.HORIZONTAL ? edgeFactorX : current == Axis.VERTICAL ? edgeFactorY : Math.min(edgeFactorX, edgeFactorY);
@@ -69,14 +74,22 @@ public final class PinchScale {
         float committedFactor = Math.clamp(rawFactor, minFactor, limitFactor);
         float visualFactor = resist(rawFactor, minFactor, limitFactor, MIN_ELASTIC_SCALE / minBase, elasticDistance);
         if (current != Axis.VERTICAL) {
-            scaleX = Math.clamp(baseScaleX * committedFactor, Math.min(1.0f, baseScaleX), maxScale);
+            scaleX = Math.clamp(baseScaleX * committedFactor, minScaleX, maxScaleX);
             visualScaleX = baseScaleX * visualFactor;
         }
         if (current != Axis.HORIZONTAL) {
-            scaleY = Math.clamp(baseScaleY * committedFactor, Math.min(1.0f, baseScaleY), maxScale);
+            scaleY = Math.clamp(baseScaleY * committedFactor, minScaleY, maxScaleY);
             visualScaleY = baseScaleY * visualFactor;
         }
         return current;
+    }
+
+    private static float getMinScale(float baseScale) {
+        return baseScale > 1.0f ? 1.0f : Math.min(MIN_SCALE, baseScale);
+    }
+
+    private static float getMaxScale(float baseScale, float maxScale) {
+        return baseScale < 1.0f ? 1.0f : maxScale;
     }
 
     private void captureBaseline() {
