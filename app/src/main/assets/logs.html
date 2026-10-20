@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="css/ui.css">
     <link rel="stylesheet" href="css/logs.css">
     <script src="js/i18n.js" defer></script>
+    <script src="js/navigation.js" defer></script>
     <script src="js/choices.js" defer></script>
     <script src="js/logs.js" defer></script>
 </head>
@@ -21,7 +22,7 @@
                 <span class="page-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 3h16v18H4V3zm2 2v14h12V5H6zm2 3h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z"/></svg></span>
                 <h1 data-i18n="logTitle">應用日誌</h1>
             </div>
-            <a class="md-btn md-btn-outlined md-icon-button" href="/?tab=settings" data-i18n-label="logBack" aria-label="返回操作頁" title="返回操作頁"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></a>
+            <a id="log_return" class="md-btn md-btn-outlined md-icon-button" href="/?tab=settings" data-i18n-label="logBack" aria-label="返回操作頁" title="返回操作頁"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></a>
         </header>
         <section class="md-card logs-connection">
             <div class="logs-status">

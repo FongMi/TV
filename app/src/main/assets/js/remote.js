@@ -216,7 +216,7 @@ function initRemote() {
         }
         danmakuUrl.disabled = applying;
         const mediaStatus = document.getElementById('media_status');
-        const mediaMessage = control.error ? t('remoteOffline') : !state.active ? t('mediaPlaybackRequired') : state.live ? t('mediaVodOnly') : state.title;
+        const mediaMessage = control.error ? t('remoteOffline') : !state.active ? t('mediaPlaybackRequired') : state.live ? t('mediaVodOnly') : [state.title, state.subtitle].filter(Boolean).join(' · ');
         if (mediaStatus.textContent !== mediaMessage) mediaStatus.textContent = mediaMessage;
         mediaStatus.dataset.error = String(control.error);
         document.getElementById('remote_actions').hidden = !state.active;

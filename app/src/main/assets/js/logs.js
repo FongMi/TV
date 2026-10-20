@@ -289,6 +289,7 @@ class LogReader {
 }
 
 function initLogs() {
+    bindWebReturn(document.getElementById('log_return'), 'settings');
     const text = document.getElementById('log_text');
     const search = document.getElementById('log_search');
     const level = document.getElementById('log_level');

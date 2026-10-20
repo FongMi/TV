@@ -1,6 +1,6 @@
 function initRemoteKeys() {
     const route = remoteReturnRoute(window.location.search);
-    document.getElementById('remote_return').href = webPageUrl(route.tab, route.path);
+    bindWebReturn(document.getElementById('remote_return'), route.tab, route.path);
     const keys = [...document.querySelectorAll('[data-key]')];
     const status = document.getElementById('remote_key_status');
     const queue = [];

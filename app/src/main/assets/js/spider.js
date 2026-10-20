@@ -1863,7 +1863,8 @@ async function initSpider() {
     async function leavePage() {
         await save.flush();
         await api('', undefined, 'DELETE').catch(error => console.warn('Crawler session cleanup:', error));
-        location.href = new URL(location.href).searchParams.has('app') ? 'tv-spider://close' : '/?tab=settings';
+        if (new URL(location.href).searchParams.has('app')) location.href = 'tv-spider://close';
+        else returnWebPage('settings');
     }
 
     async function formatArguments() {

@@ -22,4 +22,20 @@ function remoteReturnRoute(search) {
     return webRoute(params);
 }
 
-if (typeof module !== 'undefined') module.exports = {WEB_TABS, webRoute, webPageUrl, remoteReturnRoute};
+function returnWebPage(tab, path = '') {
+    const url = webPageUrl(tab, path), navigation = window.navigation;
+    const previous = navigation?.entries()[navigation.currentEntry.index - 1];
+    if (previous?.url === new URL(url, window.location.href).href) history.back();
+    else window.location.replace(url);
+}
+
+function bindWebReturn(link, tab, path = '') {
+    link.href = webPageUrl(tab, path);
+    link.addEventListener('click', event => {
+        if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        returnWebPage(tab, path);
+    });
+}
+
+if (typeof module !== 'undefined') module.exports = {WEB_TABS, webRoute, webPageUrl, remoteReturnRoute, returnWebPage, bindWebReturn};

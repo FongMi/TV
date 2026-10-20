@@ -320,7 +320,7 @@ public class Remote implements Process {
         if (!bitmap.compress(Bitmap.CompressFormat.PNG, 100, output)) return response(Status.INTERNAL_ERROR, "Artwork encoding failed");
         byte[] data = output.toByteArray();
         Response response = newFixedLengthResponse(Status.OK, "image/png", new ByteArrayInputStream(data), data.length);
-        response.addHeader("Cache-Control", "no-store");
+        response.addHeader("Cache-Control", "private, max-age=60");
         return response;
     }
 
