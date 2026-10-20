@@ -268,9 +268,11 @@ public class LivePlaybackController {
 
     private MediaMetadata publishPlaybackMetadata(@Nullable EpgData liveData) {
         LivePlayRequest request = state.getActiveRequest();
+        boolean catchup = request != null && request.isCatchup();
         Channel channel = request == null ? state.getChannel() : request.getChannel();
-        EpgData data = request != null && request.isCatchup() ? request.getCatchupData() : liveData;
-        MediaMetadata metadata = buildPlaybackMetadata(channel, data);
+        EpgData data = catchup ? request.getCatchupData() : liveData;
+        int mediaType = catchup ? MediaMetadata.MEDIA_TYPE_VIDEO : MediaMetadata.MEDIA_TYPE_TV_CHANNEL;
+        MediaMetadata metadata = buildPlaybackMetadata(channel, data).buildUpon().setMediaType(mediaType).build();
         state.setPlaybackMetadata(metadata);
         host.renderPlaybackMetadata(metadata);
         return metadata;
@@ -279,9 +281,7 @@ public class LivePlaybackController {
     private MediaMetadata buildPlaybackMetadata(Channel channel, EpgData data) {
         String title = channel == null ? "" : channel.getShow();
         String logo = channel == null ? "" : channel.getLogo();
-        String artist = data == null ? "" : data.format();
-        String name = data == null ? "" : data.getTitle();
-        return MediaItemFactory.buildMetadata(title, artist, logo, name);
+        return MediaItemFactory.buildLiveMetadata(title, data, logo);
     }
 
     private boolean cannotApply(PlaybackResult<LivePlayRequest> playback) {

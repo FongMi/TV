@@ -2,7 +2,7 @@ function readRemoteState(body) {
     if (!body || typeof body.active !== 'boolean') throw new Error('Invalid playback response');
     if (!body.active) return body;
     if (typeof body.canSetSpeed !== 'boolean' || !Number.isFinite(body.speed) || body.speed <= 0 || typeof body.mediaKey !== 'string' || !/^[0-9a-f]{32}$/.test(body.mediaKey)) throw new Error('Invalid playback response');
-    if (typeof body.title !== 'string' || typeof body.artwork !== 'string' || !Number.isSafeInteger(body.position) || body.position < 0 || !Number.isSafeInteger(body.duration) || body.duration < 0 || ![1, 2, 3, 6].includes(body.state) || typeof body.playWhenReady !== 'boolean' || typeof body.repeatOne !== 'boolean' || typeof body.live !== 'boolean' || typeof body.canNavigate !== 'boolean' || typeof body.canSeek !== 'boolean') throw new Error('Invalid playback response');
+    if (typeof body.title !== 'string' || typeof body.subtitle !== 'string' || typeof body.artwork !== 'string' || !Number.isSafeInteger(body.position) || body.position < 0 || !Number.isSafeInteger(body.duration) || body.duration < 0 || ![1, 2, 3, 6].includes(body.state) || typeof body.playWhenReady !== 'boolean' || typeof body.repeatOne !== 'boolean' || typeof body.live !== 'boolean' || typeof body.canNavigate !== 'boolean' || typeof body.canSeek !== 'boolean') throw new Error('Invalid playback response');
     return body;
 }
 
@@ -133,7 +133,6 @@ function initRemote() {
     const panel = document.getElementById('panel2');
     const mediaPanel = document.getElementById('panel3');
     const card = document.getElementById('remote_card');
-    const frame = document.getElementById('remote_artwork_frame');
     const artwork = document.getElementById('remote_artwork');
     const prev = document.getElementById('remote_prev');
     const toggle = document.getElementById('remote_toggle');
@@ -156,6 +155,10 @@ function initRemote() {
     const seeks = [[document.getElementById('remote_back30'), -30000], [document.getElementById('remote_back10'), -10000], [document.getElementById('remote_forward10'), 10000], [document.getElementById('remote_forward30'), 30000]];
     let seekPosition = null;
     let applying = false;
+    const clearArtwork = () => {
+        artwork.hidden = true;
+        card.style.removeProperty('--remote-tint');
+    };
     const renderProgress = () => {
         const total = control.state.duration || 0;
         const position = Math.min(seekPosition ?? control.state.position ?? 0, total);
@@ -173,19 +176,25 @@ function initRemote() {
         const state = control.state;
         const title = document.getElementById('remote_title');
         if (title.textContent !== (state.title || t('remoteTitle'))) title.textContent = state.title || t('remoteTitle');
+        if (title.title !== title.textContent) title.title = title.textContent;
+        const subtitleLabel = document.getElementById('remote_subtitle_text');
+        const subtitleText = state.active ? state.subtitle : '';
+        if (subtitleLabel.textContent !== subtitleText) subtitleLabel.textContent = subtitleText;
+        if (subtitleLabel.title !== subtitleText) subtitleLabel.title = subtitleText;
+        subtitleLabel.hidden = !subtitleText;
         const status = control.error ? 'remoteOffline' : !state.active ? control.pending ? 'remoteConnecting' : 'remoteIdle' : state.state === 1 ? 'remoteEnded' : state.state === 6 ? 'remoteBuffering' : state.playWhenReady ? 'remotePlaying' : 'remotePaused';
         const label = document.getElementById('remote_state');
         if (label.textContent !== t(status)) label.textContent = t(status);
         const source = state.active ? artworkUrl(state.artwork) : '';
-        frame.hidden = !source;
+        const layout = state.active ? state.live ? 'live' : 'vod' : 'idle';
+        if (card.dataset.layout !== layout) card.dataset.layout = layout;
         if (artwork.dataset.source !== source) {
             artwork.dataset.source = source;
-            artwork.hidden = true;
-            frame.style.removeProperty('--remote-artwork-ratio');
-            card.style.removeProperty('--remote-tint');
-            delete card.dataset.artwork;
             if (source) artwork.src = source;
-            else artwork.removeAttribute('src');
+            else {
+                artwork.removeAttribute('src');
+                clearArtwork();
+            }
         }
         document.getElementById('remote_progress').hidden = !state.active || state.live || !state.duration;
         if (progress.getAttribute('aria-label') !== t('remoteProgress')) progress.setAttribute('aria-label', t('remoteProgress'));
@@ -229,9 +238,7 @@ function initRemote() {
     });
     artwork.addEventListener('load', () => {
         if (!artwork.getAttribute('src') || artwork.currentSrc !== artwork.dataset.source) return;
-        frame.style.setProperty('--remote-artwork-ratio', artwork.naturalWidth + ' / ' + artwork.naturalHeight);
         artwork.hidden = false;
-        card.dataset.artwork = 'true';
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 32;
         const context = canvas.getContext('2d');
@@ -239,13 +246,11 @@ function initRemote() {
         context.drawImage(artwork, 0, 0, 32, 32);
         const tint = artworkTint(context.getImageData(0, 0, 32, 32).data);
         if (tint) card.style.setProperty('--remote-tint', tint);
+        else card.style.removeProperty('--remote-tint');
     });
     artwork.addEventListener('error', () => {
         if (artwork.currentSrc && artwork.currentSrc !== artwork.dataset.source) return;
-        artwork.hidden = true;
-        frame.style.removeProperty('--remote-artwork-ratio');
-        card.style.removeProperty('--remote-tint');
-        delete card.dataset.artwork;
+        clearArtwork();
     });
     prev.addEventListener('click', () => control.request('prev'));
     next.addEventListener('click', () => control.request('next'));

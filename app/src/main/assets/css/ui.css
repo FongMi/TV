@@ -136,8 +136,19 @@ html:has(body.logs-page, body.spider-page, body.keypad-page) { scrollbar-gutter:
 
 .remote-icons { position: absolute; width: 0; height: 0; overflow: hidden; }
 #panel2, #panel3, #panel4 { gap: var(--md-section-gap); }
-.remote-card { position: relative; display: flex; flex-direction: column; align-items: center; align-self: center; gap: var(--md-section-gap); width: 100%; max-width: 640px; overflow: hidden; }
-.remote-card[data-artwork="true"] {
+.remote-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+    gap: var(--md-section-gap);
+    width: 100%;
+    max-width: 640px;
+    overflow: hidden;
+    color: var(--md-on-surface);
+}
+.remote-card:not([data-layout="idle"]) {
     --md-primary: #F5F3F5;
     --md-on-primary: #242124;
     --md-secondary-container: rgba(255,255,255,0.12);
@@ -148,22 +159,30 @@ html:has(body.logs-page, body.spider-page, body.keypad-page) { scrollbar-gutter:
     --md-outline-variant: rgba(255,255,255,0.18);
     border-color: transparent;
     background: #181818;
-    color: var(--md-on-surface);
 }
-.remote-card[data-artwork="true"]::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, #292929 35%, rgba(24,24,24,0.5) 80%, rgba(24,24,24,0.5) calc(100% - var(--md-card-padding)), transparent), radial-gradient(ellipse at 50% 110%, rgb(var(--remote-tint, 24, 24, 24)) 30%, rgba(var(--remote-tint, 24, 24, 24),0) 90%); pointer-events: none; }
+.remote-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(41,41,41,0.55), rgba(24,24,24,0.55)), radial-gradient(ellipse at 50% 65%, rgb(var(--remote-tint, 24, 24, 24)) 10%, rgba(var(--remote-tint, 24, 24, 24),0) 100%); pointer-events: none; }
 .remote-card > * { position: relative; }
 .remote-card [hidden] { display: none; }
+.remote-card[data-layout="idle"]::before, .remote-card[data-layout="idle"] .remote-artwork, .remote-card[data-layout="idle"] .remote-progress-slot, .remote-card[data-layout="idle"] .remote-actions-slot { display: none; }
 .remote-overview { display: flex; flex-direction: column; gap: 4px; width: 100%; min-width: 0; }
 .remote-media { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; }
-.remote-artwork { display: grid; place-items: center; position: relative; flex-shrink: 0; width: min(100%, 160px); max-height: 240px; aspect-ratio: var(--remote-artwork-ratio, 2 / 3); overflow: hidden; border-radius: 16px; background: var(--md-surface-low); }
+.remote-artwork { display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; position: relative; flex-shrink: 0; width: min(100%, 280px); height: 240px; overflow: hidden; border-radius: 16px; }
+.remote-card[data-layout="live"] .remote-artwork { width: min(100%, 160px); height: auto; aspect-ratio: 16 / 9; }
 .remote-artwork > svg { width: 64px; height: 64px; fill: var(--md-outline-variant); }
-.remote-artwork img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.remote-artwork img { max-width: 100%; max-height: 100%; object-fit: contain; border-radius: inherit; }
 .remote-artwork img:not([hidden]) + svg { display: none; }
 .remote-heading { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; min-width: 0; text-align: center; }
-.remote-heading h2 { overflow-wrap: anywhere; font: var(--md-title-large); }
+.remote-title { display: grid; align-items: center; width: 100%; height: 56px; }
+.remote-card[data-layout="idle"] .remote-title { display: none; }
+.remote-title:has(.remote-subtitle:not([hidden])) { grid-template-rows: 28px 20px; align-content: center; gap: 4px; }
+.remote-title:has(.remote-subtitle:not([hidden])) h2 { -webkit-line-clamp: 1; }
+.remote-subtitle { overflow: hidden; margin: 0; color: var(--md-on-surface-variant); font-size: 14px; line-height: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.remote-heading h2 { display: -webkit-box; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font: var(--md-title-large); }
 .remote-heading span, .remote-progress span { flex-shrink: 0; color: var(--md-on-surface-variant); font-size: 13px; line-height: 20px; }
 .remote-heading span { padding: 4px 12px; border-radius: 999px; background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
 .remote-progress { display: grid; grid-template-columns: max-content minmax(0, 1fr) max-content; align-items: center; gap: 8px; width: 100%; }
+.remote-progress-slot { width: 100%; height: 48px; }
+.remote-card[data-layout="live"] .remote-progress-slot { display: none; }
 .remote-progress > span:first-child { grid-column: 1; grid-row: 1; }
 .remote-progress > span:last-child { grid-column: 3; grid-row: 1; }
 .remote-slider { position: relative; grid-column: 2; grid-row: 1; min-width: 0; }
@@ -192,6 +211,7 @@ html:has(body.logs-page, body.spider-page, body.keypad-page) { scrollbar-gutter:
 .remote-track[data-playing="true"] .remote-wave::before { animation-play-state: running; }
 @keyframes remote-wave { to { transform: translateX(-24px); } }
 .remote-actions { display: grid; grid-template-columns: repeat(2, minmax(44px, 1fr)) 64px repeat(2, minmax(44px, 1fr)); align-items: center; gap: 8px; width: 100%; max-width: 320px; }
+.remote-actions-slot { display: grid; place-items: center; width: 100%; height: 64px; }
 .remote-actions .md-btn { min-width: 44px; height: 48px; padding: 0; border-radius: 16px; box-shadow: none; }
 .remote-card .md-btn:disabled[data-pending="true"], .remote-tools .md-btn:disabled[data-pending="true"] { opacity: 1; }
 .remote-actions #remote_prev { grid-column: 2; }
@@ -723,7 +743,8 @@ details[open] > .disclosure-heading::before { transform: rotate(-90deg); }
 @media (min-width: 600px) {
     .files-header { display: grid; grid-template-columns: minmax(200px, 1fr) minmax(0, 320px); align-items: center; }
     .remote-media { flex-direction: row; gap: 24px; }
-    .remote-artwork { width: 140px; }
+    .remote-artwork { width: 200px; height: 210px; }
+    .remote-card[data-layout="live"] .remote-artwork { width: 140px; }
     .remote-heading { flex: 1; align-items: flex-start; text-align: left; }
 }
 
@@ -741,6 +762,7 @@ details[open] > .disclosure-heading::before { transform: rotate(-90deg); }
 }
 
 @media (max-width: 360px) {
+    .remote-actions-slot { height: 48px; }
     .remote-actions { grid-template-columns: repeat(2, minmax(44px, 1fr)) 48px repeat(2, minmax(44px, 1fr)); }
     .remote-actions #remote_toggle { min-width: 48px; height: 48px; }
 }

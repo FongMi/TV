@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.MediaMetadata;
@@ -13,14 +14,13 @@ import androidx.media3.datasource.IsoUri;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.BuildConfig;
-import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Drm;
+import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.player.track.LangUtil;
 import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.utils.ImgUtil;
-import com.fongmi.android.tv.utils.ResUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -30,14 +30,16 @@ import java.util.stream.IntStream;
 
 public final class MediaItemFactory {
 
-    public static MediaMetadata buildMetadata(String title, String artist, String artUri, String displayName) {
-        return buildMetadata(title, artist, artUri).buildUpon().setDisplayTitle(formatDisplayTitle(title, displayName)).build();
-    }
-
     public static MediaMetadata buildMetadata(String title, String artist, String artUri) {
         title = TextUtils.isEmpty(title) ? "" : title;
         artist = TextUtils.isEmpty(artist) ? "" : artist;
-        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setArtworkUri(getArtworkUri(artUri)).build();
+        String subtitle = title.isEmpty() || title.equals(artist) ? "" : artist;
+        return new MediaMetadata.Builder().setTitle(title).setArtist(artist).setSubtitle(subtitle).setArtworkUri(getArtworkUri(artUri)).build();
+    }
+
+    public static MediaMetadata buildLiveMetadata(String title, @Nullable EpgData data, String artUri) {
+        String details = data == null ? "" : data.format();
+        return buildMetadata(title, details, artUri).buildUpon().setStation(title).setDisplayTitle(title).setMediaType(MediaMetadata.MEDIA_TYPE_TV_CHANNEL).build();
     }
 
     public static Uri getArtworkUri(String artUri) {
@@ -45,17 +47,10 @@ public final class MediaItemFactory {
         return TextUtils.isEmpty(artUri) ? null : Uri.parse(artUri);
     }
 
-    public static String formatDisplayTitle(String title, String name) {
-        if (TextUtils.isEmpty(title)) return TextUtils.isEmpty(name) ? "" : name;
-        if (TextUtils.isEmpty(name) || TextUtils.equals(title, name)) return title;
-        return ResUtil.getString(R.string.detail_title, title, name);
-    }
-
     public static String getDisplayTitle(MediaMetadata metadata) {
         if (!TextUtils.isEmpty(metadata.displayTitle)) return metadata.displayTitle.toString();
-        String title = TextUtils.isEmpty(metadata.title) ? "" : metadata.title.toString();
-        String artist = TextUtils.isEmpty(metadata.artist) ? "" : metadata.artist.toString();
-        return formatDisplayTitle(title, artist);
+        if (!TextUtils.isEmpty(metadata.title)) return metadata.title.toString();
+        return TextUtils.isEmpty(metadata.artist) ? "" : metadata.artist.toString();
     }
 
     public static String getDefaultUserAgent() {

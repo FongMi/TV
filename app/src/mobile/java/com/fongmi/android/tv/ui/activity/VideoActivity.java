@@ -354,7 +354,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         mBinding.control.next.setOnClickListener(view -> checkNext());
         mBinding.control.prev.setOnClickListener(view -> checkPrev());
         mBinding.control.setting.setOnClickListener(view -> onSetting());
-        mBinding.control.title.setOnLongClickListener(view -> onChange());
+        mBinding.control.heading.setOnLongClickListener(view -> onChange());
         mBinding.control.right.lock.setOnClickListener(view -> onLock());
         mBinding.control.right.rotate.setOnClickListener(view -> onRotate());
         mBinding.control.danmaku.setOnClickListener(view -> onDanmakuShow());
@@ -762,6 +762,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         if (isPlaybackCurrent()) player().setMetadata(metadata);
         mBinding.control.title.setText(MediaItemFactory.getDisplayTitle(metadata));
         mBinding.control.title.setSelected(true);
+        mBinding.control.subtitle.setText(metadata.subtitle);
+        mBinding.control.subtitle.setVisibility(TextUtils.isEmpty(metadata.subtitle) ? View.GONE : View.VISIBLE);
     }
 
     @Override
@@ -1171,7 +1173,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         if (isLand() && !player().isPortrait()) setTransition();
         mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         setRequestedOrientation(PlaybackOrientation.getEnterFullscreenOrientation(player().isPortrait()));
-        mBinding.control.title.setVisibility(View.VISIBLE);
+        mBinding.control.heading.setVisibility(View.VISIBLE);
         setRotate(player().isPortrait());
         mInput.resetScale();
         App.post(mR3, 2000);
@@ -1186,7 +1188,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         if (isLand() && !player().isPortrait()) setTransition();
         setRequestedOrientation(PlaybackOrientation.getExitFullscreenOrientation(isPort()));
         mBinding.episode.postDelayed(() -> mBinding.episode.scrollToPosition(mEpisodeAdapter.getPosition()), 100);
-        mBinding.control.title.setVisibility(View.INVISIBLE);
+        mBinding.control.heading.setVisibility(View.INVISIBLE);
         mBinding.video.setLayoutParams(mFrameParams);
         mInput.resetScale();
         App.post(mR3, 2000);

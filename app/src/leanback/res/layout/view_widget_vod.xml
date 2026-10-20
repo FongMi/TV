@@ -23,14 +23,31 @@
             android:singleLine="true"
             android:textColor="@color/white"
             android:textSize="20sp"
-            tools:text="慶餘年第一季：第一集" />
+            tools:text="慶餘年第一季" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/subtitle"
+            style="@style/Shadow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title"
+            android:layout_alignStart="@+id/title"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@+id/clock"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:textColor="@color/white_80"
+            android:textSize="16sp"
+            android:visibility="gone"
+            tools:text="第1集"
+            tools:visibility="visible" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/size"
             style="@style/Shadow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/title"
+            android:layout_below="@+id/subtitle"
             android:layout_alignStart="@+id/title"
             android:textColor="@color/white"
             android:textSize="16sp"

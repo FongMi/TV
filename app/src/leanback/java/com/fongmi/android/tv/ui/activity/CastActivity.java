@@ -309,7 +309,7 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
 
     private MediaMetadata buildMetadata() {
         String title = mBinding.widget.title.getText().toString();
-        return MediaItemFactory.buildMetadata(title, "", "", "");
+        return MediaItemFactory.buildMetadata(title, "", "");
     }
 
     private void onPaused() {

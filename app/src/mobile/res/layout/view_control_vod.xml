@@ -23,13 +23,16 @@
             android:scaleType="center"
             android:src="@drawable/ic_control_back" />
 
-        <FrameLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/heading"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:visibility="invisible">
 
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/title"
@@ -39,10 +42,21 @@
                 android:singleLine="true"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                android:visibility="invisible"
-                tools:text="慶餘年第一季：第一集" />
+                tools:text="慶餘年第一季" />
 
-        </FrameLayout>
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/subtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/white_80"
+                android:textSize="14sp"
+                android:visibility="gone"
+                tools:text="第1集"
+                tools:visibility="visible" />
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="wrap_content"

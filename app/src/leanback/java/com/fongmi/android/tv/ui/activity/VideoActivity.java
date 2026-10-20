@@ -711,6 +711,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         if (isPlaybackCurrent()) player().setMetadata(metadata);
         mBinding.widget.title.setText(MediaItemFactory.getDisplayTitle(metadata));
         mBinding.widget.title.setSelected(true);
+        mBinding.widget.subtitle.setText(metadata.subtitle);
+        mBinding.widget.subtitle.setVisibility(TextUtils.isEmpty(metadata.subtitle) ? View.GONE : View.VISIBLE);
     }
 
     @Override

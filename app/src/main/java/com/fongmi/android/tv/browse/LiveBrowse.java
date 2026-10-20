@@ -12,11 +12,13 @@ import com.fongmi.android.tv.api.LiveApi;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
+import com.fongmi.android.tv.bean.EpgData;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Keep;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.google.common.collect.ImmutableList;
 
 import java.util.HashSet;
@@ -76,14 +78,14 @@ class LiveBrowse {
         Channel channel = entry.channel;
         if (channel.getData(live.getZoneId()).getList().isEmpty() && !live.getEpgXml().isEmpty()) LiveApi.parseXml(live);
         LiveApi.getEpg(channel, live.getZoneId());
-        return metadata(entry.live, mediaId, channel);
+        return metadata(entry.live, channel);
     }
 
-    private static MediaMetadata metadata(Live live, String mediaId, Channel channel) {
+    private static MediaMetadata metadata(Live live, Channel channel) {
         Epg epg = channel.getData(live.getZoneId());
         int current = epg.getInRange();
-        String details = current < 0 ? "" : epg.getList().get(current).format();
-        return BrowseTree.playable(mediaId, channel.getShow(), details, BrowseTree.artwork(channel.getLogo(), R.drawable.ic_browse_tv)).mediaMetadata.buildUpon().setArtist(details).build();
+        EpgData data = current < 0 ? null : epg.getList().get(current);
+        return MediaItemFactory.buildLiveMetadata(channel.getShow(), data, BrowseTree.artwork(channel.getLogo(), R.drawable.ic_browse_tv)).buildUpon().setIsBrowsable(false).setIsPlayable(true).build();
     }
 
     @NonNull
@@ -97,8 +99,9 @@ class LiveBrowse {
 
     private static MediaItem channelItem(Live live, String groupName, Channel channel, int index) {
         String id = LIVE_CH + groupName + '|' + index;
+        String title = channel.getNumber() + " " + channel.getShow();
         return new MediaItem.Builder().setMediaId(id)
-                .setMediaMetadata(metadata(live, id, channel).buildUpon().setTitle(channel.getNumber() + " " + channel.getShow()).build()).build();
+                .setMediaMetadata(metadata(live, channel).buildUpon().setTitle(title).setDisplayTitle(title).build()).build();
     }
 
     @Nullable
@@ -181,7 +184,7 @@ class LiveBrowse {
         if (TextUtils.isEmpty(channel.getCurrent())) return null;
         Result result = LiveApi.getUrl(channel);
         if (TextUtils.isEmpty(result.getRealUrl())) return null;
-        return BrowseTree.stream(new BrowsePlayback(mediaId, result, null, channel.getName()), channel.getShow(), null, channel.getLogo()).buildUpon().setMediaMetadata(metadata(entry.live, mediaId, channel)).build();
+        return BrowseTree.stream(new BrowsePlayback(mediaId, result, null, channel.getName()), channel.getShow(), null, channel.getLogo()).buildUpon().setMediaMetadata(metadata(entry.live, channel)).build();
     }
 
     private static Live liveHome() {

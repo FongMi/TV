@@ -85,30 +85,34 @@
                 </div>
             </div>
             <div id="panel2" class="tab-panel">
-                <section id="remote_card" class="md-card remote-card" aria-labelledby="remote_title">
+                <section id="remote_card" class="md-card remote-card" data-layout="idle" aria-labelledby="remote_title">
                     <div class="remote-overview">
                         <div class="remote-media">
-                            <div id="remote_artwork_frame" class="remote-artwork" hidden>
+                            <div id="remote_artwork_frame" class="remote-artwork">
                                 <img id="remote_artwork" alt="" referrerpolicy="no-referrer" hidden />
                                 <svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-play"/></svg>
                             </div>
-                            <div class="remote-heading"><h2 id="remote_title" data-i18n="remoteTitle">播放</h2><span id="remote_state" role="status" aria-live="polite" data-i18n="remoteIdle">目前沒有播放</span></div>
+                            <div class="remote-heading"><div class="remote-title"><h2 id="remote_title" data-i18n="remoteTitle">播放</h2><p id="remote_subtitle_text" class="remote-subtitle" hidden></p></div><span id="remote_state" role="status" aria-live="polite" data-i18n="remoteIdle">未播放</span></div>
                         </div>
-                        <div id="remote_progress" class="remote-progress" hidden>
-                            <span id="remote_elapsed">0:00</span>
-                            <div class="remote-slider">
-                                <input id="remote_bar" type="range" min="0" max="1" step="1" value="0" aria-label="播放進度" disabled />
-                                <div id="remote_track" class="remote-track" aria-hidden="true"><div class="remote-wave"></div></div>
+                        <div class="remote-progress-slot">
+                            <div id="remote_progress" class="remote-progress" hidden>
+                                <span id="remote_elapsed">0:00</span>
+                                <div class="remote-slider">
+                                    <input id="remote_bar" type="range" min="0" max="1" step="1" value="0" aria-label="播放進度" disabled />
+                                    <div id="remote_track" class="remote-track" aria-hidden="true"><div class="remote-wave"></div></div>
+                                </div>
+                                <span id="remote_duration">0:00</span>
                             </div>
-                            <span id="remote_duration">0:00</span>
                         </div>
                     </div>
-                    <div id="remote_actions" class="remote-actions" hidden>
-                        <button id="remote_repeat" class="md-btn remote-icon-button" type="button" aria-label="循環播放" title="循環播放" aria-pressed="false" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-repeat_off"/></svg></button>
-                        <button id="remote_prev" class="md-btn remote-icon-button" type="button" aria-label="上集" title="上集" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-previous"/></svg></button>
-                        <button id="remote_toggle" class="md-btn md-btn-filled" type="button" aria-label="暫停" title="暫停" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-pause"/></svg></button>
-                        <button id="remote_next" class="md-btn remote-icon-button" type="button" aria-label="下集" title="下集" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-next"/></svg></button>
-                        <button id="remote_stop" class="md-btn remote-icon-button" type="button" aria-label="停止" title="停止" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-stop"/></svg></button>
+                    <div class="remote-actions-slot">
+                        <div id="remote_actions" class="remote-actions" hidden>
+                            <button id="remote_repeat" class="md-btn remote-icon-button" type="button" aria-label="循環播放" title="循環播放" aria-pressed="false" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-repeat_off"/></svg></button>
+                            <button id="remote_prev" class="md-btn remote-icon-button" type="button" aria-label="上集" title="上集" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-previous"/></svg></button>
+                            <button id="remote_toggle" class="md-btn md-btn-filled" type="button" aria-label="暫停" title="暫停" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-pause"/></svg></button>
+                            <button id="remote_next" class="md-btn remote-icon-button" type="button" aria-label="下集" title="下集" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-next"/></svg></button>
+                            <button id="remote_stop" class="md-btn remote-icon-button" type="button" aria-label="停止" title="停止" disabled><svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-stop"/></svg></button>
+                        </div>
                     </div>
                     <button id="remote_retry" class="md-btn md-btn-tonal md-icon-button" type="button" hidden data-i18n-label="logRetry" aria-label="重新連線" title="重新連線"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#refresh"/></svg></button>
                 </section>

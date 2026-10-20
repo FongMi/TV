@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -739,10 +740,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private void onEpgLoaded(Epg epg) {
         if (mChannel == null || !mChannel.getTvgId().equals(epg.getKey())) return;
         EpgData data = epg.getEpgData();
-        boolean hasTitle = !data.getTitle().isEmpty();
         mEpgDataAdapter.addAll(epg.getList());
-        mBinding.widget.name.setMaxEms(hasTitle ? 12 : 48);
-        mBinding.widget.play.setText(data.format());
         mLive.onEpgChanged(data);
         setWidth(epg);
     }
@@ -871,13 +869,19 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     @Override
     public void renderPlaybackMetadata(MediaMetadata metadata) {
         if (service() != null && isOwner()) player().setMetadata(metadata);
+        mBinding.widget.name.setMaxEms(TextUtils.isEmpty(metadata.subtitle) ? 48 : 12);
+        mBinding.widget.play.setText(metadata.subtitle);
         mBinding.widget.title.setText(metadata.displayTitle);
         mBinding.widget.title.setSelected(true);
+        mBinding.widget.subtitle.setText(metadata.subtitle);
+        mBinding.widget.subtitle.setVisibility(TextUtils.isEmpty(metadata.subtitle) ? View.GONE : View.VISIBLE);
     }
 
     private void resetAdapter() {
         mBinding.control.action.line.setVisibility(View.GONE);
         mBinding.widget.title.setText("");
+        mBinding.widget.subtitle.setText("");
+        mBinding.widget.subtitle.setVisibility(View.GONE);
         mEpgDataAdapter.clear();
         mChannelAdapter.clear();
         mGroupAdapter.clear();

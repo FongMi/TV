@@ -265,6 +265,7 @@ public class Remote implements Process {
         if (!active) return body;
         MediaMetadata metadata = snapshot.playingMetadata();
         body.addProperty("title", MediaItemFactory.getDisplayTitle(metadata));
+        body.addProperty("subtitle", metadata.subtitle == null ? "" : metadata.subtitle.toString());
         body.addProperty("mediaKey", Crypto.md5(snapshot.url()));
         body.addProperty("artwork", metadata.artworkUri == null ? "" : "/remote/artwork?key=" + Crypto.md5(metadata.artworkUri.toString()));
         body.addProperty("position", Math.max(0, snapshot.position()));
@@ -272,7 +273,7 @@ public class Remote implements Process {
         body.addProperty("state", snapshot.state());
         body.addProperty("playWhenReady", player.getPlaybackState() != Player.STATE_ENDED && player.getPlayer().getPlayWhenReady());
         body.addProperty("repeatOne", player.isRepeatOne());
-        body.addProperty("live", player.isLive());
+        body.addProperty("live", metadata.mediaType != null && metadata.mediaType == MediaMetadata.MEDIA_TYPE_TV_CHANNEL || player.isLive());
         body.addProperty("canNavigate", service.canRemoteNavigate());
         body.addProperty("canSeek", service.canRemoteSeek());
         body.addProperty("canSetSpeed", service.canRemoteSetSpeed());
