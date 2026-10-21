@@ -147,7 +147,10 @@ html:has(body.logs-page, body.spider-page, body.keypad-page) { scrollbar-gutter:
     max-width: 640px;
     overflow: hidden;
     color: var(--md-on-surface);
+    transition: opacity 0.2s;
 }
+.remote-card[data-layout="loading"], .remote-card[data-artwork="loading"]:has(img[hidden]) { visibility: hidden; opacity: 0; }
+.remote-card:has(#remote_retry:not([hidden])) { visibility: visible; opacity: 1; }
 .remote-card:not([data-layout="idle"]) {
     --md-primary: #F5F3F5;
     --md-on-primary: #242124;

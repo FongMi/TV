@@ -85,14 +85,14 @@
                 </div>
             </div>
             <div id="panel2" class="tab-panel">
-                <section id="remote_card" class="md-card remote-card" data-layout="idle" aria-labelledby="remote_title">
+                <section id="remote_card" class="md-card remote-card" data-layout="loading" data-artwork="loading" aria-busy="true" aria-labelledby="remote_title">
                     <div class="remote-overview">
                         <div class="remote-media">
                             <div id="remote_artwork_frame" class="remote-artwork">
                                 <img id="remote_artwork" alt="" referrerpolicy="no-referrer" hidden />
                                 <svg aria-hidden="true" viewBox="0 0 960 960"><use href="#remote-icon-play"/></svg>
                             </div>
-                            <div class="remote-heading"><div class="remote-title"><h2 id="remote_title" data-i18n="remoteTitle">播放</h2><p id="remote_subtitle_text" class="remote-subtitle" hidden></p></div><span id="remote_state" role="status" aria-live="polite" data-i18n="remoteIdle">未播放</span></div>
+                            <div class="remote-heading"><div class="remote-title"><h2 id="remote_title" data-i18n="remoteTitle">播放</h2><p id="remote_subtitle_text" class="remote-subtitle" hidden></p></div><span id="remote_state" role="status" aria-live="polite" data-i18n="remoteConnecting">連線中…</span></div>
                         </div>
                         <div class="remote-progress-slot">
                             <div id="remote_progress" class="remote-progress" hidden>

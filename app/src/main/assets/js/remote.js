@@ -157,6 +157,7 @@ function initRemote() {
     let applying = false;
     const clearArtwork = () => {
         artwork.hidden = true;
+        card.dataset.artwork = 'empty';
         card.style.removeProperty('--remote-tint');
     };
     const renderProgress = () => {
@@ -186,16 +187,23 @@ function initRemote() {
         const label = document.getElementById('remote_state');
         if (label.textContent !== t(status)) label.textContent = t(status);
         const source = state.active ? artworkUrl(state.artwork) : '';
-        const layout = state.active ? state.live ? 'live' : 'vod' : 'idle';
+        const layout = state.active ? state.live ? 'live' : 'vod' : state.active === undefined && !control.error ? 'loading' : 'idle';
         if (card.dataset.layout !== layout) card.dataset.layout = layout;
+        const busy = String(layout === 'loading');
+        if (card.getAttribute('aria-busy') !== busy) card.setAttribute('aria-busy', busy);
         if (artwork.dataset.source !== source) {
             artwork.dataset.source = source;
-            if (source) artwork.src = source;
+            if (source) {
+                if (artwork.hidden) card.dataset.artwork = 'loading';
+                artwork.src = source;
+            }
             else {
                 artwork.removeAttribute('src');
                 clearArtwork();
             }
         }
+        if (layout === 'loading') card.dataset.artwork = 'loading';
+        else if (!source && card.dataset.artwork !== 'empty') clearArtwork();
         document.getElementById('remote_progress').hidden = !state.active || state.live || !state.duration;
         if (progress.getAttribute('aria-label') !== t('remoteProgress')) progress.setAttribute('aria-label', t('remoteProgress'));
         if (!state.active || !state.canSeek || control.error) seekPosition = null;
@@ -239,6 +247,7 @@ function initRemote() {
     artwork.addEventListener('load', () => {
         if (!artwork.getAttribute('src') || artwork.currentSrc !== artwork.dataset.source) return;
         artwork.hidden = false;
+        card.dataset.artwork = 'ready';
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 32;
         const context = canvas.getContext('2d');
