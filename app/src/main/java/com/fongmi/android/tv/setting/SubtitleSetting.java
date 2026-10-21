@@ -25,7 +25,7 @@ public class SubtitleSetting {
     public static final int SECONDARY_MODE_OFF = -2;
     public static final int SECONDARY_MODE_AUTO = -1;
     public static final float MIN_SCALE = 0.5f;
-    public static final float MAX_SCALE = 2.0f;
+    public static final float MAX_SCALE = 4.0f;
     public static final float MIN_BITMAP_BRIGHTNESS = 0.5f;
     public static final float MAX_BITMAP_BRIGHTNESS = 2.0f;
     public static final float MIN_POSITION = -100.0f;
