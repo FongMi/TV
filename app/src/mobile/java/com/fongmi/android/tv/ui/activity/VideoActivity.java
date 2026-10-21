@@ -1310,18 +1310,25 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     private void setArtwork() {
-        ImgUtil.load(this, mHistory.getVodPic(), new CustomTarget<>() {
-            @Override
-            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                mBinding.player.setDefaultArtwork(resource);
-            }
-
-            @Override
-            public void onLoadFailed(@Nullable Drawable errorDrawable) {
-                mBinding.player.setDefaultArtwork(errorDrawable);
-            }
-        });
+        ImgUtil.load(this, mHistory.getVodPic(), mArtworkTarget);
     }
+
+    private final CustomTarget<Drawable> mArtworkTarget = new CustomTarget<>() {
+        @Override
+        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+            mBinding.player.setDefaultArtwork(resource);
+        }
+
+        @Override
+        public void onLoadFailed(@Nullable Drawable errorDrawable) {
+            mBinding.player.setDefaultArtwork(errorDrawable);
+        }
+
+        @Override
+        public void onLoadCleared(@Nullable Drawable placeholder) {
+            mBinding.player.setDefaultArtwork(null);
+        }
+    };
 
     private void saveHistory(boolean exit) {
         if (!isWebPlaybackActive() && !isPlaybackCurrent()) return;
