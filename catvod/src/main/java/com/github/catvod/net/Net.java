@@ -640,7 +640,7 @@ public final class Net implements AutoCloseable {
 
     private Call newCall(Request request, NetOptions options) throws IOException {
         OkHttpClient http = builder(options).addNetworkInterceptor(chain -> interceptCookies(chain, request, options)).build();
-        Call call = http.newCall(request);
+        Call call = http.newCall(request.newBuilder().tag(NetOptions.class, options).build());
         synchronized (lock) {
             if (closed) throw new InterruptedIOException("Network owner closed");
             calls.add(call);

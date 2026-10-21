@@ -39,6 +39,8 @@ final class ProxyRedirectInterceptor implements Interceptor {
             followUpCount += countFollowUps(response);
             response = withPriorResponse(response, previousResponse);
             checkFollowUps(response, followUpCount);
+            NetOptions options = request.tag(NetOptions.class);
+            if (options != null && !options.isRedirect()) return response;
             Request followUp = redirect(response, chain.getFollowSslRedirects());
             if (followUp == null) return response;
             RequestBody body = followUp.body();
