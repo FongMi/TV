@@ -155,7 +155,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     public static void push(FragmentActivity activity, String text) {
         if (TextUtils.isEmpty(text)) return;
         Uri uri = UriUtil.uri(text);
-        if (FileChooser.isFileSource(uri)) FileChooser.getFileUri(uri, fileUri -> file(activity, fileUri));
+        if (FileChooser.isFileSource(uri)) file(activity, uri);
         else start(activity, Sniffer.getUrl(text));
     }
 

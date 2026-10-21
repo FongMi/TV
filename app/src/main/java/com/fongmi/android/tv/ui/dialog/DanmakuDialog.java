@@ -3,6 +3,7 @@ package com.fongmi.android.tv.ui.dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,7 +75,7 @@ public final class DanmakuDialog extends BaseBottomSheetDialog implements Danmak
         binding.recycler.setAdapter(adapter.addAll(player.getDanmakus()));
         binding.recycler.scrollToPosition(adapter.getSelected());
         binding.recycler.setVisibility(adapter.getItemCount() == 0 ? View.GONE : View.VISIBLE);
-        binding.search.setVisibility(player.getMetadata() == null || DanmakuSetting.getEffectiveApiUrl().isEmpty() ? View.GONE : View.VISIBLE);
+        binding.search.setVisibility(player.getMetadata() == null || TextUtils.isEmpty(DanmakuSetting.getEffectiveApiUrl()) ? View.GONE : View.VISIBLE);
         applyPendingDanmaku();
     }
 

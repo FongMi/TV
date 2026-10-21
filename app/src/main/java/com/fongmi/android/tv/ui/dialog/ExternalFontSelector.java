@@ -16,6 +16,7 @@ import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.PermissionUtil;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.utils.Task;
 import com.google.android.material.chip.Chip;
@@ -119,7 +120,7 @@ final class ExternalFontSelector {
         chip.setText(R.string.playback_font_import);
         chip.setCheckable(false);
         chip.setEnabled(!loading);
-        chip.setOnClickListener(view -> FileChooser.from(launcher).show(MIME_TYPES));
+        chip.setOnClickListener(this::onImport);
         group.addView(chip);
     }
 
@@ -127,6 +128,12 @@ final class ExternalFontSelector {
         Chip chip = (Chip) LayoutInflater.from(fragment.requireContext()).inflate(R.layout.view_filter_chip, group, false);
         chip.setId(View.generateViewId());
         return chip;
+    }
+
+    private void onImport(View view) {
+        PermissionUtil.requestFile(fragment, granted -> {
+            if (granted) FileChooser.from(launcher).show(MIME_TYPES);
+        });
     }
 
     private void select(@Nullable ExternalFont.Item font) {

@@ -25,7 +25,6 @@ import com.fongmi.android.tv.ui.activity.FileActivity;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Task;
-import com.github.catvod.utils.UriUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -88,7 +87,24 @@ public final class FileChooser {
     }
 
     public static void getUri(@Nullable Intent data, Consumer<Uri> callback) {
-        getFileUri(data == null ? null : data.getData(), callback);
+        Uri uri = data == null ? null : data.getData();
+        if (isFileSource(uri) && persistReadPermission(data, uri)) callback.accept(uri);
+    }
+
+    public static boolean persistReadPermission(@Nullable Intent data, Uri uri) {
+        int grants = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION;
+        if (data == null || !ContentResolver.SCHEME_CONTENT.equalsIgnoreCase(uri.getScheme()) || (data.getFlags() & grants) != grants) return true;
+        try {
+            App.get().getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        } catch (SecurityException | IllegalArgumentException e) {
+            Notify.show(Notify.getError(R.string.error_file_open, e));
+            return false;
+        }
+        return true;
+    }
+
+    public static void getFileUri(ActivityResult result, Consumer<Uri> callback) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) getFileUri(result.getData().getData(), callback);
     }
 
     public static void getFileUri(@Nullable Uri uri, Consumer<Uri> callback) {
@@ -233,7 +249,7 @@ public final class FileChooser {
 
     public static boolean isLiveSource(@Nullable Intent intent) {
         if (intent == null || !isFileSource(intent.getData())) return false;
-        String path = UriUtil.path(intent.getData()).toLowerCase(Locale.ROOT);
+        String path = FileUtil.getDisplayName(intent.getData()).toLowerCase(Locale.ROOT);
         if (path.endsWith(".m3u")) return true;
         if (!"text/plain".equalsIgnoreCase(intent.getType())) return false;
         String extension = path.substring(path.lastIndexOf('.') + 1);
