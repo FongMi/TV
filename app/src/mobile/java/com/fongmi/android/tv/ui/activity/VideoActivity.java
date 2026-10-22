@@ -1751,6 +1751,11 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     @Override
+    public boolean isScaleEnabled() {
+        return isFullscreen() && !isInPictureInPictureMode();
+    }
+
+    @Override
     public void onPinchScale(PinchScale.Axis axis, float scaleX, float scaleY) {
         if (!mScaleFeedback.isActive()) PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mScaleFeedback.show(axis, scaleX, scaleY);

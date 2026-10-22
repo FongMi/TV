@@ -1109,6 +1109,11 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     @Override
+    public boolean isScaleEnabled() {
+        return !isInPictureInPictureMode();
+    }
+
+    @Override
     public void onPinchScale(PinchScale.Axis axis, float scaleX, float scaleY) {
         if (!mScaleFeedback.isActive()) PlaybackAction.hideSpeedHint(mBinding.widget.message);
         mScaleFeedback.show(axis, scaleX, scaleY);
