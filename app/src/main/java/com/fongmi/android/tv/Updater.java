@@ -22,6 +22,7 @@ import com.fongmi.android.tv.utils.UpdatePackage;
 import com.github.catvod.net.Download;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
+import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.RuntimeModule;
 import com.github.catvod.utils.Task;
 
@@ -33,9 +34,10 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 public class Updater {
 
@@ -48,7 +50,7 @@ public class Updater {
     private boolean downloading;
     private boolean paused;
     private boolean modulesChecked;
-    private String moduleNotice;
+    private Map<RuntimeModule, Long> moduleUpdates;
     private int progress;
 
     private static class Loader {
@@ -88,7 +90,7 @@ public class Updater {
             if (installed.isEmpty()) return;
             JSONObject catalog = RuntimeInstaller.getCatalog(new CancellationSignal());
             if (catalog == null) return;
-            List<String> updates = getModuleUpdates(installed, catalog);
+            Map<RuntimeModule, Long> updates = getModuleUpdates(installed, catalog);
             if (updates.isEmpty()) return;
             App.post(() -> onModulesChecked(updates));
         } catch (IOException | RuntimeException e) {
@@ -101,26 +103,35 @@ public class Updater {
         return Arrays.stream(RuntimeModule.values()).filter(RuntimeModule::isInstalled).toList();
     }
 
-    private List<String> getModuleUpdates(List<RuntimeModule> installed, JSONObject catalog) throws IOException {
-        List<String> updates = new ArrayList<>();
-        for (RuntimeModule module : installed) {
-            JSONObject asset = RuntimeInstaller.getExternalAsset(module, catalog);
-            if (asset == null) continue;
-            long code = module.getVersionCode();
-            if (code > 0 && asset.optLong("versionCode") > code) updates.add(module == RuntimeModule.THUNDER ? ResUtil.getString(R.string.module_thunder) : module.title);
-        }
+    private Map<RuntimeModule, Long> getModuleUpdates(List<RuntimeModule> installed, JSONObject catalog) throws IOException {
+        Map<RuntimeModule, Long> updates = new EnumMap<>(RuntimeModule.class);
+        for (RuntimeModule module : installed) addModuleUpdate(module, catalog, updates);
         return updates;
     }
 
-    private void onModulesChecked(List<String> updates) {
-        moduleNotice = ResUtil.getString(R.string.module_update_notice, String.join(", ", updates));
+    private void addModuleUpdate(RuntimeModule module, JSONObject catalog, Map<RuntimeModule, Long> updates) throws IOException {
+        JSONObject asset = RuntimeInstaller.getExternalAsset(module, catalog);
+        if (asset == null) return;
+        long code = module.getVersionCode();
+        long version = asset.optLong("versionCode");
+        if (code > 0 && version > code && version > Prefers.getLong("module_update_" + module.id)) updates.put(module, version);
+    }
+
+    private void onModulesChecked(Map<RuntimeModule, Long> updates) {
+        moduleUpdates = updates;
         notifyModules();
     }
 
     public void notifyModules() {
-        if (moduleNotice == null || App.activity() == null) return;
-        Notify.show(moduleNotice);
-        moduleNotice = null;
+        if (moduleUpdates == null || App.activity() == null) return;
+        List<String> titles = moduleUpdates.keySet().stream().map(this::getModuleTitle).toList();
+        Notify.show(ResUtil.getString(R.string.module_update_notice, String.join(", ", titles)));
+        moduleUpdates.forEach((module, version) -> Prefers.put("module_update_" + module.id, version));
+        moduleUpdates = null;
+    }
+
+    private String getModuleTitle(RuntimeModule module) {
+        return module == RuntimeModule.THUNDER ? ResUtil.getString(R.string.module_thunder) : module.title;
     }
 
     private void checkRelease() {
