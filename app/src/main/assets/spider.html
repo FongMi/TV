@@ -47,7 +47,13 @@
                     <button id="spider_upload" class="md-btn md-btn-outlined" type="button" disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#upload"/></svg><span data-i18n="spiderImport">本機檔案</span></button>
                     <input id="spider_uploader" type="file" accept="*/*" hidden />
                 </div>
-                <div class="md-field"><div class="spider-label"><label for="spider_jar">jar</label><button id="spider_csp" class="md-btn md-btn-outlined" type="button" data-i18n="spiderCsp" hidden disabled>選擇 CSP</button></div><input id="spider_jar" class="md-input" type="text" autocomplete="off" spellcheck="false" disabled /></div>
+                <div class="md-field">
+                    <label for="spider_jar">jar</label>
+                    <div class="spider-source-input">
+                        <input id="spider_jar" class="md-input" type="text" autocomplete="off" spellcheck="false" disabled />
+                        <button id="spider_csp" class="md-btn md-btn-outlined md-icon-button" type="button" data-i18n-label="spiderCsp" aria-label="選擇 CSP" title="選擇 CSP" hidden disabled><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#select"/></svg></button>
+                    </div>
+                </div>
                 <div class="md-field"><label for="spider_ext">ext</label><textarea id="spider_ext" class="md-input" rows="2" autocomplete="off" spellcheck="false" disabled></textarea></div>
                 <div class="md-field"><label for="spider_method" data-i18n="spiderMethod">方法</label><button id="spider_method" class="md-input" type="button" value="home" disabled>home</button></div>
                 <div id="spider_parameters" class="spider-parameters"></div>
