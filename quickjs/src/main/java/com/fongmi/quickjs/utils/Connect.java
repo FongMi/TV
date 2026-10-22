@@ -18,7 +18,7 @@ public class Connect {
         JsonObject object = new JsonObject();
         object.addProperty("type", event.type);
         if (event.type.equals("message")) object.addProperty("binary", event.binary);
-        if (event.type.equals("open") || event.type.equals("close")) object.addProperty("code", event.code);
+        if (event.type.equals("open") || event.type.equals("close") || event.type.equals("retry")) object.addProperty("code", event.code);
         if (event.reason != null) object.addProperty("reason", event.reason);
         if (event.error != null) object.addProperty("error", event.error);
         if (event.type.equals("message") && !event.binary) return new QuickJS.Text(object.toString(), "content", (String) event.content);

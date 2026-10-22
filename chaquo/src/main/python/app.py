@@ -60,8 +60,8 @@ def init(ru, extend):
         raise
 
 
-def bindNet(ru, net, user_agent=None, local=None):
-    ru.net = NetAdapter(net, user_agent)
+def bindNet(ru, net, user_agent=None, local=None, streams=None):
+    ru.net = NetAdapter(net, user_agent, streams)
     ru.local = LocalAdapter(local)
 
 
@@ -108,6 +108,13 @@ def localProxy(ru, param):
 
 def action(ru, action):
     return json2str(ru.action(action))
+
+
+def danmaku(ru, id, emitter):
+    stop = ru.danmaku(id, lambda item: emitter.emit(json.dumps(item, ensure_ascii=False, allow_nan=False)))
+    if not callable(stop):
+        raise TypeError("danmaku must return a stop function")
+    return stop
 
 
 def destroy(ru):

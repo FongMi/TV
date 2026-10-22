@@ -27,12 +27,44 @@ function ws(url, options = {}) {
 
 async function netStream(url, options = {}) {
     if (options != null && (typeof options !== 'object' || Array.isArray(options))) throw new TypeError('Invalid stream options');
+    if (typeof url !== 'string') return netStreamBody(url, options);
     const reply = await _stream(url, options);
     if (reply?.error != null) throw new Error(String(reply.error));
     if (!reply || typeof reply.token !== 'string') throw new Error('Invalid stream response');
-    const token = reply.token;
-    const stream = Object.freeze({$tvStream: token, close: () => _streamClose(token)});
-    return {code: reply.code, headers: reply.headers, contentType: reply.contentType, stream};
+    return {code: reply.code, headers: reply.headers, contentType: reply.contentType, stream: netStreamHandle(reply.token)};
+}
+
+function netStreamHandle(token) {
+    return Object.freeze({$tvStream: token, close: () => _streamClose(token)});
+}
+
+function netStreamBody(source, options) {
+    if (!source || typeof source[Symbol.asyncIterator] !== 'function') throw new TypeError('Stream body requires an async iterable');
+    if (options && Object.keys(options).length) throw new TypeError('Stream body does not accept request options');
+    const iterator = source[Symbol.asyncIterator]();
+    let chunk = null, offset = 0, closed = false;
+    async function pull(size) {
+        while (!closed && (!chunk || offset === chunk.byteLength)) {
+            const next = await iterator.next();
+            if (next.done || closed) return null;
+            if (next.value instanceof ArrayBuffer) chunk = new Uint8Array(next.value);
+            else if (ArrayBuffer.isView(next.value)) chunk = new Uint8Array(next.value.buffer, next.value.byteOffset, next.value.byteLength);
+            else throw new TypeError('Stream body must yield bytes');
+            offset = 0;
+        }
+        if (closed) return null;
+        const end = Math.min(offset + size, chunk.byteLength);
+        const result = chunk.buffer.slice(chunk.byteOffset + offset, chunk.byteOffset + end);
+        offset = end;
+        return result;
+    }
+    async function cancel() {
+        closed = true;
+        chunk = null;
+        if (typeof iterator.return === 'function') await iterator.return();
+    }
+    const reply = _streamBody(pull, cancel);
+    return {code: 200, headers: {}, contentType: 'application/octet-stream', stream: netStreamHandle(reply.token)};
 }
 
 async function netOpenStream(url, options = {}) {
@@ -178,7 +210,7 @@ function netDownload(url, path, options = {}) {
 function getProxyUrl(params = {}) {
     if (!params || typeof params !== 'object' || Array.isArray(params)) throw new TypeError('Proxy parameters require an object');
     if ('do' in params || 'siteKey' in params) throw new TypeError('Proxy parameters cannot override routing');
-    const url = _proxyUrl(params);
+    const url = proxyUrl(params);
     if (typeof url !== 'string') throw new Error('Proxy URL is unavailable');
     return url;
 }
@@ -224,7 +256,7 @@ function netPeek(key, id) {
 }
 
 async function netJson(url, options = {}) {
-    if (options.buffer && options.buffer !== 0) throw new TypeError('JSON requests require text content');
+    if (options.buffer) throw new TypeError('JSON requests require text content');
     const result = await net.http(url, options);
     if (result.error) throw new Error(result.error);
     if (result.code < 200 || result.code >= 300) throw new Error(`HTTP ${result.code}`);
@@ -290,7 +322,10 @@ function session() {
     return {
         req: (url, options) => net.req(url, route(options)),
         http: (url, options) => net.http(url, route(options)),
-        stream: (url, options) => net.stream(url, route(options)),
+        async stream(source, options) {
+            if (typeof source !== 'string') active();
+            return net.stream(source, typeof source === 'string' ? route(options) : options);
+        },
         openStream: (url, options) => net.openStream(url, route(options)),
         ws: (url, options) => net.ws(url, route(options)),
         connect: (url, options, callback) => net.connect(url, route(options), callback),

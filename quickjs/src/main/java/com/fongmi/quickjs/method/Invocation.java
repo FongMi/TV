@@ -4,6 +4,9 @@ import com.fongmi.quickjs.QuickJS;
 import com.github.catvod.net.Net;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +22,7 @@ public final class Invocation implements AutoCloseable {
     private static final Gson GSON = new Gson();
 
     private final Set<CompletableFuture<?>> pending = ConcurrentHashMap.newKeySet();
-    private final Map<String, Net.StreamResult> streams = new HashMap<>();
+    private final Map<String, InputStream> streams = new HashMap<>();
     private final Set<String> readers = new HashSet<>();
     private final boolean proxy;
     private final long started = System.nanoTime();
@@ -50,11 +53,14 @@ public final class Invocation implements AutoCloseable {
         return new QuickJS.Json(GSON.toJson(Map.of("error", Global.errorMessage(error))));
     }
 
-    private static void closeStreams(List<Net.StreamResult> streams) {
+    private static void closeStreams(List<InputStream> streams) {
         Throwable failure = null;
-        for (Net.StreamResult stream : streams) {
+        for (InputStream stream : streams) {
             try {
                 stream.close();
+            } catch (IOException error) {
+                if (failure == null) failure = new UncheckedIOException(error);
+                else failure.addSuppressed(error);
             } catch (RuntimeException | Error error) {
                 if (failure == null) failure = error;
                 else if (failure != error) failure.addSuppressed(error);
@@ -138,7 +144,7 @@ public final class Invocation implements AutoCloseable {
         for (CompletableFuture<?> request : pending) request.cancel(true);
     }
 
-    private boolean holdStream(String token, Net.StreamResult stream, boolean reader) {
+    boolean holdStream(String token, InputStream stream, boolean reader) {
         synchronized (streams) {
             if (ended || canceled) return false;
             streams.put(token, stream);
@@ -147,11 +153,11 @@ public final class Invocation implements AutoCloseable {
         }
     }
 
-    public Net.StreamResult takeStream(String token) {
+    public InputStream takeStream(String token) {
         synchronized (streams) {
             if (ended || canceled) throw new CancellationException("Proxy invocation ended");
             if (readers.contains(token)) throw new IllegalArgumentException("Chunk reader cannot be returned as a proxy body");
-            Net.StreamResult stream = streams.remove(token);
+            InputStream stream = streams.remove(token);
             if (stream == null) throw new IllegalArgumentException("Unknown or consumed proxy stream");
             return stream;
         }
@@ -161,23 +167,23 @@ public final class Invocation implements AutoCloseable {
         synchronized (streams) {
             if (ended || canceled) throw new CancellationException("Stream invocation ended");
             if (!readers.contains(token)) throw new IllegalArgumentException("Unknown or closed chunk reader");
-            return streams.get(token);
+            return (Net.StreamResult) streams.get(token);
         }
     }
 
     boolean discardStream(String token) {
-        Net.StreamResult stream;
+        InputStream stream;
         synchronized (streams) {
             stream = streams.remove(token);
             readers.remove(token);
         }
-        if (stream != null) stream.close();
+        if (stream != null) closeStreams(List.of(stream));
         return stream != null;
     }
 
     @Override
     public void close() {
-        List<Net.StreamResult> unclaimed;
+        List<InputStream> unclaimed;
         synchronized (streams) {
             ended = true;
             unclaimed = new ArrayList<>(streams.values());

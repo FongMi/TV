@@ -37,6 +37,10 @@ public class NetOptions {
     private Boolean cookie;
     @SerializedName("ping")
     private Integer ping;
+    @SerializedName("idle")
+    private Integer idle;
+    @SerializedName("reconnect")
+    private Boolean reconnect;
     @SerializedName("maxBytes")
     private Long maxBytes;
     @SerializedName("size")
@@ -95,6 +99,15 @@ public class NetOptions {
     public int getPing() {
         if (ping != null && ping < 0) throw new IllegalArgumentException("ping must not be negative");
         return ping == null ? 0 : ping;
+    }
+
+    public int getIdle() {
+        if (idle != null && idle < 0) throw new IllegalArgumentException("idle must not be negative");
+        return idle == null ? 0 : idle;
+    }
+
+    public boolean isReconnect() {
+        return Boolean.TRUE.equals(reconnect);
     }
 
     public String getPostType() {

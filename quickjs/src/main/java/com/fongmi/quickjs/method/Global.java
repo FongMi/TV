@@ -8,6 +8,7 @@ import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.utils.Connect;
 import com.fongmi.quickjs.utils.HtmlQuery;
 import com.github.catvod.Proxy;
+import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.Net;
 import com.github.catvod.net.NetOptions;
@@ -18,12 +19,18 @@ import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.UriUtil;
 import com.google.gson.JsonElement;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class Global {
@@ -37,6 +44,8 @@ public class Global {
     private final Host host;
     private final String siteKey;
     private final Map<QuickJS.Callback, Invocation> callbacks = new HashMap<>();
+    private final Map<Integer, Consumer<JSONObject>> danmakus = new ConcurrentHashMap<>();
+    private final AtomicInteger nextDanmaku = new AtomicInteger();
     private Invocation invocation;
 
     private volatile boolean destroyed;
@@ -51,7 +60,7 @@ public class Global {
         this.web = new WebPlatform(ctx, SpiderDebug::log, api);
         this.network = new Network(this, net, web);
         this.cache = new Cache(this, network, local);
-        this.streams = new Streams(this, network);
+        this.streams = new Streams(this, network, host.getCallTimeout());
         this.sockets = new Sockets(this, network);
         setProperty();
         ctx.onClose(this::destroy).join();
@@ -85,13 +94,18 @@ public class Global {
         destroyed = true;
         network.cancelSleeps();
         try {
-            network.close();
+            streams.close();
         } finally {
-            release();
+            try {
+                network.close();
+            } finally {
+                release();
+            }
         }
     }
 
     private void release() {
+        danmakus.clear();
         network.release();
         cache.release();
         releaseCallbacks();
@@ -106,8 +120,12 @@ public class Global {
 
     public void cancelRequests() {
         sockets.markClosing();
-        network.cancelSleeps();
-        network.close();
+        try {
+            streams.close();
+        } finally {
+            network.cancelSleeps();
+            network.close();
+        }
     }
 
     private Boolean closeSession(Integer id) {
@@ -145,7 +163,9 @@ public class Global {
         ctx.bind("getUserAgent", args -> getUserAgent()).join();
         ctx.bind("getPort", args -> getPort()).join();
         ctx.bind("getProxy", args -> getProxy((Boolean) argument(args, 0))).join();
-        ctx.bind("_proxyUrl", args -> _proxyUrl((QuickJS.Json) argument(args, 0))).join();
+        ctx.bind("proxyUrl", args -> proxyUrl((QuickJS.Json) argument(args, 0))).join();
+        ctx.bind("getDanmakuUrl", args -> Spider.getDanmakuUrl(siteKey, string(args, 0))).join();
+        ctx.bind("emitDanmaku", args -> emitDanmaku(integer(args, 0), (QuickJS.Json) argument(args, 1))).join();
         ctx.bind("js2Proxy", args -> js2Proxy((Boolean) argument(args, 0), integer(args, 1), string(args, 2), string(args, 3), (QuickJS.Json) argument(args, 4))).join();
     }
 
@@ -157,6 +177,7 @@ public class Global {
         ctx.bind("__http", args -> network.http(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
         ctx.bindAsync("_httpAsync", args -> network.requestAsync(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
         ctx.bindAsync("_stream", args -> streams.proxy(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
+        ctx.bind("_streamBody", args -> streams.body((QuickJS.Callback) argument(args, 0), (QuickJS.Callback) argument(args, 1))).join();
         ctx.bindAsync("_openStream", args -> streams.open(string(args, 0), (QuickJS.Json) argument(args, 1), true), this::captureInvocation).join();
         ctx.bindAsync("_streamRead", args -> streams.read(string(args, 0), integer(args, 1)), this::captureInvocation).join();
         ctx.bind("_streamClose", args -> invocation != null && invocation.discardStream(string(args, 0))).join();
@@ -216,6 +237,57 @@ public class Global {
         return !future.isCompletedExceptionally();
     }
 
+    CompletableFuture<Object> invoke(Invocation current, QuickJS.Callback callback, Object... args) {
+        CompletableFuture<Object> result = new CompletableFuture<>();
+        if (destroyed) {
+            result.completeExceptionally(new IllegalStateException("Spider destroyed"));
+        } else {
+            ctx.execute(() -> invoke(current, callback, result, args)).whenComplete((value, error) -> {
+                if (error != null) result.completeExceptionally(error);
+            });
+        }
+        return result;
+    }
+
+    private void invoke(Invocation current, QuickJS.Callback callback, CompletableFuture<Object> result, Object[] args) {
+        if (result.isDone()) return;
+        Invocation previous = invocation;
+        invocation = current;
+        current.enter();
+        try {
+            CompletableFuture<Object> source = callback.callDetached(args);
+            result.whenComplete((value, error) -> {
+                if (result.isCancelled()) source.cancel(false);
+            });
+            source.whenComplete((value, error) -> {
+                if (error == null) result.complete(value);
+                else result.completeExceptionally(error);
+            });
+        } catch (RuntimeException | Error error) {
+            result.completeExceptionally(error);
+        } finally {
+            current.leave();
+            invocation = previous;
+        }
+    }
+
+    public int addDanmaku(Consumer<JSONObject> emit) {
+        if (destroyed) throw new IllegalStateException("Spider destroyed");
+        int id = nextDanmaku.incrementAndGet();
+        danmakus.put(id, emit);
+        return id;
+    }
+
+    public void removeDanmaku(int id) {
+        danmakus.remove(id);
+    }
+
+    private Object emitDanmaku(int id, QuickJS.Json item) throws JSONException {
+        Consumer<JSONObject> emit = danmakus.get(id);
+        if (emit != null) emit.accept(new JSONObject(item.text()));
+        return null;
+    }
+
     public String s2t(String text) {
         return Trans.s2t(false, text);
     }
@@ -248,7 +320,7 @@ public class Global {
         return Proxy.getUrl(local) + "?do=js";
     }
 
-    public String _proxyUrl(QuickJS.Json params) {
+    public String proxyUrl(QuickJS.Json params) {
         Uri.Builder url = Uri.parse(Proxy.getUrl(true)).buildUpon().appendQueryParameter("do", "js").appendQueryParameter("siteKey", siteKey);
         if (params != null) {
             for (Map.Entry<String, JsonElement> entry : Json.strict(params.text()).getAsJsonObject().entrySet()) {

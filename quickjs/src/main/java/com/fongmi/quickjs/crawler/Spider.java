@@ -28,6 +28,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 
 import dalvik.system.DexClassLoader;
 
@@ -77,7 +79,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private Object call(Invocation current, String func, Object... args) throws Exception {
-        CompletableFuture<Object> result = ctx.invokeTimed("destroy".equals(func) ? DESTROY_TIMEOUT : host.getCallTimeout(), "__JS_SPIDER__", func,
+        CompletableFuture<Object> result = ctx.invokeTimed("destroy".equals(func) || "stopDanmaku".equals(func) ? DESTROY_TIMEOUT : host.getCallTimeout(), "__JS_SPIDER__", func,
                 future -> beginCall(current, func, future), global::endCall, args);
         try {
             return "destroy".equals(func) ? result.join() : result.get();
@@ -183,6 +185,23 @@ public class Spider extends com.github.catvod.crawler.Spider {
     @Override
     public String action(String action) throws Exception {
         return (String) call("action", action);
+    }
+
+    @Override
+    public AutoCloseable danmaku(String id, Consumer<JSONObject> emit) throws Exception {
+        int token = global.addDanmaku(emit);
+        try {
+            call("startDanmaku", id, token);
+        } catch (Exception | Error error) {
+            global.removeDanmaku(token);
+            throw error;
+        }
+        AtomicBoolean closed = new AtomicBoolean();
+        return () -> {
+            if (!closed.compareAndSet(false, true)) return;
+            global.removeDanmaku(token);
+            if (!destroyed) call("stopDanmaku", token);
+        };
     }
 
     @Override

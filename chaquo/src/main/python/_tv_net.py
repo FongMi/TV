@@ -90,13 +90,90 @@ class SocketAdapter:
         self.close()
 
 
+class StreamAdapter:
+    def __init__(self, native):
+        self._native = native
+        metadata = json.loads(native.metadata())
+        self.code = metadata["code"]
+        self.headers = metadata["headers"]
+        self.contentType = metadata["contentType"]
+
+    def read(self, size=65536):
+        if isinstance(size, bool) or not isinstance(size, int) or not 1 <= size <= 1048576:
+            raise ValueError("Chunk size must be 1..1048576 bytes")
+        chunk = self._native.readChunk(size)
+        return None if chunk is None else bytes(chunk)
+
+    def close(self):
+        self._native.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
+
+
+class _StreamBody:
+    def __init__(self, source):
+        self._iterator = iter(source)
+        self._chunk = None
+
+    def pull(self, size):
+        if self._chunk is None or not self._chunk:
+            try:
+                value = next(self._iterator)
+            except StopIteration:
+                return None
+            if not isinstance(value, (bytes, bytearray, memoryview)):
+                raise TypeError("Stream body must yield bytes")
+            self._chunk = memoryview(value).cast("B")
+        result = self._chunk[:size].tobytes()
+        self._chunk = self._chunk[size:]
+        return result
+
+    def close(self):
+        self._chunk = None
+        close = getattr(self._iterator, "close", None)
+        if close is not None:
+            close()
+
+
 class NetAdapter:
-    def __init__(self, native, user_agent=None):
+    def __init__(self, native, user_agent=None, streams=None):
         self._native = native
         self._user_agent = user_agent
+        self._streams = streams
 
     def session(self):
-        return NetAdapter(self._native.session(), self._user_agent)
+        return NetAdapter(self._native.session(), self._user_agent, self._streams)
+
+    def openStream(self, url, options=None):
+        return StreamAdapter(self._open_stream(url, options))
+
+    def stream(self, source, options=None):
+        if isinstance(source, str):
+            body = self._open_stream(source, options)
+            result = json.loads(body.metadata())
+        else:
+            if options is not None and (not isinstance(options, dict) or options):
+                raise TypeError("Stream body does not accept request options")
+            if isinstance(source, (bytes, bytearray, memoryview, dict)):
+                raise TypeError("Stream body requires a byte iterable")
+            if self._streams is None:
+                raise RuntimeError("Stream bridge is unavailable")
+            body = self._streams.body(_StreamBody(source))
+            result = {"code": 200, "headers": {}, "contentType": "application/octet-stream"}
+        result["stream"] = body
+        return result
+
+    def _open_stream(self, url, options):
+        if not isinstance(url, str) or options is not None and not isinstance(options, dict):
+            raise TypeError("Stream requires a URL and options dict")
+        if self._streams is None:
+            raise RuntimeError("Stream bridge is unavailable")
+        settings = json.dumps({} if options is None else options, ensure_ascii=False, allow_nan=False)
+        return self._streams.open(self._native, url, settings)
 
     def getUserAgent(self):
         return "" if self._user_agent is None else self._user_agent.getUserAgent()

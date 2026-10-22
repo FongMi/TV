@@ -732,7 +732,7 @@ public final class Net implements AutoCloseable {
         }
     }
 
-    private Request socketRequest(String url, NetOptions options) throws IOException {
+    Request socketRequest(String url, NetOptions options) throws IOException {
         Request request = NetRequest.build(url, options, true);
         return withCookies(request, request.url(), request.header("Cookie"), options);
     }
@@ -750,7 +750,7 @@ public final class Net implements AutoCloseable {
         if (options.getTimeout() <= 0) throw new IllegalArgumentException("WebSocket requires a connect deadline");
         Request request = socketRequest(url, options);
         OkHttpClient client = socketClient(options).newBuilder().pingInterval(options.getPing(), TimeUnit.MILLISECONDS).build();
-        NetSocket socket = new NetSocket(this, options, listener);
+        NetSocket socket = new NetSocket(this, url, options, listener);
         synchronized (lock) {
             checkOpen();
             connections.add(socket);

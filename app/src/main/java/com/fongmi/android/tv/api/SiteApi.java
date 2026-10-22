@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.api;
 
+import android.net.Uri;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -9,6 +10,7 @@ import androidx.collection.ArrayMap;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
+import com.fongmi.android.tv.api.loader.BaseLoader;
 import com.fongmi.android.tv.api.loader.SpiderTestSession;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Episode;
@@ -28,6 +30,8 @@ import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.UriUtil;
 import com.github.catvod.utils.Util;
 
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +40,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import okhttp3.Call;
 import okhttp3.Response;
@@ -59,6 +64,18 @@ public class SiteApi {
 
     private static String ac(int type) {
         return type == 0 ? "videolist" : "detail";
+    }
+
+    @NonNull
+    public static AutoCloseable danmaku(@NonNull Uri uri, @NonNull Consumer<JSONObject> emit) throws Exception {
+        String key = uri.getAuthority();
+        List<String> ids = uri.getPathSegments();
+        if (!"spider".equalsIgnoreCase(uri.getScheme()) || key == null || key.isEmpty() || ids.size() != 1 || ids.get(0).isEmpty() || uri.getQuery() != null || uri.getFragment() != null) throw new IllegalArgumentException("Invalid live danmaku source");
+        String id = ids.get(0);
+        SpiderDebug.log("danmaku", "key=%s,id=%s", key, id);
+        AutoCloseable subscription = BaseLoader.get().getSpider(key).danmaku(id, emit);
+        if (subscription == null) throw new IllegalStateException("danmaku must return a subscription");
+        return subscription;
     }
 
     @NonNull

@@ -3,17 +3,54 @@ import type { Field } from "./config-fields";
 export const networkMethods = [
   ["req / http", "取得 code、headers、content 與 error；HTTP 非 2xx 需自行判斷。"],
   ["json", "取得 JSON；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。"],
-  ["get / post", "Java 取得文字正文；連線失敗拋出例外，HTTP 非 2xx 仍保留正文。"],
-  ["session", "建立隔離 Cookie 的請求流程，用完關閉。"],
+  ["get / post", "Java 取得文字正文；HTTP 非 2xx 仍保留正文。"],
+  ["getUserAgent", "Python／QuickJS 取得 App 的 User-Agent，按需放入 headers。"],
   ["getCookie / setCookie", "讀寫 WebView Cookie；Session 使用隔離 Cookie。"],
-  ["batch", "批次請求，預設每批最多 4 筆並行，按輸入順序回傳。"],
-  ["cached / peek / refresh", "TTL 快取；peek 只讀已有值，refresh 背景更新且遵守 TTL。"],
-  ["cachedText", "Python 的 self.net.cachedText 直接取得快取的 JSON 原文；cached 則將原文解碼為 Python 值。"],
-  ["clearCache", "清除一筆；省略 key 清除目前站點全部 TTL 快取並取消載入。"],
-  ["download", "共用下載器管理串流、續傳暫存與落檔；是否能續傳或並行依來源與請求條件而定，下載失敗會拋出例外。"],
+  ["session", "建立隔離 Cookie 的請求流程，用完關閉。"],
+  ["batch", "批次 HTTP 請求，預設最多 4 筆並行，按輸入順序回傳。"],
+  ["map", "QuickJS 逐項執行非同步回呼，限制並行數並保留輸入順序。"],
+  ["download", "直接下載至檔案，由共用下載器管理暫存、續傳與分段。"],
+  ["openStream", "Python／QuickJS 分塊讀取，用完關閉 reader。"],
+  ["requestStreamAsync", "Java 傳入 NetOptions，Future 回傳 Net.StreamResult。"],
+  ["stream", "Python／QuickJS 原樣轉送網址，或由產生器提供 proxy 正文。"],
   ["ws", "一次 WebSocket 訊息交換，取得首個完整訊息後關閉。"],
-  ["connect", "持續 WebSocket 連線，回呼接收連線與 open／message／error／close 事件。"],
+  ["connect", "持續 WebSocket 連線，可設定斷線恢復與接收逾時。"],
+  ["cached / peek / refresh", "TTL 快取、讀取已有值與背景更新。"],
+  ["cachedText", "Python 取得快取的 JSON 原文。"],
+  ["clearCache", "清除一筆；省略 key 清除目前站點全部 TTL 快取並取消載入。"],
   ["sleep", "可取消的等待，單位為毫秒。"],
+];
+
+export const liveDanmakuFields: Field[] = [
+  {
+    name: "text",
+    type: "string",
+    required: true,
+    description: "解碼後的文字；不得全空白，最多 4096 字元。",
+  },
+  {
+    name: "color",
+    type: "integer",
+    description: "RGB 顏色，範圍 0～16777215。",
+    default: "16777215（白色）",
+  },
+  {
+    name: "size",
+    type: "number",
+    description: "字級，單位 sp，範圍 0～96；0 跟隨使用者設定。",
+    default: "0",
+  },
+  {
+    name: "type",
+    type: "integer",
+    description: "1 滾動、4 底部、5 頂部、6 反向。",
+    default: "1",
+  },
+  {
+    name: "colors",
+    type: "integer[]",
+    description: "2～8 個 RGB 顏色組成漸層；省略時使用 color。",
+  },
 ];
 
 export const methods = [
@@ -34,6 +71,7 @@ export const methods = [
     "list + pagecount",
   ],
   ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result.url、選填 skips"],
+  ["danmaku", "選用爬蟲即時彈幕來源", "彈幕或訂閱狀態物件", "Java AutoCloseable／Python、QuickJS 停止函式"],
   ["liveContent / live", "載入直播配置", "TXT、M3U 或 Group JSON", "文字 / Group 陣列"],
   [
     "proxy / localProxy",
@@ -103,7 +141,7 @@ export const resultFields: Field[] = [
     name: "danmaku",
     type: "Danmaku[] | string",
     description:
-      "彈幕清單、單一 URL 或 JSON 陣列字串；仍受 App 彈幕載入設定控制。",
+      "彈幕清單、單一 URL 或 JSON 陣列字串，可使用檔案或爬蟲即時來源；受 App 彈幕載入設定控制。",
     default: "[]",
   },
   { name: "subs", type: "Sub[]", description: "外掛字幕清單。", default: "[]" },
@@ -241,7 +279,7 @@ export const objectGroups = [
   {
     name: "Danmaku",
     fields: [
-      ["url", "彈幕資料位置。"],
+      ["url", "HTTP(S) 資料網址，或由 getDanmakuUrl(id) 產生的即時來源。"],
       ["name", "選填顯示名稱。"],
     ],
   },

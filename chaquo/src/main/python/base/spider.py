@@ -4,6 +4,7 @@ import json
 import requests
 from lxml import etree
 from com.github.catvod import Proxy
+from com.github.catvod.crawler import Spider as JavaSpider
 from com.chaquo.python import Python
 from abc import abstractmethod, ABCMeta
 from importlib.machinery import SourceFileLoader
@@ -57,6 +58,9 @@ class Spider(metaclass=ABCMeta):
 
     def action(self, action):
         pass
+
+    def danmaku(self, id, emit):
+        raise NotImplementedError("Spider does not support live danmaku")
 
     def destroy(self):
         pass
@@ -127,6 +131,9 @@ class Spider(metaclass=ABCMeta):
         url = str(Proxy.getUrl(local))
         query = urlencode({'do': 'py', 'siteKey': self.siteKey, **params})
         return url + '?' + query
+
+    def getDanmakuUrl(self, id):
+        return str(JavaSpider.getDanmakuUrl(self.siteKey, id))
 
     def log(self, msg):
         if isinstance(msg, (dict, list)):

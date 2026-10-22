@@ -1,5 +1,5 @@
 import { configFieldGroups } from "./config-fields.ts";
-import { methods, networkMethods, objectGroups, resultFields } from "./spider-fields.ts";
+import { methods, networkMethods, objectGroups, resultFields, liveDanmakuFields } from "./spider-fields.ts";
 import { features } from "./feature-content.ts";
 import { playbackProperties } from "./playback-commands.ts";
 import {
@@ -36,10 +36,38 @@ const entries: Entry[] = [
   },
   {
     title: "爬蟲共用網路",
-    description: "Python、QuickJS、Java 的 HTTP、Cookie、TTL 快取、批次請求與下載",
+    description: "Python、QuickJS、Java 的 HTTP、串流、Cookie、TTL 快取與下載",
     href: "/spider#network",
     names: networkMethods.flatMap(([name]) => name.split(" / ").map((method) => `net.${method}`)).concat("self.net.cachedText"),
     keywords: networkMethods.flat().join(" ") + " self.net stale persist",
+  },
+  {
+    title: "串流讀取與代理",
+    description: "分塊讀取、原樣轉送與產生器正文的回傳、關閉及取消規則",
+    href: "/spider#streams",
+    names: ["net.openStream", "self.net.openStream", "net.stream", "self.net.stream", "net.requestStreamAsync", "Net.StreamResult", "InputStream"],
+    keywords: "Python QuickJS Java generator asyncGenerator proxy_body 分塊 串流 EOF 取消 timeout callTimeout",
+  },
+  {
+    title: "爬蟲 WebSocket",
+    description: "一次交換、持續收訊、心跳與斷線恢復",
+    href: "/spider#websocket",
+    names: ["net.ws", "net.connect", "socket.send", "socket.close", "socket.cancel"],
+    keywords: "Python QuickJS Java reconnect idle ping callback open message retry error close",
+  },
+  {
+    title: "爬蟲 TTL 快取",
+    description: "按站點快取 JSON、背景更新與清除",
+    href: "/spider#cache",
+    names: ["net.cached", "net.cachedText", "self.net.cachedText", "net.peek", "net.refresh", "net.clearCache"],
+    keywords: "Python QuickJS Java ttl stale persist loader cachedText TTL 快取",
+  },
+  {
+    title: "爬蟲即時彈幕",
+    description: "即時來源、彈幕顏色、字級、位置與漸層",
+    href: "/spider#live-danmaku",
+    names: ["getDanmakuUrl", "danmaku(id, emit)", "emit.accept", ...liveDanmakuFields.map((field) => field.name)],
+    keywords: "Python QuickJS Java WebSocket net.connect 停止函式 AutoCloseable state msg connecting ready retrying error 訂閱狀態 " + liveDanmakuFields.map((field) => field.description).join(" "),
   },
   {
     title: "Node.js 載入",
@@ -70,7 +98,7 @@ const entries: Entry[] = [
   {
     title: "爬蟲 Local 設定",
     description: "按站點隔離的 JSON 設定讀寫與刪除",
-    href: "/spider#network",
+    href: "/spider#cache",
     names: ["self.local", "local.get", "local.set", "local.delete"],
     keywords: "Python QuickJS Java get set delete JSON 本地儲存",
   },

@@ -8,10 +8,15 @@ import com.github.catvod.crawler.SpiderDebug;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
+import java.security.cert.CertificateException;
 import java.util.ArrayDeque;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLHandshakeException;
+import javax.net.ssl.SSLPeerUnverifiedException;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -23,6 +28,9 @@ import okio.ByteString;
 @Keep
 public final class NetSocket implements AutoCloseable {
 
+    private static final long RETRY_DELAY_MS = 1000;
+    private static final long MAX_RETRY_DELAY_MS = 30000;
+
     @Keep
     @FunctionalInterface
     public interface Listener {
@@ -30,26 +38,67 @@ public final class NetSocket implements AutoCloseable {
     }
 
     private final Net owner;
+    private final String url;
     private final NetOptions options;
+    private final long idleTimeoutNs;
     private final ArrayDeque<Event> events = new ArrayDeque<>();
     private Listener listener;
+    private OkHttpClient client;
     private volatile WebSocket socket;
     private ScheduledFuture<?> deadline;
+    private ScheduledFuture<?> retry;
+    private long retryDelayMs = RETRY_DELAY_MS;
+    private long openedAtNs;
+    private long receivedAtNs;
+    private int generation;
     private boolean opened;
     private boolean dispatching;
     private volatile boolean closing;
     private volatile boolean finished;
 
-    NetSocket(Net owner, NetOptions options, Listener listener) {
+    NetSocket(Net owner, String url, NetOptions options, Listener listener) {
         this.owner = owner;
+        this.url = url;
         this.options = options;
+        this.idleTimeoutNs = TimeUnit.MILLISECONDS.toNanos(options.getIdle());
         this.listener = listener;
     }
 
     synchronized void start(OkHttpClient client, Request request) {
         if (finished) return;
-        deadline = Net.DEADLINES.schedule(() -> client.dispatcher().executorService().execute(this::timeout), options.getTimeout(), TimeUnit.MILLISECONDS);
-        socket = client.newWebSocket(request, new Callback());
+        this.client = client;
+        connect(request);
+    }
+
+    private void connect(Request request) {
+        int token = ++generation;
+        scheduleTimeout(token, TimeUnit.MILLISECONDS.toNanos(options.getTimeout()));
+        socket = client.newWebSocket(request, new Callback(token));
+    }
+
+    private void scheduleTimeout(int token, long delayNs) {
+        if (deadline != null) deadline.cancel(false);
+        deadline = Net.DEADLINES.schedule(() -> client.dispatcher().executorService().execute(() -> timeout(token)), delayNs, TimeUnit.NANOSECONDS);
+    }
+
+    private void reconnect() {
+        try {
+            synchronized (this) {
+                if (closing || finished) return;
+                retry = null;
+                try {
+                    connect(owner.socketRequest(url, options));
+                } catch (IOException | RuntimeException error) {
+                    finish(1006, "", Net.Result.failure(error).error);
+                }
+            }
+        } finally {
+            dispatch();
+        }
+    }
+
+    private boolean isCurrent(int token) {
+        return !finished && generation == token;
     }
 
     public boolean send(String text) {
@@ -70,9 +119,10 @@ public final class NetSocket implements AutoCloseable {
             synchronized (this) {
                 if (closing || finished) return;
                 if (!opened) {
-                    abort(1001, "Canceled", null);
+                    finish(1001, "Canceled", null);
                 } else {
                     closing = true;
+                    deadline.cancel(false);
                     socket.close(1000, "");
                 }
             }
@@ -83,69 +133,101 @@ public final class NetSocket implements AutoCloseable {
 
     public void cancel() {
         try {
-            abort(1001, "Canceled", null);
+            finish(1001, "Canceled", null);
         } finally {
             dispatch();
         }
     }
 
-    private synchronized void open(WebSocket socket, Response response) {
-        if (finished) {
+    private synchronized void open(int token, WebSocket socket, Response response) {
+        if (!isCurrent(token)) {
             socket.cancel();
             return;
         }
         this.socket = socket;
         opened = true;
+        openedAtNs = System.nanoTime();
+        receivedAtNs = openedAtNs;
         deadline.cancel(false);
+        if (idleTimeoutNs > 0) scheduleTimeout(token, idleTimeoutNs);
         try {
             owner.saveCookies(response, options);
             String message = options.message();
             if (message != null && !socket.send(message)) throw new IOException("WebSocket send failed");
             events.add(new Event("open", null, 101, null, null));
         } catch (Exception e) {
-            abort(1006, "", Net.Result.failure(e).error);
+            finish(1006, "", Net.Result.failure(e).error);
         }
     }
 
-    private synchronized void message(Object content) {
-        if (!closing && !finished) events.add(new Event("message", content, 0, null, null));
+    private synchronized void message(int token, Object content) {
+        if (closing || !isCurrent(token)) return;
+        if (idleTimeoutNs > 0) receivedAtNs = System.nanoTime();
+        events.add(new Event("message", content, 0, null, null));
     }
 
-    private synchronized void closing(WebSocket socket, int code, String reason) {
-        closing = true;
-        socket.close(code, reason);
+    private synchronized void closing(int token, WebSocket socket, int code, String reason) {
+        if (isCurrent(token)) socket.close(code, reason);
     }
 
-    private synchronized void failed(Throwable error, Response response) {
-        if (finished) {
+    private synchronized void failed(int token, Throwable error, Response response) {
+        if (!isCurrent(token)) {
             if (response != null) response.close();
             return;
         }
         String message = Net.Result.failure(error).error;
+        boolean recoverable = isRecoverable(error);
         if (response != null) {
             try (response) {
                 owner.saveCookies(response, options);
                 message = "WebSocket handshake failed (HTTP " + response.code() + ")";
+                recoverable = response.code() == 408 || response.code() == 425 || response.code() == 429 || response.code() >= 500 && response.code() <= 599;
             } catch (Exception e) {
                 message = Net.Result.failure(e).error;
+                recoverable = false;
             }
         }
-        finish(1006, "", message);
+        disconnected(token, 1006, "", message, recoverable);
     }
 
-    private synchronized void abort(int code, String reason, String error) {
-        if (finished) return;
-        try {
-            if (socket != null) socket.cancel();
-        } finally {
-            finish(code, reason, error);
-        }
+    private boolean isRecoverable(Throwable error) {
+        if (!(error instanceof IOException) || error instanceof ProtocolException || error instanceof SSLPeerUnverifiedException) return false;
+        return !(error instanceof SSLHandshakeException) || !(error.getCause() instanceof CertificateException);
     }
 
-    private void timeout() {
+    private synchronized void disconnected(int token, int code, String reason, String error, boolean recoverable) {
+        if (!isCurrent(token)) return;
+        if (!closing && options.isReconnect() && recoverable) scheduleReconnect(code, reason, error);
+        else finish(code, reason, error);
+    }
+
+    private void scheduleReconnect(int code, String reason, String error) {
+        if (opened && System.nanoTime() - openedAtNs >= TimeUnit.MILLISECONDS.toNanos(MAX_RETRY_DELAY_MS)) retryDelayMs = RETRY_DELAY_MS;
+        generation++;
+        opened = false;
+        if (deadline != null) deadline.cancel(false);
+        WebSocket previous = socket;
+        socket = null;
+        if (previous != null) previous.cancel();
+        retry = Net.DEADLINES.schedule(() -> client.dispatcher().executorService().execute(this::reconnect), retryDelayMs, TimeUnit.MILLISECONDS);
+        retryDelayMs = Math.min(retryDelayMs * 2, MAX_RETRY_DELAY_MS);
+        events.add(new Event("retry", null, code, reason, error));
+    }
+
+    private void timeout(int token) {
         try {
             synchronized (this) {
-                if (!opened) abort(1006, "", Net.Result.failure(new SocketTimeoutException()).error);
+                if (closing || !isCurrent(token)) return;
+                if (opened) {
+                    if (idleTimeoutNs == 0) return;
+                    long remainingNs = idleTimeoutNs - (System.nanoTime() - receivedAtNs);
+                    if (remainingNs > 0) {
+                        scheduleTimeout(token, remainingNs);
+                        return;
+                    }
+                }
+                String error = opened ? "WebSocket receive timeout" : Net.Result.failure(new SocketTimeoutException()).error;
+                disconnected(token, 1006, "", error, true);
             }
         } finally {
             dispatch();
@@ -155,10 +237,15 @@ public final class NetSocket implements AutoCloseable {
     private synchronized void finish(int code, String reason, String error) {
         if (finished) return;
         finished = true;
+        generation++;
         if (deadline != null) deadline.cancel(false);
+        if (retry != null) retry.cancel(false);
         owner.remove(this);
         if (error != null) events.add(new Event("error", null, 0, null, error));
         events.add(new Event("close", null, code, reason, null));
+        WebSocket previous = socket;
+        socket = null;
+        if (previous != null) previous.cancel();
     }
 
     private void dispatch() {
@@ -190,7 +277,7 @@ public final class NetSocket implements AutoCloseable {
         } catch (Throwable e) {
             SpiderDebug.log(e);
             try {
-                abort(1006, "", Net.Result.failure(e).error);
+                finish(1006, "", Net.Result.failure(e).error);
             } catch (RuntimeException | Error closing) {
                 if (failure == null) failure = closing;
                 else if (failure != closing) failure.addSuppressed(closing);
@@ -206,10 +293,17 @@ public final class NetSocket implements AutoCloseable {
     }
 
     private final class Callback extends WebSocketListener {
+
+        private final int token;
+
+        private Callback(int token) {
+            this.token = token;
+        }
+
         @Override
         public void onOpen(@NonNull WebSocket socket, @NonNull Response response) {
             try {
-                open(socket, response);
+                open(token, socket, response);
             } finally {
                 dispatch();
             }
@@ -217,30 +311,30 @@ public final class NetSocket implements AutoCloseable {
 
         @Override
         public void onMessage(@NonNull WebSocket socket, @NonNull String text) {
-            message(text);
+            message(token, text);
             dispatch();
         }
 
         @Override
         public void onMessage(@NonNull WebSocket socket, @NonNull ByteString bytes) {
-            message(bytes.toByteArray());
+            message(token, bytes.toByteArray());
             dispatch();
         }
 
         @Override
         public void onClosing(@NonNull WebSocket socket, int code, @NonNull String reason) {
-            closing(socket, code, reason);
+            closing(token, socket, code, reason);
         }
 
         @Override
         public void onClosed(@NonNull WebSocket socket, int code, @NonNull String reason) {
-            finish(code, reason, null);
+            disconnected(token, code, reason, null, code == 1000 || code == 1001 || code == 1011 || code == 1012 || code == 1013);
             dispatch();
         }
 
         @Override
         public void onFailure(@NonNull WebSocket socket, @NonNull Throwable error, @Nullable Response response) {
-            failed(error, response);
+            failed(token, error, response);
             dispatch();
         }
     }
@@ -267,7 +361,7 @@ public final class NetSocket implements AutoCloseable {
             JsonObject metadata = new JsonObject();
             metadata.addProperty("type", type);
             if (type.equals("message")) metadata.addProperty("binary", binary);
-            if (type.equals("open") || type.equals("close")) metadata.addProperty("code", code);
+            if (type.equals("open") || type.equals("close") || type.equals("retry")) metadata.addProperty("code", code);
             if (reason != null) metadata.addProperty("reason", reason);
             if (error != null) metadata.addProperty("error", error);
             return new Object[]{metadata.toString(), content};

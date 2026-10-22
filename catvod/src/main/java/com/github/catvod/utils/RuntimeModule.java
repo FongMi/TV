@@ -554,7 +554,7 @@ public enum RuntimeModule {
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
             RuntimeModule owner = moduleForClass(name);
-            boolean owned = owner == module || name.startsWith("j$.") || module == PYTHON && name.startsWith("kotlin.") || module == NODEJS && name.startsWith("fi.iki.elonen.") || module == QUICKJS && name.startsWith("org.jsoup.");
+            boolean owned = owner == module || name.startsWith("j$.") || name.startsWith("com.android.tools.r8.") || module == PYTHON && name.startsWith("kotlin.") || module == NODEJS && name.startsWith("fi.iki.elonen.") || module == QUICKJS && name.startsWith("org.jsoup.");
             if (!owned) return owner == null ? super.loadClass(name, resolve) : SPIDER_LOADER.loadClass(name);
             synchronized (this) {
                 Class<?> type = findLoadedClass(name);

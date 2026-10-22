@@ -10,10 +10,13 @@ import com.github.catvod.net.Net;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Local;
 
+import org.json.JSONObject;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import okhttp3.Dns;
 
@@ -33,6 +36,15 @@ public abstract class Spider {
 
     public String getProxyUrl() {
         return getProxyUrl(Collections.emptyMap());
+    }
+
+    public String getDanmakuUrl(String id) {
+        return getDanmakuUrl(siteKey, id);
+    }
+
+    public static String getDanmakuUrl(String siteKey, String id) {
+        if (siteKey == null || siteKey.isEmpty() || id == null || id.isEmpty()) throw new IllegalArgumentException("Danmaku requires a site key and ID");
+        return new Uri.Builder().scheme("spider").authority(siteKey).appendPath(id).build().toString();
     }
 
     public String getProxyUrl(Map<String, String> params) {
@@ -97,6 +109,10 @@ public abstract class Spider {
 
     public String action(String action) throws Exception {
         return null;
+    }
+
+    public AutoCloseable danmaku(String id, Consumer<JSONObject> emit) throws Exception {
+        throw new UnsupportedOperationException("Spider does not support live danmaku");
     }
 
     public void destroy() {
