@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewbinding.ViewBinding;
 
@@ -93,6 +94,7 @@ public class FolderFragment extends BaseFragment {
     }
 
     public void setFilter(String key, Value value) {
+        getChildFragmentManager().popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         Optional.ofNullable(getChild()).ifPresent(f -> f.setFilter(key, value));
     }
 
