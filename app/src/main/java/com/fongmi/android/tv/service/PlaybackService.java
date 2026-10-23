@@ -224,7 +224,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
     }
 
     public boolean canRemoteSeek() {
-        return hasRemotePlayback() && !player.isLive() && player.getDuration() > 0 && player.getPlayer().isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM);
+        return hasRemotePlayback() && player.canSeek() && player.getDuration() > 0;
     }
 
     public boolean canRemoteSetSpeed() {
@@ -668,6 +668,7 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         protected ListenableFuture<?> handleSeek(int mediaItemIndex, long positionMs, int command) {
             if (command == COMMAND_SEEK_TO_PREVIOUS || command == COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM) dispatchPrev();
             else if (command == COMMAND_SEEK_TO_NEXT || command == COMMAND_SEEK_TO_NEXT_MEDIA_ITEM) dispatchNext();
+            else if (player.getTimeshift().isActive()) return player.getTimeshift().seekTo(positionMs);
             else return super.handleSeek(mediaItemIndex, positionMs, command);
             return Futures.immediateVoidFuture();
         }
@@ -680,11 +681,16 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
 
         @Override
         protected State getState() {
-            State state = super.getState();
+            State state = player.getTimeshift().getState(super.getState());
             Player.Commands.Builder commands = state.availableCommands.buildUpon().removeAll(COMMAND_SEEK_TO_PREVIOUS, COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM, COMMAND_SEEK_TO_NEXT, COMMAND_SEEK_TO_NEXT_MEDIA_ITEM).add(COMMAND_STOP);
             if (canRemoteNavigate()) commands.addAll(COMMAND_SEEK_TO_PREVIOUS, COMMAND_SEEK_TO_PREVIOUS_MEDIA_ITEM, COMMAND_SEEK_TO_NEXT, COMMAND_SEEK_TO_NEXT_MEDIA_ITEM);
             return state.buildUpon().setAvailableCommands(commands.build()).build();
         }
+    }
+
+    @Override
+    public void onTimeshiftChanged() {
+        if (sessionPlayer != null) sessionPlayer.updateCommands();
     }
 
     private void startBrowse(MediaItem item, long startPositionMs) {

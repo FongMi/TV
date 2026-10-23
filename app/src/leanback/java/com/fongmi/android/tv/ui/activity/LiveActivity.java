@@ -1039,7 +1039,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void onSeeking(long time) {
-        if (player().isLive()) return;
+        if (!player().canSeek()) return;
         mBinding.widget.center.setVisibility(View.VISIBLE);
         setSeekPreviewTime(mBinding.widget.duration, mBinding.widget.position, time);
         mBinding.widget.statusIcon.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
@@ -1060,13 +1060,13 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void onKeyLeft(long time) {
-        if (player().isLive()) prevLine();
+        if (!player().canSeek()) prevLine();
         else App.post(() -> seekTo(time), 250);
     }
 
     @Override
     public void onKeyRight(long time) {
-        if (player().isLive()) nextLine(true);
+        if (!player().canSeek()) nextLine(true);
         else App.post(() -> seekTo(time), 250);
     }
 

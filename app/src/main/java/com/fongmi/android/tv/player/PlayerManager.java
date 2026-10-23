@@ -75,6 +75,7 @@ public class PlayerManager implements ParseCallback {
     private final PlayerEffectManager effects;
     private final Runnable runnable;
     private final Callback callback;
+    private final TimeshiftPlayback timeshift;
     private PendingPreload pendingPreload;
     private PendingPreload queuedPreload;
     private PlayerEngine engine;
@@ -104,9 +105,11 @@ public class PlayerManager implements ParseCallback {
         this.effects = new PlayerEffectManager(() -> engine);
         this.danmakuEnabled = DanmakuSetting.isShow();
         this.player = engine.getPlayer();
+        this.timeshift = new TimeshiftPlayback(this);
     }
 
     public void release() {
+        timeshift.clear();
         App.removeCallbacks(runnable);
         stopParse();
         clearSpeedPressState();
@@ -118,6 +121,10 @@ public class PlayerManager implements ParseCallback {
 
     public Player getPlayer() {
         return player;
+    }
+
+    public TimeshiftPlayback getTimeshift() {
+        return timeshift;
     }
 
     @Nullable
@@ -288,11 +295,15 @@ public class PlayerManager implements ParseCallback {
     }
 
     public boolean isLive() {
-        return player.getCurrentMediaItem() != null && player.isCurrentMediaItemLive();
+        return player.getCurrentMediaItem() != null && (timeshift.isActive() || player.isCurrentMediaItemLive());
     }
 
     public boolean isVod() {
-        return player.getCurrentMediaItem() != null && !player.isCurrentMediaItemLive();
+        return player.getCurrentMediaItem() != null && !isLive();
+    }
+
+    public boolean canSeek() {
+        return timeshift.isActive() || !isLive() && player.isCommandAvailable(Player.COMMAND_SEEK_IN_CURRENT_MEDIA_ITEM);
     }
 
     public boolean haveTrack(int type) {
@@ -328,7 +339,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public long getPosition() {
-        return player.getCurrentPosition();
+        return timeshift.isActive() ? timeshift.getPosition() : player.getCurrentPosition();
     }
 
     public String getSizeText() {
@@ -412,6 +423,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public long getDuration() {
+        if (timeshift.isActive()) return timeshift.getDuration();
         long duration = engine.getOriginalDurationMs();
         return duration == C.TIME_UNSET ? player.getDuration() : duration;
     }
@@ -609,6 +621,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void stop() {
+        timeshift.clear();
         endSpeedPress();
         pendingPreload = null;
         queuedPreload = null;
@@ -617,12 +630,14 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void clearMediaItems() {
+        timeshift.clear();
         endSpeedPress();
         clearPreload();
         player.clearMediaItems();
     }
 
     public void prepareForReplacement() {
+        timeshift.clear();
         endSpeedPress();
         reset();
         clearPreload();
@@ -638,13 +653,15 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void replay(long positionMs) {
-        if (positionMs == C.TIME_UNSET) player.seekToDefaultPosition();
+        if (timeshift.isActive()) timeshift.seekTo(positionMs);
+        else if (positionMs == C.TIME_UNSET) player.seekToDefaultPosition();
         else player.seekTo(positionMs);
         player.play();
     }
 
     public void seekTo(long time) {
-        player.seekTo(time);
+        if (timeshift.isActive()) timeshift.seekTo(time);
+        else player.seekTo(time);
     }
 
     public long getTextOffsetMs() {
@@ -743,7 +760,7 @@ public class PlayerManager implements ParseCallback {
         if (spec == null || spec.getUrl() == null) return;
         endSpeedPress();
         PlayerEngine.Type previousType = engine.getType();
-        boolean live = player.isCurrentMediaItemLive() && player.isCurrentMediaItemDynamic();
+        boolean live = player.isCurrentMediaItemLive() && player.isCurrentMediaItemDynamic() && !timeshift.isReplaying();
         PlaybackSnapshot snapshot = PlaybackSnapshot.capture(this);
         spec.setIsoEditionIndex(snapshot.selectedIsoEditionIndex());
         ensureEngine(spec.checkUa());
@@ -849,6 +866,7 @@ public class PlayerManager implements ParseCallback {
         if (newMedia) mpvDrmExoFallback = false;
         boolean playWhenReady = player.getPlayWhenReady();
         ensureEngine(spec.checkUa());
+        if (newMedia) timeshift.start(spec);
         beginPlaybackAttempt(newMedia);
         if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;
@@ -883,7 +901,25 @@ public class PlayerManager implements ParseCallback {
     }
 
     private void startCurrent(long startPositionMs) {
-        setMediaItem(Constant.TIMEOUT_PLAY, startPositionMs, false);
+        if (timeshift.isActive()) timeshift.seekTo(startPositionMs);
+        else setMediaItem(Constant.TIMEOUT_PLAY, startPositionMs, false);
+    }
+
+    void applyTimeshift(String url, String format, Map<String, String> headers) {
+        boolean playWhenReady = player.getPlayWhenReady();
+        spec.setUrl(url);
+        spec.setFormat(format);
+        spec.setHeaders(new HashMap<>(headers));
+        setMediaItem(Constant.TIMEOUT_PLAY, C.TIME_UNSET, false);
+        player.setPlayWhenReady(playWhenReady);
+    }
+
+    void onTimeshiftChanged() {
+        callback.onTimeshiftChanged();
+    }
+
+    void onTimeshiftError() {
+        Notify.show(R.string.error_play_url);
     }
 
     private void startPreloadIfReady() {
@@ -903,7 +939,8 @@ public class PlayerManager implements ParseCallback {
     @Nullable
     public Uri getSelectedDanmakuUri() {
         Danmaku item = spec != null ? spec.getSelectedDanmaku() : null;
-        return item == null ? null : item.getUri();
+        Uri uri = item == null ? null : item.getUri();
+        return timeshift.isReplaying() && LiveDanmaku.isLive(uri) ? null : uri;
     }
 
     public void setDanmaku(Danmaku item) {
@@ -945,6 +982,9 @@ public class PlayerManager implements ParseCallback {
     }
 
     public interface Callback {
+
+        default void onTimeshiftChanged() {
+        }
 
         default void onPreloadError(Object tag) {
         }
@@ -1043,7 +1083,7 @@ public class PlayerManager implements ParseCallback {
             SubtitleOffsets offsets = player.isCommandAvailable(Player.COMMAND_GET_TEXT_OFFSET) ? manager.getSubtitleOffsets() : null;
             int repeatMode = player.getRepeatMode();
             int selectedIsoEditionIndex = getSelectedIsoEditionIndex(manager, player);
-            return new PlaybackSnapshot(player.getCurrentPosition(), player.getPlayWhenReady(), player.getPlaybackParameters(), repeatMode, volume, audioOffsetMs, offsets, selectedIsoEditionIndex);
+            return new PlaybackSnapshot(manager.getPosition(), player.getPlayWhenReady(), player.getPlaybackParameters(), repeatMode, volume, audioOffsetMs, offsets, selectedIsoEditionIndex);
         }
 
         private static int getSelectedIsoEditionIndex(PlayerManager manager, Player player) {

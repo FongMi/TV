@@ -11,6 +11,7 @@ import com.fongmi.android.tv.bean.Danmaku;
 import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
+import com.fongmi.android.tv.bean.Timeshift;
 import com.fongmi.android.tv.setting.Setting;
 import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.UriUtil;
@@ -33,6 +34,7 @@ public class PlaySpec {
     private String url;
     private Drm drm;
     private Auth.Context auth;
+    private Timeshift timeshift;
     private long endingMs;
     private int isoEditionIndex = C.INDEX_UNSET;
 
@@ -61,12 +63,14 @@ public class PlaySpec {
     public static PlaySpec from(Result result, String key, MediaMetadata metadata) {
         PlaySpec spec = new PlaySpec(key, result.getRealUrl(), result.getHeader(), result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
         spec.auth = result.getAuth();
+        spec.timeshift = result.getTimeshift();
         return spec;
     }
 
     public static PlaySpec fromParse(Result result, String key, MediaMetadata metadata) {
         PlaySpec spec = new PlaySpec(key, null, null, result.getFormat(), result.getDrm(), result.getSubs(), result.getDanmaku(), metadata);
         spec.auth = result.getAuth();
+        spec.timeshift = result.getTimeshift();
         return spec;
     }
 
@@ -101,6 +105,10 @@ public class PlaySpec {
 
     public Auth.Context getAuth() {
         return auth;
+    }
+
+    public Timeshift getTimeshift() {
+        return timeshift;
     }
 
     public int getIsoEditionIndex() {

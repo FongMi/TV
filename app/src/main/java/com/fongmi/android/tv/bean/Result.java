@@ -106,6 +106,8 @@ public class Result implements Parcelable {
     private Integer jx;
     @SerializedName("drm")
     private Drm drm;
+    @SerializedName("timeshift")
+    private Timeshift timeshift;
 
     public Result() {
     }
@@ -358,6 +360,14 @@ public class Result implements Parcelable {
 
     public void setDrm(Drm drm) {
         this.drm = drm;
+    }
+
+    public Timeshift getTimeshift() {
+        return timeshift;
+    }
+
+    public void setTimeshift(Timeshift timeshift) {
+        this.timeshift = timeshift;
     }
 
     public boolean hasMsg() {

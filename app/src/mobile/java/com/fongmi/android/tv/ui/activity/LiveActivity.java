@@ -1134,7 +1134,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     public void onSeeking(long time) {
-        if (player().isLive()) return;
+        if (!player().canSeek()) return;
         mBinding.widget.statusIcon.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
         setSeekPreviewTime(mBinding.widget.time, time);
         mBinding.widget.seek.setVisibility(View.VISIBLE);
@@ -1143,7 +1143,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     public void onSeekEnd(long time) {
-        if (player().isLive()) return;
+        if (!player().canSeek()) return;
         seekTo(time);
     }
 

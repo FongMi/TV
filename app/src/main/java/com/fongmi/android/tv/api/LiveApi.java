@@ -53,6 +53,7 @@ public class LiveApi {
     public static Result getUrl(@NonNull Channel item, @NonNull EpgData data) throws Exception {
         Result result = resolveUrl(item);
         if (Source.isPush(result.getUrl().v())) return result;
+        result.setTimeshift(null);
         result.setUrl(item.getCatchup().format(result.getRealUrl(), data));
         BaseLoader.get().requireProxy(result.getRealUrl());
         if (item.isRtsp()) result.getHeader().put("rtsp_range", data.getRange());
