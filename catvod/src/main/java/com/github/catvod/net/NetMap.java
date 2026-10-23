@@ -34,14 +34,18 @@ final class NetMap<T, R> {
         this.mapper = mapper;
         int count = Math.min(this.items.size(), limit);
         remaining = new AtomicInteger(count);
-        for (int i = 0; i < count; i++) workers.add(new FutureTask<>(this::work, null) {
+        for (int i = 0; i < count; i++) workers.add(createWorker(complete));
+    }
+
+    private FutureTask<Void> createWorker(Consumer<NetMap<?, ?>> complete) {
+        return new FutureTask<>(this::work, null) {
             @Override
             protected void done() {
                 if (remaining.decrementAndGet() != 0) return;
                 result.complete(values);
                 complete.accept(NetMap.this);
             }
-        });
+        };
     }
 
     CompletableFuture<List<R>> start() {

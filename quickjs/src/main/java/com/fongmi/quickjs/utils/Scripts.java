@@ -36,9 +36,7 @@ public final class Scripts {
         if (source == null) throw new IllegalArgumentException("Script source is required");
         JsonObject settings = Json.strict(options == null ? "{}" : options).getAsJsonObject();
         long timeout = timeout(settings);
-        JsonElement globals = settings.has("globals") ? settings.get("globals") : new JsonObject();
-        if (!globals.isJsonObject() || globals.getAsJsonObject().has("md5X")) throw new IllegalArgumentException("Invalid script globals");
-        String script = RUN + "(JSON.parse(" + GSON.toJson(globals.toString()) + ")," + GSON.toJson(source) + ")";
+        String script = buildScript(source, settings);
         QuickJS context = new QuickJS(QuickJSLoader::init);
         try {
             context.bind("md5X", args -> Crypto.md5((String) args[0])).join();
@@ -52,6 +50,12 @@ public final class Scripts {
             }
             throw error;
         }
+    }
+
+    private static String buildScript(String source, JsonObject options) {
+        JsonElement globals = options.has("globals") ? options.get("globals") : new JsonObject();
+        if (!globals.isJsonObject() || globals.getAsJsonObject().has("md5X")) throw new IllegalArgumentException("Invalid script globals");
+        return RUN + "(JSON.parse(" + GSON.toJson(globals.toString()) + ")," + GSON.toJson(source) + ")";
     }
 
     private static long timeout(JsonObject options) {
