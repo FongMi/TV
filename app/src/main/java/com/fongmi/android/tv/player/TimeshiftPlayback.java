@@ -41,7 +41,6 @@ public final class TimeshiftPlayback {
     private Object uid;
     private Call call;
     private SettableFuture<Void> pending;
-    private long generation;
     private long start;
     private long end;
     private long epochOffset = C.TIME_UNSET;
@@ -81,7 +80,6 @@ public final class TimeshiftPlayback {
     }
 
     private void cancel() {
-        generation++;
         if (call != null) call.cancel();
         if (pending != null) pending.cancel(false);
         call = null;
@@ -151,23 +149,22 @@ public final class TimeshiftPlayback {
     public ListenableFuture<?> seekTo(long position) {
         cancel();
         long time = position == C.TIME_UNSET || position >= getDuration() ? 0 : start + clamp(position);
-        long token = generation;
         SettableFuture<Void> future = SettableFuture.create();
         pending = future;
         call = requests.newCall(new Request.Builder().url(config.getUrl(time)).build());
         call.enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException error) {
-                handler.post(() -> fail(token, future));
+                handler.post(() -> fail(future));
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) {
                 try (response) {
                     Result result = readSource(response);
-                    handler.post(() -> apply(token, future, result, time));
+                    handler.post(() -> apply(future, result, time));
                 } catch (Exception error) {
-                    handler.post(() -> fail(token, future));
+                    handler.post(() -> fail(future));
                 }
             }
         });
@@ -181,8 +178,8 @@ public final class TimeshiftPlayback {
         return result;
     }
 
-    private void apply(long token, SettableFuture<Void> future, Result result, long time) {
-        if (generation != token) return;
+    private void apply(SettableFuture<Void> future, Result result, long time) {
+        if (pending != future) return;
         call = null;
         pending = null;
         replaying = time != 0;
@@ -191,8 +188,8 @@ public final class TimeshiftPlayback {
         future.set(null);
     }
 
-    private void fail(long token, SettableFuture<Void> future) {
-        if (generation != token) return;
+    private void fail(SettableFuture<Void> future) {
+        if (pending != future) return;
         call = null;
         pending = null;
         owner.onTimeshiftError();
