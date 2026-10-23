@@ -4,7 +4,7 @@ from urllib.parse import urlsplit
 from urllib.request import url2pathname
 
 from _tv_loader import Runtime, SourceNotFoundError
-from _tv_net import LocalAdapter, NetAdapter
+from _tv_net import JsAdapter, LocalAdapter, NetAdapter
 
 
 def spider(cache, api, site_key="", net=None):
@@ -60,9 +60,10 @@ def init(ru, extend):
         raise
 
 
-def bindNet(ru, net, user_agent=None, local=None, streams=None):
+def bindNet(ru, net, user_agent=None, local=None, streams=None, js=None):
     ru.net = NetAdapter(net, user_agent, streams)
     ru.local = LocalAdapter(local)
+    ru.js = JsAdapter(js)
 
 
 def homeContent(ru, filter):

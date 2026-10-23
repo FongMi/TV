@@ -6,6 +6,42 @@ _loader_type = None
 _loader_lock = Lock()
 _listener_type = None
 _listener_lock = Lock()
+_mapper_type = None
+_mapper_lock = Lock()
+
+
+def _mapper_class():
+    global _mapper_type
+    with _mapper_lock:
+        if _mapper_type is None:
+            from java import dynamic_proxy, jclass
+
+            class Mapper(dynamic_proxy(jclass("com.github.catvod.net.Net$Mapper"))):
+                def __init__(self, items, mapper, results):
+                    super().__init__()
+                    self._items = items
+                    self._mapper = mapper
+                    self._results = results
+
+                def apply(self, item, index):
+                    self._results[index] = self._mapper(self._items[index], index)
+                    return None
+
+            _mapper_type = Mapper
+        return _mapper_type
+
+
+class JsAdapter:
+    def __init__(self, native):
+        self._native = native
+
+    def eval(self, source, options=None):
+        if not isinstance(source, str) or options is not None and not isinstance(options, dict):
+            raise TypeError("Script requires source and an options dict")
+        if self._native is None:
+            raise RuntimeError("Script bridge is unavailable")
+        settings = json.dumps({} if options is None else options, ensure_ascii=False, allow_nan=False)
+        return json.loads(self._native.eval(source, settings))
 
 
 def _invalid_constant(value):
@@ -244,6 +280,16 @@ class NetAdapter:
                 raise ValueError("Invalid batch request")
         values = self._native.batchParts(json.dumps(requests, ensure_ascii=False, allow_nan=False), limit)
         return [self._parts(value, item.get("options") or {}) for value, item in zip(values, requests)]
+
+    def map(self, items, mapper, limit=4):
+        if not isinstance(items, list) or not callable(mapper) or type(limit) is not int or not 1 <= limit <= 2147483647:
+            raise ValueError("map requires a list, callable mapper and positive limit")
+        from java.util import Collections
+
+        items = list(items)
+        results = [None] * len(items)
+        self._native.map(Collections.nCopies(len(items), None), _mapper_class()(items, mapper, results), limit)
+        return results
 
     def download(self, url, path, options=None):
         from java.io import File

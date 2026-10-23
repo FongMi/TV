@@ -99,6 +99,7 @@ public class JarLoader {
     }
 
     private Throwable closeNetwork(Spider spider, Throwable failure) {
+        spider.js.close();
         try {
             if (spider.net != null) spider.net.close();
         } catch (RuntimeException | Error error) {
@@ -197,6 +198,7 @@ public class JarLoader {
             spider.init(App.get(), ext);
             return spider;
         } catch (Throwable e) {
+            spider.js.close();
             try {
                 spider.net.close();
             } catch (RuntimeException | Error error) {

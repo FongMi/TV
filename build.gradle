@@ -23,6 +23,7 @@ tasks.register('apiJar', Jar) {
         include 'com/github/catvod/utils/Crypto*.class'
         include 'com/github/catvod/utils/Decoder.class'
         include 'com/github/catvod/utils/Json.class'
+        include 'com/github/catvod/utils/Js.class'
         include 'com/github/catvod/utils/Local.class'
         include 'com/github/catvod/utils/Path.class'
         include 'com/github/catvod/utils/Prefers.class'

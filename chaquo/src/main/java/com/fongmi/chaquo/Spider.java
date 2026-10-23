@@ -58,7 +58,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         local = new Local(siteKey);
         try {
             obj.put("siteKey", siteKey);
-            app.callAttr("bindNet", obj, net, userAgent, local, streams);
+            app.callAttr("bindNet", obj, net, userAgent, local, streams, js);
             app.callAttr("init", obj, extend);
         } catch (RuntimeException | Error e) {
             releaseSpider(e);
@@ -67,6 +67,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private void releaseSpider(Throwable failure) {
+        js.close();
         try {
             streams.close();
         } catch (RuntimeException | Error error) {
@@ -164,6 +165,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public void destroy() {
+        js.close();
         Throwable failure = null;
         try {
             streams.close();

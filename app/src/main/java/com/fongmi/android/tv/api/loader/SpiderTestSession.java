@@ -449,6 +449,7 @@ public final class SpiderTestSession implements AutoCloseable {
 
         private static Throwable closeUnpublishedNetwork(Spider created) {
             try {
+                created.js.close();
                 if (created.net != null) created.net.close();
                 return null;
             } catch (RuntimeException | Error error) {
@@ -458,6 +459,7 @@ public final class SpiderTestSession implements AutoCloseable {
 
         private static Throwable closeSpiderNetwork(Spider current, Throwable failure) {
             try {
+                if (current != null) current.js.close();
                 if (current != null && current.net != null) current.net.close();
             } catch (RuntimeException | Error error) {
                 if (failure == null) failure = error;

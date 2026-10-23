@@ -14,6 +14,7 @@ import com.github.catvod.net.Net;
 import com.github.catvod.net.NetOptions;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Js;
 import com.github.catvod.utils.Local;
 import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.UriUtil;
@@ -41,6 +42,7 @@ public class Global {
     private final Streams streams;
     private final Sockets sockets;
     private final QuickJS ctx;
+    private final Js js = new Js();
     private final Host host;
     private final String siteKey;
     private final Map<QuickJS.Callback, Invocation> callbacks = new HashMap<>();
@@ -105,6 +107,7 @@ public class Global {
     }
 
     private void release() {
+        js.close();
         danmakus.clear();
         network.release();
         cache.release();
@@ -194,6 +197,7 @@ public class Global {
     }
 
     private void bindUtilities() {
+        ctx.bindAsync("evalJs", args -> evalJs(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
         ctx.bind("joinUrl", args -> joinUrl(string(args, 0), string(args, 1))).join();
         ctx.bind("htmlQuery", this::htmlQuery).join();
         ctx.bind("md5X", args -> md5X(string(args, 0))).join();
@@ -202,6 +206,17 @@ public class Global {
         ctx.bind("aesX", args -> aesX(string(args, 0), (Boolean) argument(args, 1), string(args, 2), (Boolean) argument(args, 3), string(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
         ctx.bind("desX", args -> desX(string(args, 0), (Boolean) argument(args, 1), string(args, 2), (Boolean) argument(args, 3), string(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
         ctx.bind("rsaX", args -> rsaX(string(args, 0), (Boolean) argument(args, 1), (Boolean) argument(args, 2), string(args, 3), (Boolean) argument(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
+    }
+
+    private CompletableFuture<Object> evalJs(String source, QuickJS.Json options) {
+        checkInvocation();
+        CompletableFuture<String> evaluation = js.evalAsync(source, options == null ? "{}" : options.text());
+        if (invocation != null) invocation.track(evaluation);
+        CompletableFuture<Object> result = evaluation.thenApply(QuickJS.Json::new);
+        result.whenComplete((value, error) -> {
+            if (result.isCancelled()) evaluation.cancel(true);
+        });
+        return result;
     }
 
     private void bindSocketsAndDownloads() {

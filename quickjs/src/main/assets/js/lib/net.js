@@ -279,6 +279,13 @@ globalThis.local = {
     delete: key => localCall('delete', key)
 };
 
+globalThis.js = {
+    eval(source, options = {}) {
+        if (typeof source !== 'string' || !options || typeof options !== 'object' || Array.isArray(options)) throw new TypeError('Script requires source and options');
+        return evalJs(source, JSON.parse(JSON.stringify(options, netCacheValue)));
+    }
+};
+
 function link(name, target) {
     if (!target || typeof target !== 'object' || Array.isArray(target)) throw new TypeError('link requires a target object');
     return `[a=cr:${JSON.stringify(target, netCacheValue)}/]${name}[/a]`;
@@ -333,6 +340,14 @@ function session() {
         cached: (key, options, loader) => netCached(key, options, loader, id),
         refresh: (key, options, loader) => netRefresh(key, options, loader, id),
         batch: (requests, limit) => netBatch(requests, limit, {http: (url, options) => net.http(url, route(options))}),
+        map(items, mapper, limit) {
+            active();
+            if (typeof mapper !== 'function') throw new TypeError('Invalid map options');
+            return netMap(items, (item, index) => {
+                active();
+                return mapper(item, index);
+            }, limit);
+        },
         download: (url, path, options) => netDownload(url, path, route(options)),
         peek: key => netPeek(key, id),
         clearCache: key => netClearCache(key, id),
