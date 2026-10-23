@@ -7,7 +7,7 @@ import { CodeBlock, Footer, Header } from "./ui";
 const tracks = [
   {
     title: "開發爬蟲",
-    copy: "用 Java、Python 或 JavaScript 範例，開始開發。",
+    copy: "從 Java、Python 或 QuickJS 範例開始開發。",
     href: "/spider",
     action: "爬蟲介接",
   },

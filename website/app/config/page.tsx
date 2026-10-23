@@ -29,17 +29,17 @@ const examples = {
       "api": "csp_Demo"
     },
     {
-      "key": "js_demo",
-      "name": "JavaScript Demo",
-      "type": 3,
-      "api": "./demo.js",
-      "ext": { "region": "tw" }
-    },
-    {
       "key": "py_demo",
       "name": "Python Demo",
       "type": 3,
       "api": "./demo.py"
+    },
+    {
+      "key": "js_demo",
+      "name": "QuickJS Demo",
+      "type": 3,
+      "api": "./demo.js",
+      "ext": { "region": "tw" }
     }
   ],
   "parses": [
@@ -82,7 +82,7 @@ const examples = {
 }`,
   site: `{
   "key": "js_demo",
-  "name": "JavaScript Demo",
+  "name": "QuickJS Demo",
   "type": 3,
   "api": "./demo.js",
   "ext": { "region": "tw" },
@@ -203,7 +203,7 @@ format=hls
   "ads": ["ads.example.com"]
 }`,
   catchup: `{
-  "name": "時移示意",
+  "name": "節目回看示意",
   "url": "./live.m3u",
   "catchup": {
     "type": "append",
@@ -248,12 +248,12 @@ export default function ConfigPage() {
             </div>
             <div className="schema-grid">
               <article>
-                <h3>點播配置：Java、JS、Python</h3>
+                <h3>點播配置：Java、Python、QuickJS</h3>
                 <CodeBlock label="JSON / VodConfig" path="vod.json">
                   {examples.vod}
                 </CodeBlock>
                 <p>
-                  Java 使用 <code>csp_</code> 類別名稱；JS 與 Python 檔案使用{" "}
+                  Java 使用 <code>csp_</code> 類別名稱；Python 與 QuickJS 檔案使用{" "}
                   <code>./</code> 相對路徑。
                 </p>
               </article>
@@ -310,7 +310,7 @@ export default function ConfigPage() {
                 <b>1</b>JSON HTTP
               </span>
               <span>
-                <b>3</b>JAR / JS / PY
+                <b>3</b>JAR / PY / JS
               </span>
               <span>
                 <b>4</b>HTTP 擴充
@@ -454,7 +454,7 @@ export default function ConfigPage() {
             </CodeBlock>
           </section>
           <section id="common">
-            <h2>網路、時移與顯示物件</h2>
+            <h2>共用物件</h2>
             <FieldTable fields={commonFields} label="共用物件" />
             <div className="schema-grid">
               <article>
@@ -467,8 +467,8 @@ export default function ConfigPage() {
                   <code>原主機=目標主機或 IP</code>。
                 </p>
               </article>
-              <article>
-                <h3>追看 / 時移 Catchup</h3>
+              <article id="catchup">
+                <h3>節目回看 Catchup</h3>
                 <CodeBlock label="JSON / Live.catchup" path="lives[] 物件片段">
                   {examples.catchup}
                 </CodeBlock>
@@ -477,6 +477,11 @@ export default function ConfigPage() {
                   <code>{"${(e)yyyyMMddHHmmss}"}</code>{" "}
                   會分別替換為節目開始與結束時間，格式化使用裝置系統時區，不使用{" "}
                   <code>Live.timeZone</code>。
+                </p>
+                <p>
+                  <code>catchup</code> 用於從節目表選取回看，時間軸以該節目為範圍。
+                  來源若支援依時間取源，可在頻道提供 <Link className="inline-link" href="/spider#timeshift"><code>timeshift</code></Link>，
+                  使用可拖曳的直播時間軸。
                 </p>
               </article>
             </div>

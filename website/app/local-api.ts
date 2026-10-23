@@ -123,7 +123,7 @@ export const localRemoteFields: Field[] = [
   {
     name: "canSeek",
     type: "boolean",
-    description: "是否支援網頁跳轉；直播、未知長度或播放器不能跳轉時為 false。",
+    description: "是否支援網頁跳轉；支援 timeshift 的直播也可使用，未知長度或不可跳轉時為 false。",
   },
   {
     name: "canSetSpeed",

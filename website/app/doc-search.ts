@@ -19,6 +19,10 @@ type Entry = {
   names?: string[];
 };
 
+function networkNames(...methods: string[]) {
+  return methods.flatMap((method) => [method, `net.${method}`, `self.net.${method}`]);
+}
+
 const entries: Entry[] = [
   {
     title: "爬蟲載入方式",
@@ -29,45 +33,52 @@ const entries: Entry[] = [
   },
   {
     title: "三語言 Demo",
-    description: "Java、Python、JavaScript 範例",
+    description: "Java、Python、QuickJS 範例",
     href: "/spider#demo",
     names: ["JSONObject", "JSONArray", "self.page", "page", "Response", "Response.page", "com.github.catvod.bean"],
     keywords: "CatVodSpider examples/python/spider.py examples/javascript/spider.js Demo.java 分頁",
   },
   {
     title: "爬蟲共用網路",
-    description: "Python、QuickJS、Java 的 HTTP、串流、Cookie、TTL 快取與下載",
+    description: "Java、Python、QuickJS 的 HTTP、串流、Cookie、快取與下載",
     href: "/spider#network",
-    names: networkMethods.flatMap(([name]) => name.split(" / ").map((method) => `net.${method}`)).concat("self.net.cachedText"),
+    names: [...networkNames("req", "json", "getUserAgent", "getCookie", "setCookie", "session", "batch", "map", "download", "sleep"), "net.http", "net.get", "net.post"],
     keywords: networkMethods.flat().join(" ") + " self.net stale persist",
+  },
+  {
+    title: "執行 JavaScript",
+    description: "三語言使用隔離環境執行短段腳本",
+    href: "/spider#scripts",
+    names: ["js.eval", "self.js.eval"],
+    keywords: "Java Python QuickJS JavaScript 腳本 隔離 globals timeout md5X 逾時 取消 JSON",
   },
   {
     title: "串流讀取與代理",
     description: "分塊讀取、原樣轉送與產生器正文的回傳、關閉及取消規則",
     href: "/spider#streams",
-    names: ["net.openStream", "self.net.openStream", "net.stream", "self.net.stream", "net.requestStreamAsync", "Net.StreamResult", "InputStream"],
-    keywords: "Python QuickJS Java generator asyncGenerator proxy_body 分塊 串流 EOF 取消 timeout callTimeout",
+    names: [...networkNames("openStream", "stream"), "requestStreamAsync", "net.requestStreamAsync", "Net.StreamResult", "InputStream"],
+    keywords: "Java Python QuickJS generator asyncGenerator proxy_body 分塊 串流 EOF 取消 timeout callTimeout",
   },
   {
     title: "爬蟲 WebSocket",
     description: "一次交換、持續收訊、心跳與斷線恢復",
     href: "/spider#websocket",
-    names: ["net.ws", "net.connect", "socket.send", "socket.close", "socket.cancel"],
-    keywords: "Python QuickJS Java reconnect idle ping callback open message retry error close",
+    names: [...networkNames("ws", "connect"), "socket.send", "socket.close", "socket.cancel"],
+    keywords: "Java Python QuickJS reconnect idle ping callback open message retry error close",
   },
   {
     title: "爬蟲 TTL 快取",
     description: "按站點快取 JSON、背景更新與清除",
     href: "/spider#cache",
-    names: ["net.cached", "net.cachedText", "self.net.cachedText", "net.peek", "net.refresh", "net.clearCache"],
-    keywords: "Python QuickJS Java ttl stale persist loader cachedText TTL 快取",
+    names: networkNames("cached", "cachedText", "peek", "refresh", "clearCache"),
+    keywords: "Java Python QuickJS ttl stale persist loader cachedText TTL 快取",
   },
   {
     title: "爬蟲即時彈幕",
     description: "即時來源、彈幕顏色、字級、位置與漸層",
     href: "/spider#live-danmaku",
     names: ["getDanmakuUrl", "danmaku(id, emit)", "emit.accept", ...liveDanmakuFields.map((field) => field.name)],
-    keywords: "Python QuickJS Java WebSocket net.connect 停止函式 AutoCloseable state msg connecting ready retrying error 訂閱狀態 " + liveDanmakuFields.map((field) => field.description).join(" "),
+    keywords: "Java Python QuickJS WebSocket net.connect 停止函式 AutoCloseable state msg connecting ready retrying error 訂閱狀態 " + liveDanmakuFields.map((field) => field.description).join(" "),
   },
   {
     title: "Node.js 載入",
@@ -83,13 +94,13 @@ const entries: Entry[] = [
   },
   {
     title: "爬蟲編輯與測試",
-    description: "載入 Python、QuickJS 或 Java JAR，儲存、格式化、重測與版本還原",
+    description: "載入 Java JAR、Python 或 QuickJS，儲存、格式化、重測與版本還原",
     href: "/spider#testing",
     names: ["/spider.html", "爬蟲測試", "格式化", "重測"],
     keywords: "ext JSON 參數 方法 網路紀錄 上傳 來源 版本 播放結果 Java 編譯",
   },
   {
-    title: "Runtime 與 Android UI",
+    title: "Android UI",
     description: "Java、Python 的 Context、Activity 與 Toast 接口",
     href: "/spider#runtime",
     names: ["com.github.catvod.Runtime", "Runtime.context", "Runtime.activity", "Runtime.toast", "getActivity", "self.getActivity"],
@@ -100,7 +111,7 @@ const entries: Entry[] = [
     description: "按站點隔離的 JSON 設定讀寫與刪除",
     href: "/spider#cache",
     names: ["self.local", "local.get", "local.set", "local.delete"],
-    keywords: "Python QuickJS Java get set delete JSON 本地儲存",
+    keywords: "Java Python QuickJS get set delete JSON 本地儲存",
   },
   {
     title: "演員與分類超連結",
@@ -122,6 +133,20 @@ const entries: Entry[] = [
     keywords: methods.flat().join(" "),
   },
   {
+    title: "直播回看",
+    description: "timeshift 回看範圍、依時間取源與回到直播",
+    href: "/spider#timeshift",
+    names: ["timeshift", "Channel.timeshift"],
+    keywords: "url start window time Unix 毫秒 直播 時間軸 拖曳 回看 直播點",
+  },
+  {
+    title: "節目回看 Catchup",
+    description: "從節目表選取回看，依節目起訖時間取得來源",
+    href: "/config#catchup",
+    names: ["catchup", "Live.catchup", "Channel.catchup"],
+    keywords: "直播 EPG 節目表 回看 追看 時移 source replace days",
+  },
+  {
     title: "片段跳過",
     description: "playerContent 的片頭、片中、片尾 skips 區間與毫秒規則",
     href: "/spider#skips",
@@ -133,7 +158,7 @@ const entries: Entry[] = [
     description: "action 回應的 web JSON、獨立視窗與多組 Cookie",
     href: "/spider#web",
     names: ["web", "action"],
-    keywords: "QuickJS Python Java JAR Node.js JSON url mode view browser keys cookie 登入 全螢幕 返回",
+    keywords: "Java Python QuickJS JAR Node.js JSON url mode view browser keys cookie 登入 全螢幕 返回",
   },
   {
     title: "Result 回傳欄位",

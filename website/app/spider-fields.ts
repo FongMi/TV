@@ -8,7 +8,7 @@ export const networkMethods = [
   ["getCookie / setCookie", "讀寫 WebView Cookie；Session 使用隔離 Cookie。"],
   ["session", "建立隔離 Cookie 的請求流程，用完關閉。"],
   ["batch", "批次 HTTP 請求，預設最多 4 筆並行，按輸入順序回傳。"],
-  ["map", "QuickJS 逐項執行非同步回呼，限制並行數並保留輸入順序。"],
+  ["map", "三語言逐項執行回呼，預設最多 4 項並行，保留輸入順序。"],
   ["download", "直接下載至檔案，由共用下載器管理暫存、續傳與分段。"],
   ["openStream", "Python／QuickJS 分塊讀取，用完關閉 reader。"],
   ["requestStreamAsync", "Java 傳入 NetOptions，Future 回傳 Net.StreamResult。"],
@@ -54,7 +54,7 @@ export const liveDanmakuFields: Field[] = [
 ];
 
 export const methods = [
-  ["init", "建立實例時；Node 重啟可再次呼叫", "讀取 ext、建立連線或快取", "無"],
+  ["init", "初始化爬蟲時", "讀取 ext、建立連線或快取", "無"],
   ["homeContent / home", "進入首頁", "分類與選填 filters", "Result.class"],
   ["homeVideoContent / homeVod", "首頁分類完成", "首頁推薦卡片", "Result.list"],
   [
@@ -70,7 +70,7 @@ export const methods = [
     "搜尋結果，可支援頁碼",
     "list + pagecount",
   ],
-  ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result.url、選填 skips"],
+  ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result"],
   ["danmaku", "選用爬蟲即時彈幕來源", "彈幕或訂閱狀態物件", "Java AutoCloseable／Python、QuickJS 停止函式"],
   ["liveContent / live", "載入直播配置", "TXT、M3U 或 Group JSON", "文字 / Group 陣列"],
   [
@@ -79,7 +79,7 @@ export const methods = [
     "依執行環境提供狀態、類型、內容與標頭",
     "陣列 / HTTP 回應",
   ],
-  ["action", "自訂操作", "可由 Result 解析的結果", "Java JSON 字串 / Python、JS 物件"],
+  ["action", "自訂操作", "可由 Result 解析的結果", "Java JSON 字串／Python、QuickJS 物件"],
   ["destroy", "重新載入或清除", "釋放執行緒與連線；QuickJS 清理 hook 最長 5 秒", "無"],
 ];
 
@@ -117,6 +117,11 @@ export const resultFields: Field[] = [
     type: "SkipSegment[]",
     description: "每集片頭、片中、片尾的跳過區間，start / end 都用毫秒；格式錯誤的項目會忽略。",
     default: "[]",
+  },
+  {
+    name: "timeshift",
+    type: "object",
+    description: "直播回看範圍與取源網址 {url, start, window}，格式見直播回看章節。",
   },
   {
     name: "header",

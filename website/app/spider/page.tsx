@@ -8,7 +8,7 @@ import { resultFields, objectGroups, methods, networkMethods, liveDanmakuFields 
 
 export const metadata: Metadata = {
   title: "爬蟲介接",
-  description: "Java、Python、JavaScript 爬蟲 Demo、生命週期與回傳資料格式。",
+  description: "Java、Python、QuickJS 爬蟲範例、共用接口與回傳資料格式。",
 };
 
 const java = `// 最小點播範例；example.com 為示意網址。
@@ -54,7 +54,7 @@ public class Demo extends Spider {
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
         String url = id.replace("demo://", "https://example.com/");
-        return new JSONObject().put("parse", 0).put("jx", 0).put("url", url).toString();
+        return new JSONObject().put("parse", 0).put("url", url).toString();
     }
 
     private JSONObject card(String id, String name) throws Exception {
@@ -180,13 +180,6 @@ const resultPlay = `{
     "Referer": "https://example.com/"
   },
   "format": "application/x-mpegURL",
-  "skips": [
-    { "type": "opening", "start": 0, "end": 90000 },
-    { "type": "middle", "start": 600000, "end": 630000 },
-    { "type": "middle", "start": 850000, "end": 880000 },
-    { "type": "middle", "start": 1000000, "end": 1020000 },
-    { "type": "ending", "start": 1200000, "end": 1260000 }
-  ],
   "subs": [
     {
       "url": "https://example.com/subs/demo-1.vtt",
@@ -212,7 +205,7 @@ const samples: CodeSample[] = [
     code: java,
   },
   { id: "python", label: "Python", file: "demo.py", code: python },
-  { id: "javascript", label: "JavaScript", file: "demo.js", code: javascript },
+  { id: "javascript", label: "QuickJS", file: "demo.js", code: javascript },
 ];
 
 const streamSamples: CodeSample[] = [
@@ -235,7 +228,7 @@ return [response["code"], response["contentType"], response["stream"], response[
   },
   {
     id: "javascript",
-    label: "JavaScript",
+    label: "QuickJS",
     file: "spider.js / proxy",
     code: `const response = await net.stream("https://example.com/data.bin", {
   timeout: 15000, callTimeout: 15000
@@ -248,28 +241,30 @@ export default function SpiderPage() {
   return (
     <DocsLayout
       title="爬蟲介接指南"
-      lead="從 Java、Python、JavaScript 範例開始，了解載入方式與回傳格式。"
+      lead="從 Java、Python、QuickJS 範例開始，了解載入、共用接口與回傳格式。"
     >
       <div className="docs-layout wrap">
         <DocsNav items={[
-          ["start", "載入方式"],
+          ["start", "載入爬蟲"],
           ["modules", "安裝執行模組"],
-          ["testing", "爬蟲測試"],
+          ["testing", "測試爬蟲"],
           ["demo", "三語言 Demo"],
+          ["lifecycle", "方法與呼叫時機"],
           ["network", "共用網路"],
           ["streams", "串流讀取與代理"],
           ["websocket", "WebSocket"],
           ["cache", "快取與儲存"],
+          ["scripts", "執行 JavaScript"],
+          ["runtime", "Android UI"],
+          ["result", "Result 回傳格式"],
+          ["objects", "資料物件"],
+          ["episodes", "播放分組與集數"],
+          ["proxy", "Proxy 回傳"],
           ["live-danmaku", "即時彈幕"],
-          ["runtime", "Runtime 與 Android UI"],
-          ["node", "Node.js"],
-          ["lifecycle", "方法生命週期"],
-          ["result", "Result 結構"],
+          ["timeshift", "直播回看"],
           ["skips", "片段跳過"],
           ["web", "開網頁"],
-          ["objects", "資料物件"],
-          ["episodes", "集數格式"],
-          ["proxy", "Proxy 回傳"],
+          ["node", "Node.js 載入"],
         ]} />
         <div className="docs-content">
           <section id="start">
@@ -304,11 +299,11 @@ export default function SpiderPage() {
                 </p>
               </article>
               <article>
-                <strong>JavaScript · QuickJS</strong>
+                <strong>QuickJS</strong>
                 <code>{'api: "./demo.js"'}</code>
                 <p>
-                  相對路徑以配置檔所在位置為基準；ES module
-                  預設匯出物件或建立物件的函式。
+                  JavaScript 由 QuickJS 執行；相對路徑以配置檔所在位置為基準。
+                  使用 ES module，預設匯出物件或建立物件的函式。
                 </p>
               </article>
             </div>
@@ -337,7 +332,8 @@ export default function SpiderPage() {
             </div>
             <p>
               QuickJS 使用 QuickJS-NG 引擎，不能直接執行 Node.js 套件；
-              Node.js 請依下方的獨立載入方式設定。
+              Node.js 請依 <Link className="inline-link" href="/spider#node">獨立載入方式</Link> 設定。
+              使用新接口時，請一併更新 App 與對應模組。
             </p>
           </section>
           <section id="testing">
@@ -347,7 +343,7 @@ export default function SpiderPage() {
               Python 與 QuickJS 需先安裝對應模組。
             </p>
             <ol>
-              <li>載入 .py／.js，ext 為選填；Java 載入編譯好的 JAR，再選擇類別。</li>
+              <li>載入 Java JAR 並選擇類別，或載入 .py／.js；ext 為選填。</li>
               <li>選擇方法，以 JSON 陣列填入參數，執行並查看結果與網路紀錄。</li>
               <li>修改後儲存、重新載入並重測；可格式化來源或還原版本。</li>
               <li>play 回傳有效結果後，送到 App 確認播放。</li>
@@ -372,237 +368,21 @@ export default function SpiderPage() {
               <b>回傳格式</b>Java 用 Android 內建的 <code>JSONObject</code>／
               <code>JSONArray</code> 組裝 JSON 字串；Python 回傳
               dict／list，QuickJS 回傳物件／陣列，由 App 序列化。
-              CatVodSpider 自行維護 <code>com.github.catvod.bean</code> 資料模型及{" "}
-              <code>Response</code> 組裝工具，隨爬蟲 JAR 打包，不在 SDK 內。
-              完整清單分頁可用 <code>Response.page</code>、<code>self.page</code>{" "}
-              或 <code>page</code>。
               直播可回傳 Group 陣列或 TXT／M3U 原始文字。
             </div>
             <CodeTabs samples={samples} />
             <p>
-              CatVodSpider 的完整範例涵蓋分類樣式、篩選、搜尋分頁、直播、快取與網頁操作：
-              Java 的 <code>app/src/main/java/com/github/catvod/spider/Demo.java</code>
-              與同目錄 <code>DemoData.java</code>、
-              Python 的 <code>examples/python/spider.py</code> 與 QuickJS 的{" "}
-              <code>examples/javascript/spider.js</code>。
+              完整範例見 CatVodSpider 的{" "}
+              <a href="https://github.com/FongMi/CatVodSpider/blob/main/app/src/main/java/com/github/catvod/spider/Demo.java">Java</a>、
+              <a href="https://github.com/FongMi/CatVodSpider/blob/main/examples/python/spider.py">Python</a> 與{" "}
+              <a href="https://github.com/FongMi/CatVodSpider/blob/main/examples/javascript/spider.js">QuickJS</a>，
+              涵蓋篩選、搜尋分頁、直播、快取與網頁操作。
             </p>
-          </section>
-          <section id="network">
-            <h2>共用網路</h2>
-            <p>
-              App 在初始化前提供網路接口：Java／QuickJS 使用 <code>net</code>，Python 使用 <code>self.net</code>。
-              時間單位為毫秒。完整參數與範例見 <a href="https://github.com/FongMi/CatVodSpider/blob/main/docs/development.md#網路">CatVodSpider 開發說明</a>。
-            </p>
-            <div className="table-scroll">
-              <table className="method-table" aria-label="共用網路方法">
-                <thead>
-                  <tr><th scope="col">方法</th><th scope="col">用途</th></tr>
-                </thead>
-                <tbody>
-                  {networkMethods.map(([name, description]) => (
-                    <tr key={name}>
-                      <td data-label="方法"><code>{name}</code></td>
-                      <td data-label="用途">{description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <h3>HTTP</h3>
-            <p>
-              只取 JSON 用 <code>net.json(url, options)</code>；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。
-              需要狀態碼、錯誤正文或 bytes 時用 <code>net.req</code>，QuickJS 用 <code>await net.http</code>。
-              Java 的 options 除特別標示外使用 JSON 字串，json／req 也回傳 JSON 字串。
-            </p>
-            <p>
-              QuickJS 的 req 同步執行；http／json 以 await 取得結果。Python／QuickJS 使用物件傳 options，
-              二進位回應用 <code>buffer: 3</code>，分別取得 bytes／ArrayBuffer。
-              <code>net.getUserAgent()</code> 取得 App 的 UA，需要時自行放入 headers。
-            </p>
-            <h3>Cookie 與 Session</h3>
-            <p>
-              <code>cookie: true</code> 使用並更新 WebView Cookie；以 <code>getCookie(url)</code> 讀取、
-              <code>setCookie(url, cookie)</code> 寫入單筆 Set-Cookie。
-              <code>net.session()</code> 自動管理隔離 Cookie，不共用站點的 Cookie 或 TTL 快取，也不支援 persist。
-            </p>
-            <p>
-              Session 用完須關閉：Python 用 with，QuickJS／Java 用 try/finally。
-              關閉會取消其請求、串流與連線，之後不可繼續使用。
-            </p>
-            <h3>批次與下載</h3>
-            <p>
-              <code>net.batch(requests, limit)</code> 每筆傳入 <code>&#123;url, options&#125;</code>，預設最多 4 筆並行，按輸入順序回傳。
-              QuickJS 每筆還需解析時用 <code>net.map(items, callback, limit)</code>；回呼可為 async，各項自行檢查 HTTP 狀態。
-            </p>
-            <p>
-              下載用 Python／QuickJS 的 <code>net.download(url, path, options)</code>，Java 用 <code>net.download(url, optionsJson, file)</code>。
-              <code>threads</code> 為 0 自動、1 單連線、2–4 並行上限；<code>size</code> 指定完整 bytes，<code>maxBytes</code> 限制寫入大小。
-              續傳與分段依來源的 Range 與驗證資訊決定，cookie:true／Session 不續傳；完成後仍須確認檔案內容。
-            </p>
-          </section>
-          <section id="streams">
-            <h2>串流讀取與代理</h2>
-            <p>
-              Python／QuickJS 用 <code>net.openStream(url, options)</code> 分塊讀取，Python 加上 self，QuickJS 使用 await。
-              Java 用 <code>net.requestStreamAsync(url, NetOptions)</code>，Future 回傳繼承 InputStream 的 <code>Net.StreamResult</code>。
-              用完以 with／finally 或 try-with-resources 關閉。
-            </p>
-            <h3>原樣轉送</h3>
-            <p>
-              將下列片段放入對應的 proxy 方法。成功交付後由 App 關閉 stream，不交付時自行 close。
-              QuickJS handle 只供當次 proxy 使用一次，不存入 Local／快取；Java 需引入 Net 與 NetOptions。
-            </p>
-            <CodeTabs samples={streamSamples} />
-            <h3>自訂串流正文</h3>
-            <p>
-              Python 用 <code>self.net.stream(generator())</code>，yield bytes／bytearray／連續 memoryview；
-              QuickJS 用 <code>await net.stream(asyncGenerator())</code>，yield ArrayBuffer／TypedArray。
-              將回應的 stream 放入 proxy 第三格；Java 直接回傳自訂 InputStream。
-            </p>
-            <p>
-              產生器在播放器讀取時才執行，不接受 HTTP options。reader 在產生器內開啟，以 with／finally 關閉；
-              App 關閉 body 時取消其等待中的串流請求與讀取，再關閉產生器。
-            </p>
-            <p>
-              直播可用 <code>callTimeout: 0</code> 關閉整次 HTTP 期限，保留 timeout 防止讀取卡住；Demo 使用 15 秒期限。
-              需更新配套 App 與模組。讀取大小、EOF 與取消限制見 <a href="https://github.com/FongMi/CatVodSpider/blob/main/docs/development.md#串流讀取與代理">開發說明</a>。
-            </p>
-          </section>
-          <section id="websocket">
-            <h2>WebSocket</h2>
-            <p>
-              一次交換用 <code>net.ws(url, options)</code>，取得首個完整訊息後關閉。
-              持續收訊用 <code>net.connect(url, options, callback)</code>，回呼接收 <code>(socket, event)</code>，
-              事件為 open／message／retry／error／close。
-            </p>
-            <p>
-              content 為文字，或 Python bytes／QuickJS Uint8Array／Java byte[]。
-              使用回呼傳入的 <code>socket.send()</code> 發送、<code>socket.close()</code> 關閉，需立即中斷時用 cancel。
-              站點或 Session 釋放時也會取消連線。
-            </p>
-            <p>
-              timeout 只限制建立連線；ping 是協定 Ping 的毫秒間隔。
-              idle 是未收到文字／二進位訊息的逾時毫秒數，預設 0 關閉；送出訊息與 Ping／Pong 不會重設期限。
-              平台訂閱與應用層心跳由爬蟲處理，只在來源保證持續回訊時設定 idle。
-            </p>
-            <p>
-              <code>reconnect: true</code> 啟用斷線恢復，預設關閉，等待從 1 秒倍增至 30 秒。
-              每次 open 重新訂閱，retry 時停止心跳並清除殘包。
-              主動關閉、釋放或認證／憑證／協定／回呼錯誤後不再重連。
-            </p>
-          </section>
-          <section id="cache">
-            <h2>快取與儲存</h2>
-            <h3>TTL 快取</h3>
-            <p>
-              <code>net.cached(key, options, loader)</code> 按站點快取 JSON，同 key 合併載入。
-              ttl 必填；stale 預設 true，過期先回舊值並背景更新；persist 預設 false，啟用時持久化公開資料。
-              播放網址使用短 TTL、<code>stale: false</code>，不持久化。
-            </p>
-            <p>
-              <code>peek(key)</code> 只讀已有值，包括過期值；<code>refresh(key, options, loader)</code> 立即返回，依 TTL 背景更新。
-              <code>clearCache(key)</code> 清一筆，省略 key 清除目前站點全部 TTL 快取並取消載入。
-            </p>
-            <p>
-              Python 的 <code>self.net.cachedText(key, options, loader)</code> 取得 JSON 原文；cached 則解碼為 Python 值，兩者共用 TTL 與清除規則。
-              Java 的 cached 回傳 JSON 字串。
-            </p>
-            <h3>Local</h3>
-            <p>
-              小型設定用 Java／QuickJS 的 <code>local</code>、Python 的 <code>self.local</code>。
-              以 get(key)／set(key, value)／delete(key) 讀寫，App 按站點隔離；Java 使用 JSON 字串，Python／QuickJS 使用 JSON 值。
-              清 TTL 快取不會刪除 Local。
-            </p>
-          </section>
-          <section id="live-danmaku">
-            <h2>即時彈幕</h2>
-            <p>
-              Java／Python／QuickJS 的播放回應沿用 <code>danmaku: [&#123;name, url&#125;]</code>。
-              即時來源的 url 用 <code>getDanmakuUrl(id)</code> 產生，Python 使用{" "}
-              <code>self.getDanmakuUrl(id)</code>；App 會呼叫該站點的 <code>danmaku(id, emit)</code>。
-              HTTP(S) 來源仍按彈幕檔案載入。
-            </p>
-            <CodeBlock label="JSON / 即時彈幕" path="emit(item)">{`{
-  "text": "即時彈幕",
-  "color": 6737151,
-  "size": 25,
-  "type": 1,
-  "colors": [6737151, 13408767]
-}`}</CodeBlock>
-            <FieldTable fields={liveDanmakuFields} label="即時彈幕" />
-            <p>
-              狀態也使用 <code>emit</code>，不可同時包含 text。
-              state 為 ready（訂閱可用）、retrying（恢復中）或 error（終止失敗）；
-              msg 選填，最多 512 字元，不放 Cookie、token 或簽名網址。
-              ready 須確認平台訂閱可用，不能僅以 WebSocket open 判斷。
-            </p>
-            <CodeBlock label="JSON / 訂閱狀態" path="emit(item)">{`{
-  "state": "retrying",
-  "msg": "連線中斷，等待恢復"
-}`}</CodeBlock>
-            <p>
-              App 自行設定 connecting、合併相同 state／msg；初始化例外轉成 error。
-              error 後停止訂閱並忽略後續回呼，主動停止則清除狀態，不需回報 closed。
-              狀態記錄在日誌，不會當成彈幕或反覆跳出提示。
-            </p>
-            <p>
-              <code>emit</code> 接收 Python dict、QuickJS 物件或 Java JSONObject；Java 用{" "}
-              <code>emit.accept(item)</code>。Python／QuickJS 回傳停止函式，Java 回傳 AutoCloseable。
-              切台或關閉時，App 呼叫停止；爬蟲須取消自己的連線與心跳。
-            </p>
-            <p>
-              爬蟲負責協定、解碼與樣式轉換，App 負責顯示限制，超量或過期訊息可能丟棄。
-              需配套更新 App、runtime 與 catvod-api.jar；完整範例見 CatVodSpider 的三語言 Demo。
-            </p>
-          </section>
-          <section id="runtime">
-            <h2>Runtime 與 Android UI</h2>
-            <p>
-              共用 SDK 的 <code>com.github.catvod.Runtime</code> 以 <code>Runtime.context()</code>
-              取得 Application Context、<code>Runtime.activity()</code> 取得目前 Activity，
-              <code>Runtime.toast()</code> 顯示文字提示。Java 需明確匯入這個類別；Python
-              使用 <code>jclass</code> 取得。這些接口由宿主提供，爬蟲 JAR 使用
-              <code>compileOnly</code> 依賴 SDK。
-            </p>
-            <p>
-              繼承 Spider 的 Java／Python 爬蟲也可使用 <code>getActivity()</code>／
-              <code>self.getActivity()</code>。Activity 可能為 null／None；自訂 Dialog
-              在主執行緒顯示時才取得 Activity，不保存頁面引用。
-              <code>Runtime.toast()</code> 由 App 切到主執行緒顯示。
-              QuickJS 的文字提示可從 action 回傳 <code>msg</code> 欄位。
-            </p>
-            <p>
-              JAR 自己的 <code>com.github.catvod.spider.Init.init(Context)</code>
-              是可選的初始化入口，與 <code>Runtime</code> 分開；每個爬蟲仍由 App
-              呼叫 <code>Spider.init(Context, ext)</code>。
-            </p>
-          </section>
-          <section id="node">
-            <h2>Node.js 使用獨立的載入契約</h2>
-            <p>
-              一般 <code>./demo.js</code> 仍由 QuickJS 執行。Node.js 必須以{" "}
-              <code>index.js.md5</code> 作為配置入口，同目錄提供{" "}
-              <code>index.js</code>、<code>index.config.js</code> 與{" "}
-              <code>index.config.js.md5</code>。
-            </p>
-            <p>
-              App 啟動 bundle 後，讀取 <code>/config</code> 回應的{" "}
-              <code>video</code> 或 <code>data.video</code>，把{" "}
-              <code>video.sites</code> 映射為 <code>node:</code>{" "}
-              站點路由。爬蟲以 HTTP JSON 處理接在各站點路由後的{" "}
-              <code>/init</code>、<code>/home</code>、<code>/category</code>、
-              <code>/detail</code>、<code>/search</code> 與 <code>/play</code>。
-            </p>
-            <div className="callout">
-              <b>不要只替換 api 前綴</b>Node.js 不是 QuickJS 的 export default
-              物件模式；單獨把普通配置的 api 改成 node:，不會完成 Node bundle
-              初始化。
-            </div>
           </section>
           <section id="lifecycle">
             <h2>方法與呼叫時機</h2>
             <p>
-              本表適用 Java、Python 與 QuickJS；Node.js 請使用上方的 HTTP 端點。
+              本表適用 Java、Python 與 QuickJS；Node.js 使用 <Link className="inline-link" href="/spider#node">獨立 HTTP 端點</Link>。
             </p>
             <p>
               在 <code>destroy</code> 釋放自建 Session、WebSocket 與背景工作。
@@ -640,8 +420,170 @@ export default function SpiderPage() {
               </table>
             </div>
           </section>
+          <section id="network">
+            <h2>共用網路</h2>
+            <p>
+              App 在初始化前提供網路接口：Java 使用 <code>net</code>、Python 使用 <code>self.net</code>、QuickJS 使用 <code>net</code>。
+              時間單位為毫秒。完整參數與範例見 <a href="https://github.com/FongMi/CatVodSpider/blob/main/docs/development.md#網路">CatVodSpider 開發說明</a>。
+            </p>
+            <div className="table-scroll">
+              <table className="method-table" aria-label="共用網路方法">
+                <thead>
+                  <tr><th scope="col">方法</th><th scope="col">用途</th></tr>
+                </thead>
+                <tbody>
+                  {networkMethods.map(([name, description]) => (
+                    <tr key={name}>
+                      <td data-label="方法"><code>{name}</code></td>
+                      <td data-label="用途">{description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <h3>HTTP</h3>
+            <p>
+              只取 JSON 用 <code>net.json(url, options)</code>；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。
+              需要狀態碼、錯誤正文或 bytes 時用 <code>net.req</code>，QuickJS 用 <code>await net.http</code>。
+              Java 的 options 除特別標示外使用 JSON 字串，json／req 也回傳 JSON 字串。
+            </p>
+            <p>
+              QuickJS 的 req 同步執行；http／json 以 await 取得結果。Python／QuickJS 使用物件傳 options，
+              二進位回應用 <code>buffer: 3</code>，分別取得 bytes／ArrayBuffer。
+              <code>net.getUserAgent()</code> 取得 App 的 UA，需要時自行放入 headers。
+            </p>
+            <h3>Cookie 與 Session</h3>
+            <p>
+              <code>cookie: true</code> 使用並更新 WebView Cookie；以 <code>getCookie(url)</code> 讀取、
+              <code>setCookie(url, cookie)</code> 寫入單筆 Set-Cookie。
+              <code>net.session()</code> 自動管理隔離 Cookie，不共用站點的 Cookie 或 TTL 快取，也不支援 persist。
+            </p>
+            <p>
+              Session 用完須關閉：Java 用 try-with-resources、Python 用 with、QuickJS 用 finally。
+              關閉會取消其請求、串流與連線，之後不可繼續使用。
+            </p>
+            <h3>批次與下載</h3>
+            <p>
+              <code>net.batch(requests, limit)</code> 每筆傳入 <code>&#123;url, options&#125;</code>，預設最多 4 筆並行，按輸入順序回傳。
+              每項還需快取、簽名或解析時用 <code>net.map(items, mapper, limit)</code>，回呼收 item／index，各項自行檢查 HTTP 狀態。
+              拋錯後停止派送，已開始的工作繼續完成；Java／Python 在背景執行緒回呼，QuickJS 可用 async。
+            </p>
+            <p>
+              Java 下載用 <code>net.download(url, optionsJson, file)</code>，Python／QuickJS 用 <code>net.download(url, path, options)</code>。
+              <code>threads</code> 為 0 自動、1 單連線、2–4 並行上限；<code>size</code> 指定完整 bytes，<code>maxBytes</code> 限制寫入大小。
+              續傳與分段依來源的 Range 與驗證資訊決定，cookie:true／Session 不續傳；完成後仍須確認檔案內容。
+            </p>
+          </section>
+          <section id="streams">
+            <h2>串流讀取與代理</h2>
+            <p>
+              Java 用 <code>net.requestStreamAsync(url, NetOptions)</code>，Future 回傳繼承 InputStream 的 <code>Net.StreamResult</code>。
+              Python 用 <code>self.net.openStream(url, options)</code>，QuickJS 用 <code>await net.openStream(url, options)</code>。
+              用完以 try-with-resources、with 或 finally 關閉。
+            </p>
+            <h3>原樣轉送</h3>
+            <p>
+              將下列片段放入對應的 proxy 方法。成功交付後由 App 關閉 stream，不交付時自行 close。
+              QuickJS handle 只供當次 proxy 使用一次，不存入 Local／快取；Java 需引入 Net 與 NetOptions。
+            </p>
+            <CodeTabs samples={streamSamples} />
+            <h3>自訂串流正文</h3>
+            <p>
+              Python 用 <code>self.net.stream(generator())</code>，yield bytes／bytearray／連續 memoryview；
+              QuickJS 用 <code>await net.stream(asyncGenerator())</code>，yield ArrayBuffer／TypedArray。
+              將回應的 stream 放入 proxy 第三格；Java 直接回傳自訂 InputStream。
+            </p>
+            <p>
+              產生器在播放器讀取時才執行，不接受 HTTP options。reader 在產生器內開啟，以 with／finally 關閉；
+              App 關閉 body 時取消其等待中的串流請求與讀取，再關閉產生器。
+            </p>
+            <p>
+              直播可用 <code>callTimeout: 0</code> 關閉整次 HTTP 期限，保留 timeout 防止讀取卡住；Demo 使用 15 秒期限。
+              讀取大小、EOF 與取消限制見 <a href="https://github.com/FongMi/CatVodSpider/blob/main/docs/development.md#串流讀取與代理">開發說明</a>。
+            </p>
+          </section>
+          <section id="websocket">
+            <h2>WebSocket</h2>
+            <p>
+              一次交換用 <code>net.ws(url, options)</code>，取得首個完整訊息後關閉。
+              持續收訊用 <code>net.connect(url, options, callback)</code>，回呼接收 <code>(socket, event)</code>，
+              事件為 open／message／retry／error／close。
+            </p>
+            <p>
+              content 為文字，二進位則為 Java byte[]、Python bytes 或 QuickJS Uint8Array。
+              使用回呼傳入的 <code>socket.send()</code> 發送、<code>socket.close()</code> 關閉，需立即中斷時用 cancel。
+              站點或 Session 釋放時也會取消連線。
+            </p>
+            <p>
+              timeout 只限制建立連線；ping 是協定 Ping 的毫秒間隔。
+              idle 是未收到文字／二進位訊息的逾時毫秒數，預設 0 關閉；送出訊息與 Ping／Pong 不會重設期限。
+              平台訂閱與應用層心跳由爬蟲處理，只在來源保證持續回訊時設定 idle。
+            </p>
+            <p>
+              <code>reconnect: true</code> 啟用斷線恢復，預設關閉，等待從 1 秒倍增至 30 秒。
+              每次 open 重新訂閱，retry 時停止心跳並清除殘包。
+              主動關閉、釋放或認證／憑證／協定／回呼錯誤後不再重連。
+            </p>
+          </section>
+          <section id="cache">
+            <h2>快取與儲存</h2>
+            <h3>TTL 快取</h3>
+            <p>
+              <code>net.cached(key, options, loader)</code> 按站點快取 JSON，同 key 合併載入。
+              ttl 必填；stale 預設 true，過期先回舊值並背景更新；persist 預設 false，啟用時持久化公開資料。
+              播放網址使用短 TTL、<code>stale: false</code>，不持久化。
+            </p>
+            <p>
+              <code>peek(key)</code> 只讀已有值，包括過期值；<code>refresh(key, options, loader)</code> 立即返回，依 TTL 背景更新。
+              <code>clearCache(key)</code> 清一筆，省略 key 清除目前站點全部 TTL 快取並取消載入。
+            </p>
+            <p>
+              Python 的 <code>self.net.cachedText(key, options, loader)</code> 取得 JSON 原文；cached 則解碼為 Python 值，兩者共用 TTL 與清除規則。
+              Java 的 cached 回傳 JSON 字串。
+            </p>
+            <h3>Local</h3>
+            <p>
+              小型設定用 Java 的 <code>local</code>、Python 的 <code>self.local</code> 或 QuickJS 的 <code>local</code>。
+              以 get(key)／set(key, value)／delete(key) 讀寫，App 按站點隔離；Java 使用 JSON 字串，Python／QuickJS 使用 JSON 值。
+              清 TTL 快取不會刪除 Local。
+            </p>
+          </section>
+          <section id="scripts">
+            <h2>執行 JavaScript</h2>
+            <p>
+              用 <code>js.eval(source, options)</code> 在獨立環境執行短段 JavaScript。
+              Java 的 options 與回傳值使用 JSON 字串；Python 用 <code>self.js.eval</code>，QuickJS 用 <code>await js.eval</code>。
+            </p>
+            <p>
+              <code>globals</code> 傳 JSON 變數，<code>timeout</code> 為正整數毫秒，預設 5000；內建 <code>md5X</code>。
+              回傳最後一個運算式的 JSON 值，不接受 Promise。環境不提供網路、DOM 或模組匯入，完成、逾時或取消後即關閉。
+              三種語言都需要 QuickJS 模組。
+            </p>
+          </section>
+          <section id="runtime">
+            <h2>Android UI</h2>
+            <p>
+              共用 SDK 的 <code>com.github.catvod.Runtime</code> 以 <code>Runtime.context()</code>
+              取得 Application Context、<code>Runtime.activity()</code> 取得目前 Activity，
+              <code>Runtime.toast()</code> 顯示文字提示。Java 需明確匯入這個類別；Python
+              使用 <code>jclass</code> 取得。這些接口由宿主提供，爬蟲 JAR 使用
+              <code>compileOnly</code> 依賴 SDK。
+            </p>
+            <p>
+              繼承 Spider 的 Java／Python 爬蟲也可使用 <code>getActivity()</code>／
+              <code>self.getActivity()</code>。Activity 可能為 null／None；自訂 Dialog
+              在主執行緒顯示時才取得 Activity，不保存頁面引用。
+              <code>Runtime.toast()</code> 由 App 切到主執行緒顯示。
+              QuickJS 的文字提示可從 action 回傳 <code>msg</code> 欄位。
+            </p>
+            <p>
+              JAR 自己的 <code>com.github.catvod.spider.Init.init(Context)</code>
+              是可選的初始化入口，與 <code>Runtime</code> 分開；每個爬蟲仍由 App
+              呼叫 <code>Spider.init(Context, ext)</code>。
+            </p>
+          </section>
           <section id="result">
-            <h2>Result 通用回傳格式</h2>
+            <h2>Result 回傳格式</h2>
             <div className="schema-grid">
               <article>
                 <h3>探索類</h3>
@@ -705,7 +647,157 @@ export default function SpiderPage() {
               <Link className="inline-link" href="/config#common">
                 共用物件字典
               </Link>
-              ；詳情的播放分組見下方集數格式。
+              ；詳情的播放分組見 <Link className="inline-link" href="/spider#episodes">集數格式</Link>。
+            </p>
+          </section>
+          <section id="objects">
+            <h2>資料物件</h2>
+            <p>
+              演員或分類超連結使用 Java 的 <code>Json.link(name, target)</code>、
+              Python 的 <code>self.link(name, target)</code> 或 QuickJS 的 <code>link(name, target)</code>。
+              target 包含目標分類及篩選，可用 id、name、type_flag、filter。
+            </p>
+            <div className="object-grid">
+              {objectGroups.map((group) => (
+                <article key={group.name}>
+                  <h3>{group.name}</h3>
+                  <dl>
+                    {group.fields.map(([name, description]) => (
+                      <div key={name}>
+                        <dt>{name}</dt>
+                        <dd>{description}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section id="episodes">
+            <h2>播放分組與集數</h2>
+            <div className="delimiter-grid">
+              <div>
+                <b>$$$</b>
+                <span>分隔播放分組</span>
+              </div>
+              <div>
+                <b>#</b>
+                <span>分隔同組集數</span>
+              </div>
+              <div>
+                <b>$</b>
+                <span>分隔集數名稱與 id</span>
+              </div>
+            </div>
+            <CodeBlock
+              label="JSON / Vod fields"
+              path="list[] 中的 Vod 欄位片段"
+            >{`{
+  "vod_play_from": "主線路$$$備用線路",
+  "vod_play_url": "第 01 集$demo://ep/1#第 02 集$demo://ep/2$$$第 01 集$backup://ep/1"
+}`}</CodeBlock>
+            <p>
+              使用者點擊某集後，<code>$</code> 右側的 value 會成為{" "}
+              <code>playerContent(flag, id, …)</code> 的 <code>id</code>。
+            </p>
+          </section>
+          <section id="proxy">
+            <h2>Proxy 回傳</h2>
+            <CodeBlock label="JSON / Proxy 陣列" path="proxy / localProxy">{`[
+  200,
+  "text/plain; charset=utf-8",
+  "demo response",
+  { "Cache-Control": "no-cache" }
+]`}</CodeBlock>
+            <p>
+              上例是 Python／QuickJS
+              一般陣列模式：狀態碼、Content-Type、內容、選填標頭；第 5 格{" "}
+              <code>1</code> 表示 Base64 內容。Python 方法名稱是{" "}
+              <code>localProxy</code>，第三格也可直接回傳 bytes。
+            </p>
+            <p>
+              Java 的一般 <code>Object[]</code> 回傳格式中，第三格必須是{" "}
+              <code>InputStream</code>，第四格標頭選填，不能直接放字串或
+              bytes；也可只回傳一格 <code>NanoHTTPD.Response</code>。QuickJS 的{" "}
+              <code>from=catvod</code> 另有 JSON response 模式；Node Proxy
+              則直接轉接 HTTP 回應。
+            </p>
+            <p>
+              使用 <code>getProxyUrl(params)</code> 產生網址，App 自動加入{" "}
+              <code>do</code>、<code>siteKey</code> 並編碼參數。JAR 模式沒有
+              siteKey 時會找{" "}
+              <code>com.github.catvod.spider.Proxy.proxy(Map)</code> 靜態入口。
+            </p>
+          </section>
+          <section id="live-danmaku">
+            <h2>即時彈幕</h2>
+            <p>
+              Java／Python／QuickJS 的播放回應沿用 <code>danmaku: [&#123;name, url&#125;]</code>。
+              即時來源的 url 用 <code>getDanmakuUrl(id)</code> 產生，Python 使用{" "}
+              <code>self.getDanmakuUrl(id)</code>；App 會呼叫該站點的 <code>danmaku(id, emit)</code>。
+              HTTP(S) 來源仍按彈幕檔案載入。
+            </p>
+            <CodeBlock label="JSON / 即時彈幕" path="emit(item)">{`{
+  "text": "即時彈幕",
+  "color": 6737151,
+  "size": 25,
+  "type": 1,
+  "colors": [6737151, 13408767]
+}`}</CodeBlock>
+            <FieldTable fields={liveDanmakuFields} label="即時彈幕" />
+            <p>
+              狀態也使用 <code>emit</code>，不可同時包含 text。
+              state 為 ready（訂閱可用）、retrying（恢復中）或 error（終止失敗）；
+              msg 選填，最多 512 字元，不放 Cookie、token 或簽名網址。
+              ready 須確認平台訂閱可用，不能僅以 WebSocket open 判斷。
+            </p>
+            <CodeBlock label="JSON / 訂閱狀態" path="emit(item)">{`{
+  "state": "retrying",
+  "msg": "連線中斷，等待恢復"
+}`}</CodeBlock>
+            <p>
+              App 自行設定 connecting、合併相同 state／msg；初始化例外轉成 error。
+              error 後停止訂閱並忽略後續回呼，主動停止則清除狀態，不需回報 closed。
+              狀態記錄在日誌，不會當成彈幕或反覆跳出提示。
+            </p>
+            <p>
+              <code>emit</code> 接收 Java JSONObject、Python dict 或 QuickJS 物件；Java 用{" "}
+              <code>emit.accept(item)</code> 並回傳 AutoCloseable，Python／QuickJS 回傳停止函式。
+              切台或關閉時，App 呼叫停止；爬蟲須取消自己的連線與心跳。
+            </p>
+            <p>
+              爬蟲負責協定、解碼與樣式轉換，App 負責顯示限制，超量或過期訊息可能丟棄。
+              完整範例見 CatVodSpider 的三語言 Demo。
+            </p>
+          </section>
+          <section id="timeshift">
+            <h2>直播回看</h2>
+            <p>
+              來源支援依時間取源時，在播放回應或直播列表的 <code>Channel</code> 加入 <code>timeshift</code>。
+              App 會顯示可拖曳的時間軸，最右側為直播。
+            </p>
+            <CodeBlock label="JSON / Result" path="playerContent">{`{
+  "parse": 0,
+  "url": "https://example.com/live.flv",
+  "timeshift": {
+    "url": "https://example.com/replay?time={time}",
+    "start": 1792700000000,
+    "window": 7200000
+  }
+}`}</CodeBlock>
+            <p>
+              <code>start</code> 是本場直播開始的 Unix 毫秒，<code>window</code> 是最多可回看的毫秒數。
+              時間軸從本場開始累加，最長不超過 window；可用範圍由來源決定。
+            </p>
+            <p>
+              App 將網址的 <code>{"{time}"}</code> 換成目標 Unix 毫秒後 GET；0 表示重新取得直播來源。
+              端點回傳直接播放的 <code>url</code>，並可附上 <code>header</code> 與 <code>format</code>。
+              使用本地代理時，以 <code>getProxyUrl</code> 產生網址。
+            </p>
+            <p>
+              連續拖曳或切台會取消舊請求；失敗時提示並保留目前播放。
+              回看期間暫停爬蟲即時彈幕，回到直播後恢復。
+              從節目表選取回看則使用 <Link className="inline-link" href="/config#catchup"><code>catchup</code></Link>，時間軸以該節目為範圍。
             </p>
           </section>
           <section id="skips">
@@ -781,84 +873,27 @@ export default function SpiderPage() {
               scheme、host、port 相同，才自動關閉。此條件不代表站點已驗證帳號授權。
             </p>
           </section>
-          <section id="objects">
-            <h2>常用資料物件</h2>
+          <section id="node">
+            <h2>Node.js 載入</h2>
             <p>
-              演員或分類超連結使用 Java 的 <code>Json.link(name, target)</code>、
-              Python 的 <code>self.link(name, target)</code> 或 QuickJS 的 <code>link(name, target)</code>。
-              target 包含目標分類及篩選，可用 id、name、type_flag、filter。
+              一般 <code>./demo.js</code> 仍由 QuickJS 執行。Node.js 必須以{" "}
+              <code>index.js.md5</code> 作為配置入口，同目錄提供{" "}
+              <code>index.js</code>、<code>index.config.js</code> 與{" "}
+              <code>index.config.js.md5</code>。
             </p>
-            <div className="object-grid">
-              {objectGroups.map((group) => (
-                <article key={group.name}>
-                  <h3>{group.name}</h3>
-                  <dl>
-                    {group.fields.map(([name, description]) => (
-                      <div key={name}>
-                        <dt>{name}</dt>
-                        <dd>{description}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </article>
-              ))}
+            <p>
+              App 啟動 bundle 後，讀取 <code>/config</code> 回應的{" "}
+              <code>video</code> 或 <code>data.video</code>，把{" "}
+              <code>video.sites</code> 映射為 <code>node:</code>{" "}
+              站點路由。爬蟲以 HTTP JSON 處理接在各站點路由後的{" "}
+              <code>/init</code>、<code>/home</code>、<code>/category</code>、
+              <code>/detail</code>、<code>/search</code> 與 <code>/play</code>。
+            </p>
+            <div className="callout">
+              <b>不要只替換 api 前綴</b>Node.js 不是 QuickJS 的 export default
+              物件模式；單獨把普通配置的 api 改成 node:，不會完成 Node bundle
+              初始化。
             </div>
-          </section>
-          <section id="episodes">
-            <h2>播放分組與集數字串</h2>
-            <div className="delimiter-grid">
-              <div>
-                <b>$$$</b>
-                <span>分隔播放分組</span>
-              </div>
-              <div>
-                <b>#</b>
-                <span>分隔同組集數</span>
-              </div>
-              <div>
-                <b>$</b>
-                <span>分隔集數名稱與 id</span>
-              </div>
-            </div>
-            <CodeBlock
-              label="JSON / Vod fields"
-              path="list[] 中的 Vod 欄位片段"
-            >{`{
-  "vod_play_from": "主線路$$$備用線路",
-  "vod_play_url": "第 01 集$demo://ep/1#第 02 集$demo://ep/2$$$第 01 集$backup://ep/1"
-}`}</CodeBlock>
-            <p>
-              使用者點擊某集後，<code>$</code> 右側的 value 會成為{" "}
-              <code>playerContent(flag, id, …)</code> 的 <code>id</code>。
-            </p>
-          </section>
-          <section id="proxy">
-            <h2>Proxy 回傳：依執行環境區分</h2>
-            <CodeBlock label="JSON / Proxy 陣列" path="proxy / localProxy">{`[
-  200,
-  "text/plain; charset=utf-8",
-  "demo response",
-  { "Cache-Control": "no-cache" }
-]`}</CodeBlock>
-            <p>
-              上例是 QuickJS / Python
-              一般陣列模式：狀態碼、Content-Type、內容、選填標頭；第 5 格{" "}
-              <code>1</code> 表示 Base64 內容。Python 方法名稱是{" "}
-              <code>localProxy</code>，第三格也可直接回傳 bytes。
-            </p>
-            <p>
-              Java 的一般 <code>Object[]</code> 回傳格式中，第三格必須是{" "}
-              <code>InputStream</code>，第四格標頭選填，不能直接放字串或
-              bytes；也可只回傳一格 <code>NanoHTTPD.Response</code>。QuickJS 的{" "}
-              <code>from=catvod</code> 另有 JSON response 模式；Node Proxy
-              則直接轉接 HTTP 回應。
-            </p>
-            <p>
-              使用 <code>getProxyUrl(params)</code> 產生網址，App 自動加入{" "}
-              <code>do</code>、<code>siteKey</code> 並編碼參數。JAR 模式沒有
-              siteKey 時會找{" "}
-              <code>com.github.catvod.spider.Proxy.proxy(Map)</code> 靜態入口。
-            </p>
           </section>
         </div>
       </div>

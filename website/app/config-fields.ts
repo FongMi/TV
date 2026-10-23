@@ -285,7 +285,7 @@ export const liveFields: Field[] = [
     name: "catchup",
     type: "Catchup",
     description:
-      "外部列表頻道的預設追看／時移設定；內嵌 groups 需在頻道自行提供。",
+      "外部列表頻道的預設節目回看設定；內嵌 groups 需在頻道自行提供。",
   },
   { name: "core", type: "Core", description: "特殊播放核心的進階初始化設定。" },
   { name: "groups", type: "Group[]", description: "內嵌頻道分組。" },
@@ -375,9 +375,14 @@ export const channelFields: Field[] = [
     default: "0",
   },
   {
+    name: "Channel.timeshift",
+    type: "object",
+    description: "可拖曳的直播回看時間軸，格式與 Result.timeshift 相同。",
+  },
+  {
     name: "Channel.catchup",
     type: "Catchup",
-    description: "覆蓋配置的追看／時移設定。",
+    description: "覆蓋配置的節目回看設定。",
   },
 ];
 
@@ -435,7 +440,7 @@ export const commonFields: Field[] = [
   {
     name: "Catchup.days",
     type: "string",
-    description: "保留欄位；目前不限制可追看的天數。",
+    description: "保留欄位；目前不限制可回看的天數。",
   },
   {
     name: "Catchup.regex",
@@ -446,7 +451,7 @@ export const commonFields: Field[] = [
     name: "Catchup.source",
     type: "string",
     description:
-      "追看／時移 URL 範本，請提供非空值；可含開始與結束時間 token。",
+      "節目回看 URL 範本，請提供非空值；可含開始與結束時間 token。",
   },
   {
     name: "Catchup.replace",

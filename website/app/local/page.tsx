@@ -291,6 +291,7 @@ curl --data-urlencode "type=speed" --data-urlencode "speed=1.5" "http://127.0.0.
               <code>seek</code> 的 <code>position</code> 是非負整數毫秒，超過總長時跳到結尾；
               缺少、格式錯誤或超過 64 位元整數範圍時回傳 400。
               <code>canSeek</code> 為 false 時回傳 409。
+              支援 <Link className="inline-link" href="/spider#timeshift">直播回看</Link> 的來源也可跳轉，位置以目前回看範圍的起點計算。
               <code>speed</code> 必須是 0.1–5.0 範圍內的有限數值，否則回傳 400；
               <code>canSetSpeed</code> 為 false 時回傳 409。
             </p>
