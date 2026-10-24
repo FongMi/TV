@@ -86,7 +86,7 @@ public class VodPlaybackController {
         host.showDetailMessage(result.getMsg());
     }
 
-    public void updateVod(Vod item) {
+    private void updateVod(Vod item) {
         History history = state.getHistory();
         if (history == null) return;
         replaceVodId(history, item.getId());

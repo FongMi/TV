@@ -220,6 +220,7 @@ public class SiteApi {
             }
             SpiderDebug.log("player", playerContent);
             Result result = Result.fromJson(playerContent);
+            result.getVod().setFlags();
             if (result.getFlag().isEmpty()) result.setFlag(flag);
             result.setHeader(site.getHeader());
             result.setKey(key);

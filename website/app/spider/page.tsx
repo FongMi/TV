@@ -250,6 +250,7 @@ export default function SpiderPage() {
           ["testing", "測試爬蟲"],
           ["demo", "三語言 Demo"],
           ["lifecycle", "方法與呼叫時機"],
+          ["playback-details", "播放詳情更新"],
           ["network", "共用網路"],
           ["streams", "串流讀取與代理"],
           ["websocket", "WebSocket"],
@@ -419,6 +420,42 @@ export default function SpiderPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+          <section id="playback-details">
+            <h2>播放詳情更新</h2>
+            <p>
+              <code>playerContent</code>／<code>play</code> 可在播放結果的 <code>list[0]</code> 帶回 VOD 詳情。
+              App 採用結果時更新頁面；預載結果在切集時套用，取消或過期的結果會丟棄。
+            </p>
+            <CodeBlock label="JSON / Result" path="播放結果附帶詳情">{`{
+  "parse": 0,
+  "url": "https://example.com/video.mp4",
+  "list": [
+    {
+      "vod_id": "demo-1",
+      "vod_name": "範例項目",
+      "vod_pic": "https://example.com/cover.jpg",
+      "type_name": "動畫",
+      "vod_year": "2026",
+      "vod_area": "台灣",
+      "vod_director": "示範導演",
+      "vod_actor": "演員甲、演員乙",
+      "vod_content": "完整簡介",
+      "vod_remarks": "更新至第 2 集",
+      "vod_play_from": "主要線",
+      "vod_play_url": "第1集$episode-1#第2集$episode-2"
+    }
+  ]
+}`}</CodeBlock>
+            <p>
+              Java 使用 <code>Response.vod(vod)</code>，Python／QuickJS 使用 <code>list: [vod]</code>；
+              Node.js 的 <code>/play</code> 與 type=4 API 使用相同的 JSON 格式。
+              範例見 <a className="inline-link" href="https://github.com/FongMi/CatVodSpider">CatVodSpider Demo</a>。
+            </p>
+            <p>
+              同名播放分組合併 episode，相同名稱與播放值去重，其餘追加，保留目前選集位置。
+              <code>vod_id</code> 可省略，提供時會連動歷史與收藏識別。
+            </p>
           </section>
           <section id="network">
             <h2>共用網路</h2>
@@ -888,6 +925,9 @@ export default function SpiderPage() {
               站點路由。爬蟲以 HTTP JSON 處理接在各站點路由後的{" "}
               <code>/init</code>、<code>/home</code>、<code>/category</code>、
               <code>/detail</code>、<code>/search</code> 與 <code>/play</code>。
+            </p>
+            <p>
+              <code>/play</code> 的詳情回傳格式見 <Link className="inline-link" href="#playback-details">播放詳情更新</Link>。
             </p>
             <div className="callout">
               <b>不要只替換 api 前綴</b>Node.js 不是 QuickJS 的 export default

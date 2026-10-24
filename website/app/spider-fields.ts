@@ -98,7 +98,7 @@ export const resultFields: Field[] = [
   {
     name: "list",
     type: "Vod[]",
-    description: "首頁、分類與搜尋卡片；詳情取 list[0]。",
+    description: "首頁、分類與搜尋卡片；詳情取 list[0]。播放結果可用 list[0] 更新該片詳情，預載時延至採用結果才套用。",
     default: "[]",
   },
   {

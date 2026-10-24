@@ -19,8 +19,8 @@ export const localActions = [
   ["danmaku", "text", "送出一條即時彈幕；需要有效的播放服務與非空文字。"],
   [
     "refresh",
-    "type；依類型加 path 或 json",
-    "重新整理頁面，或推送字幕、彈幕及 Vod 更新。",
+    "type；字幕、彈幕另加 path",
+    "重新整理頁面，或推送字幕及彈幕。",
   ],
   ["push", "url", "把非空 URL 交給 App 推送播放流程。"],
   ["file", "path", "開啟裝置上的檔案；不是上傳檔案。"],
@@ -154,7 +154,6 @@ export const localRefresh = [
   ["category", "—", "分類"],
   ["subtitle", "path", "字幕檔位置"],
   ["danmaku", "path", "彈幕檔位置"],
-  ["vod", "json", "Vod 物件的 JSON 字串"],
 ] as const;
 
 export const localFileEndpoints = [

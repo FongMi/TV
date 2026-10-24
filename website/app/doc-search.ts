@@ -218,6 +218,13 @@ const entries: Entry[] = [
     keywords: "LOCAL.md localhost NanoHTTPD",
   },
   {
+    title: "播放詳情更新與預載",
+    description: "播放詳情、episode 合併與預載套用時機",
+    href: "/spider#playback-details",
+    names: ["playerContent", "play", "list[0]"],
+    keywords: "playerContent play vod_name vod_pic vod_content vod_actor vod_director vod_play_url list episode 完整 增量 預載 預加載 詳情更新",
+  },
+  {
     title: "本地動作指令 /action",
     description: "播放控制、推送、搜尋、配置、字幕與彈幕",
     href: "/local#action",
