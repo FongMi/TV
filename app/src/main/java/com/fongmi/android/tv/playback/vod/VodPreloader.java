@@ -16,7 +16,7 @@ import java.util.function.LongSupplier;
 
 final class VodPreloader {
 
-    private static final long PRELOAD_DELAY_MS = 30_000;
+    private static final long PRELOAD_DELAY_MS = 15_000;
 
     private final VodPlaybackHost host;
     private final VodDataSource dataSource;

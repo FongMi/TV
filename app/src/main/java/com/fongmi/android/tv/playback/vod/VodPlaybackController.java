@@ -386,7 +386,7 @@ public class VodPlaybackController {
     }
 
     public void onPlaybackSeek() {
-        if (state.getPlayingRequest() != null) preloader.update(state.getQuality());
+        preloader.onPlayingChanged(host.isPlayerPlaying());
     }
 
     public void onTimeChanged(long time, long position, long duration) {
