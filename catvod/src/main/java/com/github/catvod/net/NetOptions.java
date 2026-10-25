@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.HashMap;
@@ -26,7 +27,7 @@ public class NetOptions {
     @SerializedName("method")
     private String method;
     @SerializedName("body")
-    private String body;
+    private JsonElement body;
     @SerializedName("data")
     private JsonElement data;
     @SerializedName("headers")
@@ -73,7 +74,7 @@ public class NetOptions {
         JsonObject values = headers == null ? new JsonObject() : GSON.toJsonTree(headers).getAsJsonObject();
         if (method.equals("POST") && values.keySet().stream().noneMatch(key -> key.equalsIgnoreCase("Content-Type"))) values.addProperty("Content-Type", "application/json; charset=utf-8");
         options.method = method;
-        options.body = body;
+        options.body = body == null ? null : new JsonPrimitive(body);
         options.headers = values;
         options.timeout = timeout;
         return options;
@@ -119,7 +120,13 @@ public class NetOptions {
     }
 
     public String getBody() {
-        return body;
+        JsonElement raw = getRawBody();
+        if (raw != null && !raw.isJsonPrimitive()) throw new IllegalArgumentException("Body must be text");
+        return raw == null ? null : raw.getAsString();
+    }
+
+    JsonElement getRawBody() {
+        return body == null || body.isJsonNull() ? null : body;
     }
 
     public JsonElement getData() {
@@ -127,7 +134,7 @@ public class NetOptions {
     }
 
     String message() {
-        if (data == null) return body;
+        if (data == null) return getBody();
         if (data.isJsonPrimitive() && data.getAsJsonPrimitive().isString()) return data.getAsString();
         return data.toString();
     }

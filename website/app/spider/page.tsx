@@ -521,6 +521,10 @@ export default function SpiderPage() {
               二進位回應用 <code>buffer: 3</code>，分別取得 bytes／ArrayBuffer。
               <code>net.getUserAgent()</code> 取得 App 的 UA，需要時自行放入 headers。
             </p>
+            <p>
+              原始 POST 用 <code>body</code>，與 data 擇一並提供 Content-Type。
+              body 支援文字或 0～255 整數陣列，例如 <code>{"body: [0, 127, 128, 255]"}</code>；buffer 只控制回應格式。
+            </p>
             <h3>Cookie 與 Session</h3>
             <p>
               <code>cookie: true</code> 使用並更新 WebView Cookie；以 <code>getCookie(url)</code> 讀取、

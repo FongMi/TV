@@ -1,7 +1,7 @@
 import type { Field } from "./config-fields";
 
 export const networkMethods = [
-  ["req / http", "取得 code、headers、content 與 error；HTTP 非 2xx 需自行判斷。"],
+  ["req / http", "取得 code、headers、content 與 error；HTTP 非 2xx 需自行判斷。body 支援文字或位元組陣列。"],
   ["json", "取得 JSON；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。"],
   ["get / post", "Java 取得文字正文；HTTP 非 2xx 仍保留正文。"],
   ["getUserAgent", "Python／QuickJS 取得 App 的 User-Agent，按需放入 headers。"],

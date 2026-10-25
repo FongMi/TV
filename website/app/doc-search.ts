@@ -43,7 +43,7 @@ const entries: Entry[] = [
     description: "Java、Python、QuickJS 的 HTTP、串流、Cookie、快取與下載",
     href: "/spider#network",
     names: [...networkNames("req", "json", "getUserAgent", "getCookie", "setCookie", "session", "batch", "map", "download", "sleep"), "net.http", "net.get", "net.post"],
-    keywords: networkMethods.flat().join(" ") + " self.net stale persist",
+    keywords: networkMethods.flat().join(" ") + " self.net stale persist 二進位 POST Content-Type 原始正文 位元組陣列",
   },
   {
     title: "執行 JavaScript",
