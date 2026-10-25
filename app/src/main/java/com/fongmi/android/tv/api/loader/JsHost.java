@@ -4,6 +4,10 @@ import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.ui.activity.WebActivity;
 import com.fongmi.android.tv.ui.custom.WebViewCookies;
 import com.fongmi.quickjs.host.Host;
+import com.github.catvod.Runtime;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 final class JsHost implements Host {
 
@@ -20,6 +24,16 @@ final class JsHost implements Host {
     @Override
     public boolean openWeb(String options) {
         return WebActivity.openWeb(options);
+    }
+
+    @Override
+    public CompletableFuture<String> dialog(String options) {
+        return Runtime.dialog(options, null);
+    }
+
+    @Override
+    public CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
+        return Runtime.dialog(options, onAction);
     }
 
     @Override

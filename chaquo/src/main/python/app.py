@@ -5,6 +5,7 @@ from urllib.request import url2pathname
 
 from _tv_loader import Runtime, SourceNotFoundError
 from _tv_net import JsAdapter, LocalAdapter, NetAdapter
+from _tv_dialog import DialogAdapter
 
 
 def spider(cache, api, site_key="", net=None):
@@ -64,6 +65,7 @@ def bindNet(ru, net, user_agent=None, local=None, streams=None, js=None):
     ru.net = NetAdapter(net, user_agent, streams)
     ru.local = LocalAdapter(local)
     ru.js = JsAdapter(js)
+    ru._dialog = DialogAdapter()
 
 
 def homeContent(ru, filter):
@@ -120,12 +122,20 @@ def danmaku(ru, id, emitter):
 
 def destroy(ru):
     try:
+        closeDialog(ru)
         ru.destroy()
     finally:
         release(ru)
 
 
 def release(ru):
+    closeDialog(ru)
     runtime = getattr(ru, '_tv_runtime', None)
     if runtime is not None:
         runtime.close()
+
+
+def closeDialog(ru):
+    dialog = getattr(ru, '_dialog', None)
+    if dialog is not None:
+        dialog.close()

@@ -612,4 +612,12 @@
     <string name="auto_add_favorite">Add to favorites</string>
     <string name="auto_remove_favorite">Remove from favorites</string>
 
+    <string name="dialog_processing">Processing…</string>
+    <string name="dialog_image">Image</string>
+    <string name="dialog_required">Required</string>
+    <string name="dialog_min_length">Enter at least %1$d characters</string>
+    <string name="dialog_max_length">Enter at most %1$d characters</string>
+    <string name="dialog_min_choices">Select at least %1$d options</string>
+    <string name="dialog_max_choices">Select at most %1$d options</string>
+
 </resources>

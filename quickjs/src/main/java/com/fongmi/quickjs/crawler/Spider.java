@@ -79,8 +79,10 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private Object call(Invocation current, String func, Object... args) throws Exception {
-        CompletableFuture<Object> result = ctx.invokeTimed("destroy".equals(func) || "stopDanmaku".equals(func) ? DESTROY_TIMEOUT : host.getCallTimeout(), "__JS_SPIDER__", func,
+        current.timeout("destroy".equals(func) || "stopDanmaku".equals(func) ? DESTROY_TIMEOUT : host.getCallTimeout());
+        CompletableFuture<Object> result = ctx.invoke("__JS_SPIDER__", func,
                 future -> beginCall(current, func, future), global::endCall, args);
+        current.bind(result);
         try {
             return "destroy".equals(func) ? result.join() : result.get();
         } catch (InterruptedException error) {
@@ -95,7 +97,6 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private void beginCall(Invocation current, String func, CompletableFuture<?> future) {
         if (destroyed && !"destroy".equals(func)) throw new IllegalStateException("Spider destroyed");
-        current.bind(future);
         if (destroyed && !"destroy".equals(func)) future.cancel(false);
         global.beginCall(current);
     }
@@ -251,6 +252,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
         ctx.submit(this::bindGlobals).get();
         ctx.setModuleLoader(module).get();
         await(ctx.evaluate(RuntimeModule.QUICKJS.readAsset("js/lib/net.js"), "lib/net.js"));
+        await(ctx.evaluate(RuntimeModule.QUICKJS.readAsset("js/lib/ui.js"), "lib/ui.js"));
         ctx.submit(() -> {
             createFun();
             return null;

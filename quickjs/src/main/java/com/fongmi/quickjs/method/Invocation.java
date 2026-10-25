@@ -2,6 +2,7 @@ package com.fongmi.quickjs.method;
 
 import com.fongmi.quickjs.QuickJS;
 import com.github.catvod.net.Net;
+import com.github.catvod.utils.CallTimeout;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -16,22 +17,27 @@ import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeoutException;
 
 public final class Invocation implements AutoCloseable {
 
     private static final Gson GSON = new Gson();
 
     private final Set<CompletableFuture<?>> pending = ConcurrentHashMap.newKeySet();
+    private final Set<CompletableFuture<?>> dialogs = ConcurrentHashMap.newKeySet();
     private final Map<String, InputStream> streams = new HashMap<>();
     private final Set<String> readers = new HashSet<>();
     private final boolean proxy;
     private final long started = System.nanoTime();
     private final Map<CompletableFuture<?>, Long> networking = new HashMap<>();
     private volatile CompletableFuture<?> result;
+    private CallTimeout timeout;
+    private Runnable resumeDeadline;
+    private long timeoutMillis;
     private volatile boolean canceled;
     private volatile boolean ended;
     private long firstTurn, ownerStart, ownerNanos, networkNanos, htmlNanos;
-    private int depth, networkOperations;
+    private int depth, networkOperations, dialogActions;
 
     public Invocation() {
         this(false);
@@ -82,9 +88,51 @@ public final class Invocation implements AutoCloseable {
     public void bind(CompletableFuture<?> result) {
         this.result = result;
         result.whenComplete((value, error) -> {
+            if (timeout != null) timeout.close();
             if (error != null) cancel();
         });
+        if (timeout != null) timeout.start(() -> fail(new TimeoutException("JavaScript call exceeded " + timeoutMillis + " ms")));
         if (canceled) result.cancel(false);
+    }
+
+    public void timeout(long timeoutMillis) {
+        this.timeoutMillis = timeoutMillis;
+        timeout = new CallTimeout(timeoutMillis);
+    }
+
+    synchronized void await(CompletableFuture<?> future) {
+        dialogs.add(future);
+        future.whenComplete((value, error) -> endDialog(future));
+        track(future);
+        pauseTimeout();
+        if (ended) future.cancel(true);
+    }
+
+    private synchronized void endDialog(CompletableFuture<?> future) {
+        dialogs.remove(future);
+        if (dialogs.isEmpty()) resumeTimeout();
+    }
+
+    private void pauseTimeout() {
+        if (timeout != null && resumeDeadline == null && depth == 0 && dialogActions == 0 && !dialogs.isEmpty() && !ended) resumeDeadline = timeout.suspend();
+    }
+
+    synchronized Runnable beginDialogAction() {
+        if (ended || canceled) throw new CancellationException("Spider call ended");
+        dialogActions++;
+        resumeTimeout();
+        return this::endDialogAction;
+    }
+
+    private synchronized void endDialogAction() {
+        dialogActions--;
+        pauseTimeout();
+    }
+
+    private synchronized void resumeTimeout() {
+        Runnable resume = resumeDeadline;
+        resumeDeadline = null;
+        if (resume != null) resume.run();
     }
 
     void track(CompletableFuture<?> request) {
@@ -109,11 +157,15 @@ public final class Invocation implements AutoCloseable {
     synchronized void enter() {
         long now = System.nanoTime();
         if (firstTurn == 0) firstTurn = now;
-        if (depth++ == 0) ownerStart = now;
+        if (depth++ == 0) {
+            ownerStart = now;
+            resumeTimeout();
+        }
     }
 
     synchronized void leave() {
         if (--depth == 0) ownerNanos += System.nanoTime() - ownerStart;
+        pauseTimeout();
     }
 
     synchronized void recordHtml(long nanos) {
@@ -183,6 +235,8 @@ public final class Invocation implements AutoCloseable {
 
     @Override
     public void close() {
+        if (timeout != null) timeout.close();
+        resumeTimeout();
         List<InputStream> unclaimed;
         synchronized (streams) {
             ended = true;
@@ -190,6 +244,7 @@ public final class Invocation implements AutoCloseable {
             streams.clear();
             readers.clear();
         }
+        for (CompletableFuture<?> dialog : dialogs) dialog.cancel(true);
         closeStreams(unclaimed);
     }
 

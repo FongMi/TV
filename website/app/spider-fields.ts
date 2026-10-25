@@ -21,6 +21,27 @@ export const networkMethods = [
   ["sleep", "可取消的等待，單位為毫秒。"],
 ];
 
+export const dialogFields: Field[] = [
+  { name: "title / message", type: "string", description: "選填標題與說明。" },
+  { name: "image", type: "string", description: "選填 base64 圖片 data URI，如 data:image/png;base64,...；由爬蟲準備內容。onAction 可更新，空字串移除；解碼失敗時，尚未結束的 dialog 會回報錯誤。" },
+  { name: "qrcode", type: "string", description: "選填非空白字串，在本機產生 QR Code；內容不必是網址，無法編碼時回報錯誤。" },
+  { name: "copyable", type: "boolean", description: "可選取 message，並提供複製全文按鈕；複製不關窗，也不呼叫 onAction。", default: "false" },
+  { name: "cancelable", type: "boolean", description: "允許返回鍵取消；false 時也阻止點外側取消。頁面銷毀及呼叫取消仍會清理視窗。", default: "true" },
+  { name: "inputs", type: "object[]", description: "選填輸入欄位；name 必填且不可重複，label 預設 name；value 為字串，預設空字串；多選為字串陣列，預設空陣列。" },
+  { name: "inputs[].helperText", type: "string", description: "欄位下方的說明文字，省略或空字串時隱藏。" },
+  { name: "inputs[].type", type: "string", description: "text、phone、number、password 為單行，textarea 為多行，select 為單選，multiselect 為多選清單；格式與業務驗證由爬蟲負責。", default: "text" },
+  { name: "inputs[].options", type: "object[]", description: "select／multiselect 必填非空陣列；value 為非空白且唯一的字串，label 預設 value 且不可空白。顯示 label，單選回傳字串，多選依選項順序回傳字串陣列；非空初始值須存在於選項，多選不可重複。" },
+  { name: "inputs[].enabled", type: "boolean", description: "允許操作欄位；停用時略過內建驗證，values 仍包含其值。onAction 可回傳 inputs 陣列，依 name 更新 enabled。", default: "true" },
+  { name: "inputs[].required", type: "boolean", description: "不可為空或全空白，多選至少選一項。", default: "false" },
+  { name: "inputs[].minLength / maxLength", type: "integer", description: "字串欄位的非負整數限制，以 Unicode 字元計算；maxLength 不可小於 minLength。留空時略過 minLength。", default: "0 / 不限制" },
+  { name: "inputs[].minItems / maxItems", type: "integer", description: "多選欄位的非負整數限制，以已選數量計算；maxItems 不可小於 minItems。留空時略過 minItems。", default: "0 / 不限制" },
+  { name: "buttons", type: "object[]", description: "選填 1～3 個按鈕，依序對應 positive、negative、neutral；id 與 label 必填且不可為空，id 不可重複。省略時提供確定（ok）與取消。" },
+  { name: "buttons[].close", type: "boolean", description: "false 時保留視窗，必須提供 onAction。", default: "true" },
+  { name: "buttons[].enabled", type: "boolean", description: "允許操作按鈕；onAction 可回傳 buttons 陣列，依 id 更新 enabled。", default: "true" },
+  { name: "buttons[].validate", type: "string[]", description: "驗證指定的欄位 name；空陣列略過驗證。", default: "全部欄位" },
+  { name: "onAction", type: "function", description: "驗證通過後接收 {button, values}，button 為按鈕 id。Java／Python 以第二參數傳入同步回呼，QuickJS 放在 options 內，可回傳 Promise。回傳 {message, qrcode, image, values, errors, inputs, buttons, close} 更新內容或關窗設定。" },
+];
+
 export const liveDanmakuFields: Field[] = [
   {
     name: "text",

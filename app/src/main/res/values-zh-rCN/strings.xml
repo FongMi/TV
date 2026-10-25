@@ -592,4 +592,12 @@
     <string name="auto_add_favorite">加入收藏</string>
     <string name="auto_remove_favorite">取消收藏</string>
 
+    <string name="dialog_processing">处理中…</string>
+    <string name="dialog_image">图片</string>
+    <string name="dialog_required">此字段必填</string>
+    <string name="dialog_min_length">请输入至少 %1$d 个字符</string>
+    <string name="dialog_max_length">请输入最多 %1$d 个字符</string>
+    <string name="dialog_min_choices">请选择至少 %1$d 个选项</string>
+    <string name="dialog_max_choices">请选择最多 %1$d 个选项</string>
+
 </resources>

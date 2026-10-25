@@ -72,6 +72,12 @@ class Spider(metaclass=ABCMeta):
         from com.github.catvod import Runtime
         return Runtime.activity()
 
+    def dialog(self, options, onAction=None):
+        dialog = getattr(self, '_dialog', None)
+        if dialog is None:
+            raise RuntimeError("Dialog bridge is unavailable")
+        return dialog.show(options, onAction)
+
     def getDependence(self):
         return []
 
@@ -82,6 +88,8 @@ class Spider(metaclass=ABCMeta):
             if hasattr(self, 'net'):
                 spider.net = self.net
                 spider.local = self.local
+            if hasattr(self, '_dialog'):
+                spider._dialog = self._dialog
             return spider
         return self.loadModule(name).Spider()
 

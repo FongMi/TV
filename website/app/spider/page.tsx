@@ -4,12 +4,44 @@ import Link from "next/link";
 import { CodeTabs, type CodeSample } from "../CodeTabs";
 import { CodeBlock, DocsLayout } from "../ui";
 import { FieldTable } from "../FieldTable";
-import { resultFields, objectGroups, methods, networkMethods, liveDanmakuFields } from "../spider-fields";
+import { resultFields, objectGroups, methods, networkMethods, liveDanmakuFields, dialogFields } from "../spider-fields";
 
 export const metadata: Metadata = {
   title: "爬蟲介接",
   description: "Java、Python、QuickJS 爬蟲範例、共用接口與回傳資料格式。",
 };
+
+const dialogSamples: CodeSample[] = [
+  {
+    id: "java", label: "Java", file: "Spider.action",
+    code: `JSONObject options = new JSONObject("""
+    {"title":"輸入內容","inputs":[{"name":"text","label":"內容","required":true}]}
+    """);
+JSONObject result = dialog.show(options);
+if (result == null) return "{}";
+String text = result.getJSONObject("values").getString("text");`,
+  },
+  {
+    id: "python", label: "Python", file: "Spider.action",
+    code: `options = {
+    "title": "輸入內容",
+    "inputs": [{"name": "text", "label": "內容", "required": True}],
+}
+result = self.dialog(options)
+if result is None:
+    return {}
+text = result["values"]["text"]`,
+  },
+  {
+    id: "quickjs", label: "QuickJS", file: "spider.action",
+    code: `const result = await dialog({
+  title: "輸入內容",
+  inputs: [{name: "text", label: "內容", required: true}]
+});
+if (result === null) return {};
+const text = result.values.text;`,
+  },
+];
 
 const java = `// 最小點播範例；example.com 為示意網址。
 package com.github.catvod.spider;
@@ -608,10 +640,150 @@ export default function SpiderPage() {
             </p>
             <p>
               繼承 Spider 的 Java／Python 爬蟲也可使用 <code>getActivity()</code>／
-              <code>self.getActivity()</code>。Activity 可能為 null／None；自訂 Dialog
+              <code>self.getActivity()</code>。Activity 可能為 null／None；自訂原生 UI
               在主執行緒顯示時才取得 Activity，不保存頁面引用。
               <code>Runtime.toast()</code> 由 App 切到主執行緒顯示。
               QuickJS 的文字提示可從 action 回傳 <code>msg</code> 欄位。
+            </p>
+            <p>
+              三語言共用 Dialog 參數與宿主介面，可顯示文字、QR Code、圖片與自訂表單。
+              Java 用 <code>dialog.show(options)</code>，Python 用 <code>self.dialog(options)</code> 同步取得結果；
+              QuickJS 用 <code>await dialog(options)</code>，onAction 放在 options 內。
+            </p>
+            <p>
+              關窗時回傳 <code>{"{button, values}"}</code>：button 是按鈕 id，values 以欄位 name 對應字串，多選欄位使用字串陣列。
+              允許的返回或點外側操作、預設取消按鈕及頁面銷毀時回傳 null／None。
+              宿主、參數或回呼錯誤時，Java／Python 拋出例外，QuickJS Promise reject。
+              呼叫取消或爬蟲釋放會關窗並停止等待。
+            </p>
+            <p>
+              Java／Python 在爬蟲工作執行緒呼叫，回呼也在原工作執行緒執行；宿主負責顯示 UI。
+              Java 的 options／event／結果使用 JSONObject，Python 使用 dict，QuickJS 使用物件。
+              Java／Python 回呼同步回傳更新，QuickJS 回呼可回傳 Promise；皆可省略回呼。
+            </p>
+            <p>
+              Java 需更新編譯用 SDK 與 App，Python／QuickJS 需使用配套 App 與模組。
+            </p>
+            <CodeTabs samples={dialogSamples} />
+            <FieldTable fields={dialogFields} label="Dialog" />
+            <p>
+              三語言 Demo 的 dialog 示範欄位更新與驗證，qrcode 示範 QR Code 更新與複製，dialog_steps 示範圖片更新與連續對話框。
+              以下以 QuickJS 展示共用參數；範例不記錄或保存輸入內容。
+            </p>
+            <CodeBlock>{`let version = 1;
+const initial = "https://example.com/?v=" + version;
+await dialog({
+  title: "QR Code 範例",
+  message: initial,
+  qrcode: initial,
+  copyable: true,
+  buttons: [{id: "refresh", label: "更新", close: false}, {id: "close", label: "關閉"}],
+  async onAction({button}) {
+    if (button !== "refresh") return;
+    await net.sleep(250);
+    const content = "https://example.com/?v=" + (++version);
+    return {qrcode: content, message: content};
+  }
+});`}</CodeBlock>
+            <p>
+              QR Code 在本機產生，內容不必是網址。message、QR Code、圖片與輸入欄共用捲動區域。
+              copyable 為 true 且 message 非空時提供複製全文按鈕；複製不關窗，也不觸發 onAction。
+              onAction 更新 message 後複製的是最新全文，保留換行與前導零。
+              要複製 QR Code 原始內容，可將相同字串填入 message；省略 qrcode 即可顯示純文字。
+            </p>
+            <CodeBlock>{`const result = await dialog({
+  title: "表單範例",
+  cancelable: true,
+  inputs: [
+    {name: "text", label: "內容", helperText: "可輸入多行文字，換行會保留", type: "textarea", enabled: false, required: true, maxLength: 80},
+    {name: "choice", label: "選項", type: "select", required: true,
+      options: [{value: "first", label: "選項一"}, {value: "second", label: "選項二"}]},
+    {name: "choices", label: "多選", type: "multiselect", required: true, maxItems: 2,
+      options: [{value: "first", label: "選項一"}, {value: "second", label: "選項二"}, {value: "third", label: "選項三"}]}
+  ],
+  buttons: [
+    {id: "fill", label: "帶入範例", close: false, validate: []},
+    {id: "confirm", label: "確認", enabled: false},
+    {id: "error", label: "錯誤提示", close: false, validate: []}
+  ],
+  async onAction({button}) {
+    await net.sleep(250);
+    if (button === "fill") return {
+      values: {text: "範例內容", choice: "first", choices: ["first", "second"]},
+      inputs: [{name: "text", enabled: true}],
+      buttons: [{id: "confirm", enabled: true}]
+    };
+    if (button === "error") return {errors: {text: "這是欄位錯誤提示示範"}};
+    return {close: true};
+  }
+});
+if (result === null) return {};
+const text = result.values.text;`}</CodeBlock>
+            <p>
+              宿主只負責顯示表單與回傳；按鈕用途、站點請求及業務驗證由爬蟲決定。
+              onAction 可回傳 message／qrcode／image 更新顯示內容、values 更新欄位值、errors 顯示欄位錯誤，close 覆蓋按鈕的關窗設定。
+              有非空欄位錯誤時保留視窗與輸入值；回傳 null／None 沿用按鈕設定，QuickJS 也可回傳 undefined。
+            </p>
+            <p>
+              回呼期間停用欄位與按鈕並顯示處理中，結束後恢復各自的 enabled 設定。
+              可修正的欄位錯誤用 errors 顯示；回呼拋出例外時會關窗並回報錯誤。
+            </p>
+            <p>
+              cancelable 預設 true，允許返回或點外側取消；false 時兩種操作都不取消。
+              預設取消按鈕、頁面銷毀及呼叫取消仍會清理視窗。
+            </p>
+            <p>
+              textarea 保留換行；select 顯示 label，回傳所選 value，長度驗證也依 value 計算。
+              multiselect 開啟原生勾選清單，確認後才套用，取消保留原值；回傳依 options 順序排列的字串陣列。
+            </p>
+            <p>
+              上下鍵移動焦點，多行輸入在首尾行才移出欄位；確認鍵開啟單選／多選清單，返回後回到原欄位。
+            </p>
+            <p>
+              values 只更新指定欄位，空字串可清空文字或取消單選，空陣列可清空多選。
+              整批 values 先核對欄位、型別與選項再套用，未知欄位、型別錯誤、不存在或重複的選項會關窗並回報錯誤。
+              更新不觸發 onAction，必填與長度檢查仍在按鈕操作時執行；帶入或重設按鈕可設 validate:[]。
+              更新欄位會清除其舊錯誤，同次回傳的 errors 隨後套用；關窗結果包含更新後的 values。
+            </p>
+            <p>
+              回傳 inputs 陣列以 name、buttons 陣列以 id 指定既有控制項，只更新 enabled；省略保持原值。
+              未知控制項、重複更新或無效布林值會關窗並回報錯誤；布林參數不接受字串或數字。
+              停用欄位略過內建驗證，values 仍包含其值。
+            </p>
+            <p>
+              回傳 qrcode 可更新或新增 QR Code；省略 qrcode 保留原 QR Code，提供時須為可編碼的非空白字串，否則關窗並回報錯誤。
+              更新 QR Code 保留輸入值；按鈕設定 close:false 或回傳 close:false 可繼續操作。
+            </p>
+            <p>
+              等待輸入暫停目前呼叫及 App 工作的期限，onAction 執行及 QuickJS 等待 Promise 時恢復計時；網路期限照常生效。
+            </p>
+            <CodeBlock>{`const first = await dialog({
+  title: "第一步",
+  image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAwCAIAAABhdOiYAAAAbklEQVR4nO3QwQkAIAwEQUuzdDvTDgQJRtE59hsIU1qtmlSOf3B5gAABAvQlUF8ZIECAAAHKFUm7BQQIECBAgAABAgToKaDIAAECBAjQZqC0W0CAAAECBAgQIECAAAECBAgQIAECBAjQLQECFGsAofuPsjrQFugAAAAASUVORK5CYII=",
+  inputs: [{name: "text", label: "內容", helperText: "確認後進入下一步", required: true}]
+});
+if (first === null) return {};
+const second = await dialog({
+  title: "第二步",
+  message: first.values.text,
+  copyable: true
+});
+if (second === null) return {};`}</CodeBlock>
+            <p>
+              連續對話框依序呼叫即可，QuickJS 使用 await；前一個視窗完成關閉後才回傳。
+              每一步都檢查 null／None，可在取消時停止後續步驟；步驟與資料傳遞由爬蟲控制。
+            </p>
+            <p>
+              image 接收爬蟲提供的 base64 圖片 data URI，使用 Android 支援的點陣圖片；圖片取得由爬蟲負責。
+              onAction 可回傳 image 更新圖片，省略時保留原圖，空字串移除；解碼失敗時，尚未結束的 dialog 會關窗並回報錯誤。
+              關窗會取消並釋放該圖片請求。
+            </p>
+            <p>
+              helperText 顯示欄位說明，錯誤清除後會恢復顯示。
+            </p>
+            <p>
+              手機驗證可把 phone 與 code 放在同一表單，發碼按鈕使用 <code>close: false</code> 與 <code>{'validate: ["phone"]'}</code>。
+              登入成功後關窗，確認 dialog 回傳後才保存憑據；取消時不套用登入結果。驗證碼保持字串，保留前導零。
             </p>
             <p>
               JAR 自己的 <code>com.github.catvod.spider.Init.init(Context)</code>

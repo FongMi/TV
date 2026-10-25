@@ -4,13 +4,17 @@ import android.app.Activity;
 import android.content.Context;
 
 import java.lang.ref.WeakReference;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class Runtime {
 
     private volatile Supplier<Activity> activity;
     private volatile Consumer<String> toast;
+    private volatile BiFunction<String, Function<String, CompletableFuture<String>>, CompletableFuture<String>> dialog;
     private WeakReference<Context> context;
 
     private static Runtime get() {
@@ -41,6 +45,16 @@ public class Runtime {
 
     public static void toast(String text) {
         get().toast.accept(text);
+    }
+
+    public static void setDialog(BiFunction<String, Function<String, CompletableFuture<String>>, CompletableFuture<String>> dialog) {
+        get().dialog = dialog;
+    }
+
+    public static CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
+        var dialog = get().dialog;
+        if (dialog == null) return CompletableFuture.failedFuture(new UnsupportedOperationException("Dialog requires a compatible App"));
+        return dialog.apply(options, onAction);
     }
 
     private static class Loader {

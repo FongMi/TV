@@ -41,6 +41,7 @@ public class Global {
     private final Cache cache;
     private final Streams streams;
     private final Sockets sockets;
+    private final Dialogs dialogs;
     private final QuickJS ctx;
     private final Js js = new Js();
     private final Host host;
@@ -64,6 +65,7 @@ public class Global {
         this.cache = new Cache(this, network, local);
         this.streams = new Streams(this, network, host.getCallTimeout());
         this.sockets = new Sockets(this, network);
+        this.dialogs = new Dialogs(this, host);
         setProperty();
         ctx.onClose(this::destroy).join();
     }
@@ -107,6 +109,7 @@ public class Global {
     }
 
     private void release() {
+        dialogs.close();
         js.close();
         danmakus.clear();
         network.release();
@@ -122,6 +125,7 @@ public class Global {
     }
 
     public void cancelRequests() {
+        dialogs.close();
         sockets.markClosing();
         try {
             streams.close();
@@ -158,6 +162,7 @@ public class Global {
     }
 
     private void bindHost() {
+        ctx.bindAsync("_dialog", args -> dialogs.open((QuickJS.Json) argument(args, 0), string(args, 1)), this::captureInvocation).join();
         ctx.bind("s2t", args -> s2t(string(args, 0))).join();
         ctx.bind("t2s", args -> t2s(string(args, 0))).join();
         ctx.bind("openWeb", args -> openWeb((QuickJS.Json) argument(args, 0))).join();
@@ -262,6 +267,28 @@ public class Global {
             });
         }
         return result;
+    }
+
+    CompletableFuture<Object> invokeDialogAction(Invocation current, String id, String event, Consumer<CompletableFuture<Object>> started) {
+        Invocation[] previous = new Invocation[1];
+        return ctx.invoke("__DIALOG_ACTIONS__", "action", future -> {
+            previous[0] = invocation;
+            invocation = current;
+            if (current != null) {
+                current.enter();
+                current.track(future);
+            }
+            started.accept(future);
+        }, () -> {
+            if (current != null) current.leave();
+            invocation = previous[0];
+        }, id, new QuickJS.Json(event));
+    }
+
+    void releaseDialogAction(String id) {
+        submit(() -> ctx.invoke("__DIALOG_ACTIONS__", "release", id).whenComplete((value, error) -> {
+            if (error != null && !destroyed) SpiderDebug.log(error);
+        }));
     }
 
     private void invoke(Invocation current, QuickJS.Callback callback, CompletableFuture<Object> result, Object[] args) {
