@@ -26,6 +26,7 @@ public final class MpvPlayerEffect implements PlayerEffect {
     public MpvPlayerEffect(MpvPlayer player) {
         this.videoEffectController = new MpvVideoEffectController();
         this.player = player;
+        player.setAudioFilterListener(this::onAudioFilterApplied);
     }
 
     @Override
@@ -87,7 +88,7 @@ public final class MpvPlayerEffect implements PlayerEffect {
     }
 
     public void clearAudioEffect() {
-        audioEffectFailed = !player.setAudioFilter(MpvAudioFilter.EMPTY);
+        if (!player.setAudioFilter(MpvAudioFilter.EMPTY)) audioEffectFailed = true;
     }
 
     @Override
@@ -108,6 +109,10 @@ public final class MpvPlayerEffect implements PlayerEffect {
     private void applyAudioConfig(int channelCount) {
         if (channelCount == Format.NO_VALUE) return;
         AudioEffectParameters config = getAudioConfig(channelCount);
-        audioEffectFailed = !player.setAudioFilter(MpvAudioEffectFilter.create(config, channelCount));
+        if (!player.setAudioFilter(MpvAudioEffectFilter.create(config, channelCount))) audioEffectFailed = true;
+    }
+
+    private void onAudioFilterApplied(boolean success) {
+        audioEffectFailed = !success;
     }
 }
