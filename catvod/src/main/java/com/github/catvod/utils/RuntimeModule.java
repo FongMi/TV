@@ -300,6 +300,7 @@ public enum RuntimeModule {
         if (state.complete) return;
         try {
             Metadata metadata = state.loadedMetadata == null ? getMetadata() : state.loadedMetadata;
+            verifyHostLibrary(metadata);
             prepare(metadata);
             pinAssets(metadata);
             loadLibraries(loader, state, metadata);
