@@ -5,9 +5,7 @@ import android.os.SystemClock;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
-import androidx.media3.common.util.LocalClearKeyLicense;
 
-import com.fongmi.android.tv.bean.Drm;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
@@ -117,11 +115,7 @@ final class VodPreloader {
     }
 
     private boolean isPreloadable(VodPlayRequest request, Result result, Episode episode) {
-        return episode != null && host.canPreloadNext() && request.accepts(result) && !result.hasMsg() && !result.needParse() && !result.isUseParse() && canPreloadDrm(result.getDrm()) && !result.getRealUrl().isEmpty() && Source.get().canPreload(result.getUrl().uri());
-    }
-
-    private boolean canPreloadDrm(Drm drm) {
-        return drm == null || !LocalClearKeyLicense.parse(drm.getKey()).isEmpty();
+        return episode != null && host.canPreloadNext() && request.accepts(result) && !result.hasMsg() && !result.needParse() && !result.isUseParse() && !result.getRealUrl().isEmpty() && Source.get().canPreload(result.getUrl().uri());
     }
 
     private void start(VodPlayRequest request, Result result, Episode episode) {
