@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.api.loader;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.exception.SpiderLoadException;
 import com.github.catvod.crawler.Spider;
-import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.runtime.PythonRuntime;
 import com.github.catvod.utils.RuntimeModule;
 
@@ -80,10 +80,10 @@ public class PyLoader {
             spider = newSpider(key, api);
             spider.init(App.get(), ext);
             return spider;
-        } catch (Throwable e) {
-            if (spider != null) spider.destroy();
-            e.printStackTrace();
-            return new SpiderNull();
+        } catch (Exception | Error error) {
+            if (spider != null) destroySpider(spider, error);
+            if (error instanceof Error fatal) throw fatal;
+            throw new SpiderLoadException(error);
         }
     }
 

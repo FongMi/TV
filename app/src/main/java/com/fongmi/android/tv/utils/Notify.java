@@ -17,6 +17,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ViewProgressBinding;
 import com.fongmi.android.tv.exception.ExtractException;
+import com.fongmi.android.tv.exception.SpiderLoadException;
 import com.github.catvod.utils.RuntimeModule;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -54,6 +55,7 @@ public class Notify {
             return ResUtil.getString(R.string.error_module_missing, title);
         }
         for (Throwable current = e; current != null; current = current.getCause()) if (current instanceof ExtractException) return current.getMessage();
+        for (Throwable current = e; current != null; current = current.getCause()) if (current instanceof SpiderLoadException) return ResUtil.getString(R.string.error_spider_load);
         return null;
     }
 

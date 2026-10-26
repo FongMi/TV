@@ -236,7 +236,7 @@ class Runtime:
 
     def _execute_module(self, name, package, module, pending, snapshot):
         try:
-            path, payload = self._download(name + ".__init__" if package else name)
+            path, payload = self._module_source(name, package)
             module = self._module(name, path, package, module)
             with self._lock:
                 self._check_open()
@@ -251,6 +251,12 @@ class Runtime:
                 pending.error = error
                 pending.done.set()
             raise
+
+    def _module_source(self, name, package):
+        try:
+            return self._download(name + ".__init__" if package else name)
+        except SourceNotFoundError as error:
+            raise ModuleNotFoundError("No module named '" + name + "'", name=name) from error
 
     def _complete_module(self, name, module, pending):
         with self._lock:

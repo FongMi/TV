@@ -67,22 +67,34 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private void releaseSpider(Throwable failure) {
-        js.close();
-        try {
-            streams.close();
-        } catch (RuntimeException | Error error) {
-            if (error != failure) failure.addSuppressed(error);
-        }
-        try {
-            net.close();
-        } catch (RuntimeException | Error error) {
-            if (error != failure) failure.addSuppressed(error);
-        }
+        closeResources(failure);
         try {
             app.callAttr("release", obj);
         } catch (RuntimeException | Error error) {
             if (error != failure) failure.addSuppressed(error);
         }
+    }
+
+    private Throwable closeResources(Throwable failure) {
+        try {
+            js.close();
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (error != failure) failure.addSuppressed(error);
+        }
+        try {
+            streams.close();
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (error != failure) failure.addSuppressed(error);
+        }
+        try {
+            if (net != null) net.close();
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (error != failure) failure.addSuppressed(error);
+        }
+        return failure;
     }
 
     @Override
@@ -165,33 +177,19 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public void destroy() {
-        js.close();
-        Throwable failure = null;
-        try {
-            streams.close();
-        } catch (RuntimeException | Error error) {
-            failure = error;
-        }
-        try {
-            if (net != null) net.close();
-        } catch (RuntimeException | Error error) {
-            if (failure == null) failure = error;
-            else if (failure != error) failure.addSuppressed(error);
-        }
-        destroyPython(failure);
+        Throwable failure = destroyPython(closeResources(null));
         if (failure instanceof RuntimeException error) throw error;
         if (failure instanceof Error error) throw error;
     }
 
-    private void destroyPython(Throwable failure) {
+    private Throwable destroyPython(Throwable failure) {
         try {
             app.callAttr("destroy", obj);
-        } catch (Exception error) {
-            if (failure != null && failure != error) failure.addSuppressed(error);
-        } catch (Error error) {
-            if (failure == null) throw error;
-            if (failure != error) failure.addSuppressed(error);
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
         }
+        return failure;
     }
 
     private Map<String, String> getHeader(PyObject obj) {
