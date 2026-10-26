@@ -9,6 +9,7 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -159,8 +160,18 @@ public final class SpiderDialog implements LifecycleEventObserver {
     private boolean onFocusKey(View view, int keyCode, KeyEvent event) {
         if (event.getAction() != KeyEvent.ACTION_DOWN || !event.hasNoModifiers() || keyCode != KeyEvent.KEYCODE_DPAD_UP && keyCode != KeyEvent.KEYCODE_DPAD_DOWN) return false;
         if (view instanceof MaterialAutoCompleteTextView select && select.isPopupShowing() || canMoveCursor(view, keyCode)) return false;
-        View next = view.focusSearch(keyCode == KeyEvent.KEYCODE_DPAD_UP ? View.FOCUS_UP : View.FOCUS_DOWN);
+        int direction = keyCode == KeyEvent.KEYCODE_DPAD_UP ? View.FOCUS_UP : View.FOCUS_DOWN;
+        ScrollView scroll = findScrollView(view);
+        if (scroll != null && scroll.arrowScroll(direction)) return true;
+        View next = view.focusSearch(direction);
         return next != null && next.requestFocus();
+    }
+
+    private ScrollView findScrollView(View view) {
+        for (ViewParent parent = view.getParent(); parent != null; parent = parent.getParent()) {
+            if (parent instanceof ScrollView scroll) return scroll;
+        }
+        return null;
     }
 
     private boolean canMoveCursor(View view, int keyCode) {
@@ -235,11 +246,12 @@ public final class SpiderDialog implements LifecycleEventObserver {
     private void addInput(LinearLayout content, JSONObject field) throws JSONException {
         String name = field.getString("name");
         if (name.isBlank() || inputs.containsKey(name)) throw new IllegalArgumentException("Dialog input names must be nonempty and unique");
-        TextInputLayout layout = new TextInputLayout(activity);
+        String type = field.optString("type", "text");
+        int style = type.equals("select") ? com.google.android.material.R.attr.textInputOutlinedExposedDropdownMenuStyle : com.google.android.material.R.attr.textInputStyle;
+        TextInputLayout layout = new TextInputLayout(activity, null, style);
         layout.setHint(field.optString("label", name));
         layout.setHelperText(field.optString("helperText"));
         layout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
-        String type = field.optString("type", "text");
         boolean multiple = type.equals("multiselect");
         EditText input = createInput(layout, type);
         input.setOnKeyListener(this::onFocusKey);
@@ -263,7 +275,6 @@ public final class SpiderDialog implements LifecycleEventObserver {
 
     private EditText createInput(TextInputLayout layout, String type) {
         if (type.equals("select")) {
-            layout.setEndIconMode(TextInputLayout.END_ICON_DROPDOWN_MENU);
             MaterialAutoCompleteTextView input = new MaterialAutoCompleteTextView(layout.getContext());
             input.setInputType(InputType.TYPE_NULL);
             input.setKeyListener(null);
@@ -296,7 +307,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
 
     private void bindMultiSelect(Input input) {
         input.layout.setEndIconMode(TextInputLayout.END_ICON_CUSTOM);
-        input.layout.setEndIconDrawable(android.R.drawable.arrow_down_float);
+        input.layout.setEndIconDrawable(R.drawable.ic_arrow_drop_down);
         input.layout.setEndIconContentDescription(input.layout.getHint());
         input.layout.setEndIconOnClickListener(view -> showChoices(input));
         input.view.setOnClickListener(view -> showChoices(input));
