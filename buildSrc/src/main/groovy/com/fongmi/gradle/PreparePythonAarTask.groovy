@@ -14,6 +14,8 @@ import org.gradle.api.tasks.*
 import org.gradle.process.ExecOperations
 
 import javax.inject.Inject
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import java.nio.file.Files
 import java.security.MessageDigest
 import java.util.zip.CRC32
@@ -48,6 +50,17 @@ abstract class PreparePythonAarTask extends DefaultTask {
     @PathSensitive(PathSensitivity.NONE)
     abstract RegularFileProperty getAppArchive()
 
+    @InputFile
+    @PathSensitive(PathSensitivity.NONE)
+    abstract RegularFileProperty getNativeArchive()
+
+    @InputFile
+    @PathSensitive(PathSensitivity.NONE)
+    abstract RegularFileProperty getNativeMetadata()
+
+    @Input
+    abstract Property<String> getRuntimeVersion()
+
     @OutputFile
     abstract RegularFileProperty getOutputArchive()
 
@@ -55,17 +68,19 @@ abstract class PreparePythonAarTask extends DefaultTask {
     void preparePythonAar() {
         def input = inputArchive.get().asFile
         def output = outputArchive.get().asFile
-        if ([input, cxxAar.get().asFile, patchelfFile.get().asFile, appArchive.get().asFile].any { it.canonicalFile == output.canonicalFile }) throw new GradleException('Python output must not replace an input')
+        if ([input, cxxAar.get().asFile, patchelfFile.get().asFile, appArchive.get().asFile, nativeArchive.get().asFile, nativeMetadata.get().asFile].any { it.canonicalFile == output.canonicalFile }) throw new GradleException('Python output must not replace an input')
         Files.deleteIfExists(output.toPath())
         def python = new File(temporaryDir, 'libpython3.10.so')
         def operations = execOperations
         try {
             ZipFile.builder().setFile(input).get().withCloseable { source ->
                 def build = PreparePythonAarTask.readBuild(source, abi.get(), false)
-                def assets = PreparePythonAarTask.prepareAssets(source, build, abi.get(), cxxAar.get().asFile, appArchive.get().asFile)
+                def nativeLibraries = PreparePythonAarTask.readNativeArchive(nativeArchive.get().asFile, nativeMetadata.get().asFile, abi.get(), runtimeVersion.get())
+                def assets = PreparePythonAarTask.prepareAssets(source, build, abi.get(), cxxAar.get().asFile, appArchive.get().asFile, nativeLibraries)
                 PreparePythonAarTask.writePreparedArchive(source, output, python, build, assets,
                         abi.get(), patchelfFile.get().asFile, operations)
             }
+            ZipFile.builder().setFile(output).get().withCloseable { source -> PreparePythonAarTask.verifyPrepared(source, cxxAar.get().asFile, abi.get()) }
         } catch (Exception error) {
             Files.deleteIfExists(output.toPath())
             throw error
@@ -74,17 +89,84 @@ abstract class PreparePythonAarTask extends DefaultTask {
         }
     }
 
-    private static Map prepareAssets(ZipFile source, Map build, String abi, File cxxAar, File appArchive) {
+    private static Map prepareAssets(ZipFile source, Map build, String abi, File cxxAar, File appArchive, Map nativeLibraries) {
         def requirements = PreparePythonAarTask.cxxRequirements(source, abi)
         def cxx = PreparePythonAarTask.readCxx(cxxAar, abi)
-        def replacements = [:]
+        def replacements = nativeLibraries.findAll { path, bytes -> path.startsWith('jni/') }
         for (def name : [requirements.path, ASSETS + 'requirements-common.imy'].unique()) replacements[name] = PreparePythonAarTask.prepareRequirements(PreparePythonAarTask.readEntry(source, name), cxx)
+        PreparePythonAarTask.prepareNativeAssets(source, replacements, nativeLibraries, abi)
         build.assets = build.assets.findAll { path, hash -> path != 'app.imy' }
         def appBytes = appArchive.bytes
         if (appBytes.length <= 0 || appBytes.length > 64 * 1024 * 1024) throw new GradleException('Invalid Python helper archive')
         build.assets['app.imy'] = PreparePythonAarTask.sha1(appBytes)
-        replacements.each { name, bytes -> build.assets[name.substring(ASSETS.length())] = PreparePythonAarTask.sha1(bytes) }
+        replacements.findAll { name, bytes -> name.startsWith(ASSETS) }.each { name, bytes -> build.assets[name.substring(ASSETS.length())] = PreparePythonAarTask.sha1(bytes) }
         return [replacements: replacements, appBytes: appBytes]
+    }
+
+    private static Map readNativeArchive(File archive, File metadata, String abi, String version) {
+        def report = new JsonSlurper().parse(metadata).abis[abi]
+        if (!(report instanceof Map) || report.abi != abi || report.inputs?.chaquopyVersion != version || !report.inputs?.sources?.python?.version?.startsWith('3.10.') || !(report.libraries instanceof List)) throw new GradleException('Incompatible Python native metadata')
+        if (report.sha256 != MessageDigest.getInstance('SHA-256').digest(archive.bytes).encodeHex().toString()) throw new GradleException('Python native archive hash mismatch')
+        ZipFile.builder().setFile(archive).get().withCloseable { source ->
+            def names = entryNames(source)
+            def libraries = AbiApkPackaging.PYTHON_LIBRARIES.collect { "jni/${abi}/${it}".toString() }.toSet()
+            if (names.findAll { it.startsWith('jni/') }.toSet() != libraries || !names.contains('bridge/chaquopy.so') || names.any { !it.startsWith("jni/${abi}/") && it != 'bridge/chaquopy.so' && !it.startsWith('dynload/') }) throw new GradleException('Invalid Python native layout')
+            if (report.libraries.collect { it.path }.toSet() != names) throw new GradleException('Incomplete Python native metadata')
+            def result = [:]
+            report.libraries.each { library ->
+                def bytes = readEntry(source, library.path)
+                if (library.sha256 != MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString()) throw new GradleException("Invalid Python native hash ${library.path}")
+                verifyNativeLibrary(bytes, abi, library.path)
+                result[library.path] = bytes
+            }
+            return result
+        }
+    }
+
+    private static void verifyNativeLibrary(byte[] bytes, String abi, String path) {
+        MpvNativeLibraries.needed(bytes, abi)
+        boolean wide = abi == 'arm64-v8a'
+        def data = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
+        long headers = wide ? data.getLong(32) : Integer.toUnsignedLong(data.getInt(28))
+        int stride = Short.toUnsignedInt(data.getShort(wide ? 54 : 42))
+        int count = Short.toUnsignedInt(data.getShort(wide ? 56 : 44))
+        for (int index = 0; index < count; index++) {
+            int position = Math.toIntExact(headers + (long) index * stride)
+            int type = data.getInt(position)
+            long offset = wide ? data.getLong(position + 8) : Integer.toUnsignedLong(data.getInt(position + 4))
+            long address = wide ? data.getLong(position + 16) : Integer.toUnsignedLong(data.getInt(position + 8))
+            long size = wide ? data.getLong(position + 40) : Integer.toUnsignedLong(data.getInt(position + 20))
+            long alignment = wide ? data.getLong(position + 48) : Integer.toUnsignedLong(data.getInt(position + 28))
+            if (type == 1 && (alignment < 16384 || (address - offset) % 16384 != 0)) throw new GradleException("${path}: LOAD must support 16 KB pages")
+            if (type == 0x6474e552 && (address + size) % 16384 != 0) throw new GradleException("${path}: RELRO must support 16 KB pages")
+        }
+    }
+
+    private static void prepareNativeAssets(ZipFile source, Map replacements, Map nativeLibraries, String abi) {
+        entryNames(source).findAll { it.startsWith(ASSETS + "bootstrap-native/${abi}/") && it.endsWith('.so') }.each { path ->
+            def library = path.endsWith('/java/chaquopy.so') ? 'bridge/chaquopy.so' : 'dynload/' + path.substring(path.lastIndexOf('/') + 1)
+            replacements[path] = nativeLibrary(nativeLibraries, library)
+        }
+        def path = ASSETS + "stdlib-${abi}.imy"
+        replacements[path] = prepareStdlib(readEntry(source, path), nativeLibraries)
+    }
+
+    private static byte[] nativeLibrary(Map nativeLibraries, String path) {
+        if (!nativeLibraries.containsKey(path)) throw new GradleException("Missing Python native library ${path}")
+        return nativeLibraries[path]
+    }
+
+    private static byte[] prepareStdlib(byte[] archive, Map nativeLibraries) {
+        ZipFile.builder().setSeekableByteChannel(new SeekableInMemoryByteChannel(archive)).get().withCloseable { input ->
+            def bytes = new ByteArrayOutputStream()
+            new ZipArchiveOutputStream(bytes).withCloseable { output ->
+                input.entries.each { entry ->
+                    if (entry.name.endsWith('.so')) writeEntry(output, entry.name, nativeLibrary(nativeLibraries, 'dynload/' + entry.name.substring(entry.name.lastIndexOf('/') + 1)))
+                    else input.getRawInputStream(entry).withCloseable { output.addRawArchiveEntry(new ZipArchiveEntry(entry), it) }
+                }
+            }
+            return bytes.toByteArray()
+        }
     }
 
     private static void writePreparedArchive(ZipFile source, File output, File python, Map build, Map assets,
@@ -102,12 +184,12 @@ abstract class PreparePythonAarTask extends DefaultTask {
                                            File python, Map build, Map assets, String abi, File patchelf, ExecOperations operations) {
         def name = entry.name
         if (entry.directory || name == ASSETS + 'app.imy' || !retained(name, abi)) return
-        if (assets.replacements.containsKey(name)) {
+        if (name == "jni/${abi}/libpython3.10.so") {
+            writePythonLibrary(target, entry, assets.replacements[name], python, patchelf, operations, abi)
+        } else if (assets.replacements.containsKey(name)) {
             writeEntry(target, name, assets.replacements[name])
         } else if (name == ASSETS + 'build.json') {
             writeEntry(target, name, JsonOutput.toJson(build).getBytes('UTF-8'))
-        } else if (name == "jni/${abi}/libpython3.10.so") {
-            writePythonLibrary(source, target, entry, python, patchelf, operations)
         } else {
             source.getRawInputStream(entry).withCloseable { stream ->
                 target.addRawArchiveEntry(new ZipArchiveEntry(entry), stream)
@@ -115,14 +197,15 @@ abstract class PreparePythonAarTask extends DefaultTask {
         }
     }
 
-    private static void writePythonLibrary(ZipFile source, ZipArchiveOutputStream target, ZipArchiveEntry entry,
-                                           File python, File patchelf, ExecOperations operations) {
-        python.bytes = PreparePythonAarTask.readEntry(source, entry.name)
+    private static void writePythonLibrary(ZipArchiveOutputStream target, ZipArchiveEntry entry, byte[] bytes,
+                                           File python, File patchelf, ExecOperations operations, String abi) {
+        python.bytes = bytes
         operations.exec {
             commandLine patchelf.absolutePath, '--page-size', '16384',
                     '--set-soname', 'libpython3.10.so', python.absolutePath
         }
         if (python.length() <= 0 || python.length() > 128L * 1024 * 1024) throw new GradleException('Invalid Python native library')
+        PreparePythonAarTask.verifyNativeLibrary(python.bytes, abi, entry.name)
         PreparePythonAarTask.writeEntry(target, entry.name, python.bytes)
     }
 
@@ -131,6 +214,17 @@ abstract class PreparePythonAarTask extends DefaultTask {
         def requirements = cxxRequirements(source, abi)
         ZipFile.builder().setSeekableByteChannel(new SeekableInMemoryByteChannel(requirements.bytes)).get().withCloseable { input ->
             if (!Arrays.equals(PreparePythonAarTask.readEntry(input, CXX), PreparePythonAarTask.readCxx(cxxAar, abi))) throw new GradleException('Python C++ runtime does not match the App')
+        }
+        if (abi == 'arm64-v8a') verifyPreparedNative(source, abi)
+    }
+
+    private static void verifyPreparedNative(ZipFile source, String abi) {
+        entryNames(source).findAll { it.endsWith('.so') }.each { path -> verifyNativeLibrary(readEntry(source, path), abi, path) }
+        for (def name : ['requirements-common.imy', "requirements-${abi}.imy", "stdlib-${abi}.imy"]) {
+            def archive = readEntry(source, ASSETS + name)
+            ZipFile.builder().setSeekableByteChannel(new SeekableInMemoryByteChannel(archive)).get().withCloseable { input ->
+                entryNames(input).findAll { it.endsWith('.so') }.each { path -> verifyNativeLibrary(readEntry(input, path), abi, name + "!/" + path) }
+            }
         }
     }
 

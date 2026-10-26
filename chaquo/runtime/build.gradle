@@ -2,6 +2,10 @@ import com.android.build.api.artifact.SingleArtifact
 import com.fongmi.gradle.AbiApkPackaging
 import com.fongmi.gradle.PreparePythonAarTask
 import com.fongmi.gradle.PythonAppAssetsTask
+import com.fongmi.gradle.VerifyPythonWheelsTask
+import groovy.json.JsonSlurper
+
+import java.security.MessageDigest
 
 plugins {
     alias libs.plugins.android.library
@@ -53,11 +57,29 @@ android {
     }
 }
 
+def nativeLock = new JsonSlurper().parseText(providers.fileContents(layout.projectDirectory.file('native.lock.json')).asText.get())
+nativeLock.manifests.each { name, metadata ->
+    def manifest = layout.projectDirectory.file("${name}/manifest.json")
+    if (!manifest.asFile.isFile()) throw new GradleException('Python native inputs are missing; run python scripts/sync_python_runtime.py from the TV root')
+    def bytes = providers.fileContents(manifest).asBytes.get()
+    if (MessageDigest.getInstance('SHA-256').digest(bytes).encodeHex().toString() != metadata.sha256) throw new GradleException('Python native inputs do not match native.lock.json; run python scripts/sync_python_runtime.py from the TV root')
+}
+def nativeWheels = new JsonSlurper().parseText(providers.fileContents(layout.projectDirectory.file('wheels/manifest.json')).asText.get())
+
 chaquopy {
     defaultConfig {
         version = "3.10"
         pip {
             install("-r", "requirements.txt")
+        }
+    }
+    productFlavors {
+        AbiApkPackaging.ABI_FLAVORS.each { name, abi ->
+            named(name) {
+                pip {
+                    nativeWheels.abis[abi].wheels.each { wheel -> install("wheels/${wheel.file}") }
+                }
+            }
         }
     }
 }
@@ -69,11 +91,22 @@ def appAssets = tasks.register('packagePythonAppAssets', PythonAppAssetsTask) {
 
 androidComponents.onVariants(androidComponents.selector().all()) { variant ->
     def flavor = variant.productFlavors.find { it.first == 'abi' }.second
+    def abi = AbiApkPackaging.ABI_FLAVORS[flavor]
+    def wheels = nativeWheels.abis[abi].wheels
+    def verified = tasks.register("verify${variant.name.capitalize()}PythonWheels", VerifyPythonWheelsTask) { task ->
+        task.wheels.from(wheels.collect { layout.projectDirectory.file("wheels/${it.file}") })
+        task.expectedHashes.set(wheels.collectEntries { [(it.file): it.sha256] })
+    }
+    def requirementsTask = "install${variant.name.capitalize()}PythonRequirements"
+    tasks.matching { it.name == requirementsTask }.configureEach { dependsOn(verified) }
     def prepared = tasks.register("prepare${variant.name.capitalize()}PythonAar", PreparePythonAarTask) { task ->
-        task.abi.set(AbiApkPackaging.ABI_FLAVORS[flavor])
+        task.abi.set(abi)
         task.cxxAar.set(repository.file('app/libs/lib-mpvplayer-release.aar'))
         task.patchelfFile.set(patchelf)
         task.appArchive.set(appAssets.flatMap { it.archiveFile })
+        task.nativeArchive.set(layout.projectDirectory.file("native-bundles/python-native-${abi}.zip"))
+        task.nativeMetadata.set(layout.projectDirectory.file('native-bundles/manifest.json'))
+        task.runtimeVersion.set(libs.versions.python)
     }
     variant.artifacts.use(prepared).wiredWithFiles({ it.inputArchive }, { it.outputArchive }).toTransform(SingleArtifact.AAR.INSTANCE)
 }

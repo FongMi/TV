@@ -25,6 +25,7 @@ public class Loader {
         Python python = Python.getInstance();
         python.getModule("ujson");
         python.getModule("Crypto.Cipher.AES");
+        python.getModule("cryptography.hazmat.primitives.ciphers");
         try (PyObject globals = python.getBuiltins().callAttr("dict");
              PyObject result = python.getBuiltins().callAttr("eval", "6 * 7", globals)) {
             if (result.toInt() != 42) throw new IllegalStateException("Python evaluation returned an unexpected result");

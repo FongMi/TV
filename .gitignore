@@ -52,6 +52,9 @@ test.gradle
 __pycache__/
 *.pyc
 *.pyo
+/chaquo/runtime/wheels/
+/chaquo/runtime/native-bundles/
+/chaquo/runtime/python-sync-*/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
