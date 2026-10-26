@@ -63,7 +63,7 @@ public class Local implements Process {
         String path = url.substring(FILE.length());
         File file = resolveFile(session, path);
         if (file.isDirectory()) return getFolder(file);
-        if (!file.isFile()) throw new FileNotFoundException("File not found");
+        if (!file.isFile()) return Nano.error(Status.NOT_FOUND, "File not found");
         return getFile(session.getHeaders(), file, getMimeTypeForFile(path));
     }
 
