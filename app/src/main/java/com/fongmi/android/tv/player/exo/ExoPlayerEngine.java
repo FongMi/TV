@@ -188,19 +188,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     }
 
     @Override
-    public boolean switchDecoderForRetry(PlaybackException exception) {
-        clearPreload();
-        return session.switchDecoderForRetry(exception);
-    }
-
-    @Override
-    public void resetDecoderFallback(@C.TrackType int trackType) {
-        session.resetDecoderFallback(trackType);
-    }
-
-    @Override
     public void prepareForNewMedia() {
-        session.prepareForNewMedia();
         subtitles.prepareForNewMedia();
     }
 
@@ -393,7 +381,6 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     public ErrorAction handleError(PlaybackException e) {
         return switch (e.errorCode) {
             case PlaybackException.ERROR_CODE_BEHIND_LIVE_WINDOW -> seekToDefaultPosition();
-            case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED, PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED, PlaybackException.ERROR_CODE_DECODING_FAILED, PlaybackException.ERROR_CODE_DECODING_FORMAT_UNSUPPORTED -> ErrorAction.DECODE;
             case PlaybackException.ERROR_CODE_IO_BAD_HTTP_STATUS -> ErrorAction.REFRESH;
             default -> ErrorAction.FATAL;
         };

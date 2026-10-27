@@ -57,14 +57,7 @@ public interface PlayerEngine {
     default void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
     }
 
-    default void resetDecoderFallback(@C.TrackType int trackType) {
-    }
-
     default void prepareForNewMedia() {
-    }
-
-    default boolean switchDecoderForRetry(PlaybackException exception) {
-        return false;
     }
 
     default PlayerEffect getEffect() {
@@ -166,7 +159,6 @@ public interface PlayerEngine {
 
     enum ErrorAction {
         RECOVERED,
-        DECODE,
         REFRESH,
         FATAL
     }

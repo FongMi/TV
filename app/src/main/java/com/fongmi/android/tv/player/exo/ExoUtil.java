@@ -109,7 +109,7 @@ public final class ExoUtil {
             this.secondaryTextOutput = secondaryTextOutput;
             this.libassPlaybackSession = libassPlaybackSession;
             if (decoderManager != null) setDecoderManager(decoderManager);
-            setEnableDecoderFallback(true);
+            setEnableDecoderFallback(false);
             setEnableSurfaceControlFrameRetention(true);
             experimentalSetEnableMediaCodecVideoRendererPrewarming(true);
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);

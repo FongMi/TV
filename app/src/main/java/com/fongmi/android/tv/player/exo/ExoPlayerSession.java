@@ -6,12 +6,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.MediaItem;
-import androidx.media3.common.PlaybackException;
 import androidx.media3.common.audio.AudioProcessor;
-import androidx.media3.exoplayer.DecoderFallback;
 import androidx.media3.exoplayer.DecoderManager;
 import androidx.media3.exoplayer.DecoderMode;
-import androidx.media3.exoplayer.ExoPlaybackException;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.libass.LibassConfiguration;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
@@ -29,6 +26,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
+import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
@@ -44,23 +42,20 @@ final class ExoPlayerSession {
     private static final long PRELOAD_DURATION_MS = 10_000;
 
     private final DecoderManager decoderManager;
-    private final DecoderFallback decoderFallback;
     private final LibassSubtitleController libassSubtitleController;
     private final LibassPlaybackSession libassPlaybackSession;
     private final SubtitleTranscriptSession subtitleTranscriptSession;
     private final DefaultPreloadManager preloadManager;
     private final boolean libassEnabled;
     private final ExoPlayer player;
-    private DecoderMode requestedAudioMode;
-    private DecoderMode requestedVideoMode;
 
     @Nullable
     private PreloadRequest preloadRequest;
 
     ExoPlayerSession(AudioProcessor audioProcessor) {
-        this.requestedAudioMode = DecoderMode.AUTO;
-        this.requestedVideoMode = DecoderMode.AUTO;
-        this.decoderManager = new DecoderManager(requestedAudioMode, requestedVideoMode);
+        DecoderMode audioMode = DecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_EXO, C.TRACK_TYPE_AUDIO));
+        DecoderMode videoMode = DecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_EXO, C.TRACK_TYPE_VIDEO));
+        this.decoderManager = new DecoderManager(audioMode, videoMode);
         TrackSelector.Factory decodeTrackSelectorFactory = context -> ExoUtil.buildTrackSelector(decoderManager);
         SecondaryTextTrackSelector.Factory secondaryTextTrackSelectorFactory = new SecondaryTextTrackSelector.Factory(decodeTrackSelectorFactory);
         SecondaryTextOutput secondaryTextOutput = new SecondaryTextOutput();
@@ -74,7 +69,6 @@ final class ExoPlayerSession {
         this.player = ExoUtil.buildPlayer(builder);
         this.subtitleTranscriptSession.setPlayer(player);
         this.decoderManager.attach(player);
-        this.decoderFallback = new DecoderFallback(decoderManager);
         this.libassSubtitleController = new LibassSubtitleController(player, libassPlaybackSession, secondaryTextTrackSelectorFactory, secondaryTextOutput);
     }
 
@@ -108,34 +102,10 @@ final class ExoPlayerSession {
     }
 
     void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
-        decoderFallback.reset(trackType);
         if (trackType != C.TRACK_TYPE_AUDIO && trackType != C.TRACK_TYPE_VIDEO) return;
         clearPreload();
-        if (trackType == C.TRACK_TYPE_AUDIO) {
-            requestedAudioMode = mode;
-            decoderManager.selectAudioDecoder(mode);
-        } else {
-            requestedVideoMode = mode;
-            decoderManager.selectVideoDecoder(mode);
-        }
-    }
-
-    boolean switchDecoderForRetry(PlaybackException exception) {
-        if (!(exception instanceof ExoPlaybackException error) || !decoderFallback.retry(error)) return false;
-        clearPreload();
-        return true;
-    }
-
-    void resetDecoderFallback(@C.TrackType int trackType) {
-        decoderFallback.reset(trackType);
-    }
-
-    void prepareForNewMedia() {
-        decoderFallback.reset(C.TRACK_TYPE_AUDIO);
-        decoderFallback.reset(C.TRACK_TYPE_VIDEO);
-        if (requestedAudioMode == decoderManager.getAudioMode() && requestedVideoMode == decoderManager.getVideoMode()) return;
-        clearPreload();
-        decoderManager.setDecoderModes(requestedAudioMode, requestedVideoMode);
+        if (trackType == C.TRACK_TYPE_AUDIO) decoderManager.selectAudioDecoder(mode);
+        else decoderManager.selectVideoDecoder(mode);
     }
 
     void preload(MediaItem mediaItem, long startPositionMs, Runnable onReady, Runnable onError) {

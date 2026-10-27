@@ -235,10 +235,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     @Override
     public ErrorAction handleError(PlaybackException e) {
-        return switch (e.errorCode) {
-            case PlaybackException.ERROR_CODE_DECODER_INIT_FAILED, PlaybackException.ERROR_CODE_DECODER_QUERY_FAILED, PlaybackException.ERROR_CODE_DECODING_FAILED -> ErrorAction.DECODE;
-            default -> ErrorAction.FATAL;
-        };
+        return ErrorAction.FATAL;
     }
 
     private void applySecondarySubtitleMode(int mode) {

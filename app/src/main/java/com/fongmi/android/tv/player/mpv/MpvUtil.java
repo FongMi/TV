@@ -3,6 +3,7 @@ package com.fongmi.android.tv.player.mpv;
 import android.content.pm.PackageManager;
 
 import androidx.annotation.Nullable;
+import androidx.media3.common.C;
 import androidx.media3.common.Player;
 import androidx.media3.datasource.DataSource;
 import androidx.media3.datasource.ProgressiveIsoCache;
@@ -93,7 +94,8 @@ public final class MpvUtil {
     }
 
     public static MpvPlayer buildPlayer(Player.Listener listener) {
-        MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(MpvDecoderMode.AUTO).setConfig(buildConfig()).build();
+        MpvDecoderMode mode = MpvDecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_MPV, C.TRACK_TYPE_VIDEO));
+        MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(mode).setConfig(buildConfig()).build();
         player.setSubtitleContentLoader(new SubtitleFileContent());
         setPreferredTextLanguages(player);
         player.addListener(listener);

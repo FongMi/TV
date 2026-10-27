@@ -53,6 +53,7 @@ import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.server.LogSession;
 import com.fongmi.android.tv.setting.DanmakuSetting;
+import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
@@ -357,19 +358,10 @@ public class PlayerManager implements ParseCallback {
 
     public void setDecoderMode(@C.TrackType int trackType, DecoderMode mode) {
         if (getDecoderMode(trackType) == null || !getSupportedDecoderModes(trackType).contains(mode)) return;
-        changeDecoder(() -> engine.setDecoderMode(trackType, mode));
-    }
-
-    public void resetDecoderModesForNewSession() {
-        DecoderMode audioMode = getDecoderMode(C.TRACK_TYPE_AUDIO);
-        DecoderMode videoMode = getDecoderMode(C.TRACK_TYPE_VIDEO);
-        boolean resetAudio = audioMode != null && audioMode != DecoderMode.AUTO;
-        boolean resetVideo = videoMode != null && videoMode != DecoderMode.AUTO;
-        if (!resetAudio && !resetVideo) return;
-        clearPreload();
-        if (resetAudio) engine.setDecoderMode(C.TRACK_TYPE_AUDIO, DecoderMode.AUTO);
-        if (resetVideo) engine.setDecoderMode(C.TRACK_TYPE_VIDEO, DecoderMode.AUTO);
-        callback.onDecodeChanged();
+        changeDecoder(() -> {
+            engine.setDecoderMode(trackType, mode);
+            DecodeSetting.putDecoderMode(getEngine(), trackType, mode);
+        });
     }
 
     private void changeDecoder(Runnable change) {
@@ -553,7 +545,6 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void setTrack(Track track) {
-        engine.resetDecoderFallback(track.getType());
         if (track.isSecondary()) setSecondaryTrack(track);
         else setPrimaryTrack(track);
     }
@@ -745,15 +736,6 @@ public class PlayerManager implements ParseCallback {
         beginPlaybackAttempt(false);
         engine.start(spec.checkUa(), snapshot.positionMs());
         snapshot.restorePlayerState(this);
-    }
-
-    private void retryDecode(PlaybackException e) {
-        if (!engine.switchDecoderForRetry(e)) {
-            callback.onError(engine.getErrorMessage(e));
-            return;
-        }
-        callback.onDecodeChanged();
-        restartCurrent();
     }
 
     private void restartCurrent() {
@@ -1184,7 +1166,6 @@ public class PlayerManager implements ParseCallback {
             PlayerEngine.ErrorAction action = engine.handleError(e);
             if (action != PlayerEngine.ErrorAction.RECOVERED) App.removeCallbacks(runnable);
             switch (action) {
-                case DECODE -> retryDecode(e);
                 case REFRESH -> handleRefreshError(e);
                 case RECOVERED -> notifyDanmakuSourceChanged();
                 case FATAL -> callback.onError(engine.getErrorMessage(e));

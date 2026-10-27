@@ -101,7 +101,6 @@ public class PlaybackService extends MediaLibraryService implements MediaLibrary
         cancelNavigation();
         if (binding != null) binding.onReplaced().run();
         binding = new ActivityBinding(owner, onReplaced);
-        player.resetDecoderModesForNewSession();
     }
 
     public boolean ownsBinding(NavigationCallback owner) {
