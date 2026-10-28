@@ -134,7 +134,7 @@ public final class FileChooser {
     }
 
     @Nullable
-    private static File getLocalFile(Uri uri) {
+    public static File getLocalFile(Uri uri) {
         try {
             String path = getLocalPath(App.get(), uri);
             if (TextUtils.isEmpty(path)) return null;

@@ -71,7 +71,7 @@ public final class SubtitleArchive {
         return isSubtitle(file.getName());
     }
 
-    private static boolean isSubtitle(String text) {
+    public static boolean isSubtitle(String text) {
         for (String extension : EXTENSIONS) if (hasExtension(text, extension)) return true;
         return false;
     }

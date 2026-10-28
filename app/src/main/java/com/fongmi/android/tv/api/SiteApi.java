@@ -183,6 +183,7 @@ public class SiteApi {
         Result result = loadPlayerContent(key, flag, id, builtin);
         if (qualityPosition >= 0 && !result.getUrl().getValues().isEmpty()) result.getUrl().set(qualityPosition);
         result.setUrl(Source.get().fetch(result));
+        if (LOCAL.equals(key) && !id.equals(result.getUrl().v()) && result.getSubs().isEmpty()) result.setSubs(LocalSubtitleScanner.scan(result.getUrl().v()));
         SpiderDebug.log("player", result.toString());
         return result;
     }

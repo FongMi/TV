@@ -38,6 +38,7 @@ import com.fongmi.android.tv.server.impl.Process;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
+import com.fongmi.android.tv.utils.SubtitleArchive;
 import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Crypto;
@@ -342,7 +343,7 @@ public class Remote implements Process {
 
     private Sub subtitle(String path) throws IOException {
         File file = Local.resolvePath(path);
-        if (!file.isFile() || !file.getName().toLowerCase(Locale.ROOT).matches(".*\\.(srt|ssa|ass)$")) throw new IllegalArgumentException("Invalid subtitle file");
+        if (!file.isFile() || !SubtitleArchive.isSubtitle(file.getName())) throw new IllegalArgumentException("Invalid subtitle file");
         return Sub.from(file.getName(), file.toURI().toString());
     }
 

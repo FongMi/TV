@@ -19,6 +19,7 @@ import com.fongmi.android.tv.server.impl.Process;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.Notify;
+import com.fongmi.android.tv.utils.SubtitleArchive;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 
@@ -64,7 +65,7 @@ public class Action implements Process {
         String path = params.get("path");
         if (TextUtils.isEmpty(path)) return;
         if (path.endsWith(".apk")) FileUtil.openFile(Path.local(path));
-        else if (path.endsWith(".srt") || path.endsWith(".ssa") || path.endsWith(".ass")) RefreshEvent.subtitle(path);
+        else if (SubtitleArchive.isSubtitle(path)) RefreshEvent.subtitle(path);
         else ServerEvent.setting(path);
     }
 

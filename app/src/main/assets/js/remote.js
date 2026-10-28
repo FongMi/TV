@@ -275,7 +275,7 @@ function initRemote() {
         const file = uploader.files[0];
         uploader.value = '';
         if (!file) return;
-        if (!/\.(srt|ssa|ass)$/i.test(file.name)) { warnToast(t('subtitleFormat')); return; }
+        if (!/\.(srt|ssa|ass|vtt|ttml|xml|dfxp)$/i.test(file.name)) { warnToast(t('subtitleFormat')); return; }
         return applyMediaSource('subtitle', '/' + file.name, file);
     });
     danmakuUpload.addEventListener('click', () => danmakuUploader.click());
