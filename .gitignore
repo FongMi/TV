@@ -2,6 +2,7 @@
 .vscode/
 .settings/
 .gradle/
+/chaquo/.ruff.toml
 build/
 .cxx/
 .externalNativeBuild/
