@@ -1,3 +1,4 @@
+import argparse
 import hashlib
 import json
 import os
@@ -95,12 +96,12 @@ def install_assets(kind, data, directory, staging):
     os.replace(metadata, folder / "manifest.json")
 
 
-def sync(lock_file, directory):
+def sync(lock_file, directory, source=None):
     lock = json.loads(lock_file.read_text(encoding="utf-8"))
     repository = lock["repository"]
     if repository.count("/") != 1 or any(value in repository for value in ["..", "\\", ":", "?", "#"]):
         raise ValueError("Invalid Python producer repository")
-    base = f"https://github.com/{repository}/releases/download/{urllib.parse.quote(lock['tag'], safe='')}/"
+    base = source.resolve().as_uri() + "/" if source is not None else f"https://github.com/{repository}/releases/download/{urllib.parse.quote(lock['tag'], safe='')}/"
     directory.mkdir(parents=True, exist_ok=True)
     assets, manifests = collect_assets(lock, directory, base)
     with tempfile.TemporaryDirectory(prefix="python-sync-", dir=directory) as temporary:
@@ -114,4 +115,7 @@ def sync(lock_file, directory):
 
 
 if __name__ == "__main__":
-    print(json.dumps(sync(ROOT / "chaquo/runtime/native.lock.json", ROOT / "chaquo/runtime"), indent=2))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--source", type=Path, help="Directory containing the CI release artifact")
+    args = parser.parse_args()
+    print(json.dumps(sync(ROOT / "chaquo/runtime/native.lock.json", ROOT / "chaquo/runtime", args.source), indent=2))
