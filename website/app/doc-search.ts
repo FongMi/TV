@@ -1,7 +1,7 @@
 import { configFieldGroups } from "./config-fields.ts";
 import { methods, networkMethods, objectGroups, resultFields, liveDanmakuFields } from "./spider-fields.ts";
 import { features } from "./feature-content.ts";
-import { playbackProperties } from "./playback-commands.ts";
+import { playbackProperties, playbackCommandGroups } from "./playback-commands.ts";
 import {
   localActions,
   localRemoteControls,
@@ -329,8 +329,8 @@ const entries: Entry[] = [
     names: ["/proxy", "/parse", "/image", "/tvbus"],
   },
   {
-    title: "Exo 播放指令",
-    description: "新增播放指令按鈕、支援範圍與可複製的 mpv 指令範例",
+    title: "播放指令",
+    description: "依播放、音量、音軌、字幕、跳轉與畫面功能查找指令",
     href: "/commands#start",
     names: ["Exo", "mpv"],
     keywords: "播放指令 按鈕 Lua 腳本 mp.commandv 新增",
@@ -349,6 +349,20 @@ const entries: Entry[] = [
     names: ["seek", "absolute", "relative", "absolute-percent", "relative-percent"],
     keywords: "快轉 倒退 跳轉 秒 百分比 片長",
   },
+  {
+    title: "音軌切換",
+    description: "Exo、mpv 的音軌循環、指定、關閉與自動選軌指令",
+    href: "/commands#track-selection",
+    names: ["aid", "audio", "cycle aid", "cycle audio", "set aid", "set audio", "cycle-values aid", "cycle-values audio"],
+    keywords: "音軌 上一軌 下一軌 關閉音訊 自動選軌 no auto up down 反向 ID",
+  },
+  ...playbackCommandGroups.map((group) => ({
+    title: `${group.title}指令`,
+    description: `${group.support}：${group.description}`,
+    href: `/commands#${group.id}`,
+    names: [group.title, ...group.commands.map(([, command]) => command)],
+    keywords: group.commands.map(([title]) => title).join(" "),
+  })),
   ...playbackProperties.map((property) => ({
     title: `${property.name} 播放指令`,
     description: property.description,

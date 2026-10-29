@@ -5,6 +5,7 @@ import androidx.media3.common.MediaChapter;
 import androidx.media3.common.Player;
 import androidx.media3.common.VideoTransform;
 import androidx.media3.common.text.SubtitleOffsets;
+import androidx.media3.common.util.TrackSelectionUtil;
 import androidx.media3.ui.PlayerView;
 
 import com.fongmi.android.tv.player.PlayerManager;
@@ -71,6 +72,9 @@ public final class ExoCommand {
             case "chapter" -> {
                 return executeChapter(manager, player, parsed);
             }
+            case "aid", "audio" -> {
+                return executeAudioTrack(player, parsed);
+            }
             case "speed" -> {
                 if (!player.isCommandAvailable(Player.COMMAND_SET_SPEED_AND_PITCH)) return Result.UNAVAILABLE;
                 float speed = (float) propertyValue(parsed, manager.getSpeed());
@@ -91,6 +95,22 @@ public final class ExoCommand {
             }
         }
         return Result.APPLIED;
+    }
+
+    private static Result executeAudioTrack(Player player, Parsed parsed) {
+        boolean applied;
+        if (parsed.mode.equals("cycle")) {
+            applied = TrackSelectionUtil.cycleTrack(player, C.TRACK_TYPE_AUDIO, !parsed.reverse, true);
+        } else if (parsed.mode.equals("cycle-values")) {
+            applied = TrackSelectionUtil.cycleTrack(player, C.TRACK_TYPE_AUDIO, parsed.trackIds, !parsed.reverse, false);
+        } else {
+            applied = switch (parsed.trackIds.get(0)) {
+                case "no" -> TrackSelectionUtil.setTrackTypeDisabled(player, C.TRACK_TYPE_AUDIO, true);
+                case "auto" -> TrackSelectionUtil.resetTrackSelection(player, C.TRACK_TYPE_AUDIO);
+                default -> TrackSelectionUtil.selectTrack(player, C.TRACK_TYPE_AUDIO, parsed.trackIds.get(0));
+            };
+        }
+        return applied ? Result.APPLIED : Result.UNAVAILABLE;
     }
 
     private static Result executeChapter(PlayerManager manager, Player player, Parsed parsed) {
@@ -191,6 +211,7 @@ public final class ExoCommand {
         if (parts.length == 2 && parts[0].equals("seek")) return parseNumeric("seek", "relative", parts[1]);
         if (parts.length == 3 && parts[0].equals("seek") && (parts[2].equals("relative") || parts[2].equals("absolute") || parts[2].equals("absolute-percent") || parts[2].equals("relative-percent"))) return parseNumeric("seek", parts[2], parts[1]);
         if (parts.length == 2 && parts[0].equals("cycle") && parts[1].equals("pause")) return new Parsed("pause", "cycle", 0);
+        if ((parts.length == 2 || parts.length == 3) && parts[0].equals("cycle") && isAudioTrack(parts[1])) return parseAudioTrackCycle(parts);
         if (parts.length == 3 && parts[0].equals("add") && parts[1].equals("chapter")) return parseChapterStep(parts[2]);
         if (parts.length == 3 && parts[0].equals("add") && (parts[1].equals("speed") || parts[1].equals("volume") || parts[1].equals("sub-delay") || parts[1].equals("audio-delay"))) return parseNumeric(parts[1], parts[0], parts[2]);
         return null;
@@ -200,6 +221,11 @@ public final class ExoCommand {
         boolean reverse = parts[1].equals("!reverse");
         int propertyIndex = reverse ? 2 : 1;
         if (parts.length <= propertyIndex + 1) return null;
+        if (isAudioTrack(parts[propertyIndex])) {
+            List<String> trackIds = List.of(parts).subList(propertyIndex + 1, parts.length);
+            for (String id : trackIds) if (!isTrackId(id) || id.equals("no") || id.equals("auto")) return null;
+            return new Parsed(parts[propertyIndex], "cycle-values", 0, null, reverse, trackIds);
+        }
         double[] values = new double[parts.length - propertyIndex - 1];
         for (int i = propertyIndex + 1; i < parts.length; i++) {
             Parsed value = parsePropertyValue(parts[propertyIndex], parts[i]);
@@ -207,6 +233,19 @@ public final class ExoCommand {
             values[i - propertyIndex - 1] = value.number;
         }
         return new Parsed(parts[propertyIndex], "cycle-values", values[0], values, reverse);
+    }
+
+    private static Parsed parseAudioTrackCycle(String[] parts) {
+        if (parts.length == 3 && !parts[2].equals("up") && !parts[2].equals("down")) return null;
+        return new Parsed(parts[1], "cycle", 0, null, parts.length == 3 && parts[2].equals("down"));
+    }
+
+    private static boolean isAudioTrack(String property) {
+        return property.equals("aid") || property.equals("audio");
+    }
+
+    private static boolean isTrackId(String text) {
+        return text.matches("[^\\s;]+");
     }
 
     private static Parsed parseChapterStep(String text) {
@@ -228,6 +267,7 @@ public final class ExoCommand {
     }
 
     private static Parsed parsePropertyValue(String property, String text) {
+        if (isAudioTrack(property)) return isTrackId(text) ? new Parsed(property, "set", 0, null, false, List.of(text)) : null;
         if (property.equals("pause") || property.equals("loop-file")) {
             if (text.equals("no")) return new Parsed(property, "set", 0);
             if (text.equals("yes") || property.equals("loop-file") && text.equals("inf")) return new Parsed(property, "set", 1);
@@ -272,7 +312,11 @@ public final class ExoCommand {
         }
     }
 
-    private record Parsed(String property, String mode, double number, double[] values, boolean reverse) {
+    private record Parsed(String property, String mode, double number, double[] values, boolean reverse, List<String> trackIds) {
+        Parsed(String property, String mode, double number, double[] values, boolean reverse) {
+            this(property, mode, number, values, reverse, null);
+        }
+
         Parsed(String property, String mode, double number) {
             this(property, mode, number, null, false);
         }

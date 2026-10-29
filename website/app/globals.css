@@ -783,13 +783,13 @@ input::placeholder {
   overflow-x: auto;
 }
 .command-example {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px 16px;
 }
 .command-example > code {
-  flex: 1 1 16rem;
+  min-width: 0;
   overflow-wrap: anywhere;
 }
 .method-table,
@@ -818,6 +818,15 @@ input::placeholder {
   vertical-align: top;
   border-top: 1px solid var(--line);
   color: var(--muted);
+}
+.command-examples {
+  table-layout: fixed;
+}
+.command-examples th:first-child {
+  width: 20%;
+}
+.command-examples th:nth-child(2) {
+  width: 45%;
 }
 .command-examples td {
   vertical-align: middle;

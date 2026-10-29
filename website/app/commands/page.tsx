@@ -5,22 +5,45 @@ import { DocsNav } from "../DocsNav";
 import {
   playbackSections,
   playbackProperties,
-  playbackExamples,
-  seekExamples,
+  playbackCommandGroups,
+  type PlaybackCommand,
 } from "../playback-commands";
 
 export const metadata: Metadata = {
   title: "播放指令",
   description:
-    "Exo 支援的 mpv 播放指令與可複製範例：跳轉、倍速、音量、延遲、循環、章節與縮放。",
+    "依功能查找 Exo 與 mpv 支援的播放指令：播放、音量、音軌、字幕、跳轉、章節與畫面調整。",
 };
+
+function CommandTable({ title, commands }: { title: string; commands: readonly PlaybackCommand[] }) {
+  return (
+    <div className="table-scroll">
+      <table className="method-table command-examples" aria-label={title + "指令"}>
+        <thead>
+          <tr><th scope="col">功能</th><th scope="col">指令</th><th scope="col">說明</th></tr>
+        </thead>
+        <tbody>
+          {commands.map(([name, command, description]) => (
+            <tr key={command}>
+              <td data-label="功能">{name}</td>
+              <td data-label="指令">
+                <div className="command-example">
+                  <code>{command}</code>
+                  <CopyButton text={command} label={name + "指令"} />
+                </div>
+              </td>
+              <td data-label="說明">{description}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
 
 export default function CommandsPage() {
   return (
-    <DocsLayout
-      title="播放指令"
-      lead="複製指令，存成播放按鈕。Exo 與 mpv 都能使用。"
-    >
+    <DocsLayout title="播放指令" lead="依功能找到需要的指令，複製後存成播放按鈕。">
       <div className="docs-layout wrap">
         <DocsNav items={playbackSections} />
         <div className="docs-content">
@@ -35,102 +58,30 @@ export default function CommandsPage() {
               mpv：進入「腳本」→「按鈕」→「新增」→「新增指令按鈕」。
               每個按鈕填一條指令，不需加上 <code>mp.commandv(...)</code>。
             </p>
+            <p>各區塊會標示支援的播放器；表內指令可直接複製。</p>
           </section>
 
-          <section id="examples">
-            <h2>常用範例</h2>
-            <p>按「複製」，貼到指令欄位。</p>
-            <div className="table-scroll">
-              <table className="method-table command-examples" aria-label="常用播放指令範例">
-                <thead>
-                  <tr>
-                    <th scope="col">功能</th>
-                    <th scope="col">指令</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {playbackExamples.map(([title, command]) => (
-                    <tr key={title}>
-                      <td data-label="功能">{title}</td>
-                      <td data-label="指令">
-                        <div className="command-example">
-                          <code>{command}</code>
-                          <CopyButton text={command} label={`${title}指令`} />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section id="properties">
-            <h2>支援的屬性</h2>
-            <p>
-              <code>set 屬性 值</code> 設定；<code>add 屬性 增量</code> 增減；
-              <code>cycle-values 屬性 值1 值2</code> 輪切。名稱請用小寫。
-            </p>
-            <div className="table-scroll">
-              <table className="method-table" aria-label="Exo 支援的播放屬性">
-                <thead>
-                  <tr>
-                    {["屬性", "支援寫法", "數值與單位", "用途與限制"].map((title) => (
-                      <th scope="col" key={title}>{title}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {playbackProperties.map((property) => (
-                    <tr key={property.name} id={property.name}>
-                      <td data-label="屬性"><code>{property.name}</code></td>
-                      <td data-label="支援寫法">{property.modes.join("、")}</td>
-                      <td data-label="數值與單位">{property.values}</td>
-                      <td data-label="用途與限制">{property.description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p>
-              <code>add chapter -1</code> 跳上一章；本章已播放超過 5 秒時，先回到本章開頭。
-            </p>
-            <p>
-              縮放設為 <code>1</code>，取消該方向的額外縮放，保留畫面比例模式。
-              放大可能裁切邊緣；字幕、彈幕與控制介面大小不變。
-            </p>
-          </section>
-
-          <section id="seek">
-            <h2>跳轉位置</h2>
-            <p>
-              預設以秒計算；百分比以整部片長計算。超出範圍時停在起點或終點。
-            </p>
-            <div className="table-scroll">
-              <table className="method-table" aria-label="跳轉指令範例">
-                <thead>
-                  <tr><th scope="col">指令</th><th scope="col">效果</th></tr>
-                </thead>
-                <tbody>
-                  {seekExamples.map(([command, description]) => (
-                    <tr key={command}>
-                      <td data-label="指令"><code>{command}</code></td>
-                      <td data-label="效果">{description}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p>
-              來源需支援跳轉；百分比與從片尾倒數都需要已知片長。
-            </p>
-          </section>
+          {playbackCommandGroups.map((group) => (
+            <section id={group.id} key={group.id}>
+              {group.id === "playback" && <><span id="examples" /><span id="properties" /></>}
+              <h2>{group.title}</h2>
+              <p><b>支援：{group.support}。</b> {group.description}</p>
+              <CommandTable title={group.title} commands={group.commands} />
+              {playbackProperties.filter((property) => group.properties.includes(property.name)).map((property) => (
+                <p id={property.name} key={property.name}>
+                  <code>{property.name}</code>：{property.values}。支援 {property.modes.join("、")}。
+                  {property.description}
+                </p>
+              ))}
+              {group.notes.map((note) => <p key={note}>{note}</p>)}
+            </section>
+          ))}
 
           <section id="cycle-values">
-            <h2>輪切數值</h2>
+            <h2>輪切語法</h2>
             <p>
-              <code>cycle-values</code> 支援上表所有屬性，依目前值輪切，末項後回到首項。
-              目前值不在清單時，從首項開始。
+              <code>cycle-values 屬性 值1 值2</code> 依目前值輪切，末項後回到首項。
+              Exo 支援各區塊列出的共用屬性；目前值不在清單時，從首項開始。
             </p>
             <p>
               加上 <code>!reverse</code> 反向切換；目前值不在清單時，從末項開始。
@@ -139,7 +90,9 @@ export default function CommandsPage() {
               {"cycle-values !reverse speed 1 1.25 1.5 2"}
             </CodeBlock>
             <p>
-              任一值無效，整條指令不執行。<code>cycle</code> 僅支援 <code>pause</code>。
+              Exo 會先檢查整份清單，任一值無效就不執行。
+              Exo 的 <code>cycle</code> 支援 <code>pause</code>、<code>aid</code> 與 <code>audio</code>。
+              音軌可加上 <code>up</code> 或 <code>down</code> 指定方向。屬性名稱請用小寫。
             </p>
           </section>
 
@@ -147,19 +100,11 @@ export default function CommandsPage() {
             <h2>使用限制</h2>
             <div className="callout">
               <b>功能取決於目前影片</b>
-              <span>
-                未播放或影片不支援該操作時，會提示「目前播放無法執行此指令」。
-              </span>
+              <span>未播放或影片不支援該操作時，會提示「目前播放無法執行此指令」。</span>
             </div>
-            <p>
-              Exo 只支援本頁語法，不支援分號串接、額外前綴或 seek 旗標。
-            </p>
-            <p>
-              Lua 外掛與 <code>mpv.conf</code> 僅限 mpv，可自行匯入外掛。
-            </p>
-            <p>
-              本頁範圍以 Exo 為準；mpv 依原生規則，音量與循環行為可能不同。
-            </p>
+            <p>Exo 不支援分號串接、額外前綴或 seek 旗標。</p>
+            <p>Lua 外掛與 <code>mpv.conf</code> 僅限 mpv，可自行匯入外掛。</p>
+            <p>共用屬性的數值範圍以 Exo 為準；mpv 依原生規則，音量與循環行為可能不同。</p>
           </section>
         </div>
       </div>
