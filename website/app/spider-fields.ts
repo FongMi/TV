@@ -1,7 +1,7 @@
 import type { Field } from "./config-fields";
 
 export const networkMethods = [
-  ["req / http", "取得 code、headers、content 與 error；HTTP 非 2xx 需自行判斷。body 支援文字或位元組陣列。"],
+  ["req", "取得 code、headers、content 與 error；QuickJS 使用 await。HTTP 非 2xx 需自行判斷，body 支援文字或位元組陣列。"],
   ["json", "取得 JSON；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。"],
   ["get / post", "Java 取得文字正文；HTTP 非 2xx 仍保留正文。"],
   ["getUserAgent", "Python／QuickJS 取得 App 的 User-Agent，按需放入 headers。"],
@@ -23,23 +23,23 @@ export const networkMethods = [
 
 export const dialogFields: Field[] = [
   { name: "title / message", type: "string", description: "選填標題與說明。" },
-  { name: "image", type: "string", description: "選填 base64 圖片 data URI，如 data:image/png;base64,...；由爬蟲準備內容。onAction 可更新，空字串移除；解碼失敗時，尚未結束的 dialog 會回報錯誤。" },
+  { name: "image", type: "string", description: "選填 base64 圖片 data URI，如 data:image/png;base64,...；由爬蟲準備內容。callback 可更新，空字串移除；解碼失敗時，尚未結束的 dialog 會回報錯誤。" },
   { name: "qrcode", type: "string", description: "選填非空白字串，在本機產生 QR Code；內容不必是網址，無法編碼時回報錯誤。" },
-  { name: "copyable", type: "boolean", description: "可選取 message，並提供複製全文按鈕；複製不關窗，也不呼叫 onAction。", default: "false" },
+  { name: "copyable", type: "boolean", description: "可選取 message，並提供複製全文按鈕；複製不關窗，也不呼叫 callback。", default: "false" },
   { name: "cancelable", type: "boolean", description: "允許返回鍵取消；false 時也阻止點外側取消。頁面銷毀及呼叫取消仍會清理視窗。", default: "true" },
   { name: "inputs", type: "object[]", description: "選填輸入欄位；name 必填且不可重複，label 預設 name；value 為字串，預設空字串；多選為字串陣列，預設空陣列。" },
   { name: "inputs[].helperText", type: "string", description: "欄位下方的說明文字，省略或空字串時隱藏。" },
   { name: "inputs[].type", type: "string", description: "text、phone、number、password 為單行，textarea 為多行，select 為單選，multiselect 為多選清單；格式與業務驗證由爬蟲負責。", default: "text" },
   { name: "inputs[].options", type: "object[]", description: "select／multiselect 必填非空陣列；value 為非空白且唯一的字串，label 預設 value 且不可空白。顯示 label，單選回傳字串，多選依選項順序回傳字串陣列；非空初始值須存在於選項，多選不可重複。" },
-  { name: "inputs[].enabled", type: "boolean", description: "允許操作欄位；停用時略過內建驗證，values 仍包含其值。onAction 可回傳 inputs 陣列，依 name 更新 enabled。", default: "true" },
+  { name: "inputs[].enabled", type: "boolean", description: "允許操作欄位；停用時略過內建驗證，values 仍包含其值。callback 可回傳 inputs 陣列，依 name 更新 enabled。", default: "true" },
   { name: "inputs[].required", type: "boolean", description: "不可為空或全空白，多選至少選一項。", default: "false" },
   { name: "inputs[].minLength / maxLength", type: "integer", description: "字串欄位的非負整數限制，以 Unicode 字元計算；maxLength 不可小於 minLength。留空時略過 minLength。", default: "0 / 不限制" },
   { name: "inputs[].minItems / maxItems", type: "integer", description: "多選欄位的非負整數限制，以已選數量計算；maxItems 不可小於 minItems。留空時略過 minItems。", default: "0 / 不限制" },
   { name: "buttons", type: "object[]", description: "選填 1～3 個按鈕，依序對應 positive、negative、neutral；id 與 label 必填且不可為空，id 不可重複。省略時提供確定（ok）與取消。" },
-  { name: "buttons[].close", type: "boolean", description: "false 時保留視窗，必須提供 onAction。", default: "true" },
-  { name: "buttons[].enabled", type: "boolean", description: "允許操作按鈕；onAction 可回傳 buttons 陣列，依 id 更新 enabled。", default: "true" },
+  { name: "buttons[].close", type: "boolean", description: "false 時保留視窗，必須提供 callback。", default: "true" },
+  { name: "buttons[].enabled", type: "boolean", description: "允許操作按鈕；callback 可回傳 buttons 陣列，依 id 更新 enabled。", default: "true" },
   { name: "buttons[].validate", type: "string[]", description: "驗證指定的欄位 name；空陣列略過驗證。", default: "全部欄位" },
-  { name: "onAction", type: "function", description: "驗證通過後接收 {button, values}，button 為按鈕 id。Java／Python 以第二參數傳入同步回呼，QuickJS 放在 options 內，可回傳 Promise。回傳 {message, qrcode, image, values, errors, inputs, buttons, close} 更新內容或關窗設定。" },
+  { name: "callback", type: "function", description: "dialog 的選填第二參數，不放在 options 內。驗證通過後接收 {button, values}，button 為按鈕 id。Java／Python 使用同步回呼，QuickJS 可回傳 Promise。回傳 {message, qrcode, image, values, errors, inputs, buttons, close} 更新內容或關窗設定。" },
 ];
 
 export const liveDanmakuFields: Field[] = [
@@ -75,29 +75,30 @@ export const liveDanmakuFields: Field[] = [
 ];
 
 export const methods = [
-  ["init", "初始化爬蟲時", "讀取 ext、建立連線或快取", "無"],
-  ["homeContent / home", "進入首頁", "分類與選填 filters", "Result.class"],
-  ["homeVideoContent / homeVod", "首頁分類完成", "首頁推薦卡片", "Result.list"],
+  ["init", "初始化爬蟲時", "讀取 ext 字串；Python／QuickJS 可省略", "無"],
+  ["homeContent", "進入首頁", "分類與選填 filters", "Result.class"],
+  ["homeVideoContent", "首頁分類完成", "首頁推薦卡片", "Result.list"],
   [
-    "categoryContent / category",
+    "categoryContent",
     "分類、換頁、變更篩選",
     "該頁卡片與總頁數",
     "list + pagecount",
   ],
-  ["detailContent / detail", "點擊卡片", "完整資訊與播放分組", "list[0]"],
+  ["detailContent", "點擊卡片", "依完整 ID 陣列的順序回傳資訊與播放分組，保留重複 ID", "list"],
   [
-    "searchContent / search",
+    "searchContent",
     "搜尋",
     "搜尋結果，可支援頁碼",
     "list + pagecount",
   ],
-  ["playerContent / play", "選擇集數", "最終 URL 與播放參數", "Result"],
+  ["playerContent", "選擇集數", "最終 URL 與播放參數", "Result"],
   ["danmaku", "選用爬蟲即時彈幕來源", "彈幕或訂閱狀態物件", "Java AutoCloseable／Python、QuickJS 停止函式"],
-  ["liveContent / live", "載入直播配置", "TXT、M3U 或 Group JSON", "文字 / Group 陣列"],
+  ["liveContent", "載入直播配置", "TXT、M3U 或 Group JSON", "文字 / Group 陣列"],
+  ["manualVideoCheck / isVideoFormat", "嗅探網頁請求時", "啟用爬蟲判斷並辨識影音網址", "boolean"],
   [
-    "proxy / localProxy",
+    "proxy",
     "本地代理收到請求",
-    "依執行環境提供狀態、類型、內容與標頭",
+    "接收扁平字串鍵值集合，提供狀態、類型、內容與標頭",
     "陣列 / HTTP 回應",
   ],
   ["action", "自訂操作", "可由 Result 解析的結果", "Java JSON 字串／Python、QuickJS 物件"],
