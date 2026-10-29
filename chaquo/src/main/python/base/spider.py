@@ -1,57 +1,56 @@
 import json
-from com.github.catvod import Proxy
-from com.github.catvod.crawler import Spider as JavaSpider
-from abc import abstractmethod, ABCMeta
 from urllib.parse import urlencode
 
+from com.github.catvod import Proxy
+from com.github.catvod.crawler import Spider as JavaSpider
 
-class Spider(metaclass=ABCMeta):
+
+class Spider:
     _instance = None
 
     def __init__(self):
-        self.extend = ''
+        self.extend = ""
 
     def __new__(cls, *args, **kwargs):
-        if not cls._instance:
+        if cls.__dict__.get("_instance") is None:
             cls._instance = super().__new__(cls)
         return cls._instance
 
-    @abstractmethod
     def init(self, extend=""):
         pass
 
     def homeContent(self, filter):
-        pass
+        return {"class": []}
 
     def homeVideoContent(self):
-        pass
+        return {"list": []}
 
     def categoryContent(self, tid, pg, filter, extend):
-        pass
+        return {"list": []}
 
     def detailContent(self, ids):
-        pass
+        return {"list": []}
 
     def searchContent(self, key, quick, pg="1"):
-        pass
+        return {"list": []}
 
     def playerContent(self, flag, id, vipFlags):
-        pass
+        return {}
 
     def liveContent(self, url):
-        pass
+        return ""
 
-    def localProxy(self, param):
-        pass
+    def proxy(self, params):
+        return [404, "text/plain", ""]
 
     def isVideoFormat(self, url):
-        pass
+        return False
 
     def manualVideoCheck(self):
-        pass
+        return False
 
     def action(self, action):
-        pass
+        return {}
 
     def danmaku(self, id, emit):
         raise NotImplementedError("Spider does not support live danmaku")
@@ -59,42 +58,36 @@ class Spider(metaclass=ABCMeta):
     def destroy(self):
         pass
 
-    def getName(self):
-        pass
-
     def getActivity(self):
         from com.github.catvod import Runtime
-        return Runtime.activity()
 
-    def dialog(self, options, onAction=None):
-        dialog = getattr(self, '_dialog', None)
-        if dialog is None:
-            raise RuntimeError("Dialog bridge is unavailable")
-        return dialog.show(options, onAction)
+        return Runtime.activity()
 
     def getDependence(self):
         return []
 
     def loadSpider(self, name):
-        spider = self._tv_runtime.spider(name)
-        if hasattr(self, 'net'):
+        spider = self.runtime.spider(name)
+        if hasattr(self, "net"):
             spider.net = self.net
             spider.local = self.local
             spider.js = self.js
-        if hasattr(self, '_dialog'):
-            spider._dialog = self._dialog
+        if hasattr(self, "dialog"):
+            spider.dialog = self.dialog
         return spider
 
     def loadModule(self, name):
-        return self._tv_runtime.load_reference(name)
+        return self.runtime.load_reference(name)
 
     def getProxyUrl(self, params=None, local=True):
         params = {} if params is None else dict(params)
-        if 'do' in params or 'siteKey' in params:
-            raise ValueError('Reserved proxy parameter')
+        if not isinstance(local, bool):
+            raise TypeError("Proxy local flag requires a boolean")
+        if "do" in params or "siteKey" in params:
+            raise ValueError("Reserved proxy parameter")
         url = str(Proxy.getUrl(local))
-        query = urlencode({'do': 'py', 'siteKey': self.siteKey, **params})
-        return url + '?' + query
+        query = urlencode({"do": "py", "siteKey": self.siteKey, **params})
+        return url + "?" + query
 
     def getDanmakuUrl(self, id):
         return str(JavaSpider.getDanmakuUrl(self.siteKey, id))
@@ -103,14 +96,14 @@ class Spider(metaclass=ABCMeta):
         if isinstance(msg, (dict, list)):
             print(json.dumps(msg, ensure_ascii=False))
         else:
-            print(f'{msg}')
+            print(f"{msg}")
 
     @staticmethod
     def link(name, target):
         if not isinstance(target, dict):
             raise TypeError("link requires a target dict")
-        target = json.dumps(target, ensure_ascii=False, separators=(',', ':'), allow_nan=False)
-        return '[a=cr:%s/]%s[/a]' % (target, name)
+        target = json.dumps(target, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
+        return f"[a=cr:{target}/]{name!s}[/a]"
 
     @staticmethod
     def page(items, pg, limit, total=None):
@@ -119,13 +112,7 @@ class Spider(metaclass=ABCMeta):
             raise ValueError("page requires a positive limit")
         if total is None:
             total = len(items)
-            items = items[(pg - 1) * limit:pg * limit]
+            items = items[(pg - 1) * limit : pg * limit]
         if isinstance(total, bool) or not isinstance(total, int) or total < 0:
             raise ValueError("page requires a nonnegative total")
-        return {
-            'list': items,
-            'page': pg,
-            'pagecount': max(1, (total + limit - 1) // limit),
-            'limit': limit,
-            'total': total,
-        }
+        return {"list": items, "page": pg, "pagecount": max(1, (total + limit - 1) // limit), "limit": limit, "total": total}

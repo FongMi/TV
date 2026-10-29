@@ -5,7 +5,7 @@ from threading import Lock
 def _callback(callback):
     from java import dynamic_proxy, jclass
 
-    JSONObject = jclass("org.json.JSONObject")
+    json_object = jclass("org.json.JSONObject")
 
     class Callback(dynamic_proxy(jclass("com.github.catvod.utils.Dialog$Callback"))):
         def onAction(self, event):
@@ -14,7 +14,7 @@ def _callback(callback):
                 return None
             if not isinstance(update, dict):
                 raise TypeError("Dialog action result must be a dict")
-            return JSONObject(json.dumps(update, ensure_ascii=False, allow_nan=False))
+            return json_object(json.dumps(update, ensure_ascii=False, allow_nan=False))
 
     return Callback()
 
@@ -38,10 +38,12 @@ class DialogAdapter:
             if self._native is None:
                 self._native = jclass("com.github.catvod.utils.Dialog")()
             native = self._native
-        JSONObject = jclass("org.json.JSONObject")
+        json_object = jclass("org.json.JSONObject")
         callback = None if onAction is None else _callback(onAction)
-        result = native.show(JSONObject(json.dumps(options, ensure_ascii=False, allow_nan=False)), callback)
+        result = native.show(json_object(json.dumps(options, ensure_ascii=False, allow_nan=False)), callback)
         return None if result is None else json.loads(str(result))
+
+    __call__ = show
 
     def close(self):
         with self._lock:

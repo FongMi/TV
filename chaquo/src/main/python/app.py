@@ -1,35 +1,36 @@
 import json
 import os
+from inspect import isawaitable, iscoroutine
 from urllib.parse import urlsplit
 from urllib.request import url2pathname
 
-from _tv_loader import Runtime, SourceNotFoundError
-from _tv_net import JsAdapter, LocalAdapter, NetAdapter
-from _tv_dialog import DialogAdapter
+from runtime.dialog import DialogAdapter
+from runtime.loader import Runtime, SourceNotFoundError
+from runtime.net import JsAdapter, LocalAdapter, NetAdapter
 
 
 def spider(cache, api, site_key="", net=None):
-    return Runtime(cache, api, site_key, lambda url: readSource(url, net, inline=url == api)).create()
+    return Runtime(cache, api, site_key, lambda url: read_source(url, net, inline=url == api)).create()
 
 
-def readSource(api, net=None, inline=True):
+def read_source(api, net=None, inline=True):
     parsed = urlsplit(api)
-    if parsed.scheme in ('http', 'https'):
-        return readRemote(api, net)
-    if parsed.scheme == 'file':
+    if parsed.scheme in ("http", "https"):
+        return read_remote(api, net)
+    if parsed.scheme == "file":
         api = url2pathname(parsed.path)
         if parsed.netloc:
-            api = '//%s%s' % (parsed.netloc, api)
-    if not inline or parsed.scheme == 'file' or os.path.isfile(api):
+            api = f"//{parsed.netloc}{api}"
+    if not inline or parsed.scheme == "file" or os.path.isfile(api):
         try:
-            with open(api, 'rb') as stream:
+            with open(api, "rb") as stream:
                 return stream.read()
         except FileNotFoundError as error:
             raise SourceNotFoundError(error.errno, error.strerror, error.filename) from error
     return api.encode()
 
 
-def readRemote(api, net):
+def read_remote(api, net):
     if net is None:
         raise RuntimeError("Remote Python source requires a network owner")
     response = NetAdapter(net).req(api, {"timeout": 10000, "callTimeout": 10000, "buffer": 3})
@@ -42,20 +43,31 @@ def readRemote(api, net):
     return response["content"]
 
 
-def str2json(content):
-    return json.loads(content)
+def encode_json(content):
+    return json.dumps(sync_result(content), ensure_ascii=False, separators=(",", ":"), allow_nan=False)
 
 
-def json2str(content):
-    return json.dumps(content, ensure_ascii=False, allow_nan=False)
+def sync_result(value):
+    if isawaitable(value):
+        if iscoroutine(value):
+            value.close()
+        raise TypeError("Python spider methods must be synchronous")
+    return value
+
+
+def boolean_result(value):
+    value = sync_result(value)
+    if not isinstance(value, bool):
+        raise TypeError("Spider video checks must return bool")
+    return value
 
 
 def init(ru, extend):
     try:
-        runtime = getattr(ru, '_tv_runtime', None)
+        runtime = getattr(ru, "runtime", None)
         if runtime is not None:
             runtime.prepare(ru)
-        ru.init(extend)
+        sync_result(ru.init(extend))
     except BaseException:
         release(ru)
         raise
@@ -65,77 +77,77 @@ def bindNet(ru, net, user_agent=None, local=None, streams=None, js=None):
     ru.net = NetAdapter(net, user_agent, streams)
     ru.local = LocalAdapter(local)
     ru.js = JsAdapter(js)
-    ru._dialog = DialogAdapter()
+    ru.dialog = DialogAdapter()
 
 
 def homeContent(ru, filter):
-    return json2str(ru.homeContent(filter))
+    return encode_json(ru.homeContent(filter))
 
 
 def homeVideoContent(ru):
-    return json2str(ru.homeVideoContent())
+    return encode_json(ru.homeVideoContent())
 
 
 def categoryContent(ru, tid, pg, filter, extend):
-    return json2str(ru.categoryContent(tid, pg, filter, str2json(extend)))
+    return encode_json(ru.categoryContent(tid, pg, filter, json.loads(extend)))
 
 
 def detailContent(ru, array):
-    return json2str(ru.detailContent(str2json(array)))
+    return encode_json(ru.detailContent(json.loads(array)))
 
 
 def searchContent(ru, key, quick, pg="1"):
-    return json2str(ru.searchContent(key, quick, pg))
+    return encode_json(ru.searchContent(key, quick, pg))
 
 
 def playerContent(ru, flag, id, vipFlags):
-    return json2str(ru.playerContent(flag, id, str2json(vipFlags)))
+    return encode_json(ru.playerContent(flag, id, json.loads(vipFlags)))
 
 
 def isVideoFormat(ru, url):
-    return bool(ru.isVideoFormat(url))
+    return boolean_result(ru.isVideoFormat(url))
 
 
 def manualVideoCheck(ru):
-    return bool(ru.manualVideoCheck())
+    return boolean_result(ru.manualVideoCheck())
 
 
 def liveContent(ru, url):
     value = ru.liveContent(url)
-    return value if isinstance(value, str) else json2str(value)
+    return value if isinstance(value, str) else encode_json(value)
 
 
-def localProxy(ru, param):
-    return ru.localProxy(str2json(param))
+def proxy(ru, params):
+    return sync_result(ru.proxy(json.loads(params)))
 
 
 def action(ru, action):
-    return json2str(ru.action(action))
+    return encode_json(ru.action(action))
 
 
 def danmaku(ru, id, emitter):
-    stop = ru.danmaku(id, lambda item: emitter.emit(json.dumps(item, ensure_ascii=False, allow_nan=False)))
+    stop = sync_result(ru.danmaku(id, lambda item: emitter.emit(encode_json(item))))
     if not callable(stop):
         raise TypeError("danmaku must return a stop function")
-    return stop
+    return lambda: sync_result(stop())
 
 
 def destroy(ru):
     try:
-        closeDialog(ru)
-        ru.destroy()
+        close_dialog(ru)
+        sync_result(ru.destroy())
     finally:
         release(ru)
 
 
 def release(ru):
-    closeDialog(ru)
-    runtime = getattr(ru, '_tv_runtime', None)
+    close_dialog(ru)
+    runtime = getattr(ru, "runtime", None)
     if runtime is not None:
         runtime.close()
 
 
-def closeDialog(ru):
-    dialog = getattr(ru, '_dialog', None)
+def close_dialog(ru):
+    dialog = getattr(ru, "dialog", None)
     if dialog is not None:
         dialog.close()
