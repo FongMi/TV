@@ -74,9 +74,9 @@ public enum RuntimeModule {
 
     public String getCompatibilityId() {
         return switch (this) {
-            case PYTHON -> "catvod-python-plugin-v2";
+            case PYTHON -> "catvod-python-plugin-v3";
             case NODEJS -> "catvod-nodejs-plugin-v2";
-            case QUICKJS -> "fongmi-quickjs-ng-0.17-v11";
+            case QUICKJS -> "fongmi-quickjs-ng-0.17-v12";
             case THUNDER -> "catvod-thunder-plugin-v1";
             case MPV -> "mpv-jni-ffmpeg-shared-v1";
             case BDJ -> "libbluray-1.4.1-openjdk8-zero-v1";

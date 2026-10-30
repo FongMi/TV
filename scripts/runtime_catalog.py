@@ -14,9 +14,9 @@ from zipfile import BadZipFile, ZIP_STORED, ZipFile
 
 ABIS = ("arm64-v8a", "armeabi-v7a")
 MODULES = {
-    "python": ("catvod-python-plugin-v2", "libchaquopy_java.so"),
+    "python": ("catvod-python-plugin-v3", "libchaquopy_java.so"),
     "nodejs": ("catvod-nodejs-plugin-v2", "libnode.so"),
-    "quickjs": ("fongmi-quickjs-ng-0.17-v11", "libquickjs-wrapper.so"),
+    "quickjs": ("fongmi-quickjs-ng-0.17-v12", "libquickjs-wrapper.so"),
     "thunder": ("catvod-thunder-plugin-v1", "libxl_thunder_sdk.so"),
     "bdj": ("libbluray-1.4.1-openjdk8-zero-v1", None),
     "mpv": ("mpv-jni-ffmpeg-shared-v1", "libplayer.so"),
