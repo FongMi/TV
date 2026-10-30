@@ -21,9 +21,9 @@ final class NetRequest {
     private static final Set<String> POST_TYPES = Set.of("json", "form", "form-data");
 
     static Request build(String url, NetOptions options, boolean socket) {
+        validateOptions(options);
         Headers headers = Headers.of(options.getHeader());
         Request.Builder request = new Request.Builder().url(url).headers(headers);
-        validateRequestBody(options);
         if (!socket) {
             String method = requestMethod(options);
             request.method(method, requestBody(method, options, headers));
@@ -31,7 +31,8 @@ final class NetRequest {
         return withParams(request.build(), options.getParams());
     }
 
-    private static void validateRequestBody(NetOptions options) {
+    private static void validateOptions(NetOptions options) {
+        options.getBuffer();
         if (options.getData() != null && options.getRawBody() != null) throw new IllegalArgumentException("data and body are mutually exclusive");
     }
 
@@ -96,7 +97,7 @@ final class NetRequest {
     }
 
     private static RequestBody rawBody(JsonElement raw, MediaType type) {
-        if (raw.isJsonPrimitive()) return RequestBody.create(raw.getAsString(), type);
+        if (raw.isJsonPrimitive() && raw.getAsJsonPrimitive().isString()) return RequestBody.create(raw.getAsString(), type);
         if (!raw.isJsonArray()) throw new IllegalArgumentException("Raw body must be text or bytes");
         JsonArray values = raw.getAsJsonArray();
         byte[] bytes = new byte[values.size()];

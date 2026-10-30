@@ -46,7 +46,7 @@ final class Network {
     }
 
     Net client(JsonObject options) {
-        JsonElement value = options.get("__net");
+        JsonElement value = options.get("netId");
         if (value == null) return net;
         if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isNumber()) throw new IllegalArgumentException("Invalid network session");
         int id = value.getAsInt();
@@ -82,49 +82,22 @@ final class Network {
         return session;
     }
 
-    Object http(String url, QuickJS.Json options, QuickJS.Callback complete) {
-        if (complete == null) return request(url, options);
-        requestAsync(url, options, complete, false);
-        return null;
+    CompletableFuture<Object> req(String url, QuickJS.Json options) {
+        return requestAsync(url, options, false);
     }
 
-    Object webSocket(String url, QuickJS.Json options, QuickJS.Callback complete) {
-        if (complete == null) return null;
-        requestAsync(url, options, complete, true);
-        return null;
+    CompletableFuture<Object> ws(String url, QuickJS.Json options) {
+        return requestAsync(url, options, true);
     }
 
-    private Object request(String url, QuickJS.Json options) {
+    private CompletableFuture<Object> requestAsync(String url, QuickJS.Json options, boolean socket) {
         try {
             global.checkInvocation();
             JsonObject json = parseOptions(options);
             NetOptions req = GSON.fromJson(json, NetOptions.class);
-            return Connect.result(req, sendRequest(url, json, req, false).get());
-        } catch (Exception e) {
-            return Connect.error(e);
-        }
-    }
-
-    CompletableFuture<Object> requestAsync(String url, QuickJS.Json options) {
-        try {
-            global.checkInvocation();
-            JsonObject json = parseOptions(options);
-            NetOptions req = GSON.fromJson(json, NetOptions.class);
-            return completeResponse(req, sendRequest(url, json, req, false));
+            return completeResponse(req, sendRequest(url, json, req, socket));
         } catch (Exception error) {
             return CompletableFuture.completedFuture(Connect.error(error));
-        }
-    }
-
-    private void requestAsync(String url, QuickJS.Json options, QuickJS.Callback complete, boolean socket) {
-        global.hold(complete);
-        try {
-            global.checkInvocation();
-            JsonObject json = parseOptions(options);
-            NetOptions req = GSON.fromJson(json, NetOptions.class);
-            sendRequest(url, json, req, socket).whenComplete((response, error) -> global.complete(complete, req, error == null ? response : Net.Result.failure(error)));
-        } catch (Exception e) {
-            global.complete(complete, new NetOptions(), Net.Result.failure(e));
         }
     }
 

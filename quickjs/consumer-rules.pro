@@ -1,2 +1,1 @@
 -keep class com.fongmi.quickjs.* { *; }
--keep class com.fongmi.quickjs.bean.Res { *; }

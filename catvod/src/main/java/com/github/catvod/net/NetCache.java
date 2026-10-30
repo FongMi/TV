@@ -61,15 +61,6 @@ final class NetCache implements AutoCloseable {
         return entry == null ? null : entry.value;
     }
 
-    synchronized String value(String key, CacheOptions options) {
-        if (closed) throw new IllegalStateException("Network owner closed");
-        if (key == null || key.isEmpty()) throw new IllegalArgumentException("Invalid cache key");
-        if (options.persist && read == null) throw new IllegalArgumentException("Persistent cache requires a site owner");
-        Entry entry = options.ttl == 0 ? null : entries.get(key);
-        if (options.ttl > 0 && entry == null && options.persist) entry = restore(key);
-        return fresh(entry, options.ttl) ? entry.value : null;
-    }
-
     CompletableFuture<String> cached(String key, CacheOptions options, Supplier<CompletableFuture<String>> loader) {
         Flight flight;
         String stale;

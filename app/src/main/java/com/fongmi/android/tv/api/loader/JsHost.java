@@ -32,8 +32,8 @@ final class JsHost implements Host {
     }
 
     @Override
-    public CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
-        return Runtime.dialog(options, onAction);
+    public CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> callback) {
+        return Runtime.dialog(options, callback);
     }
 
     @Override

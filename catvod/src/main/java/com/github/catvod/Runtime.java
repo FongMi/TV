@@ -53,10 +53,10 @@ public class Runtime {
         get().dialog = dialog;
     }
 
-    public static CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
+    public static CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> callback) {
         var dialog = get().dialog;
         if (dialog == null) return Task.failedFuture(new UnsupportedOperationException("Dialog requires a compatible App"));
-        return dialog.apply(options, onAction);
+        return dialog.apply(options, callback);
     }
 
     private static class Loader {

@@ -5,13 +5,11 @@ import android.net.Uri;
 import com.fongmi.quickjs.QuickJS;
 import com.fongmi.quickjs.WebPlatform;
 import com.fongmi.quickjs.host.Host;
-import com.fongmi.quickjs.utils.Connect;
 import com.fongmi.quickjs.utils.HtmlQuery;
 import com.github.catvod.Proxy;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.Net;
-import com.github.catvod.net.NetOptions;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Js;
@@ -39,53 +37,70 @@ public class Global {
 
     private final WebPlatform web;
     private final Network network;
-    private final Cache cache;
     private final Streams streams;
     private final Sockets sockets;
     private final Dialogs dialogs;
+    private final Cache cache;
     private final QuickJS ctx;
+    private final QuickJS.Reference bridge;
     private final Js js = new Js();
     private final Host host;
     private final String siteKey;
+    private final AtomicInteger nextDanmaku = new AtomicInteger();
     private final Map<QuickJS.Callback, Invocation> callbacks = new HashMap<>();
     private final Map<Integer, Consumer<JSONObject>> danmakus = new ConcurrentHashMap<>();
-    private final AtomicInteger nextDanmaku = new AtomicInteger();
+
+    private QuickJS.Reference dialogActions;
+    private QuickJS.Reference spider;
     private Invocation invocation;
 
     private volatile boolean destroyed;
 
     private Global(QuickJS ctx, Host host, String siteKey, String api) {
-        this.host = host;
-        Net net = new Net(host, siteKey);
-        Local local = new Local(siteKey);
-        this.siteKey = siteKey;
         this.ctx = ctx;
-        ctx.setAsyncScopeCapture(this::captureInvocation).join();
+        this.host = host;
+        this.siteKey = siteKey;
+        this.bridge = (QuickJS.Reference) ctx.reference("newObject").join();
         this.web = new WebPlatform(ctx, SpiderDebug::log, api);
-        this.network = new Network(this, net, web);
-        this.cache = new Cache(this, network, local);
+        this.network = new Network(this, new Net(host, siteKey), web);
+        this.cache = new Cache(this, network, new Local(siteKey));
         this.streams = new Streams(this, network, host.getCallTimeout());
         this.sockets = new Sockets(this, network);
         this.dialogs = new Dialogs(this, host);
-        setProperty();
+        ctx.reference("set", bridge, "siteKey", siteKey).join();
+        ctx.setAsyncScopeCapture(this::captureScope).join();
+        ctx.registerModule("catvod:host", bridge).join();
         ctx.onClose(this::destroy).join();
+        bind();
     }
 
     public static Global create(QuickJS ctx, Host host, String siteKey, String api) {
         return new Global(ctx, host, siteKey, api);
     }
 
-    private static Object argument(Object[] args, int index) {
+    private static Object arg(Object[] args, int index) {
         return index < args.length ? args[index] : null;
     }
 
-    private static String string(Object[] args, int index) {
-        return (String) argument(args, index);
+    private static String str(Object[] args, int index) {
+        return (String) arg(args, index);
     }
 
     private static Integer integer(Object[] args, int index) {
-        Number value = (Number) argument(args, index);
+        Number value = (Number) arg(args, index);
         return value == null ? null : value.intValue();
+    }
+
+    private static QuickJS.Json json(Object[] args, int index) {
+        return (QuickJS.Json) arg(args, index);
+    }
+
+    private static QuickJS.Callback callback(Object[] args, int index) {
+        return (QuickJS.Callback) arg(args, index);
+    }
+
+    private static Boolean bool(Object[] args, int index) {
+        return (Boolean) arg(args, index);
     }
 
     static String errorMessage(Throwable error) {
@@ -112,12 +127,19 @@ public class Global {
     private void release() {
         dialogs.close();
         js.close();
-        danmakus.clear();
-        network.release();
         cache.release();
+        network.release();
+        danmakus.clear();
         releaseCallbacks();
         sockets.release();
         web.close();
+        releaseReferences();
+    }
+
+    private void releaseReferences() {
+        if (spider != null) spider.close();
+        if (dialogActions != null) dialogActions.close();
+        bridge.close();
     }
 
     private void releaseCallbacks() {
@@ -154,67 +176,80 @@ public class Global {
         invocation = null;
     }
 
-    private void setProperty() {
+    public CompletableFuture<Object> call(String method, Consumer<CompletableFuture<Object>> before, Runnable after, Object... args) {
+        return ctx.invoke(spider, method, before, after, args);
+    }
+
+    private Object attach(QuickJS.Reference value, QuickJS.Reference actions) {
+        spider = value;
+        dialogActions = actions;
+        return null;
+    }
+
+    private void bind() {
+        ctx.bindReference(bridge, "attach", args -> attach((QuickJS.Reference) arg(args, 0), (QuickJS.Reference) arg(args, 1))).join();
         bindHost();
-        bindNetwork();
+        bindNet();
+        bindSocket();
         bindCache();
-        bindUtilities();
-        bindSocketsAndDownloads();
+        bindUtils();
     }
 
     private void bindHost() {
-        ctx.bindAsync("_dialog", args -> dialogs.open((QuickJS.Json) argument(args, 0), string(args, 1)), this::captureInvocation).join();
-        ctx.bind("s2t", args -> s2t(string(args, 0))).join();
-        ctx.bind("t2s", args -> t2s(string(args, 0))).join();
-        ctx.bind("openWeb", args -> openWeb((QuickJS.Json) argument(args, 0))).join();
-        ctx.bind("getCookie", args -> getCookie(string(args, 0))).join();
-        ctx.bind("setCookie", args -> setCookie(string(args, 0), string(args, 1))).join();
-        ctx.bind("getUserAgent", args -> getUserAgent()).join();
-        ctx.bind("getPort", args -> getPort()).join();
-        ctx.bind("getProxy", args -> getProxy((Boolean) argument(args, 0))).join();
-        ctx.bind("proxyUrl", args -> proxyUrl((QuickJS.Json) argument(args, 0))).join();
-        ctx.bind("getDanmakuUrl", args -> Spider.getDanmakuUrl(siteKey, string(args, 0))).join();
-        ctx.bind("emitDanmaku", args -> emitDanmaku(integer(args, 0), (QuickJS.Json) argument(args, 1))).join();
-        ctx.bind("js2Proxy", args -> js2Proxy((Boolean) argument(args, 0), integer(args, 1), string(args, 2), string(args, 3), (QuickJS.Json) argument(args, 4))).join();
+        ctx.bind(bridge, "openWeb", args -> openWeb(json(args, 0))).join();
+        ctx.bindAsync(bridge, "dialog", args -> dialogs.open(json(args, 0), str(args, 1)), this::captureScope).join();
+        ctx.bind(bridge, "getPort", args -> getPort()).join();
+        ctx.bind(bridge, "proxyUrl", args -> proxyUrl(json(args, 0), bool(args, 1))).join();
+        ctx.bind(bridge, "danmakuUrl", args -> Spider.danmakuUrl(siteKey, str(args, 0))).join();
+        ctx.bind(bridge, "emitDanmaku", args -> emitDanmaku(integer(args, 0), json(args, 1))).join();
     }
 
-    private void bindNetwork() {
-        ctx.bind("_netSession", args -> network.openSession()).join();
-        ctx.bind("_netGetCookie", args -> network.getCookie(string(args, 0), integer(args, 1))).join();
-        ctx.bind("_netSetCookie", args -> network.setCookie(string(args, 0), string(args, 1), integer(args, 2))).join();
-        ctx.bind("_netClose", args -> closeSession(integer(args, 0))).join();
-        ctx.bind("__http", args -> network.http(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
-        ctx.bindAsync("_httpAsync", args -> network.requestAsync(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
-        ctx.bindAsync("_stream", args -> streams.proxy(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
-        ctx.bind("_streamBody", args -> streams.body((QuickJS.Callback) argument(args, 0), (QuickJS.Callback) argument(args, 1))).join();
-        ctx.bindAsync("_openStream", args -> streams.open(string(args, 0), (QuickJS.Json) argument(args, 1), true), this::captureInvocation).join();
-        ctx.bindAsync("_streamRead", args -> streams.read(string(args, 0), integer(args, 1)), this::captureInvocation).join();
-        ctx.bind("_streamClose", args -> invocation != null && invocation.discardStream(string(args, 0))).join();
-        ctx.bind("__ws", args -> network.webSocket(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
-        ctx.bindAsync("_sleep", args -> network.sleep(((Number) argument(args, 0)).doubleValue(), integer(args, 1)), this::captureInvocation).join();
+    private void bindNet() {
+        ctx.bind(bridge, "getUserAgent", args -> host.getUserAgent()).join();
+        ctx.bind(bridge, "getCookie", args -> getCookie(str(args, 0), integer(args, 1))).join();
+        ctx.bind(bridge, "setCookie", args -> setCookie(str(args, 0), str(args, 1), integer(args, 2))).join();
+        ctx.bind(bridge, "session", args -> network.openSession()).join();
+        ctx.bind(bridge, "closeSession", args -> closeSession(integer(args, 0))).join();
+        ctx.bindAsync(bridge, "req", args -> network.req(str(args, 0), json(args, 1)), this::captureScope).join();
+        ctx.bindAsync(bridge, "ws", args -> network.ws(str(args, 0), json(args, 1)), this::captureScope).join();
+        ctx.bind(bridge, "download", args -> download(str(args, 0), str(args, 1), json(args, 2), callback(args, 3))).join();
+        ctx.bindAsync(bridge, "sleep", args -> network.sleep(((Number) arg(args, 0)).doubleValue(), integer(args, 1)), this::captureScope).join();
+        ctx.bindAsync(bridge, "stream", args -> streams.proxy(str(args, 0), json(args, 1)), this::captureScope).join();
+        ctx.bind(bridge, "streamBody", args -> streams.body(callback(args, 0), callback(args, 1))).join();
+        ctx.bindAsync(bridge, "openStream", args -> streams.open(str(args, 0), json(args, 1), true), this::captureScope).join();
+        ctx.bindAsync(bridge, "streamRead", args -> streams.read(str(args, 0), integer(args, 1)), this::captureScope).join();
+        ctx.bind(bridge, "streamClose", args -> closeStream(str(args, 0))).join();
     }
 
     private void bindCache() {
-        ctx.bind("_cached", args -> cache.load(string(args, 0), string(args, 1), integer(args, 2), (QuickJS.Callback) argument(args, 3), (QuickJS.Callback) argument(args, 4), (Boolean) argument(args, 5))).join();
-        ctx.bind("_peek", args -> cache.peek(string(args, 0), integer(args, 1))).join();
-        ctx.bind("_clearCache", args -> cache.clear(string(args, 0), integer(args, 1))).join();
-        ctx.bind("_local", args -> cache.local(string(args, 0), string(args, 1), string(args, 2))).join();
-        ctx.bind("_cacheResolve", args -> cache.resolve(integer(args, 0), string(args, 1), string(args, 2))).join();
+        ctx.bind(bridge, "cached", args -> cache.load(str(args, 0), str(args, 1), integer(args, 2), callback(args, 3), callback(args, 4), bool(args, 5))).join();
+        ctx.bind(bridge, "peek", args -> cache.peek(str(args, 0), integer(args, 1))).join();
+        ctx.bind(bridge, "clearCache", args -> cache.clear(str(args, 0), integer(args, 1))).join();
+        ctx.bind(bridge, "cacheResolve", args -> cache.resolve(integer(args, 0), str(args, 1), str(args, 2))).join();
+        ctx.bind(bridge, "local", args -> cache.local(str(args, 0), str(args, 1), str(args, 2))).join();
     }
 
-    private void bindUtilities() {
-        ctx.bindAsync("evalJs", args -> evalJs(string(args, 0), (QuickJS.Json) argument(args, 1)), this::captureInvocation).join();
-        ctx.bind("joinUrl", args -> joinUrl(string(args, 0), string(args, 1))).join();
-        ctx.bind("htmlQuery", this::htmlQuery).join();
-        ctx.bind("md5X", args -> md5X(string(args, 0))).join();
-        ctx.bind("sha256X", args -> sha256X(string(args, 0))).join();
-        ctx.bind("randomX", args -> randomX(integer(args, 0))).join();
-        ctx.bind("aesX", args -> aesX(string(args, 0), (Boolean) argument(args, 1), string(args, 2), (Boolean) argument(args, 3), string(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
-        ctx.bind("desX", args -> desX(string(args, 0), (Boolean) argument(args, 1), string(args, 2), (Boolean) argument(args, 3), string(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
-        ctx.bind("rsaX", args -> rsaX(string(args, 0), (Boolean) argument(args, 1), (Boolean) argument(args, 2), string(args, 3), (Boolean) argument(args, 4), string(args, 5), (Boolean) argument(args, 6))).join();
+    private void bindUtils() {
+        ctx.bind(bridge, "s2t", args -> s2t(str(args, 0))).join();
+        ctx.bind(bridge, "t2s", args -> t2s(str(args, 0))).join();
+        ctx.bind(bridge, "joinUrl", args -> joinUrl(str(args, 0), str(args, 1))).join();
+        ctx.bind(bridge, "htmlQuery", args -> htmlQuery(str(args, 0), json(args, 1))).join();
+        ctx.bindAsync(bridge, "eval", args -> eval(str(args, 0), json(args, 1)), this::captureScope).join();
+        ctx.bind(bridge, "md5X", args -> md5X(str(args, 0))).join();
+        ctx.bind(bridge, "sha256X", args -> sha256X(str(args, 0))).join();
+        ctx.bind(bridge, "randomX", args -> randomX(integer(args, 0))).join();
+        ctx.bind(bridge, "aesX", args -> aesX(str(args, 0), bool(args, 1), str(args, 2), bool(args, 3), str(args, 4), str(args, 5), bool(args, 6))).join();
+        ctx.bind(bridge, "desX", args -> desX(str(args, 0), bool(args, 1), str(args, 2), bool(args, 3), str(args, 4), str(args, 5), bool(args, 6))).join();
+        ctx.bind(bridge, "rsaX", args -> rsaX(str(args, 0), bool(args, 1), bool(args, 2), str(args, 3), bool(args, 4), str(args, 5), bool(args, 6))).join();
     }
 
-    private CompletableFuture<Object> evalJs(String source, QuickJS.Json options) {
+    private void bindSocket() {
+        ctx.bind(bridge, "connect", args -> sockets.connect(str(args, 0), json(args, 1), callback(args, 2))).join();
+        ctx.bind(bridge, "socketSend", args -> sockets.send(integer(args, 0), str(args, 1), (byte[]) arg(args, 2))).join();
+        ctx.bind(bridge, "socketClose", args -> closeSocket(integer(args, 0), bool(args, 1))).join();
+    }
+
+    private CompletableFuture<Object> eval(String source, QuickJS.Json options) {
         checkInvocation();
         CompletableFuture<String> evaluation = js.evalAsync(source, options == null ? "{}" : options.text());
         if (invocation != null) invocation.track(evaluation);
@@ -225,25 +260,33 @@ public class Global {
         return result;
     }
 
-    private void bindSocketsAndDownloads() {
-        ctx.bind("_connect", args -> sockets.connect(string(args, 0), (QuickJS.Json) argument(args, 1), (QuickJS.Callback) argument(args, 2))).join();
-        ctx.bind("_socketSend", args -> sockets.send(integer(args, 0), string(args, 1), (byte[]) argument(args, 2))).join();
-        ctx.bind("_socketClose", args -> {
-            sockets.close(integer(args, 0), (Boolean) argument(args, 1));
-            return null;
-        }).join();
-        ctx.bind("_download", args -> {
-            network.download(string(args, 0), string(args, 1), (QuickJS.Json) argument(args, 2), (QuickJS.Callback) argument(args, 3));
-            return null;
-        }).join();
+    private String getCookie(String url, Integer id) {
+        return id == null ? host.getCookie(url) : network.getCookie(url, id);
     }
 
-    private QuickJS.Json htmlQuery(Object[] args) throws IOException {
-        QuickJS.Json plan = (QuickJS.Json) argument(args, 1);
+    private Boolean setCookie(String url, String cookie, Integer id) {
+        return id == null ? host.setCookie(url, cookie) : network.setCookie(url, cookie, id);
+    }
+
+    private Object closeSocket(Integer id, Boolean cancel) {
+        sockets.close(id, cancel);
+        return null;
+    }
+
+    private Boolean closeStream(String token) {
+        return invocation != null && invocation.discardStream(token);
+    }
+
+    private Object download(String url, String path, QuickJS.Json options, QuickJS.Callback complete) {
+        network.download(url, path, options, complete);
+        return null;
+    }
+
+    private QuickJS.Json htmlQuery(String html, QuickJS.Json plan) throws IOException {
         Invocation current = invocation;
         long start = System.nanoTime();
         try {
-            return new QuickJS.Json(HtmlQuery.query(string(args, 0), plan == null ? null : plan.text()));
+            return new QuickJS.Json(HtmlQuery.query(html, plan == null ? null : plan.text()));
         } finally {
             if (current != null) current.recordHtml(System.nanoTime() - start);
         }
@@ -269,7 +312,7 @@ public class Global {
 
     CompletableFuture<Object> invokeDialogAction(Invocation current, String id, String event, Consumer<CompletableFuture<Object>> started) {
         Invocation[] previous = new Invocation[1];
-        return ctx.invoke("__DIALOG_ACTIONS__", "action", future -> {
+        return ctx.invoke(dialogActions, "action", future -> {
             previous[0] = invocation;
             invocation = current;
             if (current != null) {
@@ -284,7 +327,7 @@ public class Global {
     }
 
     void releaseDialogAction(String id) {
-        submit(() -> ctx.invoke("__DIALOG_ACTIONS__", "release", id).whenComplete((value, error) -> {
+        submit(() -> ctx.invoke(dialogActions, "release", id).whenComplete((value, error) -> {
             if (error != null && !destroyed) SpiderDebug.log(error);
         }));
     }
@@ -340,39 +383,25 @@ public class Global {
         return options != null && host.openWeb(options.text());
     }
 
-    public String getCookie(String url) {
-        return host.getCookie(url);
-    }
-
-    public Boolean setCookie(String url, String cookie) {
-        return host.setCookie(url, cookie);
-    }
-
-    public String getUserAgent() {
-        return host.getUserAgent();
-    }
-
     public Integer getPort() {
         return Proxy.getPort();
     }
 
-    public String getProxy(Boolean local) {
-        return Proxy.getUrl(local) + "?do=js";
-    }
-
-    public String proxyUrl(QuickJS.Json params) {
-        Uri.Builder url = Uri.parse(Proxy.getUrl(true)).buildUpon().appendQueryParameter("do", "js").appendQueryParameter("siteKey", siteKey);
-        if (params != null) {
-            for (Map.Entry<String, JsonElement> entry : Json.strict(params.text()).getAsJsonObject().entrySet()) {
-                if (entry.getKey().equals("do") || entry.getKey().equals("siteKey")) throw new IllegalArgumentException("Reserved proxy parameter");
-                url.appendQueryParameter(entry.getKey(), entry.getValue().getAsString());
-            }
-        }
+    private String proxyUrl(QuickJS.Json params, Boolean local) {
+        Uri.Builder url = Uri.parse(Proxy.getUrl(local == null || local)).buildUpon();
+        url.appendQueryParameter("do", "js");
+        url.appendQueryParameter("siteKey", siteKey);
+        JsonElement values = params == null ? null : Json.strict(params.text());
+        if (values == null || values.isJsonNull()) return url.build().toString();
+        if (!values.isJsonObject()) throw new IllegalArgumentException("Proxy parameters require an object");
+        for (Map.Entry<String, JsonElement> entry : values.getAsJsonObject().entrySet()) appendProxyParam(url, entry.getKey(), entry.getValue());
         return url.build().toString();
     }
 
-    public String js2Proxy(Boolean dynamic, Integer siteType, String siteKey, String url, QuickJS.Json headers) {
-        return getProxy(!dynamic) + String.format("&from=catvod&siteType=%s&siteKey=%s&header=%s&url=%s", siteType, siteKey, Uri.encode(headers.text()), Uri.encode(url));
+    private void appendProxyParam(Uri.Builder url, String key, JsonElement value) {
+        if (key.equals("do") || key.equals("siteKey")) throw new IllegalArgumentException("Reserved proxy parameter");
+        if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isString()) throw new IllegalArgumentException("Proxy parameters require string keys and values");
+        url.appendQueryParameter(key, value.getAsString());
     }
 
     public String joinUrl(String parent, String child) {
@@ -401,10 +430,6 @@ public class Global {
 
     public String rsaX(String mode, boolean pub, boolean encrypt, String input, boolean inBase64, String key, boolean outBase64) {
         return Crypto.rsa(mode, pub, encrypt, input, inBase64, key, outBase64);
-    }
-
-    void complete(QuickJS.Callback complete, NetOptions req, Net.Result result) {
-        submit(() -> invoke(complete, () -> complete.call(Connect.result(req, result))));
     }
 
     void complete(QuickJS.Callback complete, Object... args) {
@@ -437,7 +462,7 @@ public class Global {
         if (invocation != null && invocation.isCanceled()) throw new CancellationException("Spider call canceled");
     }
 
-    private QuickJS.AsyncScope captureInvocation() {
+    private QuickJS.AsyncScope captureScope() {
         Invocation current = invocation;
         return () -> {
             Invocation previous = invocation;

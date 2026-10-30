@@ -1,8 +1,8 @@
 package com.fongmi.android.tv.api.loader;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.exception.SpiderLoadException;
 import com.github.catvod.crawler.Spider;
-import com.github.catvod.crawler.SpiderNull;
 import com.github.catvod.runtime.QuickJsRuntime;
 import com.github.catvod.utils.RuntimeModule;
 
@@ -94,12 +94,10 @@ public class JsLoader {
             spider = newSpider(key, api, BaseLoader.get().dex(jar));
             spider.init(App.get(), ext);
             return spider;
-        } catch (Throwable e) {
-            if (spider != null) spider.destroy();
-            RuntimeModule.MissingException missing = RuntimeModule.MissingException.find(e);
-            if (missing != null) throw missing;
-            e.printStackTrace();
-            return new SpiderNull();
+        } catch (Exception | Error error) {
+            if (spider != null) destroySpider(spider, error);
+            if (error instanceof Error fatal) throw fatal;
+            throw new SpiderLoadException(error);
         }
     }
 

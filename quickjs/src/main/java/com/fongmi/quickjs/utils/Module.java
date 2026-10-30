@@ -49,6 +49,7 @@ public class Module implements QuickJS.ModuleLoader {
 
     @Override
     public String normalize(String base, String name) {
+        if (name.equals("catvod")) return "assets://js/lib/catvod.js";
         return UriUtil.resolve(base, name);
     }
 
@@ -118,8 +119,7 @@ public class Module implements QuickJS.ModuleLoader {
     private CompletableFuture<String> read(String name, Net client) {
         if (name.startsWith("http")) return client.requestAsync(name, new NetOptions()).thenApply(this::readResponse);
         if (name.startsWith("assets")) return CompletableFuture.completedFuture(RuntimeModule.QUICKJS.readAsset(name));
-        if (name.startsWith("lib/")) return CompletableFuture.completedFuture(RuntimeModule.QUICKJS.readAsset("js/" + name));
-        return CompletableFuture.completedFuture(null);
+        throw new IllegalArgumentException("Unsupported module URL: " + name);
     }
 
     private String readResponse(Net.Result result) {

@@ -1,9 +1,9 @@
 package com.fongmi.quickjs.crawler;
 
 import com.fongmi.quickjs.QuickJS;
+import com.fongmi.quickjs.QuickJSLoader;
 import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.utils.Module;
-import com.fongmi.quickjs.QuickJSLoader;
 
 import dalvik.system.DexClassLoader;
 

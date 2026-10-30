@@ -21,12 +21,12 @@ public final class Dialog implements AutoCloseable {
         return show(options, null);
     }
 
-    public JSONObject show(JSONObject options, Callback onAction) throws Exception {
+    public JSONObject show(JSONObject options, Callback callback) throws Exception {
         if (Looper.myLooper() == Looper.getMainLooper()) throw new IllegalStateException("Dialog.show requires a worker thread");
         if (options == null) throw new IllegalArgumentException("Dialog options are required");
         if (closed) throw new IllegalStateException("Dialog owner is closed");
         BlockingQueue<Runnable> actions = new LinkedBlockingQueue<>();
-        CompletableFuture<String> source = Runtime.dialog(options.toString(), onAction == null ? null : event -> enqueue(actions, onAction, event));
+        CompletableFuture<String> source = Runtime.dialog(options.toString(), callback == null ? null : event -> enqueue(actions, callback, event));
         requests.add(source);
         source.whenComplete((value, error) -> {
             requests.remove(source);

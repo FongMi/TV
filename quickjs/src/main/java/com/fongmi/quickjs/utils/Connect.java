@@ -4,15 +4,9 @@ import com.fongmi.quickjs.QuickJS;
 import com.github.catvod.net.Net;
 import com.github.catvod.net.NetOptions;
 import com.github.catvod.net.NetSocket;
-import com.github.catvod.utils.Util;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import java.nio.charset.Charset;
-
 public class Connect {
-
-    private static final Gson GSON = new Gson();
 
     public static Object event(NetSocket.Event event) {
         JsonObject object = new JsonObject();
@@ -27,36 +21,21 @@ public class Connect {
 
     public static Object result(NetOptions options, Net.Result result) {
         try {
-            JsonObject object = new JsonObject();
-            if (result.code instanceof Number code) object.addProperty("code", code.intValue());
-            else object.addProperty("code", String.valueOf(result.code));
-            object.add("headers", GSON.toJsonTree(result.headers));
-            if (result.error != null) {
-                object.addProperty("content", "");
-                object.addProperty("error", result.error);
-            } else {
-                return content(options, result, object);
-            }
-            return new QuickJS.Json(object.toString());
+            Object[] parts = result.parts(options);
+            String json = (String) parts[0];
+            return result.error == null ? content(options, json, parts[1]) : new QuickJS.Text(json, "content", "");
         } catch (Exception e) {
             return error(e);
         }
     }
 
-    private static Object content(NetOptions options, Net.Result result, JsonObject object) {
-        switch (options.getBuffer()) {
-            case 0 -> {
-                return new QuickJS.Text(object.toString(), "content", new String(result.body, Charset.forName(options.getCharset())));
-            }
-            case 1 -> {
-                return new QuickJS.ByteArray(object.toString(), "content", result.body);
-            }
-            case 2 -> object.addProperty("content", Util.base64(result.body));
-            case 3 -> {
-                return new QuickJS.Binary(object.toString(), "content", result.body);
-            }
-        }
-        return new QuickJS.Json(object.toString());
+    private static Object content(NetOptions options, String json, Object body) {
+        return switch (options.getBuffer()) {
+            case 0, 2 -> new QuickJS.Text(json, "content", (String) body);
+            case 1 -> new QuickJS.ByteArray(json, "content", (byte[]) body);
+            case 3 -> new QuickJS.Binary(json, "content", (byte[]) body);
+            default -> throw new IllegalArgumentException("Buffer must be an integer from 0 to 3");
+        };
     }
 
     public static Object error(Throwable error) {

@@ -16,16 +16,14 @@ public final class Scripts {
     private static final String RUN = """
             ((globals, source) => {
                 const target = globalThis, evaluate = eval, stringify = JSON.stringify;
-                const finite = Number.isFinite, number = Number, define = Object.defineProperty;
-                const tag = Function.prototype.call.bind(Object.prototype.toString);
+                const define = Object.defineProperty;
                 for (const key of Object.keys(globals)) define(target, key, {value: globals[key], writable: true, configurable: true});
-                return stringify(evaluate(source), (key, value) => {
-                    const type = typeof value;
-                    if (value === undefined || type === 'function' || type === 'symbol'
-                        || type === 'number' && !finite(value) || tag(value) === '[object Number]' && !finite(number(value))
-                        || tag(value) === '[object Map]' || tag(value) === '[object Set]' || tag(value) === '[object Promise]') throw new TypeError('Script result must be JSON');
+                const json = stringify(evaluate(source), (key, value) => {
+                    if (value && typeof value.then === 'function') throw new TypeError('Script result must be JSON');
                     return value;
                 });
+                if (json === undefined) throw new TypeError('Script result must be JSON');
+                return json;
             })
             """;
 

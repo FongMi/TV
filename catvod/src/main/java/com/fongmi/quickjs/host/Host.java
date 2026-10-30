@@ -23,7 +23,7 @@ public interface Host extends Net.Cookies {
         return Task.failedFuture(new UnsupportedOperationException("Dialog requires a compatible App"));
     }
 
-    default CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
+    default CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> callback) {
         return Task.failedFuture(new UnsupportedOperationException("Dialog actions require a compatible App"));
     }
 

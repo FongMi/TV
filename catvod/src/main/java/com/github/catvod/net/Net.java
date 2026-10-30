@@ -65,6 +65,7 @@ public final class Net implements AutoCloseable {
 
     @Keep
     public interface Cookies {
+
         String getCookie(String url);
 
         boolean setCookie(String url, String cookie);
@@ -222,11 +223,6 @@ public final class Net implements AutoCloseable {
         return cache.peek(key);
     }
 
-    public String cachedValue(String key, String options) {
-        checkOpen();
-        return cache.value(key, CacheOptions.from(options));
-    }
-
     public void refresh(String key, String options, Callable<String> loader) {
         if (loader == null) throw new IllegalArgumentException("Cache loader is required");
         CacheOptions config = CacheOptions.from(options);
@@ -362,13 +358,11 @@ public final class Net implements AutoCloseable {
 
     public <T, R> List<R> map(List<T> items, Mapper<T, R> mapper, int limit) throws Exception {
         if (items == null || mapper == null || limit < 1) throw new IllegalArgumentException("Invalid map options");
-        NetMap<T, R> mapping;
-        synchronized (lock) {
+        if (items.isEmpty()) {
             checkOpen();
-            if (items.isEmpty()) return new ArrayList<>();
-            mapping = new NetMap<>(items, mapper, limit, this::removeMap);
-            maps.add(mapping);
+            return new ArrayList<>();
         }
+        NetMap<T, R> mapping = createMap(items, mapper, limit);
         try {
             return mapping.start().get();
         } catch (InterruptedException error) {
@@ -378,6 +372,15 @@ public final class Net implements AutoCloseable {
             if (error.getCause() instanceof Exception cause) throw cause;
             if (error.getCause() instanceof Error cause) throw cause;
             throw new IllegalStateException(error.getCause());
+        }
+    }
+
+    private <T, R> NetMap<T, R> createMap(List<T> items, Mapper<T, R> mapper, int limit) {
+        synchronized (lock) {
+            checkOpen();
+            NetMap<T, R> mapping = new NetMap<>(items, mapper, limit, this::removeMap);
+            maps.add(mapping);
+            return mapping;
         }
     }
 
@@ -397,30 +400,25 @@ public final class Net implements AutoCloseable {
 
     private Result[] batch(JsonArray requests, int limit) throws IOException {
         validateBatch(requests, limit);
-        Result[] results = new Result[requests.size()];
-        List<CompletableFuture<Result>> active = new ArrayList<>();
+        if (requests.isEmpty()) {
+            checkOpen();
+            return new Result[0];
+        }
+        NetMap<JsonElement, Result> mapping = createMap(requests.asList(), (value, index) -> batchRequest(value.getAsJsonObject()), limit);
         try {
-            for (int start = 0; start < requests.size(); start += active.size()) {
-                active.clear();
-                enqueueBatch(requests, start, limit, active);
-                awaitBatch(active, results, start);
-            }
-            return results;
+            return mapping.start().get().toArray(Result[]::new);
         } catch (InterruptedException e) {
             throw interrupted(e);
         } catch (ExecutionException e) {
             throw new IOException(e.getCause());
         } finally {
-            for (CompletableFuture<Result> request : active) if (!request.isDone()) request.cancel(true);
+            mapping.cancel();
         }
     }
 
-    private void enqueueBatch(JsonArray requests, int start, int limit, List<CompletableFuture<Result>> active) {
-        for (int index = start; index < requests.size() && active.size() < limit; index++) {
-            JsonObject item = requests.get(index).getAsJsonObject();
-            String url = item.get("url").getAsString();
-            active.add(requestAsync(url, NetOptions.from(item.get("options") == null ? null : item.get("options").toString())));
-        }
+    private Result batchRequest(JsonObject item) {
+        String url = item.get("url").getAsString();
+        return request(url, NetOptions.from(item.get("options") == null ? null : item.get("options").toString()));
     }
 
     private void validateBatch(JsonArray requests, int limit) {
@@ -433,10 +431,6 @@ public final class Net implements AutoCloseable {
         JsonObject item = value.getAsJsonObject();
         JsonElement url = item.get("url"), options = item.get("options");
         if (url == null || !url.isJsonPrimitive() || !url.getAsJsonPrimitive().isString() || options != null && !options.isJsonNull() && !options.isJsonObject()) throw new IllegalArgumentException("Invalid batch request");
-    }
-
-    private void awaitBatch(List<CompletableFuture<Result>> active, Result[] results, int start) throws InterruptedException, ExecutionException {
-        for (int index = 0; index < active.size(); index++) results[start + index] = active.get(index).get();
     }
 
     public Object[][] batchParts(String requests, int limit) throws IOException {

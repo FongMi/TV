@@ -15,7 +15,7 @@ public class NetOptions {
     private static final Gson GSON = new Gson();
 
     @SerializedName("buffer")
-    private Integer buffer;
+    private JsonElement buffer;
     @SerializedName("redirect")
     private Integer redirect;
     @SerializedName("timeout")
@@ -81,7 +81,16 @@ public class NetOptions {
     }
 
     public int getBuffer() {
-        return buffer == null ? 0 : buffer;
+        if (buffer == null || buffer.isJsonNull()) return 0;
+        if (!buffer.isJsonPrimitive() || !buffer.getAsJsonPrimitive().isNumber()) throw new IllegalArgumentException("Buffer must be an integer from 0 to 3");
+        int value;
+        try {
+            value = buffer.getAsBigDecimal().intValueExact();
+        } catch (ArithmeticException | NumberFormatException error) {
+            throw new IllegalArgumentException("Buffer must be an integer from 0 to 3", error);
+        }
+        if (value < 0 || value > 3) throw new IllegalArgumentException("Buffer must be an integer from 0 to 3");
+        return value;
     }
 
     public int getRedirect() {
@@ -121,7 +130,7 @@ public class NetOptions {
 
     public String getBody() {
         JsonElement raw = getRawBody();
-        if (raw != null && !raw.isJsonPrimitive()) throw new IllegalArgumentException("Body must be text");
+        if (raw != null && (!raw.isJsonPrimitive() || !raw.getAsJsonPrimitive().isString())) throw new IllegalArgumentException("Body must be text");
         return raw == null ? null : raw.getAsString();
     }
 

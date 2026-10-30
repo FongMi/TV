@@ -7,9 +7,9 @@ import com.fongmi.quickjs.utils.Scripts;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.runtime.QuickJsRuntime;
 
-import dalvik.system.DexClassLoader;
-
 import java.util.concurrent.CompletableFuture;
+
+import dalvik.system.DexClassLoader;
 
 public final class RuntimeEntry implements QuickJsRuntime {
 

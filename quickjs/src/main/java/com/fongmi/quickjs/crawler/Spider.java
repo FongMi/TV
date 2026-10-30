@@ -6,7 +6,6 @@ import com.fongmi.quickjs.Console;
 import com.fongmi.quickjs.QuickJS;
 import com.fongmi.quickjs.QuickJSContext;
 import com.fongmi.quickjs.QuickJSLoader;
-import com.fongmi.quickjs.bean.Res;
 import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.method.Global;
 import com.fongmi.quickjs.method.Invocation;
@@ -14,7 +13,6 @@ import com.fongmi.quickjs.utils.Module;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.RuntimeModule;
-import com.github.catvod.utils.Util;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,11 +20,14 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -44,7 +45,6 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private QuickJS ctx;
     private volatile Global global;
     private volatile boolean destroyed;
-    private boolean cat;
 
     public Spider(String api, DexClassLoader dex) {
         this(api, dex, Host.NONE);
@@ -80,8 +80,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private Object call(Invocation current, String func, Object... args) throws Exception {
         current.timeout("destroy".equals(func) || "stopDanmaku".equals(func) ? DESTROY_TIMEOUT : host.getCallTimeout());
-        CompletableFuture<Object> result = ctx.invoke("__JS_SPIDER__", func,
-                future -> beginCall(current, func, future), global::endCall, args);
+        CompletableFuture<Object> result = global.call(func, future -> beginCall(current, func), global::endCall, args);
         current.bind(result);
         try {
             return "destroy".equals(func) ? result.join() : result.get();
@@ -95,24 +94,21 @@ public class Spider extends com.github.catvod.crawler.Spider {
         }
     }
 
-    private void beginCall(Invocation current, String func, CompletableFuture<?> future) {
+    private void beginCall(Invocation current, String func) {
         if (destroyed && !"destroy".equals(func)) throw new IllegalStateException("Spider destroyed");
-        if (destroyed && !"destroy".equals(func)) future.cancel(false);
         global.beginCall(current);
     }
 
     private void logMetrics(Invocation current, String func) {
         Invocation.Metrics metrics = current.metrics();
-        SpiderDebug.log("quickjs", "%s total=%.2fms queue=%.2fms owner=%.2fms net=%.2fms html=%.2fms netOps=%d pending=%d streams=%d",
-                func, metrics.elapsedNanos() / 1e6, metrics.queuedNanos() / 1e6, metrics.ownerNanos() / 1e6,
-                metrics.networkNanos() / 1e6, metrics.htmlNanos() / 1e6, metrics.networkOperations(), metrics.pending(), metrics.streams());
+        SpiderDebug.log("quickjs", "%s total=%.2fms queue=%.2fms owner=%.2fms net=%.2fms html=%.2fms netOps=%d pending=%d streams=%d", func, metrics.elapsedNanos() / 1e6, metrics.queuedNanos() / 1e6, metrics.ownerNanos() / 1e6, metrics.networkNanos() / 1e6, metrics.htmlNanos() / 1e6, metrics.networkOperations(), metrics.pending(), metrics.streams());
     }
 
     @Override
     public void init(Context context, String extend) throws Exception {
         try {
             initializeJS();
-            call("init", getExt(extend));
+            call("init", extend);
         } catch (Exception | Error error) {
             failInitialization(error);
             throw error;
@@ -130,57 +126,60 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     @Override
     public String homeContent(boolean filter) throws Exception {
-        return (String) call("home", filter);
+        return (String) call("homeContent", filter);
     }
 
     @Override
     public String homeVideoContent() throws Exception {
-        return (String) call("homeVod");
+        return (String) call("homeVideoContent");
     }
 
     @Override
     public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) throws Exception {
-        return (String) call("category", tid, pg, filter, new QuickJS.Json(new JSONObject(extend).toString()));
+        return (String) call("categoryContent", tid, pg, filter, new QuickJS.Json(new JSONObject(extend).toString()));
     }
 
     @Override
     public String detailContent(List<String> ids) throws Exception {
-        return (String) call("detail", ids.get(0));
+        return (String) call("detailContent", (Object) ids.toArray());
     }
 
     @Override
     public String searchContent(String key, boolean quick) throws Exception {
-        return (String) call("search", key, quick);
+        return searchContent(key, quick, "1");
     }
 
     @Override
     public String searchContent(String key, boolean quick, String pg) throws Exception {
-        return (String) call("search", key, quick, pg);
+        return (String) call("searchContent", key, quick, pg);
     }
 
     @Override
     public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
-        return (String) call("play", flag, id, vipFlags.toArray());
+        return (String) call("playerContent", flag, id, vipFlags.toArray());
     }
 
     @Override
     public String liveContent(String url) throws Exception {
-        return (String) call("live", url);
+        return (String) call("liveContent", url);
     }
 
     @Override
     public boolean manualVideoCheck() throws Exception {
-        return (Boolean) call("sniffer");
+        return (Boolean) call("manualVideoCheck");
     }
 
     @Override
     public boolean isVideoFormat(String url) throws Exception {
-        return (Boolean) call("isVideo", url);
+        return (Boolean) call("isVideoFormat", url);
     }
 
     @Override
     public Object[] proxy(Map<String, String> params) throws Exception {
-        return "catvod".equals(params.get("from")) ? proxy2(params) : proxy1(params);
+        try (Invocation current = new Invocation(true)) {
+            Object[] array = (Object[]) call(current, "proxy", new QuickJS.Json(new JSONObject(params).toString()));
+            return proxyResponse(current, array);
+        }
     }
 
     @Override
@@ -209,37 +208,52 @@ public class Spider extends com.github.catvod.crawler.Spider {
     public synchronized void destroy() {
         if (destroyed) return;
         destroyed = true;
-        try {
-            cancelRequests();
-            destroyScript();
-        } finally {
-            closeContext();
-        }
+        Throwable failure = cancelRequests();
+        failure = cancelPending(failure);
+        failure = destroyScript(failure);
+        failure = closeContext(failure);
+        if (failure instanceof RuntimeException error) throw error;
+        if (failure instanceof Error error) throw error;
+        if (failure != null) throw new IllegalStateException("Cannot destroy JavaScript spider", failure);
     }
 
-    private void cancelRequests() {
+    private Throwable cancelRequests() {
         try {
             if (global != null) global.cancelRequests();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (RuntimeException | Error error) {
+            return error;
         }
+        return null;
     }
 
-    private void destroyScript() {
+    private Throwable cancelPending(Throwable failure) {
         try {
             if (ctx != null) ctx.cancelPending();
-            call("destroy");
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
         }
+        return failure;
     }
 
-    private void closeContext() {
+    private Throwable destroyScript(Throwable failure) {
+        try {
+            if (global != null) call("destroy");
+        } catch (Exception | Error error) {
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
+        }
+        return failure;
+    }
+
+    private Throwable closeContext(Throwable failure) {
         try {
             releaseJS();
-        } catch (Throwable e) {
-            e.printStackTrace();
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
         }
+        return failure;
     }
 
     private void releaseJS() {
@@ -251,8 +265,6 @@ public class Spider extends com.github.catvod.crawler.Spider {
         ctx = new QuickJS(QuickJSLoader::init);
         ctx.submit(this::bindGlobals).get();
         ctx.setModuleLoader(module).get();
-        await(ctx.evaluate(RuntimeModule.QUICKJS.readAsset("js/lib/net.js"), "lib/net.js"));
-        await(ctx.evaluate(RuntimeModule.QUICKJS.readAsset("js/lib/ui.js"), "lib/ui.js"));
         ctx.submit(() -> {
             createFun();
             return null;
@@ -279,94 +291,85 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private void createObj() throws Exception {
-        String spider = "__JS_SPIDER__";
-        String global = "globalThis." + spider;
         String content = module.load(api);
-        cat = content.contains("__jsEvalReturn");
-        await(ctx.evaluateModule(content.replace(spider, global), api));
-        await(ctx.evaluateModule(String.format(RuntimeModule.QUICKJS.readAsset("js/lib/spider.js"), JSONObject.quote(api), JSONObject.quote(siteKey)), api + "#spider"));
+        evaluateModule(content, api);
+        evaluateModule(String.format(RuntimeModule.QUICKJS.readAsset("js/lib/spider.js"), JSONObject.quote(api)), api + "#spider");
     }
 
-    private Object getExt(String ext) throws Exception {
-        if (!cat) return Json.isObj(ext) ? new QuickJS.Json(ext) : ext;
-        JSONObject object = new JSONObject().put("stype", 3).put("skey", siteKey);
-        object.put("ext", Json.isObj(ext) ? new JSONObject(ext) : ext);
-        return new QuickJS.Json(object.toString());
-    }
-
-    private Object[] proxy1(Map<String, String> params) throws Exception {
-        try (Invocation current = new Invocation(true)) {
-            Object[] array = (Object[]) call(current, "proxy", new QuickJS.Json(new JSONObject(params).toString()));
-            return proxyResponse(current, array);
+    private void evaluateModule(String source, String name) throws Exception {
+        try (Invocation current = new Invocation()) {
+            current.timeout(host.getCallTimeout());
+            CompletableFuture<Object> result = ctx.evaluateModule(source, name, future -> global.beginCall(current), global::endCall);
+            current.bind(result);
+            await(result);
         }
     }
 
     private Object[] proxyResponse(Invocation current, Object[] array) throws Exception {
-        if (array.length < 3) throw new IllegalArgumentException("Invalid proxy response");
-        Object body = jsonValue(array[2]);
-        boolean streaming = body instanceof JSONObject handle && handle.length() == 1 && handle.has("$tvStream");
-        Object header = array.length > 3 ? array[3] : null;
-        Map<String, String> headers = proxyHeaders(header, streaming);
-        JSONArray metadata = new JSONArray().put(array[0]).put(array[1]).put(array.length > 4 ? array[4] : null);
-        if (streaming) {
-            if (metadata.optInt(2) == 1) throw new IllegalArgumentException("Streams cannot be base64 encoded");
-            int code = metadata.optInt(0);
-            if (code < 100 || code > 599) throw new IllegalArgumentException("Invalid stream response status");
-            return new Object[]{code, metadata.optString(1), current.takeStream(((JSONObject) body).getString("$tvStream")), headers};
-        }
-        return new Object[]{metadata.optInt(0), metadata.optString(1), getStream(body, metadata.optInt(2) == 1), headers};
+        if (array == null || array.length < 3 || array.length > 4) throw new IllegalArgumentException("Proxy response requires three or four fields");
+        int code = proxyCode(array[0]);
+        if (!(array[1] instanceof String mime)) throw new IllegalArgumentException("Proxy response MIME requires a string");
+        Map<String, String> headers = proxyHeaders(array.length > 3 ? array[3] : null);
+        InputStream body = proxyBody(current, array[2]);
+        return new Object[]{code, mime, body, headers};
     }
 
-    private Map<String, String> proxyHeaders(Object header, boolean streaming) throws JSONException {
-        if (streaming) return streamHeaders(header);
-        return header == null ? null : Json.toMap(header instanceof QuickJS.Json(String text) ? text : String.valueOf(header));
+    private int proxyCode(Object value) {
+        if (!(value instanceof Number number)) throw new IllegalArgumentException("Proxy response status requires an integer from 100 to 599");
+        int code = number.intValue();
+        if (number.doubleValue() != code || code < 100 || code > 599) throw new IllegalArgumentException("Proxy response status requires an integer from 100 to 599");
+        return code;
     }
 
-    private Map<String, String> streamHeaders(Object header) throws JSONException {
+    private Map<String, String> proxyHeaders(Object header) throws JSONException {
         if (header == null) return null;
-        JSONObject object = new JSONObject(header instanceof QuickJS.Json(String text) ? text : String.valueOf(header));
+        if (!(header instanceof QuickJS.Json(String text))) throw new IllegalArgumentException("Proxy response headers require an object");
+        JSONObject object = new JSONObject(text);
         Map<String, String> headers = new LinkedHashMap<>();
         for (Iterator<String> keys = object.keys(); keys.hasNext(); ) {
             String key = keys.next();
-            headers.put(key, streamHeaderValue(object.get(key)));
+            headers.put(key, headerValue(object.get(key)));
         }
         return headers;
     }
 
-    private String streamHeaderValue(Object value) throws JSONException {
-        if (value instanceof JSONArray values) {
-            StringBuilder joined = new StringBuilder();
-            for (int i = 0; i < values.length(); i++) {
-                if (!(values.get(i) instanceof String part)) throw new IllegalArgumentException("Invalid stream response header");
-                if (i > 0) joined.append(", ");
-                joined.append(part);
-            }
-            value = joined.toString();
+    private String headerValue(Object value) throws JSONException {
+        if (value instanceof String text) return text;
+        if (!(value instanceof JSONArray values)) throw new IllegalArgumentException("Invalid proxy response header");
+        StringJoiner joined = new StringJoiner(", ");
+        for (int i = 0; i < values.length(); i++) {
+            if (!(values.get(i) instanceof String text)) throw new IllegalArgumentException("Invalid proxy response header");
+            joined.add(text);
         }
-        if (!(value instanceof String text)) throw new IllegalArgumentException("Invalid stream response header");
-        return text;
+        return joined.toString();
     }
 
-    private Object[] proxy2(Map<String, String> params) throws Exception {
-        String url = params.get("url");
-        String header = params.get("header");
-        String proxy = (String) call("proxy", (Object) url.split("/"), new QuickJS.Json(header));
-        Res res = Res.objectFrom(proxy);
-        return new Object[]{res.getCode(), res.getContentType(), res.getStream()};
+    private InputStream proxyBody(Invocation current, Object value) throws JSONException {
+        if (value instanceof QuickJS.Json(String text)) value = new JSONTokener(text).nextValue();
+        if (value instanceof JSONObject stream && stream.length() == 1 && stream.has("$tvStream")) return current.takeStream(stream.getString("$tvStream"));
+        if (value instanceof byte[] bytes) return new ByteArrayInputStream(bytes);
+        if (value instanceof String text) return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
+        if (value instanceof Object[] array) return new ByteArrayInputStream(proxyBytes(array));
+        if (value instanceof JSONArray array) return new ByteArrayInputStream(proxyBytes(array));
+        throw new IllegalArgumentException("Proxy response body requires text or bytes");
     }
 
-    private ByteArrayInputStream getStream(Object o, boolean base64) {
-        if (o instanceof byte[] bytes) return new ByteArrayInputStream(bytes);
-        String content = String.valueOf(o);
-        if (base64 && content.contains("base64,")) content = content.split("base64,")[1];
-        return new ByteArrayInputStream(base64 ? Util.decode(content) : content.getBytes());
+    private byte[] proxyBytes(Object[] array) {
+        byte[] bytes = new byte[array.length];
+        for (int i = 0; i < bytes.length; i++) bytes[i] = proxyByte(array[i]);
+        return bytes;
     }
 
-    private Object jsonValue(Object value) throws JSONException {
-        if (value instanceof QuickJS.Json(String text)) return new JSONTokener(text).nextValue();
-        if (!(value instanceof Object[] items)) return value;
-        JSONArray array = new JSONArray();
-        for (Object item : items) array.put(jsonValue(item));
-        return array;
+    private byte[] proxyBytes(JSONArray array) {
+        byte[] bytes = new byte[array.length()];
+        for (int i = 0; i < bytes.length; i++) bytes[i] = proxyByte(array.opt(i));
+        return bytes;
+    }
+
+    private byte proxyByte(Object value) {
+        if (!(value instanceof Number number)) throw new IllegalArgumentException("Proxy bytes must be integers from 0 to 255");
+        int byteValue = number.intValue();
+        if (number.doubleValue() != byteValue || byteValue < 0 || byteValue > 255) throw new IllegalArgumentException("Proxy bytes must be integers from 0 to 255");
+        return (byte) byteValue;
     }
 }

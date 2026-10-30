@@ -347,7 +347,7 @@ public final class SpiderTest implements Process, AutoCloseable {
 
         synchronized JSONObject play(JSONObject body) throws Exception {
             requireIdle();
-            if (runtime == null || !runtime.isLoaded() || !state.equals("done") || !method.equals("play") || !output.equals(body.getString("result"))) throw new IllegalStateException("Run play successfully before sending its result");
+            if (runtime == null || !runtime.isLoaded() || !state.equals("done") || !method.equals("playerContent") || !output.equals(body.getString("result"))) throw new IllegalStateException("Run playerContent successfully before sending its result");
             Result result = Result.fromJson(output);
             if (result.getUrl().isEmpty()) throw new IllegalArgumentException("Playback URL is empty");
             ServerEvent.push(runtime.preview(output));

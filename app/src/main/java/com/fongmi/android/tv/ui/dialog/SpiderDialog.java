@@ -68,7 +68,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
     private final CompletableFuture<String> result = new CompletableFuture<>();
     private final Map<String, Input> inputs = new LinkedHashMap<>();
     private final Map<Integer, ButtonOptions> buttons = new LinkedHashMap<>();
-    private final Function<String, CompletableFuture<String>> onAction;
+    private final Function<String, CompletableFuture<String>> callback;
     private CompletableFuture<String> action;
     private FragmentActivity activity;
     private AlertDialog dialog;
@@ -83,8 +83,8 @@ public final class SpiderDialog implements LifecycleEventObserver {
         return show(options, null);
     }
 
-    public static CompletableFuture<String> show(String options, Function<String, CompletableFuture<String>> onAction) {
-        SpiderDialog request = new SpiderDialog(onAction);
+    public static CompletableFuture<String> show(String options, Function<String, CompletableFuture<String>> callback) {
+        SpiderDialog request = new SpiderDialog(callback);
         CompletableFuture<String> completion = request.result.whenCompleteAsync((value, error) -> request.close(), App::post);
         completion.whenComplete((value, error) -> {
             if (completion.isCancelled()) request.cancel();
@@ -93,8 +93,8 @@ public final class SpiderDialog implements LifecycleEventObserver {
         return completion;
     }
 
-    private SpiderDialog(Function<String, CompletableFuture<String>> onAction) {
-        this.onAction = onAction;
+    private SpiderDialog(Function<String, CompletableFuture<String>> callback) {
+        this.callback = callback;
     }
 
     private void showDialog(String options) {
@@ -403,7 +403,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
         String label = button.getString("label");
         if (id.isBlank() || label.isBlank() || !ids.add(id)) throw new IllegalArgumentException("Dialog buttons require unique ids and nonempty labels");
         boolean close = flag(button, "close", true);
-        if (!close && onAction == null) throw new IllegalArgumentException("Nonclosing dialog buttons require onAction");
+        if (!close && callback == null) throw new IllegalArgumentException("Nonclosing dialog buttons require callback");
         return new ButtonOptions(id, label, close, validateNames(button.has("validate") ? button.getJSONArray("validate") : null), flag(button, "enabled", true));
     }
 
@@ -443,7 +443,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
         try {
             if (!validateInputs(button)) return;
             String event = inputEvent(button.id);
-            if (onAction == null) {
+            if (callback == null) {
                 result.complete(event);
             } else {
                 startAction(which, button, event);
@@ -461,7 +461,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
 
     private void startAction(int which, ButtonOptions button, String event) {
         setBusy(true, which);
-        action = Objects.requireNonNull(onAction.apply(event));
+        action = Objects.requireNonNull(callback.apply(event));
         CompletableFuture<String> current = action;
         current.whenComplete((update, error) -> App.post(() -> completeAction(current, which, button, update, error)));
     }

@@ -50,9 +50,10 @@ export function gbkTool() {
             });
         },
         decode: function(str) {
-            return str.replace(/%[0-9A-F]{2}%[0-9A-F]{2}/g, function(a) {
-                if (a in G2Uhash) {
-                    return String.fromCharCode('0x' + G2Uhash[a]);
+            return str.replace(/%[89A-F][0-9A-F]%[0-9A-F]{2}/gi, function(a) {
+                var key = a.toUpperCase();
+                if (key in G2Uhash) {
+                    return String.fromCharCode('0x' + G2Uhash[key]);
                 } else {
                     return a;
                 }

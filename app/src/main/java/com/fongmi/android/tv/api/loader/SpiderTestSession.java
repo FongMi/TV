@@ -192,24 +192,46 @@ public final class SpiderTestSession implements AutoCloseable {
     }
 
     static Object call(Spider spider, String method, JSONArray args) throws Exception {
+        checkArgs(method, args);
         return switch (method) {
-            case "home" -> spider.homeContent(args.getBoolean(0));
-            case "homeVod" -> spider.homeVideoContent();
-            case "category" -> spider.categoryContent(args.getString(0), args.getString(1), args.getBoolean(2), stringMap(args.getJSONObject(3)));
-            case "detail" -> spider.detailContent(strings(args.getJSONArray(0)));
-            case "search" -> {
-                String keyword = args.getString(0), page = args.getString(2);
-                boolean quick = args.getBoolean(1);
-                yield page.equals("1") ? spider.searchContent(keyword, quick) : spider.searchContent(keyword, quick, page);
+            case "homeContent" -> spider.homeContent(bool(args, 0));
+            case "homeVideoContent" -> spider.homeVideoContent();
+            case "categoryContent" -> spider.categoryContent(string(args.get(0)), string(args.get(1)), bool(args, 2), stringMap(args.getJSONObject(3)));
+            case "detailContent" -> spider.detailContent(strings(args.getJSONArray(0)));
+            case "searchContent" -> {
+                String key = string(args.get(0)), pg = args.length() > 2 ? string(args.get(2)) : "1";
+                boolean quick = bool(args, 1);
+                yield pg.equals("1") ? spider.searchContent(key, quick) : spider.searchContent(key, quick, pg);
             }
-            case "play" -> spider.playerContent(args.getString(0), args.getString(1), strings(args.getJSONArray(2)));
-            case "action" -> spider.action(args.getString(0));
-            case "live" -> spider.liveContent(args.getString(0));
-            case "sniffer" -> spider.manualVideoCheck();
-            case "isVideo" -> spider.isVideoFormat(args.getString(0));
+            case "playerContent" -> spider.playerContent(string(args.get(0)), string(args.get(1)), strings(args.getJSONArray(2)));
+            case "action" -> spider.action(string(args.get(0)));
+            case "liveContent" -> spider.liveContent(string(args.get(0)));
+            case "manualVideoCheck" -> spider.manualVideoCheck();
+            case "isVideoFormat" -> spider.isVideoFormat(string(args.get(0)));
             case "proxy" -> spider.proxy(stringMap(args.getJSONObject(0)));
             default -> throw new IllegalArgumentException("Unknown crawler method: " + method);
         };
+    }
+
+    private static void checkArgs(String method, JSONArray args) {
+        int count = switch (method) {
+            case "homeVideoContent", "manualVideoCheck" -> 0;
+            case "homeContent", "detailContent", "liveContent", "isVideoFormat", "action", "proxy" -> 1;
+            case "searchContent", "playerContent" -> 3;
+            case "categoryContent" -> 4;
+            default -> throw new IllegalArgumentException("Unknown crawler method: " + method);
+        };
+        if (args.length() != count && !(method.equals("searchContent") && args.length() == 2)) throw new IllegalArgumentException("Invalid crawler arguments: " + method);
+    }
+
+    private static boolean bool(JSONArray args, int index) throws Exception {
+        if (args.get(index) instanceof Boolean value) return value;
+        throw new IllegalArgumentException("Crawler argument requires a boolean: " + index);
+    }
+
+    private static String string(Object value) {
+        if (value instanceof String text) return text;
+        throw new IllegalArgumentException("Crawler argument requires a string");
     }
 
     private static HashMap<String, String> stringMap(JSONObject object) throws Exception {
@@ -217,14 +239,14 @@ public final class SpiderTestSession implements AutoCloseable {
         Iterator<String> keys = object.keys();
         while (keys.hasNext()) {
             String key = keys.next();
-            values.put(key, object.getString(key));
+            values.put(key, string(object.get(key)));
         }
         return values;
     }
 
     private static List<String> strings(JSONArray array) throws Exception {
         List<String> values = new ArrayList<>();
-        for (int i = 0; i < array.length(); i++) values.add(array.getString(i));
+        for (int i = 0; i < array.length(); i++) values.add(string(array.get(i)));
         return values;
     }
 

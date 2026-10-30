@@ -1,16 +1,16 @@
 const SPIDER_METHODS = [
-    ['home', '[true]', 'home(filter)'], ['homeVod', '[]', 'homeVod()'],
-    ['category', '["","1",true,{}]', 'category(tid, page, filter, extend)'],
-    ['search', '["",false,"1"]', 'search(keyword, quick, page)'],
-    ['detail', '[[""]]', 'detail([ids])'], ['play', '["","",[]]', 'play(flag, id, vipFlags)'],
-    ['action', '[""]', 'action(value)'], ['live', '[""]', 'live(url)'],
-    ['sniffer', '[]', 'sniffer()'], ['isVideo', '[""]', 'isVideo(url)'], ['proxy', '[{}]', 'proxy(params)']
+    ['homeContent', '[true]', 'homeContent(filter)'], ['homeVideoContent', '[]', 'homeVideoContent()'],
+    ['categoryContent', '["","1",true,{}]', 'categoryContent(tid, pg, filter, extend)'],
+    ['searchContent', '["",false,"1"]', 'searchContent(key, quick, pg)'],
+    ['detailContent', '[[""]]', 'detailContent(ids)'], ['playerContent', '["","",[]]', 'playerContent(flag, id, vipFlags)'],
+    ['action', '[""]', 'action(action)'], ['liveContent', '[""]', 'liveContent(url)'],
+    ['manualVideoCheck', '[]', 'manualVideoCheck()'], ['isVideoFormat', '[""]', 'isVideoFormat(url)'], ['proxy', '[{}]', 'proxy(params)']
 ];
 
 const SPIDER_PARAMETERS = {
-    home: [['filter', 'boolean']], homeVod: [], category: [['category', 'string'], ['page', 'string'], ['filter', 'boolean'], ['extend', 'object']],
-    search: [['keyword', 'string'], ['quick', 'boolean'], ['page', 'string']], detail: [['ids', 'array']], play: [['flag', 'string'], ['id', 'string'], ['vipFlags', 'array']],
-    action: [['value', 'string']], live: [['url', 'string']], sniffer: [], isVideo: [['url', 'string']], proxy: [['params', 'object']]
+    homeContent: [['filter', 'boolean']], homeVideoContent: [], categoryContent: [['tid', 'string'], ['pg', 'string'], ['filter', 'boolean'], ['extend', 'object']],
+    searchContent: [['key', 'string'], ['quick', 'boolean'], ['pg', 'string']], detailContent: [['ids', 'array']], playerContent: [['flag', 'string'], ['id', 'string'], ['vipFlags', 'array']],
+    action: [['action', 'string']], liveContent: [['url', 'string']], manualVideoCheck: [], isVideoFormat: [['url', 'string']], proxy: [['params', 'object']]
 };
 
 const SPIDER_SYMBOLS = {
@@ -22,14 +22,14 @@ const SPIDER_SYMBOLS = {
 
 function spiderParameterValue(value, type) {
     const parsed = type === 'string' ? value : JSON.parse(value);
-    if (type === 'boolean' && typeof parsed !== 'boolean' || type === 'array' && (!Array.isArray(parsed) || parsed.some(value => typeof value !== 'string')) || type === 'object' && (!parsed || typeof parsed !== 'object' || Array.isArray(parsed))) throw new Error('Invalid argument');
+    if (type === 'boolean' && typeof parsed !== 'boolean' || type === 'array' && (!Array.isArray(parsed) || parsed.some(value => typeof value !== 'string')) || type === 'object' && (!parsed || typeof parsed !== 'object' || Array.isArray(parsed) || Object.values(parsed).some(value => typeof value !== 'string'))) throw new Error('Invalid argument');
     return parsed;
 }
 
 function spiderParameters(method, text) {
     try {
         const args = JSON.parse(text), schema = SPIDER_PARAMETERS[method];
-        if (!schema || !Array.isArray(args) || args.length !== schema.length && !(method === 'search' && args.length === 2)) return null;
+        if (!schema || !Array.isArray(args) || args.length !== schema.length && !(method === 'searchContent' && args.length === 2)) return null;
         return args.map((value, index) => spiderParameter(schema[index], value));
     } catch {
         return null;
@@ -75,10 +75,9 @@ class SpiderHistory {
     }
 
     addEntry(entry) {
-        if (!entry || !['api', 'jar', 'ext'].every(key => typeof entry[key] === 'string') || !entry.api.trim()) return;
-        const method = SPIDER_METHODS.some(([name]) => name === entry.method) ? entry.method : 'home';
+        if (!entry || !['api', 'jar', 'ext'].every(key => typeof entry[key] === 'string') || !entry.api.trim() || !SPIDER_METHODS.some(([name]) => name === entry.method)) return;
         const parameters = Object.fromEntries(SPIDER_METHODS.filter(([name]) => typeof entry.parameters?.[name] === 'string').map(([name]) => [name, entry.parameters[name]]));
-        const value = {api: entry.api.trim(), jar: entry.jar.trim(), ext: entry.ext, method, parameters};
+        const value = {api: entry.api.trim(), jar: entry.jar.trim(), ext: entry.ext, method: entry.method, parameters};
         if (!this.find(value)) this.entries.push(value);
     }
 
@@ -167,7 +166,8 @@ class SpiderCases {
     }
 
     addEntry(entry) {
-        if (typeof entry?.source !== 'string' || typeof entry.name !== 'string' || !entry.name.trim() || entry.name.length > 80 || !SPIDER_METHODS.some(([name]) => name === entry.method)) return;
+        const method = entry?.method;
+        if (typeof entry?.source !== 'string' || typeof entry.name !== 'string' || !entry.name.trim() || entry.name.length > 80 || !SPIDER_METHODS.some(([name]) => name === method)) return;
         let expected;
         try {
             if (!Array.isArray(JSON.parse(entry.args))) return;
@@ -175,7 +175,7 @@ class SpiderCases {
         } catch {
             return;
         }
-        if (!this.entries.some(value => value.source === entry.source && value.name === entry.name.trim())) this.entries.push({source: entry.source, name: entry.name.trim(), method: entry.method, args: entry.args, expected});
+        if (!this.entries.some(value => value.source === entry.source && value.name === entry.name.trim())) this.entries.push({source: entry.source, name: entry.name.trim(), method, args: entry.args, expected});
     }
 
     list(config) {return this.entries.filter(entry => entry.source === spiderSourceKey(config));}
@@ -421,21 +421,21 @@ function spiderValidate(method, text) {
     const issues = [];
     let truncated = false;
     const add = (path, code) => {if (issues.length < 100) issues.push({path, code}); else truncated = true;};
-    if (method === 'action' || method === 'live') return {checked: false, issues};
+    if (method === 'action' || method === 'liveContent') return {checked: false, issues};
     let result;
     try {
         result = JSON.parse(text);
     } catch {
         return {checked: true, issues: [{path: '$', code: 'json'}]};
     }
-    if (method === 'sniffer' || method === 'isVideo') {
+    if (method === 'manualVideoCheck' || method === 'isVideoFormat') {
         if (typeof result !== 'boolean') add('$', 'boolean');
         return {checked: true, issues};
     }
     const object = value => value !== null && typeof value === 'object' && !Array.isArray(value);
     const value = field => (typeof field === 'string' || typeof field === 'number') && String(field).trim() !== '';
     if (!object(result)) return {checked: true, issues: [{path: '$', code: 'object'}]};
-    if (method === 'play') {
+    if (method === 'playerContent') {
         if (!spiderPlaybackUrls(result.url).length) add('/url', 'url');
         if (result.parse != null && ![0, 1, '0', '1'].includes(result.parse)) add('/parse', 'parse');
         let header = result.header;
@@ -452,7 +452,7 @@ function spiderValidate(method, text) {
         if (typeof result.mime !== 'string') add('/mime', 'string');
         if (typeof result.body !== 'string' || result.bodyEncoding !== 'base64') add('/body', 'string');
     } else {
-        if (method === 'home' && !('class' in result) && !('list' in result)) add('/class', 'array');
+        if (method === 'homeContent' && !('class' in result) && !('list' in result)) add('/class', 'array');
         if ('class' in result) {
             if (!Array.isArray(result.class)) {
                 add('/class', 'array');
@@ -461,11 +461,11 @@ function spiderValidate(method, text) {
                 result.class.forEach((item, index) => validateClassItem(item, index, ids));
             }
         }
-        if (method !== 'home' || 'list' in result) {
+        if (method !== 'homeContent' || 'list' in result) {
             if (!Array.isArray(result.list)) add('/list', 'array');
             else result.list.forEach(validateListItem);
         }
-        if (method === 'category' || method === 'search') {
+        if (method === 'categoryContent' || method === 'searchContent') {
             for (const key of ['page', 'pagecount', 'limit', 'total']) {
                 if (result[key] !== undefined && (!/^[0-9]+$/.test(String(result[key])) || !Number.isSafeInteger(Number(result[key])) || Number(result[key]) < (key === 'page' ? 1 : 0))) add('/' + key, 'number');
             }
@@ -489,7 +489,7 @@ function spiderValidate(method, text) {
         }
         if (!value(item.vod_id) && !value(item.action)) add(path + '/vod_id', 'required');
         if (!value(item.vod_name)) add(path + '/vod_name', 'required');
-        if (method === 'detail' && ('vod_play_from' in item || 'vod_play_url' in item)) {
+        if (method === 'detailContent' && ('vod_play_from' in item || 'vod_play_url' in item)) {
             if (typeof item.vod_play_from !== 'string' || typeof item.vod_play_url !== 'string') add(path + '/vod_play_url', 'string');
             else if (item.vod_play_from.split('$$$').length !== item.vod_play_url.split('$$$').length) add(path + '/vod_play_url', 'lines');
         }
@@ -499,7 +499,7 @@ function spiderValidate(method, text) {
 }
 
 async function spiderSuite(call, changed, active = () => true) {
-    const steps = ['home', 'category', 'detail', 'play'].map(method => ({method, state: 'pending'}));
+    const steps = ['homeContent', 'categoryContent', 'detailContent', 'playerContent'].map(method => ({method, state: 'pending'}));
     let args = [true], proceed = true;
     for (const step of steps) {
         if (!proceed || !active()) {
@@ -521,8 +521,8 @@ async function spiderSuite(call, changed, active = () => true) {
             applySuiteResult(step, result);
             if (step.state !== 'passed') {
                 proceed = false;
-            } else if (step.method !== 'play') {
-                const next = {home: 'category', category: 'detail', detail: 'play'}[step.method];
+            } else if (step.method !== 'playerContent') {
+                const next = {homeContent: 'categoryContent', categoryContent: 'detailContent', detailContent: 'playerContent'}[step.method];
                 const choice = spiderChoices(step.text).find(value => value.method === next);
                 if (choice) args = choice.args;
                 else proceed = false;
@@ -618,15 +618,15 @@ function addSpiderChoice(item, classes, value, add) {
     const id = value(classes ? item.type_id : item.vod_id);
     const name = value(classes ? item.type_name : item.vod_name);
     if (classes) {
-        if (id) add(name || id, 'category', [id, '1', true, {}]);
+        if (id) add(name || id, 'categoryContent', [id, '1', true, {}]);
     } else if (value(item.action)) {
         add(name || value(item.action), 'action', [value(item.action)]);
     } else if (item.vod_tag === 'folder' || item.cate !== undefined && item.cate !== null) {
-        if (id) add(name || id, 'category', [id, '1', true, {}]);
+        if (id) add(name || id, 'categoryContent', [id, '1', true, {}]);
     } else if (value(item.vod_play_url)) {
         addSpiderPlaybackChoices(item, value, add);
     } else if (id) {
-        add(name || id, 'detail', [[id]]);
+        add(name || id, 'detailContent', [[id]]);
     }
 }
 
@@ -645,7 +645,7 @@ function addSpiderEpisodes(flag, line, add) {
         const separator = episode.indexOf('$');
         const url = (separator < 0 ? episode : episode.slice(separator + 1)).trim();
         const label = separator < 0 ? String(index + 1).padStart(2, '0') : episode.slice(0, separator).trim();
-        if (url) add(flag + ' · ' + (label || String(index + 1).padStart(2, '0')), 'play', [flag, url, []]);
+        if (url) add(flag + ' · ' + (label || String(index + 1).padStart(2, '0')), 'playerContent', [flag, url, []]);
     });
 }
 
@@ -755,7 +755,7 @@ async function initSpider() {
 
     function restoreArguments() {
         const entry = history.find(config());
-        el('method').value = entry?.method || 'home';
+        el('method').value = entry?.method || 'homeContent';
         el('args').value = entry?.parameters[el('method').value] ?? SPIDER_METHODS.find(([name]) => name === el('method').value)[1];
         renderArguments();
     }
@@ -782,7 +782,7 @@ async function initSpider() {
             input.rows = 2;
             input.classList.add('spider-json');
         }
-        if (name === 'page') input.inputMode = 'numeric';
+        if (name === 'pg') input.inputMode = 'numeric';
         input.spellcheck = false;
         input.autocomplete = 'off';
         input.value = text;
@@ -1301,7 +1301,7 @@ async function initSpider() {
         el('validation').textContent = validation?.checked ? t(validation.truncated ? 'spiderCheckLimit' : validation.issues.length ? 'spiderCheckIssues' : 'spiderCheckPassed', String(validation.issues.length)) : '';
         el('check').hidden = !validation?.issues.length;
         el('location').hidden = info.state !== 'error' || !source || source.path !== info.api || !spiderErrorLocation(info.result, source.path, rootPath);
-        el('playback').hidden = resultMethod !== 'play' || !validation?.checked || spiderValidate(resultMethod, info.result).issues.length > 0 || !matches();
+        el('playback').hidden = resultMethod !== 'playerContent' || !validation?.checked || spiderValidate(resultMethod, info.result).issues.length > 0 || !matches();
         el('feedback').hidden = !el('validation').textContent && el('location').hidden && el('playback').hidden;
     }
 

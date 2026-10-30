@@ -1,57 +1,44 @@
-import * as spider from %s;
+import * as entry from %s;
+import host from 'catvod:host';
+import {Spider} from 'catvod';
+import {stringify} from 'assets://js/lib/net.js';
+import {dialogActions} from 'assets://js/lib/dialog.js';
 
-const site = Object.freeze({type: 3, key: %s});
-
-loadSpider();
-const api = globalThis.__JS_SPIDER__;
-if (api) globalThis.__JS_SPIDER__ = createSpider(api);
-
-function loadSpider() {
-    if (globalThis.__JS_SPIDER__) return;
-    if (spider.__jsEvalReturn) {
-        globalThis.req = http;
-        globalThis.__JS_SPIDER__ = spider.__jsEvalReturn();
-    } else if (spider.default) {
-        globalThis.__JS_SPIDER__ = typeof spider.default === 'function' ? spider.default(site) : spider.default;
-    }
-}
+if (typeof entry.default !== 'function' || !(entry.default.prototype instanceof Spider)) throw new TypeError('Spider requires a default class extending Spider');
+host.attach(createSpider(new entry.default()), dialogActions);
 
 function createSpider(api) {
     const wrapped = Object.create(api);
-    for (const name of ['home', 'homeVod', 'category', 'detail', 'search', 'play', 'live', 'action']) bindSpiderMethod(wrapped, api, name, true);
-    for (const name of ['init', 'proxy', 'sniffer', 'isVideo']) bindSpiderMethod(wrapped, api, name, false);
+    for (const name of ['homeContent', 'homeVideoContent', 'categoryContent', 'detailContent', 'searchContent', 'playerContent', 'liveContent', 'action']) bindSpiderMethod(wrapped, api, name, true);
+    for (const name of ['init', 'proxy', 'manualVideoCheck', 'isVideoFormat']) bindSpiderMethod(wrapped, api, name, false);
     bindDanmaku(wrapped, api);
     return wrapped;
 }
 
-function output(value) {
-    if (typeof value === 'string') return value;
-    const json = JSON.stringify(value, netCacheValue);
-    if (json === undefined) throw new TypeError('Spider data must be JSON');
+function output(value, method) {
+    if (method === 'liveContent' && typeof value === 'string') return value;
+    if (!value || typeof value !== 'object') throw new TypeError('Spider data must be an object or array');
+    const json = stringify(value);
+    if (json[0] !== '{' && json[0] !== '[') throw new TypeError('Spider data must be an object or array');
     return json;
 }
 
 function bindSpiderMethod(wrapped, api, name, serialize) {
-    if (typeof api[name] !== 'function') return;
     Object.defineProperty(wrapped, name, {
-        value: function(...args) {
-            const value = api[name].apply(api, args);
-            if (!serialize) return value;
-            return value && typeof value.then === 'function' ? value.then(output) : output(value);
+        value: async function(...args) {
+            const value = await api[name](...args);
+            return serialize ? output(value, name) : value;
         },
-        writable: true,
-        configurable: true,
-        enumerable: true
+        writable: true, configurable: true, enumerable: true
     });
 }
 
 function bindDanmaku(wrapped, api) {
     const danmakus = new Map();
     wrapped.startDanmaku = async function(id, token) {
-        if (typeof api.danmaku !== 'function') throw new Error('Spider does not support live danmaku');
         const stop = await api.danmaku(id, item => {
             if (!item || typeof item !== 'object' || Array.isArray(item)) throw new TypeError('Danmaku must be an object');
-            emitDanmaku(token, item);
+            host.emitDanmaku(token, item);
         });
         if (typeof stop !== 'function') throw new TypeError('danmaku must return a stop function');
         danmakus.set(token, stop);
@@ -78,10 +65,5 @@ function bindDanmaku(wrapped, api) {
         if (failures.length) throw failures[0];
     }
 
-    Object.defineProperty(wrapped, 'destroy', {
-        value: destroy,
-        writable: true,
-        configurable: true,
-        enumerable: true
-    });
+    Object.defineProperty(wrapped, 'destroy', {value: destroy, writable: true, configurable: true, enumerable: true});
 }

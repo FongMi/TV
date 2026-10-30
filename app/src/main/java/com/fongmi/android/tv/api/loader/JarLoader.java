@@ -83,7 +83,7 @@ public class JarLoader {
     }
 
     private void destroy(Spider spider) {
-        spider.dialog.close();
+        spider.closeDialog();
         Throwable failure = destroySpider(spider);
         failure = closeNetwork(spider, failure);
         if (failure instanceof RuntimeException error) throw error;
@@ -199,7 +199,7 @@ public class JarLoader {
             spider.init(App.get(), ext);
             return spider;
         } catch (Throwable e) {
-            spider.dialog.close();
+            spider.closeDialog();
             spider.js.close();
             try {
                 spider.net.close();
