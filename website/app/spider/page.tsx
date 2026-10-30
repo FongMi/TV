@@ -17,7 +17,7 @@ const dialogSamples: CodeSample[] = [
     code: `JSONObject options = new JSONObject("""
     {"title":"輸入內容","inputs":[{"name":"text","label":"內容","required":true}]}
     """);
-JSONObject result = dialog.show(options);
+JSONObject result = dialog(options);
 if (result == null) return "{}";
 String text = result.getJSONObject("values").getString("text");`,
   },
@@ -33,8 +33,8 @@ if result is None:
 text = result["values"]["text"]`,
   },
   {
-    id: "quickjs", label: "QuickJS", file: "spider.action",
-    code: `const result = await dialog({
+    id: "quickjs", label: "QuickJS", file: "Spider.action",
+    code: `const result = await this.dialog({
   title: "輸入內容",
   inputs: [{name: "text", label: "內容", required: true}]
 });
@@ -46,11 +46,12 @@ const text = result.values.text;`,
 const java = `// 最小點播範例；example.com 為示意網址。
 package com.github.catvod.spider;
 
+import com.github.catvod.bean.Class;
+import com.github.catvod.bean.Vod;
 import com.github.catvod.crawler.Spider;
+import com.github.catvod.utils.Response;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,40 +59,38 @@ public class Demo extends Spider {
 
     // 回傳分類清單。
     @Override
-    public String homeContent(boolean filter) throws Exception {
-        JSONObject item = new JSONObject().put("type_id", "movie").put("type_name", "電影");
-        return new JSONObject().put("class", new JSONArray().put(item)).toString();
+    public String homeContent(boolean filter) {
+        return Response.create().classes(List.of(Class.create().id("movie").name("電影"))).string();
     }
 
     // 範例只有一頁；第二頁起回傳空清單。
     @Override
-    public String categoryContent(String tid, String pg, boolean filter,
-            HashMap<String, String> extend) throws Exception {
-        int page = Math.max(1, Integer.parseInt(pg));
-        JSONArray items = new JSONArray();
-        if (page == 1) items.put(card("demo-1", "範例項目"));
-        return new JSONObject().put("list", items).put("page", page)
-                .put("pagecount", 1).put("limit", 20).put("total", 1).toString();
+    public String categoryContent(String tid, String pg, boolean filter, HashMap<String, String> extend) {
+        List<Vod> items = List.of(card("demo-1", "範例項目"));
+        return Response.page(items, Integer.parseInt(pg), 20).string();
     }
 
     // 集數先使用穩定 ID，播放時再取得網址。
     @Override
-    public String detailContent(List<String> ids) throws Exception {
-        JSONObject item = card(ids.get(0), "範例項目").put("vod_play_from", "Demo")
-                .put("vod_play_url", "第 1 集$demo://episode/1");
-        return new JSONObject().put("list", new JSONArray().put(item)).toString();
+    public String detailContent(List<String> ids) {
+        List<Vod> items = new ArrayList<>();
+        for (String id : ids) items.add(detailVod(id));
+        return Response.create().vods(items).string();
     }
 
     // 將播放 ID 換成實際網址。
     @Override
-    public String playerContent(String flag, String id, List<String> vipFlags) throws Exception {
+    public String playerContent(String flag, String id, List<String> vipFlags) {
         String url = id.replace("demo://", "https://example.com/");
-        return new JSONObject().put("parse", 0).put("url", url).toString();
+        return Response.create().url(url).string();
     }
 
-    private JSONObject card(String id, String name) throws Exception {
-        return new JSONObject().put("vod_id", id).put("vod_name", name)
-                .put("vod_pic", "https://example.com/poster.jpg");
+    private Vod detailVod(String id) {
+        return card(id, "範例項目").playFrom("Demo").playUrl("第 1 集$demo://episode/1");
+    }
+
+    private Vod card(String id, String name) {
+        return Vod.create().id(id).name(name).pic("https://example.com/poster.jpg");
     }
 }`;
 
@@ -105,9 +104,7 @@ class Spider(BaseSpider):
 
     # 回傳分類清單。
     def homeContent(self, filter):
-        return {
-            "class": [{"type_id": "movie", "type_name": "電影"}]
-        }
+        return {"class": [{"type_id": "movie", "type_name": "電影"}]}
 
     # 完整清單交給共用方法分頁。
     def categoryContent(self, tid, pg, filter, extend):
@@ -116,12 +113,12 @@ class Spider(BaseSpider):
 
     # 集數先使用穩定 ID，播放時再取得網址。
     def detailContent(self, ids):
-        item = self.card(ids[0], "範例項目")
-        item.update({
-            "vod_play_from": "Demo",
-            "vod_play_url": "第 1 集$demo://episode/1"
-        })
-        return {"list": [item]}
+        items = []
+        for video_id in ids:
+            item = self.card(video_id, "範例項目")
+            item.update({"vod_play_from": "Demo", "vod_play_url": "第 1 集$demo://episode/1"})
+            items.append(item)
+        return {"list": items}
 
     # 將播放 ID 換成實際網址。
     def playerContent(self, flag, id, vipFlags):
@@ -136,44 +133,44 @@ class Spider(BaseSpider):
         }`;
 
 const javascript = `// 最小點播範例；example.com 為示意網址。
+import {Spider} from "catvod";
+
 const card = (id, name) => ({
   vod_id: id,
   vod_name: name,
   vod_pic: "https://example.com/poster.jpg"
 });
 
-export default {
-  init(ext) {},
-
+export default class Demo extends Spider {
   // 回傳分類清單。
-  home(filter) {
+  homeContent(filter) {
     return {
       class: [{ type_id: "movie", type_name: "電影" }]
     };
-  },
+  }
 
   // 完整清單交給共用方法分頁。
-  category(tid, pg, filter, extend) {
+  categoryContent(tid, pg, filter, extend) {
     const items = [card("demo-1", "範例項目")];
-    return page(items, pg, 20);
-  },
+    return this.page(items, pg, 20);
+  }
 
   // 集數先使用穩定 ID，播放時再取得網址。
-  detail(id) {
-    const item = {
+  detailContent(ids) {
+    const list = ids.map(id => ({
       ...card(id, "範例項目"),
       vod_play_from: "Demo",
       vod_play_url: "第 1 集$demo://episode/1"
-    };
-    return { list: [item] };
-  },
+    }));
+    return {list};
+  }
 
   // 將播放 ID 換成實際網址。
-  play(flag, id, vipFlags) {
+  playerContent(flag, id, vipFlags) {
     const url = id.replace("demo://", "https://example.com/");
     return { parse: 0, url };
   }
-};`;
+}`;
 
 const resultExplore = `{
   "class": [
@@ -252,7 +249,7 @@ return new Object[]{response.code, response.contentType, response, response.head
   {
     id: "python",
     label: "Python",
-    file: "spider.py / localProxy",
+    file: "spider.py / proxy",
     code: `response = self.net.stream("https://example.com/data.bin", {
     "timeout": 15000, "callTimeout": 15000
 })
@@ -336,7 +333,7 @@ export default function SpiderPage() {
                 <code>{'api: "./demo.js"'}</code>
                 <p>
                   JavaScript 由 QuickJS 執行；相對路徑以配置檔所在位置為基準。
-                  使用 ES module，預設匯出物件或建立物件的函式。
+                  從 <code>catvod</code> 匯入 Spider，預設匯出繼承它的類別。
                 </p>
               </article>
             </div>
@@ -379,8 +376,12 @@ export default function SpiderPage() {
               <li>載入 Java JAR 並選擇類別，或載入 .py／.js；ext 為選填。</li>
               <li>選擇方法，以 JSON 陣列填入參數，執行並查看結果與網路紀錄。</li>
               <li>修改後儲存、重新載入並重測；可格式化來源或還原版本。</li>
-              <li>play 回傳有效結果後，送到 App 確認播放。</li>
+              <li>playerContent 回傳有效結果後，送到 App 確認播放。</li>
             </ol>
+            <p>
+              方法名稱使用 homeContent、categoryContent、detailContent、playerContent 等完整入口。
+              searchContent 可傳 [key, quick]，省略的 pg 為字串 <code>{'"1"'}</code>；布林值使用 true／false，分類的 extend 與 proxy params 使用字串鍵值物件。
+            </p>
             <p>
               App 不編譯 Java，修改 .java 後需重新產生並載入 JAR。
               測試逾時預設 30 秒，可設為 1–300 秒；重新載入、取消或離開會清理測試工作。
@@ -398,11 +399,21 @@ export default function SpiderPage() {
               並補上搜尋與錯誤處理。
             </p>
             <div className="callout">
-              <b>回傳格式</b>Java 用 Android 內建的 <code>JSONObject</code>／
-              <code>JSONArray</code> 組裝 JSON 字串；Python 回傳
+              <b>回傳格式</b>Java 用 <code>Class</code>／<code>Vod</code> 組裝資料，
+              由 <code>Response</code> 產生 JSON 字串；Python 回傳
               dict／list，QuickJS 回傳物件／陣列，由 App 序列化。
               直播可回傳 Group 陣列或 TXT／M3U 原始文字。
             </div>
+            <p>
+              三種語言的 detailContent 都接收完整 ID 集合，依輸入順序回傳，保留重複 ID；空集合回傳空 list。
+              單筆失敗時整個批次回報錯誤；未上架等合法空結果可合併，並保留各筆 msg。
+            </p>
+            <p>
+              QuickJS 使用完整的 homeContent／categoryContent／detailContent／playerContent 等入口名稱。
+              constructor 維持同步，非同步初始化放在 init；入口可回傳同步值或 Promise。
+              Python／QuickJS 的 init 接收原始 ext 字串，需要 JSON 時由來源解析；categoryContent 的 extend 仍是篩選物件。
+              init 可省略；未覆寫的首頁、列表、播放／操作、直播及代理分別使用空 class、空 list、空物件、空字串與 404 回應。
+            </p>
             <CodeTabs samples={samples} />
             <p>
               完整範例見 CatVodSpider 的{" "}
@@ -456,7 +467,7 @@ export default function SpiderPage() {
           <section id="playback-details">
             <h2>播放詳情更新</h2>
             <p>
-              <code>playerContent</code>／<code>play</code> 可在播放結果的 <code>list[0]</code> 帶回 VOD 詳情。
+              <code>playerContent</code> 可在播放結果的 <code>list[0]</code> 帶回 VOD 詳情。
               App 採用結果時更新頁面；預載結果在切集時套用，取消或過期的結果會丟棄。
             </p>
             <CodeBlock label="JSON / Result" path="播放結果附帶詳情">{`{
@@ -492,7 +503,8 @@ export default function SpiderPage() {
           <section id="network">
             <h2>共用網路</h2>
             <p>
-              App 在初始化前提供網路接口：Java 使用 <code>net</code>、Python 使用 <code>self.net</code>、QuickJS 使用 <code>net</code>。
+              App 在初始化前提供網路接口：Java 使用 <code>net</code>、Python 使用 <code>self.net</code>、QuickJS 使用 <code>this.net</code>。
+              QuickJS 輔助模組也可從 <code>catvod</code> 明確匯入 net、local、js、dialog 等資源，下文以 net 簡寫。
               時間單位為毫秒。完整參數與範例見 <a href="https://github.com/FongMi/CatVodSpider/blob/main/docs/development.md#網路">CatVodSpider 開發說明</a>。
             </p>
             <div className="table-scroll">
@@ -513,11 +525,11 @@ export default function SpiderPage() {
             <h3>HTTP</h3>
             <p>
               只取 JSON 用 <code>net.json(url, options)</code>；連線失敗、HTTP 非 2xx 或無效 JSON 會拋出例外。
-              需要狀態碼、錯誤正文或 bytes 時用 <code>net.req</code>，QuickJS 用 <code>await net.http</code>。
+              需要狀態碼、錯誤正文或 bytes 時用 <code>net.req</code>，QuickJS 用 <code>await net.req</code>。
               Java 的 options 除特別標示外使用 JSON 字串，json／req 也回傳 JSON 字串。
             </p>
             <p>
-              QuickJS 的 req 同步執行；http／json 以 await 取得結果。Python／QuickJS 使用物件傳 options，
+              QuickJS 的 req／json 都以 await 取得結果，沒有同步 req 或 http 別名。Python／QuickJS 使用物件傳 options，
               二進位回應用 <code>buffer: 3</code>，分別取得 bytes／ArrayBuffer。
               <code>net.getUserAgent()</code> 取得 App 的 UA，需要時自行放入 headers。
             </p>
@@ -618,6 +630,7 @@ export default function SpiderPage() {
             <p>
               小型設定用 Java 的 <code>local</code>、Python 的 <code>self.local</code> 或 QuickJS 的 <code>local</code>。
               以 get(key)／set(key, value)／delete(key) 讀寫，App 按站點隔離；Java 使用 JSON 字串，Python／QuickJS 使用 JSON 值。
+              set／delete 沒有回傳值。
               清 TTL 快取不會刪除 Local。
             </p>
           </section>
@@ -651,8 +664,8 @@ export default function SpiderPage() {
             </p>
             <p>
               三語言共用 Dialog 參數與宿主介面，可顯示文字、QR Code、圖片與自訂表單。
-              Java 用 <code>dialog.show(options)</code>，Python 用 <code>self.dialog(options)</code> 同步取得結果；
-              QuickJS 用 <code>await dialog(options)</code>，onAction 放在 options 內。
+              Java 用 <code>dialog(options)</code>，Python 用 <code>self.dialog(options)</code> 同步取得結果；
+              QuickJS 用 <code>await this.dialog(options, callback)</code>，回呼以第二參數傳入。
             </p>
             <p>
               關窗時回傳 <code>{"{button, values}"}</code>：button 是按鈕 id，values 以欄位 name 對應字串，多選欄位使用字串陣列。
@@ -676,26 +689,25 @@ export default function SpiderPage() {
             </p>
             <CodeBlock>{`let version = 1;
 const initial = "https://example.com/?v=" + version;
-await dialog({
+await this.dialog({
   title: "QR Code 範例",
   message: initial,
   qrcode: initial,
   copyable: true,
-  buttons: [{id: "refresh", label: "更新", close: false}, {id: "close", label: "關閉"}],
-  async onAction({button}) {
-    if (button !== "refresh") return;
-    await net.sleep(250);
-    const content = "https://example.com/?v=" + (++version);
-    return {qrcode: content, message: content};
-  }
+  buttons: [{id: "refresh", label: "更新", close: false}, {id: "close", label: "關閉"}]
+}, async ({button}) => {
+  if (button !== "refresh") return;
+  await this.net.sleep(250);
+  const content = "https://example.com/?v=" + (++version);
+  return {qrcode: content, message: content};
 });`}</CodeBlock>
             <p>
               QR Code 在本機產生，內容不必是網址。message、QR Code、圖片與輸入欄共用捲動區域。
-              copyable 為 true 且 message 非空時提供複製全文按鈕；複製不關窗，也不觸發 onAction。
-              onAction 更新 message 後複製的是最新全文，保留換行與前導零。
+              copyable 為 true 且 message 非空時提供複製全文按鈕；複製不關窗，也不觸發 callback。
+              callback 更新 message 後複製的是最新全文，保留換行與前導零。
               要複製 QR Code 原始內容，可將相同字串填入 message；省略 qrcode 即可顯示純文字。
             </p>
-            <CodeBlock>{`const result = await dialog({
+            <CodeBlock>{`const result = await this.dialog({
   title: "表單範例",
   cancelable: true,
   inputs: [
@@ -709,23 +721,22 @@ await dialog({
     {id: "fill", label: "帶入範例", close: false, validate: []},
     {id: "confirm", label: "確認", enabled: false},
     {id: "error", label: "錯誤提示", close: false, validate: []}
-  ],
-  async onAction({button}) {
-    await net.sleep(250);
-    if (button === "fill") return {
-      values: {text: "範例內容", choice: "first", choices: ["first", "second"]},
-      inputs: [{name: "text", enabled: true}],
-      buttons: [{id: "confirm", enabled: true}]
-    };
-    if (button === "error") return {errors: {text: "這是欄位錯誤提示示範"}};
-    return {close: true};
-  }
+  ]
+}, async ({button}) => {
+  await this.net.sleep(250);
+  if (button === "fill") return {
+    values: {text: "範例內容", choice: "first", choices: ["first", "second"]},
+    inputs: [{name: "text", enabled: true}],
+    buttons: [{id: "confirm", enabled: true}]
+  };
+  if (button === "error") return {errors: {text: "這是欄位錯誤提示示範"}};
+  return {close: true};
 });
 if (result === null) return {};
 const text = result.values.text;`}</CodeBlock>
             <p>
               宿主只負責顯示表單與回傳；按鈕用途、站點請求及業務驗證由爬蟲決定。
-              onAction 可回傳 message／qrcode／image 更新顯示內容、values 更新欄位值、errors 顯示欄位錯誤，close 覆蓋按鈕的關窗設定。
+              callback 可回傳 message／qrcode／image 更新顯示內容、values 更新欄位值、errors 顯示欄位錯誤，close 覆蓋按鈕的關窗設定。
               有非空欄位錯誤時保留視窗與輸入值；回傳 null／None 沿用按鈕設定，QuickJS 也可回傳 undefined。
             </p>
             <p>
@@ -746,7 +757,7 @@ const text = result.values.text;`}</CodeBlock>
             <p>
               values 只更新指定欄位，空字串可清空文字或取消單選，空陣列可清空多選。
               整批 values 先核對欄位、型別與選項再套用，未知欄位、型別錯誤、不存在或重複的選項會關窗並回報錯誤。
-              更新不觸發 onAction，必填與長度檢查仍在按鈕操作時執行；帶入或重設按鈕可設 validate:[]。
+              更新不觸發 callback，必填與長度檢查仍在按鈕操作時執行；帶入或重設按鈕可設 validate:[]。
               更新欄位會清除其舊錯誤，同次回傳的 errors 隨後套用；關窗結果包含更新後的 values。
             </p>
             <p>
@@ -759,15 +770,15 @@ const text = result.values.text;`}</CodeBlock>
               更新 QR Code 保留輸入值；按鈕設定 close:false 或回傳 close:false 可繼續操作。
             </p>
             <p>
-              等待輸入暫停目前呼叫及 App 工作的期限，onAction 執行及 QuickJS 等待 Promise 時恢復計時；網路期限照常生效。
+              等待輸入暫停目前呼叫及 App 工作的期限，callback 執行及 QuickJS 等待 Promise 時恢復計時；網路期限照常生效。
             </p>
-            <CodeBlock>{`const first = await dialog({
+            <CodeBlock>{`const first = await this.dialog({
   title: "第一步",
   image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAAAwCAIAAABhdOiYAAAAbklEQVR4nO3QwQkAIAwEQUuzdDvTDgQJRtE59hsIU1qtmlSOf3B5gAABAvQlUF8ZIECAAAHKFUm7BQQIECBAgAABAgToKaDIAAECBAjQZqC0W0CAAAECBAgQIECAAAECBAgQIAECBAjQLQECFGsAofuPsjrQFugAAAAASUVORK5CYII=",
   inputs: [{name: "text", label: "內容", helperText: "確認後進入下一步", required: true}]
 });
 if (first === null) return {};
-const second = await dialog({
+const second = await this.dialog({
   title: "第二步",
   message: first.values.text,
   copyable: true
@@ -779,7 +790,7 @@ if (second === null) return {};`}</CodeBlock>
             </p>
             <p>
               image 接收爬蟲提供的 base64 圖片 data URI，使用 Android 支援的點陣圖片；圖片取得由爬蟲負責。
-              onAction 可回傳 image 更新圖片，省略時保留原圖，空字串移除；解碼失敗時，尚未結束的 dialog 會關窗並回報錯誤。
+              callback 可回傳 image 更新圖片，省略時保留原圖，空字串移除；解碼失敗時，尚未結束的 dialog 會關窗並回報錯誤。
               關窗會取消並釋放該圖片請求。
             </p>
             <p>
@@ -800,7 +811,7 @@ if (second === null) return {};`}</CodeBlock>
             <div className="schema-grid">
               <article>
                 <h3>探索類</h3>
-                <CodeBlock label="JSON / Result" path="home · category">
+                <CodeBlock label="JSON / Result" path="homeContent · categoryContent">
                   {resultExplore}
                 </CodeBlock>
                 <p>
@@ -916,7 +927,7 @@ if (second === null) return {};`}</CodeBlock>
           </section>
           <section id="proxy">
             <h2>Proxy 回傳</h2>
-            <CodeBlock label="JSON / Proxy 陣列" path="proxy / localProxy">{`[
+            <CodeBlock label="JSON / Proxy 陣列" path="proxy(params)">{`[
   200,
   "text/plain; charset=utf-8",
   "demo response",
@@ -924,22 +935,34 @@ if (second === null) return {};`}</CodeBlock>
 ]`}</CodeBlock>
             <p>
               上例是 Python／QuickJS
-              一般陣列模式：狀態碼、Content-Type、內容、選填標頭；第 5 格{" "}
-              <code>1</code> 表示 Base64 內容。Python 方法名稱是{" "}
-              <code>localProxy</code>，第三格也可直接回傳 bytes。
+              一般陣列模式：狀態碼、Content-Type、內容、選填標頭。三語言的入口統一為{" "}
+              <code>proxy(params)</code>；Python 第三格也可直接回傳 bytes。
+            </p>
+            <p>
+              params 是一個扁平的字串鍵值集合：Java 為 Map、Python 為 dict、QuickJS 為物件。
+              請求參數、HTTP 標頭與檔案資訊依序合併，後者覆寫同名欄位；也會包含 do／siteKey。
+              來源依需要讀取 url、id、type 等欄位，網址參數已由 HTTP 層解碼。
+            </p>
+            <p>
+              Python／QuickJS 的回應 headers 接受字串或字串陣列，多值以逗號與空格合併；一般與串流回應使用相同規則，無效型別會回報錯誤。
             </p>
             <p>
               Java 的一般 <code>Object[]</code> 回傳格式中，第三格必須是{" "}
               <code>InputStream</code>，第四格標頭選填，不能直接放字串或
-              bytes；也可只回傳一格 <code>NanoHTTPD.Response</code>。QuickJS 的{" "}
-              <code>from=catvod</code> 另有 JSON response 模式；Node Proxy
+              bytes；也可只回傳一格 <code>NanoHTTPD.Response</code>。QuickJS 使用上述陣列模式；Node Proxy
               則直接轉接 HTTP 回應。
             </p>
             <p>
-              使用 <code>getProxyUrl(params)</code> 產生網址，App 自動加入{" "}
-              <code>do</code>、<code>siteKey</code> 並編碼參數。JAR 模式沒有
+              使用 <code>proxyUrl(params, local)</code> 產生網址，Python／QuickJS 分別用{" "}
+              <code>self.proxyUrl</code>／<code>this.proxyUrl</code>。
+              App 自動加入 <code>do</code>、<code>siteKey</code> 並編碼參數，params 不可覆寫兩者。JAR 模式沒有
               siteKey 時會找{" "}
               <code>com.github.catvod.spider.Proxy.proxy(Map)</code> 靜態入口。
+            </p>
+            <p>
+              params 的鍵和值都須為字串，不自動轉型；省略 params 或傳入 null／None 時視為空集合。
+              local 只接受布林，預設 true 使用本機，false 使用區域網路 IP；Python 可寫{" "}
+              <code>self.proxyUrl(params, local=False)</code>。
             </p>
           </section>
           <section id="live-danmaku">
@@ -1005,7 +1028,7 @@ if (second === null) return {};`}</CodeBlock>
             <p>
               App 將網址的 <code>{"{time}"}</code> 換成目標 Unix 毫秒後 GET；0 表示重新取得直播來源。
               端點回傳直接播放的 <code>url</code>，並可附上 <code>header</code> 與 <code>format</code>。
-              使用本地代理時，以 <code>getProxyUrl</code> 產生網址。
+              使用本地代理時，以 <code>proxyUrl</code> 產生網址。
             </p>
             <p>
               連續拖曳或切台會取消舊請求；失敗時提示並保留目前播放。
@@ -1106,9 +1129,8 @@ if (second === null) return {};`}</CodeBlock>
               <code>/play</code> 的詳情回傳格式見 <Link className="inline-link" href="#playback-details">播放詳情更新</Link>。
             </p>
             <div className="callout">
-              <b>不要只替換 api 前綴</b>Node.js 不是 QuickJS 的 export default
-              物件模式；單獨把普通配置的 api 改成 node:，不會完成 Node bundle
-              初始化。
+              <b>不要只替換 api 前綴</b>Node.js 不使用 QuickJS 的 Spider 子類別入口；
+              單獨把普通配置的 api 改成 node:，不會完成 Node bundle 初始化。
             </div>
           </section>
         </div>

@@ -30,7 +30,7 @@ public final class RuntimeEntry implements PythonRuntime {
     @Override
     public String format(String source) {
         loader();
-        try (PyObject result = Python.getInstance().getModule("_tv_format").callAttr("format_source", source)) {
+        try (PyObject result = Python.getInstance().getModule("runtime.format").callAttr("format_source", source)) {
             return result.toString();
         }
     }

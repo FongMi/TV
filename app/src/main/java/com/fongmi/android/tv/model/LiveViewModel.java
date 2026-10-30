@@ -19,6 +19,7 @@ import com.fongmi.android.tv.playback.live.LivePlaybackHost;
 import com.fongmi.android.tv.playback.live.LivePlaybackState;
 import com.fongmi.android.tv.utils.Notify;
 
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
@@ -30,6 +31,7 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
     private final MutableLiveData<Boolean> xml;
     private final MutableLiveData<Live> live;
     private final MutableLiveData<Epg> epg;
+    private final MutableLiveData<Epg> epgDay;
 
     private final ViewModelTaskRunner<TaskType> tasks;
     private final LivePlaybackState playbackState;
@@ -37,6 +39,7 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
 
     public LiveViewModel() {
         this.epg = new MutableLiveData<>();
+        this.epgDay = new MutableLiveData<>();
         this.xml = new MutableLiveData<>();
         this.live = new MutableLiveData<>();
         this.error = new MutableLiveData<>();
@@ -60,6 +63,10 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
 
     public LiveData<Epg> epg() {
         return epg;
+    }
+
+    public LiveData<Epg> epgDay() {
+        return epgDay;
     }
 
     public LiveData<Live> live() {
@@ -91,6 +98,12 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
 
     public void getEpg(Channel item) {
         execute(TaskType.EPG, () -> LiveApi.getEpg(item, zoneId), epg::postValue, error -> epg.postValue(new Epg()));
+    }
+
+    public void getEpg(Channel item, LocalDate day) {
+        ZoneId zone = zoneId;
+        execute(TaskType.EPG_DAY, () -> LiveApi.getEpg(item, zone, day), epgDay::postValue,
+                error -> epgDay.postValue(item.getData(zone, day)));
     }
 
     @Override
@@ -142,6 +155,7 @@ public class LiveViewModel extends ViewModel implements LiveDataSource {
 
         LIVE(Constant.TIMEOUT_LIVE),
         EPG(Constant.TIMEOUT_EPG),
+        EPG_DAY(Constant.TIMEOUT_EPG),
         XML(Constant.TIMEOUT_XML),
         URL(Constant.TIMEOUT_PARSE_LIVE);
 

@@ -1,6 +1,6 @@
 [versions]
 agp = "9.4.0"
-python = "17.1.0"
+python = "17.2.0"
 minSdk = "24"
 targetSdk = "37"
 compileSdk = "37"

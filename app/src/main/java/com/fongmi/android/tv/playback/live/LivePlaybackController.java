@@ -19,6 +19,8 @@ import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.setting.LiveSetting;
 import com.fongmi.android.tv.utils.ResUtil;
 
+import java.util.Comparator;
+
 public class LivePlaybackController {
 
     private final LivePlaybackHost host;
@@ -112,6 +114,17 @@ public class LivePlaybackController {
 
     public void onEpgChanged(EpgData data) {
         if (state.getChannel() != null && state.getPendingRequest() == null) publishPlaybackMetadata(data);
+    }
+
+    @Nullable
+    public EpgData getPlayingEpgData() {
+        LivePlayRequest request = state.getActiveRequest();
+        return request == null ? getCurrentEpgData(state.getChannel()) : getEpgData(request);
+    }
+
+    public boolean isCatchup() {
+        LivePlayRequest request = state.getActiveRequest();
+        return request != null && request.isCatchup();
     }
 
     public void refresh() {
@@ -252,6 +265,14 @@ public class LivePlaybackController {
     @Nullable
     private EpgData getNextEpgData(Channel channel) {
         if (channel == null) return null;
+        LivePlayRequest request = state.getActiveRequest();
+        if (request != null && request.isCatchup() && request.matches(channel)) {
+            long start = request.getCatchupData().getStartTime();
+            long now = System.currentTimeMillis();
+            return channel.getDataList().stream().flatMap(day -> day.getList().stream())
+                    .filter(data -> data.getStartTime() > start && data.getStartTime() <= now)
+                    .min(Comparator.comparingLong(EpgData::getStartTime)).orElse(null);
+        }
         Epg epg = channel.getData(host.getZoneId());
         int current = epg.getInRange();
         int position = epg.getSelected() + 1;

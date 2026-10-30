@@ -60,6 +60,7 @@ import com.fongmi.android.tv.ui.adapter.GroupAdapter;
 import com.fongmi.android.tv.ui.custom.PinchScale;
 import com.fongmi.android.tv.ui.custom.PinchScaleFeedback;
 import com.fongmi.android.tv.ui.custom.TouchInput;
+import com.fongmi.android.tv.ui.custom.LiveProgrammeInfo;
 import com.fongmi.android.tv.ui.dialog.CastDialog;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.InfoDialog;
@@ -76,14 +77,20 @@ import com.fongmi.android.tv.utils.PiP;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Traffic;
 import com.fongmi.android.tv.utils.Util;
+import com.fongmi.android.tv.utils.EpgHistory;
+import com.fongmi.android.tv.utils.Formatters;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.time.ZoneId;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 public class LiveActivity extends PlaybackActivity implements TouchInput.Listener, Biometric.Callback, PassListener, ConfigListener, LiveListener, GroupAdapter.OnClickListener, ChannelAdapter.OnClickListener, EpgDataAdapter.OnClickListener, CastDialog.Listener, InfoDialog.Listener, LivePlaybackHost {
 
@@ -96,12 +103,14 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     private TouchInput mInput;
     private PinchScaleFeedback mScaleFeedback;
     private PiP mPiP;
+    private LiveProgrammeInfo mProgrammeInfo;
     private Runnable mR1;
     private Runnable mR2;
     private Runnable mR3;
     private List<Group> mHides;
     private Group mGroup;
     private Channel mChannel;
+    private LocalDate mEpgDay;
     private String mPlaybackKey;
     private boolean rotate;
     private int count;
@@ -178,6 +187,9 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
         setRecyclerView();
         setVideoView();
         setViewModel();
+        mProgrammeInfo = new LiveProgrammeInfo(mBinding, mLive::getPlayingEpgData, mLive::isCatchup,
+                () -> { if (mChannel != null) mViewModel.getEpg(mChannel); },
+                () -> { if (mChannel != null) mLive.onEpgChanged(mChannel.getData(mViewModel.getZoneId()).selected().getEpgData()); });
         checkLive();
     }
 
@@ -217,6 +229,8 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
         mBinding.group.setAdapter(mGroupAdapter = new GroupAdapter(this));
         mBinding.channel.setAdapter(mChannelAdapter = new ChannelAdapter(this));
         mBinding.epgData.setAdapter(mEpgDataAdapter = new EpgDataAdapter(this));
+        mBinding.epgDate.setOnClickListener(view -> showEpgDates());
+        mBinding.epgBack.setOnClickListener(view -> hideEpg());
     }
 
     private void setVideoView() {
@@ -245,11 +259,14 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
         observeWhenServiceReady(mViewModel.playback(), this::onPlaybackObserved);
         observeWhenServiceReady(mViewModel.error(), this::onLoadErrorObserved);
         observeForever(mViewModel.epg(), this::onEpgLoaded);
+        observeForever(mViewModel.epgDay(), this::onEpgDayLoaded);
         mViewModel.live().observe(this, this::onLiveParsed);
         mViewModel.xml().observe(this, this::onXmlParsed);
     }
 
     private void onLiveParsed(Live live) {
+        mEpgDay = LocalDate.now(mViewModel.getZoneId());
+        updateEpgDate();
         mViewModel.parseXml(live);
         setGroup(live);
         setWidth(live);
@@ -315,13 +332,16 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     private void setWidth(Epg epg) {
         int padding = ResUtil.dp2px(48);
-        if (epg.getList().isEmpty()) return;
+        if (epg.getList().isEmpty()) {
+            setWidth(mBinding.epgPanel, Math.min(ResUtil.dp2px(200), ResUtil.getScreenWidth() / 2));
+            return;
+        }
         int minWidth = ResUtil.getTextWidth(epg.getList().get(0).getTime(), 12);
         if (epg.getWidth() == 0) for (EpgData item : epg.getList()) epg.setWidth(Math.max(epg.getWidth(), ResUtil.getTextWidth(item.getTitle(), 14)));
         int maxWidth = ResUtil.getScreenWidth() / 2;
         int minContentWidth = Math.min(minWidth + padding, maxWidth);
         int width = epg.getWidth() == 0 ? 0 : Math.clamp(epg.getWidth() + padding, minContentWidth, maxWidth);
-        setWidth(mBinding.epgData, width);
+        setWidth(mBinding.epgPanel, Math.max(Math.min(ResUtil.dp2px(168), maxWidth), width));
     }
 
     private void setWidth(View view, int width) {
@@ -354,7 +374,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private void onBack() {
-        finish();
+        onBackInvoked();
     }
 
     private void onCast() {
@@ -473,17 +493,41 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private void showEpg(Channel item) {
-        if (mChannel == null || mChannel.getData(mViewModel.getZoneId()).getList().isEmpty() || mEpgDataAdapter.getItemCount() == 0 || !mChannel.equals(item) || !mChannel.getGroup().equals(mGroup)) return;
-        scrollToPosition(mBinding.epgData, item.getData(mViewModel.getZoneId()).getSelected());
-        mBinding.epgData.setVisibility(View.VISIBLE);
+        if (mChannel == null || !mChannel.equals(item) || !mChannel.getGroup().equals(mGroup)) return;
+        updateEpgDate();
+        displayEpg(item.getData(mViewModel.getZoneId(), mEpgDay));
+        mBinding.epgPanel.setVisibility(View.VISIBLE);
         mBinding.channel.setVisibility(View.GONE);
         mBinding.group.setVisibility(View.GONE);
+        mViewModel.getEpg(item, mEpgDay);
     }
 
     private void hideEpg() {
         mBinding.channel.setVisibility(View.VISIBLE);
         mBinding.group.setVisibility(View.VISIBLE);
-        mBinding.epgData.setVisibility(View.GONE);
+        mBinding.epgPanel.setVisibility(View.GONE);
+    }
+
+    private void updateEpgDate() {
+        mEpgDay = EpgHistory.clamp(mEpgDay, LocalDate.now(mViewModel.getZoneId()));
+        mBinding.epgDate.setText(mEpgDay.format(DateTimeFormatter.ofPattern("MM-dd E", Locale.getDefault())) + " ▾");
+    }
+
+    private void showEpgDates() {
+        if (mChannel == null) return;
+        updateEpgDate();
+        List<LocalDate> dates = EpgHistory.dates(LocalDate.now(mViewModel.getZoneId()));
+        CharSequence[] labels = dates.stream().map(day -> day.format(DateTimeFormatter.ofPattern("yyyy-MM-dd EEEE", Locale.getDefault()))).toArray(CharSequence[]::new);
+        new MaterialAlertDialogBuilder(this).setTitle(R.string.epg_history_date)
+                .setSingleChoiceItems(labels, dates.indexOf(mEpgDay), (dialog, which) -> {
+                    mEpgDay = dates.get(which);
+                    updateEpgDate();
+                    mEpgDataAdapter.clear();
+                    mBinding.epgEmpty.setText(R.string.content_retry_loading);
+                    mBinding.epgEmpty.setVisibility(View.VISIBLE);
+                    mViewModel.getEpg(mChannel, mEpgDay);
+                    dialog.dismiss();
+                }).show();
     }
 
     @Override
@@ -531,6 +575,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     private void showInfo() {
+        if (mProgrammeInfo != null) mProgrammeInfo.onNativeInfoShown();
         mBinding.widget.infoPip.setVisibility(isInPictureInPictureMode() ? View.VISIBLE : View.GONE);
         mBinding.widget.info.setVisibility(isInPictureInPictureMode() ? View.GONE : View.VISIBLE);
         setR3Callback();
@@ -594,7 +639,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     public void onItemClick(Channel item) {
-        if (!item.getData(mViewModel.getZoneId()).getList().isEmpty() && item.isSelected() && mChannel != null && mChannel.equals(item) && mChannel.getGroup().equals(mGroup)) showEpg(item);
+        if (item.isSelected() && mChannel != null && mChannel.equals(item) && mChannel.getGroup().equals(mGroup)) showEpg(item);
         else if (mGroup != null) mLive.selectChannel(item.group(mGroup));
     }
 
@@ -645,14 +690,33 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     private void onEpgLoaded(Epg epg) {
         if (mChannel == null || !mChannel.getTvgId().equals(epg.getKey())) return;
-        EpgData data = epg.getEpgData();
+        mLive.onEpgChanged(epg.getEpgData());
+        if (isVisible(mBinding.epgPanel) && epg.equal(mEpgDay.format(Formatters.DATE))) displayEpg(epg);
+    }
+
+    private void onEpgDayLoaded(Epg epg) {
+        if (mChannel == null || !mChannel.getTvgId().equals(epg.getKey()) || !isVisible(mBinding.epgPanel)) return;
+        updateEpgDate();
+        if (epg.equal(mEpgDay.format(Formatters.DATE))) displayEpg(epg);
+    }
+
+    private void displayEpg(Epg epg) {
         mEpgDataAdapter.addAll(epg.getList());
-        mLive.onEpgChanged(data);
+        mEpgDataAdapter.setSelected(mLive.getPlayingEpgData());
+        mBinding.epgEmpty.setText(R.string.epg_history_empty);
+        mBinding.epgEmpty.setVisibility(epg.getList().isEmpty() ? View.VISIBLE : View.GONE);
+        scrollToPosition(mBinding.epgData, Math.max(0, epg.getSelected()));
         setWidth(epg);
     }
 
     private void onXmlParsed(boolean success) {
-        if (mChannel != null && success) mViewModel.getEpg(mChannel);
+        if (mChannel != null && success) {
+            mViewModel.getEpg(mChannel);
+            if (isVisible(mBinding.epgPanel)) {
+                updateEpgDate();
+                mViewModel.getEpg(mChannel, mEpgDay);
+            }
+        }
     }
 
     private void stopPlayer() {
@@ -781,7 +845,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
         mBinding.control.title.setText(metadata.displayTitle);
         mBinding.control.title.setSelected(true);
         mBinding.control.subtitle.setText(metadata.subtitle);
-        mBinding.control.subtitle.setVisibility(TextUtils.isEmpty(metadata.subtitle) ? View.GONE : View.VISIBLE);
+        mBinding.control.subtitle.setVisibility(View.GONE);
     }
 
     private void checkControl() {
@@ -1219,10 +1283,11 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     protected void onBackInvoked() {
         if (isVisible(mBinding.control.getRoot())) {
             hideControl();
-        } else if (isVisible(mBinding.widget.info)) {
-            hideInfo();
         } else if (isVisible(mBinding.recycler)) {
             hideUI();
+            hideInfo();
+        } else if (isVisible(mBinding.widget.info)) {
+            hideInfo();
         } else if (handleWebViewNavigation()) {
             return;
         } else if (!isLock()) {
@@ -1233,6 +1298,7 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
 
     @Override
     protected void onDestroy() {
+        if (mProgrammeInfo != null) mProgrammeInfo.release();
         if (isBindingOwner() && isOwner()) Source.get().exit();
         App.removeCallbacks(mR1, mR2, mR3);
         super.onDestroy();
