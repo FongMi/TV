@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
-import android.os.Process;
 import android.system.ErrnoException;
 import android.system.Os;
 
@@ -16,6 +15,7 @@ import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 import com.chaquo.python.internal.Common;
 import com.github.catvod.Runtime;
+import com.github.catvod.utils.PackageAbi;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.RuntimeModule;
 
@@ -52,7 +52,7 @@ public final class Platform extends Python.Platform {
         try {
             RuntimeModule.PYTHON.load(path -> System.load(path));
             File directory = RuntimeModule.PYTHON.getDirectory();
-            abi = Process.is64Bit() ? "arm64-v8a" : "armeabi-v7a";
+            abi = PackageAbi.get();
             buildJson = readBuild(new FileInputStream(new File(directory, "chaquopy/build.json")));
             if (!buildJson.getString("python_version").equals("3.10")) throw new IOException("Unsupported Python version");
             assetHashes = buildJson.getJSONObject("assets");

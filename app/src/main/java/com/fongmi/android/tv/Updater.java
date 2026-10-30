@@ -1,7 +1,6 @@
 package com.fongmi.android.tv;
 
 import android.os.CancellationSignal;
-import android.os.Process;
 import android.text.format.DateUtils;
 import android.text.format.Formatter;
 import android.view.View;
@@ -21,6 +20,7 @@ import com.fongmi.android.tv.utils.RuntimeInstaller;
 import com.fongmi.android.tv.utils.UpdatePackage;
 import com.github.catvod.net.Download;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.PackageAbi;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.RuntimeModule;
@@ -136,7 +136,7 @@ public class Updater {
 
     private void checkRelease() {
         try {
-            String abi = Process.is64Bit() ? "arm64_v8a" : "armeabi_v7a";
+            String abi = PackageAbi.get().replace('-', '_');
             String filename = BuildConfig.FLAVOR + "-" + abi + ".apk";
             JSONObject release = Github.getUpdate(new JSONArray(OkHttp.string(Github.getReleases())), BuildConfig.VERSION_NAME, filename);
             if (release == null) {

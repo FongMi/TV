@@ -1,7 +1,5 @@
 package com.fongmi.quickjs.utils;
 
-import android.os.Build;
-import android.os.Process;
 import android.text.TextUtils;
 import android.util.LruCache;
 
@@ -10,6 +8,7 @@ import com.fongmi.quickjs.QuickJS;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.Net;
 import com.github.catvod.net.NetOptions;
+import com.github.catvod.utils.PackageAbi;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.RuntimeModule;
 import com.github.catvod.utils.UriUtil;
@@ -42,7 +41,7 @@ public class Module implements QuickJS.ModuleLoader {
     }
 
     private ModuleBytecodeCache createBytecodeCache() {
-        String abi = Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS[0] : Build.SUPPORTED_32_BIT_ABIS[0];
+        String abi = PackageAbi.get();
         File directory = new File(Path.cache(), "quickjs-bytecode");
         String identity = RuntimeModule.QUICKJS.getCompatibilityId() + '\0' + abi;
         return new ModuleBytecodeCache(directory, identity, MAX_BYTECODE_BYTES, MAX_BYTECODE_FILES, SpiderDebug::log);

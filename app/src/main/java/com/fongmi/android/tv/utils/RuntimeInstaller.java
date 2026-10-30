@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.CancellationSignal;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Process;
 
 import androidx.annotation.MainThread;
 import androidx.core.app.NotificationCompat;
@@ -28,6 +27,7 @@ import com.fongmi.android.tv.BuildConfig;
 import com.fongmi.android.tv.R;
 import com.github.catvod.net.Download;
 import com.github.catvod.net.OkHttp;
+import com.github.catvod.utils.PackageAbi;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.RuntimeModule;
@@ -65,7 +65,7 @@ public class RuntimeInstaller extends BroadcastReceiver {
     private static boolean removing;
 
     public static String getAbi() {
-        return Process.is64Bit() ? "arm64-v8a" : "armeabi-v7a";
+        return PackageAbi.get();
     }
 
     public static JSONObject getAsset(RuntimeModule module, CancellationSignal signal) throws IOException {
@@ -139,9 +139,10 @@ public class RuntimeInstaller extends BroadcastReceiver {
     }
 
     private static JSONObject selectArtifact(JSONArray artifacts, JSONObject selected, long code, String version) throws JSONException {
+        String abi = getAbi();
         for (int i = 0; i < artifacts.length(); i++) {
             JSONObject artifact = artifacts.getJSONObject(i);
-            if (!getAbi().equals(artifact.getString("abi"))) continue;
+            if (!abi.equals(artifact.getString("abi"))) continue;
             if (artifact.optInt("minSdk", 24) > Build.VERSION.SDK_INT) continue;
             if (selected != null && selected.getLong("versionCode") >= code) continue;
             selected = createAsset(artifact, code, version);

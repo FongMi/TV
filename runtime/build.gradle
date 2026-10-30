@@ -77,6 +77,13 @@ android {
         buildConfig = false
     }
 
+    if (module in ['python', 'quickjs']) {
+        sourceSets.main.java {
+            srcDir repository.dir('catvod/src/main/java')
+            setIncludes(['com/github/catvod/utils/PackageAbi.java'])
+        }
+    }
+
     compileOptions {
         coreLibraryDesugaringEnabled = engine != null
         sourceCompatibility JavaVersion.VERSION_21

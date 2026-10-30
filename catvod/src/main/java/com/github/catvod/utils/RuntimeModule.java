@@ -4,7 +4,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Build;
-import android.os.Process;
 import android.system.ErrnoException;
 import android.system.Os;
 
@@ -422,7 +421,7 @@ public enum RuntimeModule {
     }
 
     private Metadata parseMetadata(ZipFile apk, PackageInfo info, JSONObject json, byte[] bytes) throws IOException, JSONException {
-        String abi = getAbi();
+        String abi = PackageAbi.get();
         verifyMetadata(json, info, abi);
         List<Payload> files = readPayloads(json, abi);
         verifyJavaRuntime(json, info);
@@ -441,7 +440,7 @@ public enum RuntimeModule {
 
     private void verifyMetadata(JSONObject json, PackageInfo info, String abi) throws IOException, JSONException {
         if (!id.equals(json.getString("module")) || !getPackageName().equals(json.getString("packageName")) || versionCode(info) != json.getLong("versionCode") || !json.getString("versionName").equals(info.versionName) || !getCompatibilityId().equals(json.getString("compatibilityId"))) throw new IOException("Incompatible runtime metadata");
-        if (abi == null || !abi.equals(json.getString("abi"))) throw new IOException("Incompatible runtime ABI");
+        if (!abi.equals(json.getString("abi"))) throw new IOException("Incompatible runtime ABI");
         if (this != BDJ && !("lib/" + abi + "/" + library).equals(json.getString("library"))) throw new IOException("Incompatible runtime ABI");
     }
 
@@ -656,11 +655,6 @@ public enum RuntimeModule {
 
     private static long versionCode(PackageInfo info) {
         return Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
-    }
-
-    private static String getAbi() {
-        for (String abi : Process.is64Bit() ? Build.SUPPORTED_64_BIT_ABIS : Build.SUPPORTED_32_BIT_ABIS) if ("arm64-v8a".equals(abi) || "armeabi-v7a".equals(abi)) return abi;
-        return null;
     }
 
     private PackageInfo getExternalInfo() {
