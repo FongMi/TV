@@ -11,13 +11,14 @@ import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.net.Net;
 import com.github.catvod.utils.Crypto;
-import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Js;
 import com.github.catvod.utils.Local;
 import com.github.catvod.utils.Task;
 import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.UriUtil;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -387,21 +388,13 @@ public class Global {
         return Proxy.getPort();
     }
 
-    private String proxyUrl(QuickJS.Json params, Boolean local) {
-        Uri.Builder url = Uri.parse(Proxy.getUrl(local == null || local)).buildUpon();
+    private String proxyUrl(QuickJS.Json params, boolean local) {
+        Uri.Builder url = Uri.parse(Proxy.getUrl(local)).buildUpon();
         url.appendQueryParameter("do", "js");
         url.appendQueryParameter("siteKey", siteKey);
-        JsonElement values = params == null ? null : Json.strict(params.text());
-        if (values == null || values.isJsonNull()) return url.build().toString();
-        if (!values.isJsonObject()) throw new IllegalArgumentException("Proxy parameters require an object");
-        for (Map.Entry<String, JsonElement> entry : values.getAsJsonObject().entrySet()) appendProxyParam(url, entry.getKey(), entry.getValue());
+        JsonObject values = JsonParser.parseString(params.text()).getAsJsonObject();
+        for (Map.Entry<String, JsonElement> entry : values.entrySet()) url.appendQueryParameter(entry.getKey(), entry.getValue().getAsString());
         return url.build().toString();
-    }
-
-    private void appendProxyParam(Uri.Builder url, String key, JsonElement value) {
-        if (key.equals("do") || key.equals("siteKey")) throw new IllegalArgumentException("Reserved proxy parameter");
-        if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isString()) throw new IllegalArgumentException("Proxy parameters require string keys and values");
-        url.appendQueryParameter(key, value.getAsString());
     }
 
     public String joinUrl(String parent, String child) {

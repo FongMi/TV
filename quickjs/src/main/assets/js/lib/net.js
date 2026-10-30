@@ -190,15 +190,13 @@ export function proxyUrl(params = {}, local = true) {
     params ??= {};
     if (Object.prototype.toString.call(params) !== '[object Object]' || Object.getOwnPropertySymbols(params).length) throw new TypeError('Proxy parameters require an object with string keys and values');
     if (typeof local !== 'boolean') throw new TypeError('Proxy local flag requires a boolean');
-    if ('do' in params || 'siteKey' in params) throw new TypeError('Proxy parameters cannot override routing');
     const values = Object.create(null);
     for (const [key, value] of Object.entries(params)) {
+        if (key === 'do' || key === 'siteKey') throw new TypeError('Proxy parameters cannot override routing');
         if (typeof value !== 'string') throw new TypeError('Proxy parameters require string keys and values');
         values[key] = value;
     }
-    const url = host.proxyUrl(values, local);
-    if (typeof url !== 'string') throw new Error('Proxy URL is unavailable');
-    return url;
+    return host.proxyUrl(values, local);
 }
 
 async function batch(requests, limit = 4, client = net) {
