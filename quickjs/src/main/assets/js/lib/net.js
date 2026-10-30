@@ -22,8 +22,7 @@ async function stream(url, options = {}) {
     if (options != null && (typeof options !== 'object' || Array.isArray(options))) throw new TypeError('Invalid stream options');
     if (typeof url !== 'string') return streamBody(url, options);
     const reply = await host.stream(url, options);
-    if (reply?.error != null) throw new Error(String(reply.error));
-    if (!reply || typeof reply.token !== 'string') throw new Error('Invalid stream response');
+    if (reply.error != null) throw new Error(String(reply.error));
     return {code: reply.code, headers: reply.headers, contentType: reply.contentType, stream: streamHandle(reply.token)};
 }
 
@@ -63,8 +62,7 @@ function streamBody(source, options) {
 async function openStream(url, options = {}) {
     if (options != null && (typeof options !== 'object' || Array.isArray(options))) throw new TypeError('Invalid stream options');
     const reply = await host.openStream(url, options);
-    if (reply?.error != null) throw new Error(String(reply.error));
-    if (!reply || typeof reply.token !== 'string') throw new Error('Invalid stream response');
+    if (reply.error != null) throw new Error(String(reply.error));
     const token = reply.token;
     let pending = false, closed = false, eof = false;
     return Object.freeze({
@@ -82,7 +80,6 @@ async function openStream(url, options = {}) {
                     eof = true;
                     return null;
                 }
-                if (!(chunk instanceof ArrayBuffer) || chunk.byteLength > size) throw new Error('Invalid stream chunk');
                 return chunk;
             } catch (error) {
                 closed = true;
@@ -108,11 +105,11 @@ function connect(url, options, callback) {
     const socket = {
         send(data) {
             if (closed) return false;
-            if (typeof data === 'string') return host.socketSend(id, data, null) === true;
+            if (typeof data === 'string') return host.socketSend(id, data, null);
             const view = ArrayBuffer.isView(data);
             const buffer = view ? data.buffer : data;
             if (!(buffer instanceof ArrayBuffer)) throw new TypeError('send requires text or bytes');
-            return host.socketSend(id, null, view ? new Uint8Array(buffer, data.byteOffset, data.byteLength) : buffer) === true;
+            return host.socketSend(id, null, view ? new Uint8Array(buffer, data.byteOffset, data.byteLength) : buffer);
         },
         close() {
             if (closed) return;
@@ -135,7 +132,6 @@ function connect(url, options, callback) {
             console.error(error?.message || String(error));
         });
     });
-    if (!Number.isInteger(id) || id <= 0) throw new Error('WebSocket connection is unavailable');
     return socket;
 }
 
@@ -305,7 +301,6 @@ export function stringify(value) {
 
 function session() {
     const id = host.session();
-    if (!Number.isInteger(id) || id <= 0) throw new Error('Network session is unavailable');
     let closed = false;
     const active = () => {
         if (closed) throw new Error('Network session is closed');
@@ -338,20 +333,16 @@ function session() {
         getUserAgent: () => host.getUserAgent(),
         getCookie(url) {
             active();
-            const cookie = host.getCookie(url, id);
-            if (typeof cookie !== 'string') throw new Error('Network session is unavailable');
-            return cookie;
+            return host.getCookie(url, id);
         },
         setCookie(url, cookie) {
             active();
-            const result = host.setCookie(url, cookie, id);
-            if (typeof result !== 'boolean') throw new Error('Network session is unavailable');
-            return result;
+            return host.setCookie(url, cookie, id);
         },
         close() {
             if (closed) return;
             closed = true;
-            if (host.closeSession(id) !== true) throw new Error('Network session is unavailable');
+            host.closeSession(id);
         }
     };
 }

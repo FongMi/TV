@@ -67,9 +67,7 @@ def boolean_result(value):
 
 def init(ru, extend):
     try:
-        runtime = getattr(ru, "runtime", None)
-        if runtime is not None:
-            runtime.prepare(ru)
+        ru.runtime.prepare(ru)
         sync_result(ru.init(extend))
     except BaseException:
         release(ru)
@@ -151,9 +149,7 @@ def destroy(ru):
 
 def release(ru):
     close_dialog(ru)
-    runtime = getattr(ru, "runtime", None)
-    if runtime is not None:
-        runtime.close()
+    ru.runtime.close()
 
 
 def close_dialog(ru):

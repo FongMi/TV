@@ -58,7 +58,7 @@ function bindDanmaku(wrapped, api) {
             }
         }
         try {
-            if (typeof api.destroy === 'function') await api.destroy();
+            await api.destroy();
         } catch (error) {
             failures.push(error);
         }
