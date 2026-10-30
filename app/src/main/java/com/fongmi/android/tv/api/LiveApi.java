@@ -43,6 +43,19 @@ public class LiveApi {
     }
 
     @NonNull
+    public static Epg getEpg(@NonNull Channel item, @NonNull ZoneId zoneId, @NonNull LocalDate day) {
+        // Fetch only the selected day and its midnight carry-over. Browsing
+        // history must not refetch today's neighbours or change live metadata.
+        fetchEpgDay(item, zoneId, day);
+        try {
+            if (!Thread.currentThread().isInterrupted()) fetchEpgDay(item, zoneId, day.minusDays(1));
+        } catch (Exception ignored) {
+            // An unavailable previous day must not hide the requested schedule.
+        }
+        return item.getData(zoneId, day);
+    }
+
+    @NonNull
     public static Result getUrl(@NonNull Channel item) throws Exception {
         Result result = resolveUrl(item);
         item.applyAuth(result);
@@ -79,7 +92,11 @@ public class LiveApi {
     }
 
     private static void fetchEpgDay(@NonNull Channel item, @NonNull ZoneId zoneId, int offset) {
-        String date = LocalDate.now(zoneId).plusDays(offset).format(Formatters.DATE);
+        fetchEpgDay(item, zoneId, LocalDate.now(zoneId).plusDays(offset));
+    }
+
+    private static void fetchEpgDay(@NonNull Channel item, @NonNull ZoneId zoneId, @NonNull LocalDate day) {
+        String date = day.format(Formatters.DATE);
         String url = item.getEpg().replace("{date}", date);
         boolean need = url.startsWith("http") && item.getDataList().stream().noneMatch(epg -> epg.equal(date));
         if (need) item.setData(Epg.objectFrom(OkHttp.string(url), item.getTvgId(), date, zoneId));

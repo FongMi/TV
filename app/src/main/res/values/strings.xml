@@ -4,6 +4,9 @@
     <string name="app_name">TV</string>
 
     <!-- Live -->
+    <string name="epg_history_date">Programme date</string>
+    <string name="epg_history_empty">No programmes available for this date</string>
+    <string name="epg_history_channels">‹ Channels</string>
     <string name="live_pass">Pass</string>
     <string name="live_refresh">Refresh</string>
     <string name="live_line">Line <xliff:g name="name">%s</xliff:g></string>

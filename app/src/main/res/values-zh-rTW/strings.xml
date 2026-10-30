@@ -4,6 +4,9 @@
     <string name="app_name">影視</string>
 
     <!-- Live -->
+    <string name="epg_history_date">節目日期</string>
+    <string name="epg_history_empty">此日期暫無節目表</string>
+    <string name="epg_history_channels">‹ 頻道</string>
     <string name="live_pass">密碼</string>
     <string name="live_refresh">刷新</string>
     <string name="live_line">來源 <xliff:g name="name">%s</xliff:g></string>
