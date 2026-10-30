@@ -7,13 +7,15 @@ import com.fongmi.android.tv.utils.FileUtil;
 import com.github.catvod.net.OkHttp;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.UriUtil;
-import com.google.common.net.HttpHeaders;
 
 import java.util.Locale;
 
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class Strm implements Source.Extractor {
+
+    private static final long MAX_STRM_BYTES = 64 * 1024;
 
     @Override
     public boolean match(Uri uri) {
@@ -30,9 +32,15 @@ public class Strm implements Source.Extractor {
 
     private String http(String url) throws Exception {
         try (Response res = OkHttp.newCall(OkHttp.noRedirect(), url).execute()) {
-            String content = res.header(HttpHeaders.CONTENT_DISPOSITION, "").toLowerCase(Locale.ROOT);
-            boolean text = content.contains(".strm") || content.contains(".txt");
-            return text ? res.body().string().split("\\R", 2)[0] : url;
+            if (!res.isSuccessful() || res.body() == null) return url;
+            // A .strm endpoint can also serve media directly; never read its entire body.
+            try (ResponseBody body = res.peekBody(MAX_STRM_BYTES)) {
+                if (body.contentLength() >= MAX_STRM_BYTES) return url;
+                String content = body.string();
+                if (content.startsWith("\uFEFF")) content = content.substring(1);
+                String line = content.split("\\R", 2)[0].trim();
+                return line.matches("[a-zA-Z][a-zA-Z0-9+.-]*:\\S+") ? line : url;
+            }
         }
     }
 }

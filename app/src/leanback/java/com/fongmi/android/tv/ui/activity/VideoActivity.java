@@ -508,6 +508,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void onPlaybackRequested() {
+        mInput.cancelSeek();
         showProgress();
     }
 
@@ -1628,6 +1629,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onStop() {
+        mInput.cancelSeek();
         super.onStop();
         saveHistory(false);
         if (PlayerSetting.isBackgroundOff()) mClock.stop();
@@ -1654,6 +1656,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onDestroy() {
+        mInput.cancelSeek();
         mClock.release();
         saveHistory(true);
         DanmakuApi.cancel();

@@ -12,6 +12,7 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
 
     private static final int SEEK_COMMIT_DELAY_MS = 250;
 
+    private final Runnable seekCommit = this::commitSeek;
     private boolean fullscreen;
     private int centerKeyCode = KeyEvent.KEYCODE_UNKNOWN;
     private long centerKeyDownTime;
@@ -31,7 +32,17 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
     }
 
     public void setFullscreen(boolean fullscreen) {
+        if (!fullscreen) cancelSeek();
         this.fullscreen = fullscreen;
+    }
+
+    public void cancelSeek() {
+        App.removeCallbacks(seekCommit);
+        resetSeekTime();
+    }
+
+    private void commitSeek() {
+        listener.onSeekEnd(consumeSeekTime());
     }
 
     private boolean isSupportedKey(KeyEvent event) {
@@ -45,13 +56,12 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
     }
 
     private void handleKeyEvent(KeyEvent event) {
-        if (KeyUtil.isActionDown(event) && KeyUtil.isLeftKey(event)) {
-            listener.onSeeking(offsetSeekTime(-Constant.INTERVAL_SEEK));
-        } else if (KeyUtil.isActionDown(event) && KeyUtil.isRightKey(event)) {
-            listener.onSeeking(offsetSeekTime(Constant.INTERVAL_SEEK));
-        } else if (KeyUtil.isActionUp(event) && (KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event))) {
-            long time = consumeSeekTime();
-            App.post(() -> listener.onSeekEnd(time), SEEK_COMMIT_DELAY_MS);
+        boolean seekKey = KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event);
+        if (KeyUtil.isActionDown(event) && seekKey) {
+            App.removeCallbacks(seekCommit);
+            listener.onSeeking(offsetSeekTime(KeyUtil.isLeftKey(event) ? -Constant.INTERVAL_SEEK : Constant.INTERVAL_SEEK));
+        } else if (KeyUtil.isActionUp(event) && seekKey) {
+            App.post(seekCommit, SEEK_COMMIT_DELAY_MS);
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isUpKey(event)) {
             if (isSpeedPressActive()) finishSpeedPress();
             else listener.onKeyUp();

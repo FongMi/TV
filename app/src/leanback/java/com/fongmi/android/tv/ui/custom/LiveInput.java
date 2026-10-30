@@ -10,10 +10,12 @@ import com.fongmi.android.tv.utils.KeyUtil;
 public final class LiveInput extends BaseInput<LiveInput.Listener> {
 
     private static final int CHANNEL_NUMBER_TIMEOUT_MS = 2000;
+    private static final int SEEK_COMMIT_DELAY_MS = 250;
 
     private final StringBuilder channelNumber;
 
     private final Runnable findChannel = this::findChannel;
+    private final Runnable seekCommit = this::commitSeek;
 
     public static LiveInput create(Context context, Listener listener) {
         return new LiveInput(context, listener);
@@ -22,6 +24,16 @@ public final class LiveInput extends BaseInput<LiveInput.Listener> {
     private LiveInput(Context context, Listener listener) {
         super(context, listener);
         this.channelNumber = new StringBuilder();
+    }
+
+    public void cancelSeek() {
+        App.removeCallbacks(seekCommit);
+        resetSeekTime();
+    }
+
+    private void commitSeek() {
+        long time = consumeSeekTime();
+        if (listener.canSeek()) listener.onSeekEnd(time);
     }
 
     private boolean isSupportedKey(KeyEvent event) {
@@ -35,18 +47,22 @@ public final class LiveInput extends BaseInput<LiveInput.Listener> {
     }
 
     private void handleKeyEvent(KeyEvent event) {
-        if (KeyUtil.isActionDown(event) && KeyUtil.isLeftKey(event)) {
-            listener.onSeeking(offsetSeekTime(-Constant.INTERVAL_SEEK));
-        } else if (KeyUtil.isActionDown(event) && KeyUtil.isRightKey(event)) {
-            listener.onSeeking(offsetSeekTime(Constant.INTERVAL_SEEK));
+        boolean seekKey = KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event);
+        if (KeyUtil.isActionDown(event) && seekKey) {
+            App.removeCallbacks(seekCommit);
+            if (listener.canSeek()) listener.onSeeking(offsetSeekTime(KeyUtil.isLeftKey(event) ? -Constant.INTERVAL_SEEK : Constant.INTERVAL_SEEK));
+            else cancelSeek();
         } else if (KeyUtil.isActionDown(event) && KeyUtil.isUpKey(event)) {
             listener.onKeyUp();
         } else if (KeyUtil.isActionDown(event) && KeyUtil.isDownKey(event)) {
             listener.onKeyDown();
-        } else if (KeyUtil.isActionUp(event) && KeyUtil.isLeftKey(event)) {
-            listener.onKeyLeft(consumeSeekTime());
-        } else if (KeyUtil.isActionUp(event) && KeyUtil.isRightKey(event)) {
-            listener.onKeyRight(consumeSeekTime());
+        } else if (KeyUtil.isActionUp(event) && seekKey) {
+            if (listener.canSeek()) App.post(seekCommit, SEEK_COMMIT_DELAY_MS);
+            else {
+                cancelSeek();
+                if (KeyUtil.isLeftKey(event)) listener.onKeyLeft();
+                else listener.onKeyRight();
+            }
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isDigitKey(event)) {
             appendChannelDigit(event.getKeyCode());
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isEnterKey(event)) {
@@ -76,19 +92,23 @@ public final class LiveInput extends BaseInput<LiveInput.Listener> {
 
         boolean canHandleKeyEvent();
 
+        boolean canSeek();
+
         void onShow(String number);
 
         void onFind(String number);
 
         void onSeeking(long time);
 
+        void onSeekEnd(long time);
+
         void onKeyUp();
 
         void onKeyDown();
 
-        void onKeyLeft(long time);
+        void onKeyLeft();
 
-        void onKeyRight(long time);
+        void onKeyRight();
 
         void onKeyCenter();
 
