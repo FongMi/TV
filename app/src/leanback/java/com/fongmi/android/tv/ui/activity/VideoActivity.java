@@ -272,6 +272,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (TextUtils.isEmpty(intent.getStringExtra("id")) || isSameVideo(intent)) return;
+        mInput.cancelSeek();
         externalPlaybackCompleted = false;
         saveHistory(true);
         mVod.reset();
@@ -508,11 +509,13 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void onPlaybackRequested() {
+        mInput.cancelSeek();
         showProgress();
     }
 
     @Override
     public void prepareSource(Vod item) {
+        mInput.cancelSeek();
         ExternalPlayback.clearOptions(getIntent());
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getId());
@@ -526,6 +529,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void stopPlaybackForRefresh() {
+        mInput.cancelSeek();
         if (!isBindingOwner()) return;
         stopWebPlayback();
         service().stopPlayback(getNavigationCallback());
@@ -568,6 +572,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void startPlayback(Result result, boolean useParse, long startPositionMs, MediaMetadata metadata) {
+        mInput.cancelSeek();
         ExternalPlayback.apply(result, getIntent());
         startPositionMs = ExternalPlayback.takePosition(getIntent(), startPositionMs);
         if (startWebPlayback(mBinding.video, result)) return;
@@ -1374,6 +1379,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onPreloadTransition(Object tag, long oldPositionMs, long oldDurationMs) {
+        mInput.cancelSeek();
         if (tag instanceof VodPlayRequest request) mVod.onPreloadTransition(request, oldPositionMs, oldDurationMs);
     }
 
@@ -1572,6 +1578,11 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    public void onSeekCancel() {
+        hideCenter();
+    }
+
+    @Override
     public boolean onSpeedPressStart() {
         if (!player().isPlaying()) return false;
         return PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
@@ -1628,6 +1639,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onStop() {
+        mInput.cancelSeek();
         super.onStop();
         saveHistory(false);
         if (PlayerSetting.isBackgroundOff()) mClock.stop();
@@ -1654,6 +1666,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     protected void onDestroy() {
+        mInput.cancelSeek();
         mClock.release();
         saveHistory(true);
         DanmakuApi.cancel();

@@ -4,13 +4,9 @@ import android.content.Context;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 
-import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.Constant;
 import com.fongmi.android.tv.utils.KeyUtil;
 
-public final class VodInput extends BaseInput<VodInput.Listener> {
-
-    private static final int SEEK_COMMIT_DELAY_MS = 250;
+public final class VodInput extends SeekInput<VodInput.Listener> {
 
     private boolean fullscreen;
     private int centerKeyCode = KeyEvent.KEYCODE_UNKNOWN;
@@ -31,6 +27,7 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
     }
 
     public void setFullscreen(boolean fullscreen) {
+        if (!fullscreen) cancelSeek();
         this.fullscreen = fullscreen;
     }
 
@@ -45,14 +42,8 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
     }
 
     private void handleKeyEvent(KeyEvent event) {
-        if (KeyUtil.isActionDown(event) && KeyUtil.isLeftKey(event)) {
-            listener.onSeeking(offsetSeekTime(-Constant.INTERVAL_SEEK));
-        } else if (KeyUtil.isActionDown(event) && KeyUtil.isRightKey(event)) {
-            listener.onSeeking(offsetSeekTime(Constant.INTERVAL_SEEK));
-        } else if (KeyUtil.isActionUp(event) && (KeyUtil.isLeftKey(event) || KeyUtil.isRightKey(event))) {
-            long time = consumeSeekTime();
-            App.post(() -> listener.onSeekEnd(time), SEEK_COMMIT_DELAY_MS);
-        } else if (KeyUtil.isActionUp(event) && KeyUtil.isUpKey(event)) {
+        if (onSeekKey(event)) return;
+        if (KeyUtil.isActionUp(event) && KeyUtil.isUpKey(event)) {
             if (isSpeedPressActive()) finishSpeedPress();
             else listener.onKeyUp();
         } else if (KeyUtil.isActionUp(event) && KeyUtil.isDownKey(event)) {
@@ -85,11 +76,7 @@ public final class VodInput extends BaseInput<VodInput.Listener> {
         listener.onSpeedPressEnd();
     }
 
-    public interface Listener extends BaseInput.Listener {
-
-        void onSeeking(long time);
-
-        void onSeekEnd(long time);
+    public interface Listener extends SeekInput.Listener {
 
         boolean onSpeedPressStart();
 

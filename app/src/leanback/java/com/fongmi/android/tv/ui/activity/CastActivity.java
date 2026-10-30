@@ -177,6 +177,7 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     }
 
     private void start() {
+        mInput.cancelSeek();
         mPlaybackKey = mAction.getCurrentURI();
         if (mRenderer != null) mRenderer.activateDlna(mDlnaOwner, mPlaybackKey);
         startPlayer(mPlaybackKey, mAction.result(), false, Constant.TIMEOUT_PLAY, buildMetadata());
@@ -442,6 +443,11 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     }
 
     @Override
+    public void onSeekCancel() {
+        hideCenter();
+    }
+
+    @Override
     public boolean onSpeedPressStart() {
         if (!player().isPlaying()) return false;
         return PlaybackAction.startSpeedPress(player(), mBinding.widget.message);
@@ -487,6 +493,7 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
 
     @Override
     protected void onStop() {
+        mInput.cancelSeek();
         super.onStop();
         if (PlayerSetting.isBackgroundOff()) mClock.stop();
     }
@@ -507,6 +514,7 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
 
     @Override
     protected void onDestroy() {
+        mInput.cancelSeek();
         mClock.release();
         releaseRenderer();
         App.removeCallbacks(mR1, mR2);

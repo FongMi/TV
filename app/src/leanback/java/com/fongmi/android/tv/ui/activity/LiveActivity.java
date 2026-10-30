@@ -798,17 +798,20 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void preparePlaybackForRefresh() {
+        mInput.cancelSeek();
         player().prepareForReplacement();
     }
 
     @Override
     public void stopPlaybackForRefresh() {
+        mInput.cancelSeek();
         stopWebPlayback();
         stopPlayer();
     }
 
     @Override
     public void startPlayback(Result result, long position, MediaMetadata metadata) {
+        mInput.cancelSeek();
         mPlaybackKey = result.getRealUrl();
         if (startWebPlayback(result)) return;
         startPlayer(mPlaybackKey, result, false, getHome().getTimeout(), position, metadata);
@@ -1026,6 +1029,11 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
+    public boolean canSeek() {
+        return player().canSeek();
+    }
+
+    @Override
     public void onShow(String number) {
         mBinding.widget.digital.setText(number);
         mBinding.widget.digital.setVisibility(View.VISIBLE);
@@ -1059,15 +1067,23 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     }
 
     @Override
-    public void onKeyLeft(long time) {
-        if (!player().canSeek()) prevLine();
-        else App.post(() -> seekTo(time), 250);
+    public void onSeekEnd(long time) {
+        seekTo(time);
     }
 
     @Override
-    public void onKeyRight(long time) {
-        if (!player().canSeek()) nextLine(true);
-        else App.post(() -> seekTo(time), 250);
+    public void onSeekCancel() {
+        hideCenter();
+    }
+
+    @Override
+    public void onKeyLeft() {
+        prevLine();
+    }
+
+    @Override
+    public void onKeyRight() {
+        nextLine(true);
     }
 
     @Override
@@ -1101,6 +1117,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     protected void onStop() {
+        mInput.cancelSeek();
         super.onStop();
         if (PlayerSetting.isBackgroundOff()) mClock.stop();
     }
@@ -1123,6 +1140,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     protected void onDestroy() {
+        mInput.cancelSeek();
         mClock.release();
         if (isBindingOwner() && isOwner()) Source.get().exit();
         App.removeCallbacks(mR0, mR1, mR2, mR3, mR4);
