@@ -29,7 +29,6 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.PlaybackContent;
 import com.fongmi.android.tv.databinding.DialogPlaybackContentBinding;
 import com.fongmi.android.tv.player.PlayerManager;
-import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.ui.activity.PlaybackActivity;
 import com.fongmi.android.tv.ui.adapter.PlaybackContentAdapter;
 import com.fongmi.android.tv.ui.custom.CustomTextListener;
@@ -256,7 +255,7 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
         } else {
             binding.status.setVisibility(View.GONE);
             List<Danmaku> source = activity.getDanmakuItems();
-            long timeOffset = DanmakuSetting.getConfig().timeOffsetMs;
+            long timeOffset = player.getDanmakuConfig().timeOffsetMs;
             if (!force && danmaku == source && danmakuOffsetMs == timeOffset && isCurrent(requestedContext)) return;
             danmaku = source;
             danmakuOffsetMs = timeOffset;
@@ -374,7 +373,7 @@ final class PlaybackContentPanel implements PlaybackContentAdapter.OnClickListen
         PlayerManager player = player();
         if (context == null || player == null || context.source() != player.getPlayer() || context.tab() != state.tab || !context.media().equals(player.getKey() + "\n" + player.getUrl())) return false;
         if (context.source() != null && !Objects.equals(context.timeline(), context.source().getCurrentTimeline())) return false;
-        return state.tab == PlaybackContentDialog.SUBTITLE ? context.offsets().equals(player.getSubtitleOffsets()) && context.selections().equals(getSelectedSelections(player)) : context.offset() == DanmakuSetting.getConfig().timeOffsetMs;
+        return state.tab == PlaybackContentDialog.SUBTITLE ? context.offsets().equals(player.getSubtitleOffsets()) && context.selections().equals(getSelectedSelections(player)) : context.offset() == player.getDanmakuConfig().timeOffsetMs;
     }
 
     private record SubtitleSelections(@Nullable TrackSelectionOverride primary, @Nullable TrackSelectionOverride secondary) {

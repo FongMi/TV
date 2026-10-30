@@ -98,7 +98,7 @@ public class ControlDialog extends BaseBottomSheetDialog implements ParseAdapter
     }
 
     private void setSpeed(@NonNull Slider slider, float value, boolean fromUser) {
-        if (fromUser) SpeedSetting.putPlayback(player.setSpeed(value));
+        if (fromUser) player.setSpeed(value);
     }
 
     private void setParse() {

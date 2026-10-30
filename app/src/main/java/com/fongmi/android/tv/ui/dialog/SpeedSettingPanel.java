@@ -16,15 +16,13 @@ final class SpeedSettingPanel {
 
     private final DialogSpeedSettingBinding binding;
     private final PlayerManager player;
-    private final boolean save;
     private final float[] presets;
     private final TextView[] presetViews;
     private float speed;
 
-    SpeedSettingPanel(DialogSpeedSettingBinding binding, PlayerManager player, boolean save) {
+    SpeedSettingPanel(DialogSpeedSettingBinding binding, PlayerManager player) {
         this.binding = binding;
         this.player = player;
-        this.save = save;
         this.presets = SpeedSetting.getPresets();
         this.presetViews = new TextView[]{binding.preset01, binding.preset02, binding.preset03, binding.preset04, binding.preset05, binding.preset06, binding.preset07, binding.preset08};
     }
@@ -92,7 +90,6 @@ final class SpeedSettingPanel {
         this.speed = player.setSpeed(speed);
         updateSpeedValue();
         updateLongPressSpeedNextFocus();
-        if (save) SpeedSetting.putPlayback(this.speed);
         return true;
     }
 

@@ -22,8 +22,6 @@ public class DanmakuSetting {
     private static final float MAX_STROKE_WIDTH_MULTIPLIER = 0.3f;
     private static final float MIN_PROJECTION_OFFSET = 0.02f;
     private static final float MAX_PROJECTION_OFFSET = 0.15f;
-    private static final long MIN_TIME_OFFSET_MS = -300000L;
-    private static final long MAX_TIME_OFFSET_MS = 300000L;
     private static final long MIN_DURATION_MS = 3000L;
     private static final long MAX_DURATION_MS = 15000L;
     private static final long MIN_FIXED_DURATION_MS = 2000L;
@@ -192,14 +190,6 @@ public class DanmakuSetting {
         Prefers.put("danmaku_fixed_duration", Math.clamp(value, MIN_FIXED_DURATION_MS, MAX_FIXED_DURATION_MS));
     }
 
-    public static long getTimeOffsetMs() {
-        return Math.clamp(Prefers.getLong("danmaku_time_offset", 0L), MIN_TIME_OFFSET_MS, MAX_TIME_OFFSET_MS);
-    }
-
-    public static void putTimeOffsetMs(long value) {
-        Prefers.put("danmaku_time_offset", Math.clamp(value, MIN_TIME_OFFSET_MS, MAX_TIME_OFFSET_MS));
-    }
-
     public static int getMaxOnScreen() {
         return Math.clamp(Prefers.getInt("danmaku_max_on_screen", 150), MIN_MAX_ON_SCREEN, MAX_MAX_ON_SCREEN);
     }
@@ -337,7 +327,6 @@ public class DanmakuSetting {
         DanmakuConfig config = DanmakuConfig.DEFAULT;
         putDurationMs(config.durationMs);
         putFixedDurationMs(config.fixedDurationMs);
-        putTimeOffsetMs(config.timeOffsetMs);
     }
 
     public static void resetDensity() {
@@ -377,7 +366,6 @@ public class DanmakuSetting {
                 .setColorMode(getColorMode())
                 .setDurationMs(getDurationMs())
                 .setFixedDurationMs(getFixedDurationMs())
-                .setTimeOffsetMs(getTimeOffsetMs())
                 .setMaxOnScreen(getMaxOnScreen())
                 .setScrollAreaRatio(getScrollAreaRatio())
                 .setScrollGapRatio(getScrollGapRatio())

@@ -30,12 +30,14 @@ final class DanmakuSettingPanel {
     private final DialogDanmakuSettingBinding binding;
     private final PlayerManager player;
     private final ExternalFontSelector fontSelector;
+    private long timeOffsetMs;
     private int currentTab;
 
     DanmakuSettingPanel(DialogDanmakuSettingBinding binding, PlayerManager player, ExternalFontSelector fontSelector) {
         this.binding = binding;
         this.player = player;
         this.fontSelector = fontSelector;
+        this.timeOffsetMs = player.getDanmakuConfig().timeOffsetMs;
     }
 
     void bind() {
@@ -77,7 +79,7 @@ final class DanmakuSettingPanel {
 
     private void bindTiming() {
         var timing = binding.timing;
-        setupMs(timing.timeOffsetSlider, timing.timeOffsetValue, DanmakuSetting.getTimeOffsetMs(), DanmakuSetting::putTimeOffsetMs);
+        setupMs(timing.timeOffsetSlider, timing.timeOffsetValue, timeOffsetMs, value -> timeOffsetMs = value);
         setupMs(timing.durationSlider, timing.durationValue, DanmakuSetting.getDurationMs(), DanmakuSetting::putDurationMs);
         setupMs(timing.fixedDurationSlider, timing.fixedDurationValue, DanmakuSetting.getFixedDurationMs(), DanmakuSetting::putFixedDurationMs);
     }
@@ -132,6 +134,7 @@ final class DanmakuSettingPanel {
 
     private void resetTiming() {
         DanmakuSetting.resetTiming();
+        timeOffsetMs = 0;
         bindTiming();
         applyConfig();
     }
@@ -163,6 +166,7 @@ final class DanmakuSettingPanel {
     private void resetAll() {
         DanmakuSetting.resetAppearance();
         DanmakuSetting.resetTiming();
+        timeOffsetMs = 0;
         DanmakuSetting.resetDensity();
         DanmakuSetting.resetDisplay();
         bindAppearance();
@@ -212,7 +216,7 @@ final class DanmakuSettingPanel {
     }
 
     private void applyConfig() {
-        if (!player.isReleased()) player.setDanmakuConfig(DanmakuSetting.getConfig());
+        if (!player.isReleased()) player.setDanmakuConfig(DanmakuSetting.getConfig().buildUpon().setTimeOffsetMs(timeOffsetMs).build());
     }
 
     private int styleChipForMode(int mode) {

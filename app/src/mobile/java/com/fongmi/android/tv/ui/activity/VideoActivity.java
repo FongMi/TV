@@ -81,7 +81,6 @@ import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
-import com.fongmi.android.tv.setting.SpeedSetting;
 import com.fongmi.android.tv.ui.adapter.EpisodeAdapter;
 import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.QualityAdapter;
@@ -737,7 +736,6 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         mHistory = history;
         mBinding.control.action.opening.setText(openingText(history.getOpening()));
         mBinding.control.action.ending.setText(endingText(history.getEnding()));
-        player().setSpeed(SpeedSetting.getPlayback());
         setScale(getScale());
     }
 
@@ -1064,12 +1062,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     private void onSpeed() {
-        SpeedSettingDialog.create().save(true).show(this);
+        SpeedSettingDialog.create().show(this);
         hideControl();
     }
 
     private boolean onSpeedLong() {
-        SpeedSetting.putPlayback(PlaybackAction.toggleSpeed(player(), mBinding.widget.message));
+        PlaybackAction.toggleSpeed(player(), mBinding.widget.message);
         setR1Callback();
         return true;
     }

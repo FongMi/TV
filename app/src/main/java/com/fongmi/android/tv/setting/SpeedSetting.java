@@ -43,14 +43,6 @@ public class SpeedSetting {
         return PRESETS.clone();
     }
 
-    public static float getPlayback() {
-        return clamp(Prefers.getFloat("speed_playback", NORMAL));
-    }
-
-    public static void putPlayback(float speed) {
-        Prefers.put("speed_playback", clamp(speed));
-    }
-
     public static float getLongPress() {
         return clampLongPress(Prefers.getFloat("speed_long_press", Prefers.getFloat("speed", LONG_PRESS)));
     }

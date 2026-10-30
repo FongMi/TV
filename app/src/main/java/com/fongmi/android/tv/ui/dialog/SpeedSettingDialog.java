@@ -1,6 +1,5 @@
 package com.fongmi.android.tv.ui.dialog;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -18,15 +17,8 @@ import com.fongmi.android.tv.utils.Util;
 
 public final class SpeedSettingDialog {
 
-    private boolean save;
-
     public static SpeedSettingDialog create() {
         return new SpeedSettingDialog();
-    }
-
-    public SpeedSettingDialog save(boolean save) {
-        this.save = save;
-        return this;
     }
 
     public void show(FragmentActivity activity) {
@@ -34,9 +26,6 @@ public final class SpeedSettingDialog {
         if (manager.isStateSaved()) return;
         for (Fragment fragment : manager.getFragments()) if (fragment instanceof BottomSheet || fragment instanceof SideSheet) return;
         DialogFragment dialog = Util.isFullscreenLand(activity) || Util.isLeanback() ? new SideSheet() : new BottomSheet();
-        Bundle arguments = new Bundle();
-        arguments.putBoolean("save", save);
-        dialog.setArguments(arguments);
         dialog.show(manager, null);
     }
 
@@ -57,7 +46,7 @@ public final class SpeedSettingDialog {
         @Override
         protected void initView() {
             PlaybackDialog.observe(this, player -> {
-                if (player != null) new SpeedSettingPanel(binding, player, requireArguments().getBoolean("save")).bind();
+                if (player != null) new SpeedSettingPanel(binding, player).bind();
             });
         }
 
@@ -85,7 +74,7 @@ public final class SpeedSettingDialog {
         @Override
         protected void initView() {
             PlaybackDialog.observe(this, player -> {
-                if (player != null) new SpeedSettingPanel(binding, player, requireArguments().getBoolean("save")).bind();
+                if (player != null) new SpeedSettingPanel(binding, player).bind();
             });
         }
 

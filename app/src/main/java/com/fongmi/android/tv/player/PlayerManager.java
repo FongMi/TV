@@ -87,6 +87,7 @@ public class PlayerManager implements ParseCallback {
     private String playbackId;
     private long playbackAttempt;
     private float speedBeforePress = Float.NaN;
+    private long danmakuTimeOffsetMs;
 
     private long pendingStartPositionMs;
     private Result browseResult;
@@ -450,7 +451,12 @@ public class PlayerManager implements ParseCallback {
         player.selectEdition(edition);
     }
 
+    public DanmakuConfig getDanmakuConfig() {
+        return DanmakuSetting.getConfig().buildUpon().setTimeOffsetMs(danmakuTimeOffsetMs).build();
+    }
+
     public void setDanmakuConfig(DanmakuConfig config) {
+        danmakuTimeOffsetMs = config.timeOffsetMs;
         callback.onDanmakuConfigChanged(config);
     }
 
@@ -625,6 +631,12 @@ public class PlayerManager implements ParseCallback {
         endSpeedPress();
         clearPreload();
         player.clearMediaItems();
+        resetPlaybackSettings();
+    }
+
+    private void resetPlaybackSettings() {
+        setSpeed(SpeedSetting.NORMAL);
+        setDanmakuConfig(DanmakuSetting.getConfig());
     }
 
     public void prepareForReplacement() {
@@ -846,9 +858,12 @@ public class PlayerManager implements ParseCallback {
         endSpeedPress();
         if (newMedia && refreshAttempted) spec.refresh();
         if (newMedia) mpvDrmExoFallback = false;
+        MediaItem current = player.getCurrentMediaItem();
+        boolean newContent = newMedia && (current == null || !TextUtils.equals(current.mediaId, spec.getKey()));
         boolean playWhenReady = player.getPlayWhenReady();
         ensureEngine(spec.checkUa());
         if (newMedia) timeshift.start(spec);
+        if (newContent) resetPlaybackSettings();
         beginPlaybackAttempt(newMedia);
         if (newMedia) engine.prepareForNewMedia();
         pendingPreload = null;
