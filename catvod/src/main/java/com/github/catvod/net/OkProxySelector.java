@@ -9,9 +9,10 @@ import java.net.ProxySelector;
 import java.net.SocketAddress;
 import java.net.URI;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import okhttp3.HttpUrl;
 
 public class OkProxySelector extends ProxySelector {
 
@@ -53,11 +54,12 @@ public class OkProxySelector extends ProxySelector {
         return getProxies(uri, find(uri));
     }
 
-    Policy policy(URI uri, Policy previous) {
+    Policy policy(HttpUrl url, Policy previous) {
+        URI uri = url.uri();
         Proxy item = find(uri);
         if (item == null && canInherit(uri, previous)) item = previous.rule;
         List<java.net.Proxy> proxies = getProxies(uri, item);
-        return new Policy(uri, item, proxies, system, generation);
+        return new Policy(url, item, proxies, system, generation);
     }
 
     private boolean canInherit(URI uri, Policy previous) {
@@ -89,10 +91,10 @@ public class OkProxySelector extends ProxySelector {
         private final String host;
         private final int port;
 
-        private Policy(URI uri, Proxy rule, List<java.net.Proxy> proxies, ProxySelector system, int generation) {
-            this.scheme = uri.getScheme().toLowerCase(Locale.ROOT);
-            this.host = uri.getHost().toLowerCase(Locale.ROOT);
-            this.port = getPort(uri);
+        private Policy(HttpUrl url, Proxy rule, List<java.net.Proxy> proxies, ProxySelector system, int generation) {
+            this.scheme = url.scheme();
+            this.host = url.host();
+            this.port = url.port();
             this.rule = rule;
             this.proxies = List.copyOf(proxies);
             this.system = system;
@@ -126,13 +128,6 @@ public class OkProxySelector extends ProxySelector {
         @Override
         public int hashCode() {
             return Objects.hash(System.identityHashCode(rule), System.identityHashCode(system), generation, scheme, host, port, proxies);
-        }
-
-        private static int getPort(URI uri) {
-            if (uri.getPort() != -1) return uri.getPort();
-            if ("http".equalsIgnoreCase(uri.getScheme())) return 80;
-            if ("https".equalsIgnoreCase(uri.getScheme())) return 443;
-            return -1;
         }
     }
 }
