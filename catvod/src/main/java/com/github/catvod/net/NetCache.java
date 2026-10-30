@@ -1,6 +1,7 @@
 package com.github.catvod.net;
 
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Task;
 import com.google.gson.JsonObject;
 
 import java.io.InterruptedIOException;
@@ -73,15 +74,15 @@ final class NetCache implements AutoCloseable {
         Flight flight;
         String stale;
         synchronized (this) {
-            if (closed) return Net.failedFuture(canceled());
-            if (key == null || key.isEmpty() || loader == null) return Net.failedFuture(new IllegalArgumentException("Invalid cache options"));
-            if (options.persist && read == null) return Net.failedFuture(new IllegalArgumentException("Persistent cache requires a site owner"));
+            if (closed) return Task.failedFuture(canceled());
+            if (key == null || key.isEmpty() || loader == null) return Task.failedFuture(new IllegalArgumentException("Invalid cache options"));
+            if (options.persist && read == null) return Task.failedFuture(new IllegalArgumentException("Persistent cache requires a site owner"));
             Entry entry = options.ttl == 0 ? null : entries.get(key);
             if (options.ttl > 0 && entry == null && options.persist) entry = restore(key);
             if (fresh(entry, options.ttl)) return CompletableFuture.completedFuture(entry.value);
             if (entry != null && entry.flight != null) return entry.value == null || !options.stale ? copy(entry.flight.result) : CompletableFuture.completedFuture(entry.value);
             if (options.ttl > 0 && entry == null) {
-                if (entries.size() == CAPACITY && !evict()) return Net.failedFuture(new IllegalStateException("Cache capacity exceeded"));
+                if (entries.size() == CAPACITY && !evict()) return Task.failedFuture(new IllegalStateException("Cache capacity exceeded"));
                 entry = new Entry();
                 entries.put(key, entry);
             }

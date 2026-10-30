@@ -3,6 +3,8 @@ package com.github.catvod;
 import android.app.Activity;
 import android.content.Context;
 
+import com.github.catvod.utils.Task;
+
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
@@ -53,7 +55,7 @@ public class Runtime {
 
     public static CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
         var dialog = get().dialog;
-        if (dialog == null) return CompletableFuture.failedFuture(new UnsupportedOperationException("Dialog requires a compatible App"));
+        if (dialog == null) return Task.failedFuture(new UnsupportedOperationException("Dialog requires a compatible App"));
         return dialog.apply(options, onAction);
     }
 

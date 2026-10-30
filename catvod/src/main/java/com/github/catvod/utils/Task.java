@@ -12,6 +12,7 @@ import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.SettableFuture;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,6 +37,12 @@ public class Task {
 
     public static ScheduledExecutorService scheduler() {
         return scheduler;
+    }
+
+    public static <T> CompletableFuture<T> failedFuture(Throwable error) {
+        CompletableFuture<T> result = new CompletableFuture<>();
+        result.completeExceptionally(error);
+        return result;
     }
 
     public static Future<?> submit(Runnable task) {

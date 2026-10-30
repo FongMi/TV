@@ -1,6 +1,7 @@
 package com.fongmi.quickjs.host;
 
 import com.github.catvod.net.Net;
+import com.github.catvod.utils.Task;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
@@ -19,15 +20,11 @@ public interface Host extends Net.Cookies {
     }
 
     default CompletableFuture<String> dialog(String options) {
-        CompletableFuture<String> result = new CompletableFuture<>();
-        result.completeExceptionally(new UnsupportedOperationException("Dialog requires a compatible App"));
-        return result;
+        return Task.failedFuture(new UnsupportedOperationException("Dialog requires a compatible App"));
     }
 
     default CompletableFuture<String> dialog(String options, Function<String, CompletableFuture<String>> onAction) {
-        CompletableFuture<String> result = new CompletableFuture<>();
-        result.completeExceptionally(new UnsupportedOperationException("Dialog actions require a compatible App"));
-        return result;
+        return Task.failedFuture(new UnsupportedOperationException("Dialog actions require a compatible App"));
     }
 
     default String getCookie(String url) {

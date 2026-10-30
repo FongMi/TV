@@ -2,6 +2,7 @@ package com.fongmi.quickjs.method;
 
 import com.fongmi.quickjs.QuickJS;
 import com.fongmi.quickjs.host.Host;
+import com.github.catvod.utils.Task;
 
 import java.util.Set;
 import java.util.concurrent.CancellationException;
@@ -66,7 +67,7 @@ final class Dialogs {
         }
 
         private CompletableFuture<String> onAction(String event) {
-            if (result.isDone()) return CompletableFuture.failedFuture(new CancellationException("Dialog is closed"));
+            if (result.isDone()) return Task.failedFuture(new CancellationException("Dialog is closed"));
             Runnable finish = invocation == null ? () -> {} : invocation.beginDialogAction();
             CompletableFuture<Object> call = global.invokeDialogAction(invocation, callback, event, future -> {
                 actions.add(future);

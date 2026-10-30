@@ -4,6 +4,8 @@ import com.github.catvod.Runtime;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public final class PackageAbi {
@@ -28,9 +30,12 @@ public final class PackageAbi {
 
     private static boolean hasAbi(ZipFile apk, String abi) {
         String prefix = "lib/" + abi + "/";
-        return apk.stream().anyMatch(entry -> {
+        Enumeration<? extends ZipEntry> entries = apk.entries();
+        while (entries.hasMoreElements()) {
+            ZipEntry entry = entries.nextElement();
             String name = entry.getName();
-            return !entry.isDirectory() && name.startsWith(prefix) && name.endsWith(".so") && name.indexOf('/', prefix.length()) < 0;
-        });
+            if (!entry.isDirectory() && name.startsWith(prefix) && name.endsWith(".so") && name.indexOf('/', prefix.length()) < 0) return true;
+        }
+        return false;
     }
 }

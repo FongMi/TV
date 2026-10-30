@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import com.github.catvod.Runtime;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Json;
+import com.github.catvod.utils.Task;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -191,12 +192,6 @@ public final class Net implements AutoCloseable {
         return error;
     }
 
-    static <T> CompletableFuture<T> failedFuture(Throwable error) {
-        CompletableFuture<T> future = new CompletableFuture<>();
-        future.completeExceptionally(error);
-        return future;
-    }
-
     private CompletableFuture<String> load(Callable<String> loader) {
         CompletableFuture<String> loading = new CompletableFuture<>();
         FutureTask<Void> task = new FutureTask<>(() -> {
@@ -217,7 +212,7 @@ public final class Net implements AutoCloseable {
 
     public CompletableFuture<String> cachedAsync(String key, String options, Supplier<CompletableFuture<String>> loader) {
         synchronized (lock) {
-            if (closed) return failedFuture(new InterruptedIOException("Network owner closed"));
+            if (closed) return Task.failedFuture(new InterruptedIOException("Network owner closed"));
         }
         return cache.cached(key, CacheOptions.from(options), loader);
     }
@@ -470,7 +465,6 @@ public final class Net implements AutoCloseable {
 
     public CompletableFuture<String> downloadAsync(String url, String json, File file) {
         File target = file.isAbsolute() ? file : new File(Runtime.context().getCacheDir(), file.getPath());
-        CompletableFuture<String> future = new CompletableFuture<>();
         NetOptions options;
         Download download;
         Call call;
@@ -478,16 +472,15 @@ public final class Net implements AutoCloseable {
             options = NetOptions.from(json);
             download = createDownload(url, target, options);
         } catch (Exception e) {
-            future.completeExceptionally(e);
-            return future;
+            return Task.failedFuture(e);
         }
         try {
             call = newDownloadCall(download, options);
         } catch (Exception e) {
             closeDownload(download, e);
-            future.completeExceptionally(e);
-            return future;
+            return Task.failedFuture(e);
         }
+        CompletableFuture<String> future = new CompletableFuture<>();
         future.whenComplete((result, error) -> {
             if (future.isCancelled()) cancelDownload(call, download);
         });
@@ -613,13 +606,13 @@ public final class Net implements AutoCloseable {
     }
 
     public CompletableFuture<StreamResult> requestStreamAsync(String url, NetOptions options) {
-        CompletableFuture<StreamResult> future = new CompletableFuture<>();
         Call call;
         try {
             call = newCall(url, options);
         } catch (Exception error) {
-            return failedFuture(error);
+            return Task.failedFuture(error);
         }
+        CompletableFuture<StreamResult> future = new CompletableFuture<>();
         future.whenComplete((result, error) -> {
             if (future.isCancelled()) call.cancel();
         });
@@ -984,10 +977,10 @@ public final class Net implements AutoCloseable {
 
         public CompletableFuture<Integer> readAsync(ByteBuffer bytes) {
             if (bytes == null || bytes.isReadOnly() || !bytes.hasRemaining() || bytes.remaining() > 1024 * 1024) throw new IllegalArgumentException("Read requires a writable range of 1..1048576 bytes");
-            if (!reading.compareAndSet(false, true)) return failedFuture(new IllegalStateException("Stream read already pending"));
+            if (!reading.compareAndSet(false, true)) return Task.failedFuture(new IllegalStateException("Stream read already pending"));
             if (finished.get()) {
                 endRead();
-                return failedFuture(new IOException("Response stream closed"));
+                return Task.failedFuture(new IOException("Response stream closed"));
             }
             CompletableFuture<Integer> result = new CompletableFuture<>();
             result.whenComplete((value, error) -> {

@@ -16,6 +16,7 @@ import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Js;
 import com.github.catvod.utils.Local;
+import com.github.catvod.utils.Task;
 import com.github.catvod.utils.Trans;
 import com.github.catvod.utils.UriUtil;
 import com.google.gson.JsonElement;
@@ -258,14 +259,11 @@ public class Global {
     }
 
     CompletableFuture<Object> invoke(Invocation current, QuickJS.Callback callback, Object... args) {
+        if (destroyed) return Task.failedFuture(new IllegalStateException("Spider destroyed"));
         CompletableFuture<Object> result = new CompletableFuture<>();
-        if (destroyed) {
-            result.completeExceptionally(new IllegalStateException("Spider destroyed"));
-        } else {
-            ctx.execute(() -> invoke(current, callback, result, args)).whenComplete((value, error) -> {
-                if (error != null) result.completeExceptionally(error);
-            });
-        }
+        ctx.execute(() -> invoke(current, callback, result, args)).whenComplete((value, error) -> {
+            if (error != null) result.completeExceptionally(error);
+        });
         return result;
     }
 
