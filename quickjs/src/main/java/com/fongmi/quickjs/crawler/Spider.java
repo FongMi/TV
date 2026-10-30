@@ -306,7 +306,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private Object[] proxyResponse(Invocation current, Object[] array) throws Exception {
-        if (array == null || array.length < 3 || array.length > 4) throw new IllegalArgumentException("Proxy response requires three or four fields");
+        if (array == null || array.length < 3) throw new IllegalArgumentException("Proxy response requires status, MIME and body");
         int code = proxyCode(array[0]);
         if (!(array[1] instanceof String mime)) throw new IllegalArgumentException("Proxy response MIME requires a string");
         Map<String, String> headers = proxyHeaders(array.length > 3 ? array[3] : null);
@@ -346,7 +346,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private InputStream proxyBody(Invocation current, Object value) throws JSONException {
         if (value instanceof QuickJS.Json(String text)) value = new JSONTokener(text).nextValue();
-        if (value instanceof JSONObject stream && stream.length() == 1 && stream.has("$tvStream")) return current.takeStream(stream.getString("$tvStream"));
+        if (value instanceof JSONObject stream && stream.has("$tvStream")) return current.takeStream(stream.getString("$tvStream"));
         if (value instanceof byte[] bytes) return new ByteArrayInputStream(bytes);
         if (value instanceof String text) return new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8));
         if (value instanceof Object[] array) return new ByteArrayInputStream(proxyBytes(array));

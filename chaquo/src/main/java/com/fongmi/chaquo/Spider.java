@@ -151,10 +151,9 @@ public class Spider extends com.github.catvod.crawler.Spider {
     @Override
     public Object[] proxy(Map<String, String> params) throws Exception {
         List<PyObject> list = app.callAttr("proxy", obj, GSON.toJson(params)).asList();
-        if (list.size() < 3) throw new IllegalArgumentException("Proxy response requires three or four fields");
+        if (list.size() < 3) throw new IllegalArgumentException("Proxy response requires status, MIME and body");
         InputStream stream = proxyBody(list.get(2));
         try {
-            if (list.size() > 4) throw new IllegalArgumentException("Proxy response requires three or four fields");
             boolean header = list.size() > 3 && list.get(3) != null;
             return new Object[]{proxyCode(list.get(0)), proxyMime(list.get(1)), stream, header ? getHeader(list.get(3)) : null};
         } catch (RuntimeException | Error error) {
