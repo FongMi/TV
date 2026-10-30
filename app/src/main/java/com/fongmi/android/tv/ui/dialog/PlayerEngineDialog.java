@@ -17,6 +17,7 @@ import com.fongmi.android.tv.playback.PlaybackAction;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.ui.activity.PlaybackActivity;
+import com.github.catvod.utils.RuntimeModule;
 
 public final class PlayerEngineDialog extends BaseBottomSheetDialog {
 
@@ -52,9 +53,11 @@ public final class PlayerEngineDialog extends BaseBottomSheetDialog {
         this.player = player;
         if (player == null) return;
         int engine = PlaybackAction.getEngine(player);
+        boolean mpv = RuntimeModule.MPV.isInstalled();
+        binding.mpv.setVisibility(mpv ? View.VISIBLE : View.GONE);
         binding.exo.setSelected(engine == PlayerSetting.ENGINE_EXO);
-        binding.mpv.setSelected(engine == PlayerSetting.ENGINE_MPV);
-        (engine == PlayerSetting.ENGINE_MPV ? binding.mpv : binding.exo).requestFocus();
+        binding.mpv.setSelected(mpv && engine == PlayerSetting.ENGINE_MPV);
+        (binding.mpv.isSelected() ? binding.mpv : binding.exo).requestFocus();
     }
 
     @Override

@@ -78,7 +78,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
     }
 
     private void setEngine(View view) {
-        int index = (PlayerSetting.getEngine() + 1) % engine.length;
+        int index = (PlayerSetting.getEngine() + 1) % PlayerSetting.getEngineCount();
         if (index == PlayerSetting.ENGINE_MPV && !MpvUtil.checkInstalled()) return;
         PlayerSetting.putEngine(index);
         setPlaybackModeText();

@@ -77,7 +77,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
     }
 
     private void setEngine(View view) {
-        int index = (PlayerSetting.getEngine() + 1) % engine.length;
+        int index = (PlayerSetting.getEngine() + 1) % PlayerSetting.getEngineCount();
         if (index == PlayerSetting.ENGINE_MPV && !MpvUtil.checkInstalled()) return;
         PlayerSetting.putEngine(index);
         setPlaybackModeText();
@@ -156,6 +156,9 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
     @Override
     protected void onResume() {
         super.onResume();
-        if (mBinding != null) setPlaybackModeText();
+        if (mBinding != null) {
+            setPlaybackModeText();
+            setVisible();
+        }
     }
 }
