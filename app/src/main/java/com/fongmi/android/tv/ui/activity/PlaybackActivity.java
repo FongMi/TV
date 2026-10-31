@@ -6,16 +6,23 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.net.Uri;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
+import android.view.PixelCopy;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -74,6 +81,8 @@ import java.util.function.Consumer;
 
 public abstract class PlaybackActivity extends BaseActivity implements MediaController.Listener, Player.Listener, ServiceConnection {
 
+    private ImageView mFreeze;
+    private boolean mFrozen;
     private final DanmakuPlayerViewController danmakuController = new DanmakuPlayerViewController();
     private final LiveDanmaku liveDanmaku = new LiveDanmaku(danmakuController::post, this::onDanmakuState);
     private final List<ServiceReadyObserver<?>> serviceReadyObservers = new ArrayList<>();
@@ -836,6 +845,57 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         if (PlayerSetting.isDebug() && !getPlayerView().isDebugViewVisible()) getPlayerView().toggleDebugView();
     }
 
+    private void hideVideoWhileBuffering(int state) {
+        if (player().getEngine() != PlayerSetting.ENGINE_EXO) state = Player.STATE_READY;
+        freezeVideo(state == Player.STATE_BUFFERING);
+    }
+
+    // Exo renders stale frames after a seek, so the last picture is kept in an overlay until playback is ready again
+    private void freezeVideo(boolean on) {
+        View surface = getPlayerView().getVideoSurfaceView();
+        if (surface == null) return;
+        if (!on) {
+            mFrozen = false;
+            surface.setAlpha(1f);
+            if (mFreeze != null) mFreeze.setVisibility(View.GONE);
+            return;
+        }
+        if (mFrozen) return;
+        mFrozen = true;
+        int w = surface.getWidth() / 2;
+        int h = surface.getHeight() / 2;
+        if (w <= 0 || h <= 0) {
+            surface.setAlpha(0f);
+            return;
+        }
+        Bitmap bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        if (surface instanceof SurfaceView) {
+            PixelCopy.request((SurfaceView) surface, bitmap, result -> showFreeze(surface, result == PixelCopy.SUCCESS ? bitmap : null), new Handler(Looper.getMainLooper()));
+        } else if (surface instanceof TextureView) {
+            showFreeze(surface, ((TextureView) surface).getBitmap(bitmap));
+        } else {
+            surface.setAlpha(0f);
+        }
+    }
+
+    private void showFreeze(View surface, Bitmap bitmap) {
+        if (!mFrozen) return;
+        if (bitmap != null) {
+            ViewGroup parent = (ViewGroup) surface.getParent();
+            if (mFreeze == null) {
+                mFreeze = new ImageView(this);
+                mFreeze.setScaleType(ImageView.ScaleType.FIT_XY);
+            }
+            if (mFreeze.getParent() != parent) {
+                if (mFreeze.getParent() != null) ((ViewGroup) mFreeze.getParent()).removeView(mFreeze);
+                parent.addView(mFreeze, parent.indexOfChild(surface) + 1, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+            }
+            mFreeze.setImageBitmap(bitmap);
+            mFreeze.setVisibility(View.VISIBLE);
+        }
+        surface.setAlpha(0f);
+    }
+
     private void configurePlayerView() {
         PlayerView playerView = getPlayerView();
         playerView.setRender(PlayerSetting.getRender());
@@ -1072,6 +1132,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     @Override
     public void onPlaybackStateChanged(int state) {
         if (!isOwner()) return;
+        hideVideoWhileBuffering(state);
         onStateChanged(state);
         getPlayerView().setDiscMenuController(discMenu());
     }

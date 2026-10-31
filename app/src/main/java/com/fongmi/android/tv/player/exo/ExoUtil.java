@@ -24,10 +24,13 @@ import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider;
 import androidx.media3.exoplayer.audio.DefaultAudioSink;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector;
 import androidx.media3.exoplayer.text.TextOutput;
 import androidx.media3.exoplayer.text.TextRenderer;
 import androidx.media3.exoplayer.trackselection.DecodeTrackSelector;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.exoplayer.video.MediaCodecVideoRenderer;
+import androidx.media3.exoplayer.video.VideoRendererEventListener;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.track.LangUtil;
@@ -114,6 +117,24 @@ public final class ExoUtil {
             experimentalSetEnableMediaCodecVideoRendererPrewarming(true);
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);
             setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
+        }
+
+        @Override
+        protected void buildVideoRenderers(@NonNull Context context, int extensionRendererMode, @NonNull MediaCodecSelector selector, boolean enableDecoderFallback, @NonNull Handler eventHandler, @NonNull VideoRendererEventListener eventListener, long allowedVideoJoiningTimeMs, @NonNull ArrayList<Renderer> out) {
+            int start = out.size();
+            super.buildVideoRenderers(context, extensionRendererMode, selector, enableDecoderFallback, eventHandler, eventListener, allowedVideoJoiningTimeMs, out);
+            if (out.size() > start && out.get(start).getClass() == MediaCodecVideoRenderer.class) out.set(start, createVideoRenderer(context, selector, enableDecoderFallback, eventHandler, eventListener, allowedVideoJoiningTimeMs));
+        }
+
+        @Nullable
+        @Override
+        protected Renderer buildSecondaryVideoRenderer(@NonNull Renderer renderer, @NonNull Context context, int extensionRendererMode, @NonNull MediaCodecSelector selector, boolean enableDecoderFallback, @NonNull Handler eventHandler, @NonNull VideoRendererEventListener eventListener, long allowedVideoJoiningTimeMs) {
+            if (renderer instanceof FirstFrameVideoRenderer) return createVideoRenderer(context, selector, enableDecoderFallback, eventHandler, eventListener, allowedVideoJoiningTimeMs);
+            return super.buildSecondaryVideoRenderer(renderer, context, extensionRendererMode, selector, enableDecoderFallback, eventHandler, eventListener, allowedVideoJoiningTimeMs);
+        }
+
+        private Renderer createVideoRenderer(Context context, MediaCodecSelector selector, boolean enableDecoderFallback, Handler eventHandler, VideoRendererEventListener eventListener, long allowedVideoJoiningTimeMs) {
+            return new FirstFrameVideoRenderer(new MediaCodecVideoRenderer.Builder(context).setCodecAdapterFactory(getCodecAdapterFactory()).setMediaCodecSelector(selector).setAllowedJoiningTimeMs(allowedVideoJoiningTimeMs).setEnableDecoderFallback(enableDecoderFallback).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy()).setEventHandler(eventHandler).setEventListener(eventListener).setMaxDroppedFramesToNotify(50));
         }
 
         @Override
