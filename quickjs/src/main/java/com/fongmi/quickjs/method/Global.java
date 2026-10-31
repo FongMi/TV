@@ -204,7 +204,6 @@ public class Global {
     private void bindHost() {
         ctx.bind(bridge, "openWeb", args -> openWeb(json(args, 0))).join();
         ctx.bindAsync(bridge, "dialog", args -> dialogs.open(json(args, 0), str(args, 1)), this::captureScope).join();
-        ctx.bind(bridge, "getPort", args -> getPort()).join();
         ctx.bind(bridge, "proxyUrl", args -> proxyUrl(json(args, 0), bool(args, 1))).join();
         ctx.bind(bridge, "danmakuUrl", args -> Spider.danmakuUrl(siteKey, str(args, 0))).join();
         ctx.bind(bridge, "emitDanmaku", args -> emitDanmaku(integer(args, 0), json(args, 1))).join();
@@ -388,10 +387,6 @@ public class Global {
 
     public Boolean openWeb(QuickJS.Json options) {
         return options != null && host.openWeb(options.text());
-    }
-
-    public Integer getPort() {
-        return Proxy.getPort();
     }
 
     private String proxyUrl(QuickJS.Json params, boolean local) {
