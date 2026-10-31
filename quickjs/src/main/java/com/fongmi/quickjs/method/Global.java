@@ -4,6 +4,7 @@ import android.net.Uri;
 
 import com.fongmi.quickjs.QuickJS;
 import com.fongmi.quickjs.WebPlatform;
+import com.fongmi.quickjs.Wasm;
 import com.fongmi.quickjs.host.Host;
 import com.fongmi.quickjs.utils.HtmlQuery;
 import com.github.catvod.Proxy;
@@ -37,6 +38,7 @@ import java.util.function.Supplier;
 public class Global {
 
     private final WebPlatform web;
+    private final Wasm wasm;
     private final Network network;
     private final Streams streams;
     private final Sockets sockets;
@@ -63,12 +65,14 @@ public class Global {
         this.siteKey = siteKey;
         this.bridge = (QuickJS.Reference) ctx.reference("newObject").join();
         this.web = new WebPlatform(ctx, SpiderDebug::log, api);
+        this.wasm = new Wasm(ctx);
         this.network = new Network(this, new Net(host, siteKey), web);
         this.cache = new Cache(this, network, new Local(siteKey));
         this.streams = new Streams(this, network, host.getCallTimeout());
         this.sockets = new Sockets(this, network);
         this.dialogs = new Dialogs(this, host);
         ctx.reference("set", bridge, "siteKey", siteKey).join();
+        ctx.reference("set", bridge, "wasm", wasm.exports()).join();
         ctx.setAsyncScopeCapture(this::captureScope).join();
         ctx.registerModule("catvod:host", bridge).join();
         ctx.onClose(this::destroy).join();
@@ -133,6 +137,7 @@ public class Global {
         danmakus.clear();
         releaseCallbacks();
         sockets.release();
+        wasm.close();
         web.close();
         releaseReferences();
     }

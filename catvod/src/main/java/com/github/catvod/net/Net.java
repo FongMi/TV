@@ -241,6 +241,10 @@ public final class Net implements AutoCloseable {
         cache.clear(key);
     }
 
+    public boolean invalidateCache(String key, String expected) {
+        return cache.invalidate(key, expected);
+    }
+
     public void clearCache() {
         cache.clear(null);
     }

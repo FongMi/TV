@@ -360,4 +360,4 @@ export const net = {
     getUserAgent: () => host.getUserAgent()
 };
 
-export const {s2t, t2s, openWeb, getPort, danmakuUrl, joinUrl, htmlQuery, md5X, sha256X, randomX, aesX, desX, rsaX} = host;
+export const {s2t, t2s, openWeb, getPort, danmakuUrl, joinUrl, htmlQuery, md5X, sha256X, randomX, aesX, desX, rsaX, wasm} = host;
