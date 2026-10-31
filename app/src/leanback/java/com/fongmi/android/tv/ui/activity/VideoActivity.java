@@ -325,6 +325,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mBinding.control.action.ending.setOnClickListener(view -> onEnding());
         mBinding.control.action.repeat.setOnClickListener(view -> onRepeat());
         mBinding.control.action.danmaku.setOnClickListener(view -> onDanmaku());
+        mBinding.control.action.danmakuSwitch.setOnClickListener(view -> onDanmakuSwitch());
         mBinding.control.action.edition.setOnClickListener(view -> onEdition());
         mBinding.control.action.chapter.setOnClickListener(view -> onChapter());
         mBinding.control.action.discMenu.setOnClickListener(this::onDiscMenu);
@@ -379,7 +380,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         setSeekNextFocusDown(R.id.next);
         setActionFocusBoundary(mBinding.control.action.getRoot());
         PlayerEngineDialog.setText(mBinding.control.action.player);
-        mBinding.control.action.danmaku.setVisibility(DanmakuSetting.isLoad() ? View.VISIBLE : View.GONE);
+        setDanmakuVisible();
     }
 
     private void setPlaybackMode() {
@@ -1090,6 +1091,18 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         return true;
     }
 
+    private void setDanmakuVisible() {
+        mBinding.control.action.danmaku.setVisibility(DanmakuSetting.isLoad() ? View.VISIBLE : View.GONE);
+        mBinding.control.action.danmakuSwitch.setVisibility(DanmakuSetting.isLoad() ? View.VISIBLE : View.GONE);
+        mBinding.control.action.danmakuSwitch.setText(DanmakuSetting.isShow() ? R.string.danmaku_on : R.string.danmaku_off);
+    }
+
+    private void onDanmakuSwitch() {
+        DanmakuSetting.putShow(!DanmakuSetting.isShow());
+        player().setDanmakuEnabled(DanmakuSetting.isShow());
+        setDanmakuVisible();
+    }
+
     private void onDanmaku() {
         DanmakuDialog.create().show(this);
         hideControl();
@@ -1457,7 +1470,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
             setPlaybackMode();
             setTrackVisible();
             setMediaOptionVisible();
-            mBinding.control.action.danmaku.setVisibility(DanmakuSetting.isLoad() ? View.VISIBLE : View.GONE);
+            setDanmakuVisible();
         }
     }
 

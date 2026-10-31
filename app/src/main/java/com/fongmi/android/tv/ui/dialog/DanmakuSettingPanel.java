@@ -31,13 +31,15 @@ final class DanmakuSettingPanel {
     private final PlayerManager player;
     private final ExternalFontSelector fontSelector;
     private long timeOffsetMs;
+    private final int startTab;
     private int currentTab;
 
-    DanmakuSettingPanel(DialogDanmakuSettingBinding binding, PlayerManager player, ExternalFontSelector fontSelector) {
+    DanmakuSettingPanel(DialogDanmakuSettingBinding binding, PlayerManager player, ExternalFontSelector fontSelector, int startTab) {
         this.binding = binding;
+        this.startTab = startTab;
         this.player = player;
         this.fontSelector = fontSelector;
-        this.timeOffsetMs = player.getDanmakuConfig().timeOffsetMs;
+        this.timeOffsetMs = player == null ? 0 : player.getDanmakuConfig().timeOffsetMs;
     }
 
     void bind() {
@@ -47,8 +49,8 @@ final class DanmakuSettingPanel {
         bindDisplay();
         SettingPanelViews.bindTabs(binding.tabGroup, getTabs(), this::showTab);
         bindReset();
-        showTab(0);
-        PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, binding.tabAppearance);
+        showTab(startTab);
+        PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, getTabs()[startTab]);
     }
 
     void release() {
@@ -216,7 +218,7 @@ final class DanmakuSettingPanel {
     }
 
     private void applyConfig() {
-        if (!player.isReleased()) player.setDanmakuConfig(DanmakuSetting.getConfig().buildUpon().setTimeOffsetMs(timeOffsetMs).build());
+        if (player != null && !player.isReleased()) player.setDanmakuConfig(DanmakuSetting.getConfig().buildUpon().setTimeOffsetMs(timeOffsetMs).build());
     }
 
     private int styleChipForMode(int mode) {

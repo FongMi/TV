@@ -209,6 +209,8 @@
     <!-- Danmaku Setting -->
     <string name="danmaku">Danmaku</string>
     <string name="danmaku_select">Select danmaku</string>
+    <string name="danmaku_on">Danmaku: on</string>
+    <string name="danmaku_off">Danmaku: off</string>
     <string name="danmaku_setting">Danmaku setting</string>
     <string name="danmaku_text_size">Text scale</string>
     <string name="danmaku_transparency">Opacity</string>

@@ -209,6 +209,8 @@
     <!-- Danmaku Setting -->
     <string name="danmaku">彈幕</string>
     <string name="danmaku_select">選擇彈幕</string>
+    <string name="danmaku_on">彈幕：開</string>
+    <string name="danmaku_off">彈幕：關</string>
     <string name="danmaku_setting">彈幕設定</string>
     <string name="danmaku_text_size">字體縮放</string>
     <string name="danmaku_transparency">透明度</string>

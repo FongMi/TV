@@ -106,6 +106,14 @@
             tools:visibility="visible" />
 
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/danmakuSwitch"
+            style="@style/Control"
+            android:layout_marginEnd="8dp"
+            android:visibility="gone"
+            tools:text="@string/danmaku_on"
+            tools:visibility="visible" />
+
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/edition"
             style="@style/Control"
             android:layout_marginEnd="8dp"

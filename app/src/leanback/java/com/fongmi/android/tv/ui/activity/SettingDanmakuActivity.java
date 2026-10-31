@@ -15,6 +15,7 @@ import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.DanmakuApiDialog;
+import com.fongmi.android.tv.ui.dialog.DanmakuSettingDialog;
 
 public class SettingDanmakuActivity extends BaseActivity implements DanmakuListener {
 
@@ -49,6 +50,7 @@ public class SettingDanmakuActivity extends BaseActivity implements DanmakuListe
         mBinding.danmakuAuto.setOnClickListener(this::setDanmakuAuto);
         mBinding.danmakuLoad.setOnClickListener(this::setDanmakuLoad);
         mBinding.danmakuSpider.setOnClickListener(this::setDanmakuSpider);
+        mBinding.danmakuDensity.setOnClickListener(view -> DanmakuSettingDialog.create().tab(2).show(this));
     }
 
     private void setDanmakuLoad(View view) {

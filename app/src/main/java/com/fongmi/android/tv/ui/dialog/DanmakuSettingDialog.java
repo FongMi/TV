@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.ui.dialog;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
@@ -13,6 +14,7 @@ import androidx.viewbinding.ViewBinding;
 import com.fongmi.android.tv.databinding.DialogDanmakuSettingBinding;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
+import com.fongmi.android.tv.ui.activity.PlaybackActivity;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 
@@ -22,15 +24,30 @@ public final class DanmakuSettingDialog {
         return new DanmakuSettingDialog();
     }
 
+    private int tab;
+
+    public DanmakuSettingDialog tab(int tab) {
+        this.tab = tab;
+        return this;
+    }
+
     public void show(FragmentActivity activity) {
         FragmentManager manager = activity.getSupportFragmentManager();
         if (manager.isStateSaved()) return;
         for (Fragment fragment : manager.getFragments()) if (fragment instanceof BottomSheet || fragment instanceof SideSheet) return;
-        if (Util.isFullscreenLand(activity) || Util.isLeanback()) new SideSheet().show(manager, null);
-        else new BottomSheet().show(manager, null);
+        if (Util.isFullscreenLand(activity) || Util.isLeanback()) SideSheet.newInstance(tab).show(manager, null);
+        else BottomSheet.newInstance(tab).show(manager, null);
     }
 
     public static final class BottomSheet extends BaseBottomSheetDialog {
+
+        static BottomSheet newInstance(int tab) {
+            BottomSheet sheet = new BottomSheet();
+            Bundle args = new Bundle();
+            args.putInt("tab", tab);
+            sheet.setArguments(args);
+            return sheet;
+        }
 
         private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
         private DialogDanmakuSettingBinding binding;
@@ -49,15 +66,16 @@ public final class DanmakuSettingDialog {
         @Override
         protected void initView() {
             PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
-            PlaybackDialog.observe(this, this::bindPlayer);
+            if (requireActivity() instanceof PlaybackActivity) PlaybackDialog.observe(this, this::bindPlayer);
+            else bindPlayer(null);
         }
 
         private void bindPlayer(PlayerManager player) {
             if (panel != null) panel.release();
             fontSelector.release();
             panel = null;
-            if (player == null) return;
-            panel = new DanmakuSettingPanel(binding, player, fontSelector);
+            if (player == null && requireActivity() instanceof PlaybackActivity) return;
+            panel = new DanmakuSettingPanel(binding, player, fontSelector, requireArguments().getInt("tab"));
             panel.bind();
         }
 
@@ -77,6 +95,14 @@ public final class DanmakuSettingDialog {
 
     public static final class SideSheet extends BaseSideSheetDialog {
 
+        static SideSheet newInstance(int tab) {
+            SideSheet sheet = new SideSheet();
+            Bundle args = new Bundle();
+            args.putInt("tab", tab);
+            sheet.setArguments(args);
+            return sheet;
+        }
+
         private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
         private DialogDanmakuSettingBinding binding;
         private DanmakuSettingPanel panel;
@@ -94,15 +120,16 @@ public final class DanmakuSettingDialog {
         @Override
         protected void initView() {
             PlaybackDialogFocus.preferCheckedChips(binding.getRoot());
-            PlaybackDialog.observe(this, this::bindPlayer);
+            if (requireActivity() instanceof PlaybackActivity) PlaybackDialog.observe(this, this::bindPlayer);
+            else bindPlayer(null);
         }
 
         private void bindPlayer(PlayerManager player) {
             if (panel != null) panel.release();
             fontSelector.release();
             panel = null;
-            if (player == null) return;
-            panel = new DanmakuSettingPanel(binding, player, fontSelector);
+            if (player == null && requireActivity() instanceof PlaybackActivity) return;
+            panel = new DanmakuSettingPanel(binding, player, fontSelector, requireArguments().getInt("tab"));
             panel.bind();
         }
 
