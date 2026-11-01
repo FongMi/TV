@@ -17,9 +17,12 @@ import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.playback.PlaybackResult;
 import com.fongmi.android.tv.player.extractor.Source;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.SourceUrl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class VodPlaybackController {
 
@@ -151,10 +154,68 @@ public class VodPlaybackController {
         if (episode == null) return;
         result.getUrl().set(request.getQualityPosition());
         if (redirectPush(result)) return;
+        if (!result.getResolvedEpisodes().isEmpty()) {
+            resolveEpisodes(result, request);
+            return;
+        }
         applyPlaybackState(result, request);
         renderPlaybackResult(result, episode);
         startPlayback(result, request.getStartPositionMs() == C.TIME_UNSET ? startPositionMs() : request.getStartPositionMs(), episode);
         preloader.update(result);
+    }
+
+    private void resolveEpisodes(Result result, VodPlayRequest request) {
+        updateResolvedVod(result);
+        Flag flag = state.findFlag(host.getVodKey(), request);
+        Episode selected = updateResolvedEpisodes(flag, request.getId(), result.getResolvedEpisodes());
+        selectResolvedEpisode(flag, selected);
+        requestResolvedPlayback(flag, selected, result, request);
+    }
+
+    private void updateResolvedVod(Result result) {
+        if (result.getList().isEmpty()) return;
+        updateVod(result.getVod());
+        result.setList(List.of());
+    }
+
+    private Episode updateResolvedEpisodes(Flag flag, String id, List<Episode> items) {
+        List<Episode> episodes = new ArrayList<>(items);
+        Episode selected = episodes.stream().filter(Episode::isSelected).findFirst().orElseThrow();
+        if (state.getHistory().isRevSort()) Collections.reverse(episodes);
+        replaceResolvedEpisodes(flag, SourceUrl.original(id), episodes);
+        return selected;
+    }
+
+    private void requestResolvedPlayback(Flag flag, Episode episode, Result result, VodPlayRequest request) {
+        VodPlayRequest next = request.withEpisode(episode);
+        state.setPendingRequest(next);
+        host.renderEpisodes(flag.getEpisodes());
+        host.renderEpisodeSelection(episode);
+        dataSource.resolveContent(next, result);
+        host.onPlaybackRequested();
+    }
+
+    private void selectResolvedEpisode(Flag flag, Episode episode) {
+        flag.toggle(true, episode);
+        preloader.clear();
+        History history = state.getHistory();
+        long position = history.getPosition();
+        long duration = history.getDuration();
+        historyPolicy.updateEpisode(history, flag, episode);
+        history.setPosition(position);
+        history.setDuration(duration);
+    }
+
+    private void replaceResolvedEpisodes(Flag flag, String id, List<Episode> episodes) {
+        List<Episode> current = flag.getEpisodes();
+        int position = -1;
+        for (int i = current.size() - 1; i >= 0; i--) {
+            if (!SourceUrl.original(current.get(i).getUrl()).equals(id)) continue;
+            position = i;
+            current.remove(i);
+        }
+        if (position < 0) throw new IllegalStateException("Source episode is no longer selected");
+        current.addAll(position, episodes);
     }
 
     private void renderPlaybackResult(Result result, Episode episode) {
@@ -195,11 +256,15 @@ public class VodPlaybackController {
         Flag selected = resolveFlag(item);
         if (!force && selected.isSelected()) return;
         preloader.clear();
+        bindFlag(selected);
+        seamless(selected);
+    }
+
+    private void bindFlag(Flag selected) {
         for (Flag flag : state.getFlags()) flag.setSelected(selected);
         host.renderFlagSelection(selected);
         host.renderEpisodes(selected.getEpisodes());
         host.renderQualityVisible(false);
-        seamless(selected);
     }
 
     public void selectEpisode(Episode item) {
@@ -298,22 +363,44 @@ public class VodPlaybackController {
 
     public void playbackError(String msg) {
         preloader.clear();
+        if (isResolvedPlayback()) cancelResolvedPlayback();
         host.resetPlaybackForError(msg);
         fallbackPolicy.playbackError();
+    }
+
+    private boolean isResolvedPlayback() {
+        History history = state.getHistory();
+        return history != null && SourceUrl.isResolved(history.getEpisodeUrl());
+    }
+
+    private void cancelResolvedPlayback() {
+        dataSource.cancelContent();
+        state.clearPlayRequest();
+        Source.get().exit();
     }
 
     public void playbackEnded() {
         nextEpisode(true);
     }
 
+    private boolean isPlaybackResolutionFailed() {
+        Result result = state.getQuality();
+        return result.hasMsg() && result.getUrl().isEmpty();
+    }
+
     public void replay() {
         if (state.getHistory() != null) state.getHistory().setPosition(C.TIME_UNSET);
-        if (host.isPlayerEmpty()) refresh();
+        if (isResolvedPlayback() || isPlaybackResolutionFailed()) reloadPlayback();
+        else if (host.isPlayerEmpty()) refresh();
         else host.replay(startPositionMs());
     }
 
     public void refresh() {
         saveCurrentHistory();
+        reloadPlayback();
+    }
+
+    private void reloadPlayback() {
         preloader.clear();
         host.stopPlaybackForRefresh();
         restorePlaybackSelection(state.getPlayingRequest());
@@ -334,7 +421,9 @@ public class VodPlaybackController {
     }
 
     private void requestSelectedEpisode() {
-        if (state.hasEpisode()) requestPlayer(state.getFlag(), state.getEpisode(), C.TIME_UNSET);
+        History history = state.getHistory();
+        if (state.hasFlags() && history != null && SourceUrl.isResolved(history.getEpisodeUrl())) requestSavedEpisode(history);
+        else if (state.hasEpisode()) requestPlayer(state.getFlag(), state.getEpisode(), C.TIME_UNSET);
     }
 
     public void nextEpisode(boolean notify) {
@@ -513,9 +602,11 @@ public class VodPlaybackController {
         item.checkPic(host.getVodPic());
         item.checkName(host.getVodName());
         List<Flag> flags = item.getFlags();
+        for (Flag flag : flags) restoreExpandedEpisodes(flag);
         state.setFlags(flags);
         History history = historyPolicy.findOrCreate(host.getHistoryKey(), host.getVodMark(), item);
         state.setHistory(history);
+        restoreSavedEpisode(history);
         lastHistory = history;
         host.renderDetail(item, history);
         host.renderFlags(flags);
@@ -524,11 +615,58 @@ public class VodPlaybackController {
         return history;
     }
 
+    private void restoreExpandedEpisodes(Flag flag) {
+        Flag previous = findFlag(flag);
+        if (previous == null || previous == flag) return;
+        for (int i = flag.getEpisodes().size() - 1; i >= 0; i--) restoreExpandedEpisode(flag, previous, i);
+    }
+
+    private void restoreExpandedEpisode(Flag flag, Flag previous, int position) {
+        String id = flag.getEpisodes().get(position).getUrl();
+        if (SourceUrl.isResolved(id)) return;
+        List<Episode> episodes = previous.getEpisodes().stream().filter(episode -> SourceUrl.isResolved(episode.getUrl()) && SourceUrl.original(episode.getUrl()).equals(id)).collect(Collectors.toCollection(ArrayList::new));
+        if (episodes.isEmpty()) return;
+        if (state.getHistory() != null && state.getHistory().isRevSort()) Collections.reverse(episodes);
+        flag.getEpisodes().remove(position);
+        flag.getEpisodes().addAll(position, episodes);
+    }
+
+    private void restoreSavedEpisode(History history) {
+        if (!host.getVodMark().isEmpty()) return;
+        String saved = history.getEpisodeUrl();
+        Flag flag = state.getFlags().stream().filter(item -> item.getFlag().equals(history.getVodFlag())).findFirst().orElse(null);
+        if (flag == null) return;
+        for (int i = 0; i < flag.getEpisodes().size(); i++) if (restoreResolvedSelection(flag, history, saved, i)) return;
+    }
+
+    private boolean restoreResolvedSelection(Flag flag, History history, String saved, int position) {
+        Episode episode = flag.getEpisodes().get(position);
+        String selected = SourceUrl.restore(saved, episode.getUrl());
+        if (selected == null) return false;
+        history.setEpisodeUrl(selected);
+        flag.getEpisodes().set(position, Episode.create(history.getVodRemarks(), episode.getDesc(), selected));
+        return true;
+    }
+
     private void restoreDetail(VodPlayRequest activeRequest, History history) {
         if (restorePlaybackSelection(activeRequest)) publishPlaybackMetadata(state.getEpisode());
+        else if (host.getVodMark().isEmpty() && SourceUrl.isResolved(history.getEpisodeUrl())) requestSavedEpisode(history);
         else selectFlag(history.getFlag(), true);
         if (history.isRevSort()) reverseEpisode(true);
         if (state.getPlayingRequest() != null && !host.hasPlaybackSession()) requestSelectedEpisode();
+    }
+
+    private void requestSavedEpisode(History history) {
+        VodPlayRequest request = VodPlayRequest.create(host.getVodKey(), history.getFlag(), history.getEpisode());
+        if (restorePlaybackSelection(request)) requestPlayer(state.getFlag(), state.getEpisode(), C.TIME_UNSET);
+        else showMissingEpisode(history);
+    }
+
+    private void showMissingEpisode(History history) {
+        bindFlag(resolveFlag(history.getFlag()));
+        preloader.clear();
+        cancelResolvedPlayback();
+        host.resetPlaybackForError(ResUtil.getString(R.string.error_episode_missing));
     }
 
     private boolean restorePlaybackSelection(VodPlayRequest request) {
@@ -569,11 +707,18 @@ public class VodPlaybackController {
 
     private void seamless(Flag flag) {
         History history = state.getHistory();
-        Episode episode = history == null ? null : flag.find(history.getVodRemarks(), host.getVodMark().isEmpty());
+        Episode episode = findHistoryEpisode(flag, history);
         host.renderQualityVisible(episode != null && episode.isSelected() && state.getQuality().getUrl().isMulti());
         if (episode == null || episode.isSelected()) return;
         history.setVodRemarks(episode.getName());
         selectEpisode(episode);
+    }
+
+    private Episode findHistoryEpisode(Flag flag, History history) {
+        if (history == null) return null;
+        boolean strict = host.getVodMark().isEmpty();
+        if (strict && flag.getFlag().equals(history.getVodFlag()) && SourceUrl.isResolved(history.getEpisodeUrl())) return flag.getEpisodes().stream().filter(episode -> episode.getUrl().equals(history.getEpisodeUrl())).findFirst().orElse(null);
+        return flag.find(history.getVodRemarks(), strict);
     }
 
     private void mergeFlag(Flag activated, Flag item) {
@@ -581,6 +726,7 @@ public class VodPlaybackController {
         if (target == null) {
             state.getFlags().add(item);
         } else {
+            restoreExpandedEpisodes(item);
             target.mergeEpisodes(item.getEpisodes(), state.getHistory() != null && state.getHistory().isRevSort());
             if (target.equals(activated)) host.renderEpisodes(target.getEpisodes());
         }

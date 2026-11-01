@@ -6,11 +6,14 @@ import android.util.Base64;
 
 import androidx.media3.common.MimeTypes;
 
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Sub;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.exception.ExtractException;
 import com.fongmi.android.tv.impl.NewPipeImpl;
+import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.utils.UriUtil;
 
 import org.schabi.newpipe.extractor.ListExtractor;
@@ -40,6 +43,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -77,6 +81,7 @@ public class YouTube implements Source.Extractor {
     @Override
     public String fetch(Result result) throws Exception {
         StreamInfo info = StreamInfo.getInfo(result.getUrl().v());
+        result.setDirect();
         result.setSubs(getSubtitles(info.getSubtitles()));
         result.setList(List.of(convert(info).trans()));
         return getPlayUrl(info);
@@ -269,15 +274,11 @@ public class YouTube implements Source.Extractor {
         }
 
         @Override
-        public List<Episode> call() {
-            try {
-                YoutubePlaylistExtractor extractor = loadPlaylist();
-                List<Episode> episodes = new ArrayList<>();
-                add(extractor, episodes, extractor.getInitialPage());
-                return episodes;
-            } catch (Exception e) {
-                return Collections.emptyList();
-            }
+        public List<Episode> call() throws Exception {
+            if (Thread.currentThread().isInterrupted()) throw new CancellationException();
+            List<Episode> episodes = readEpisodes(loadPlaylist());
+            if (episodes.isEmpty()) throw new ExtractException(ResUtil.getString(R.string.error_play_url));
+            return episodes;
         }
 
         private YoutubePlaylistExtractor loadPlaylist() throws Exception {
@@ -288,17 +289,21 @@ public class YouTube implements Source.Extractor {
             return extractor;
         }
 
-        private void add(YoutubePlaylistExtractor extractor, List<Episode> episodes, ListExtractor.InfoItemsPage<StreamInfoItem> page) {
+        private List<Episode> readEpisodes(YoutubePlaylistExtractor extractor) throws Exception {
+            List<Episode> episodes = new ArrayList<>();
+            ListExtractor.InfoItemsPage<StreamInfoItem> page = extractor.getInitialPage();
+            while (true) {
+                if (Thread.currentThread().isInterrupted()) throw new CancellationException();
+                addEpisodes(episodes, page);
+                if (!page.hasNextPage()) return episodes;
+                page = extractor.getPage(page.getNextPage());
+            }
+        }
+
+        private void addEpisodes(List<Episode> episodes, ListExtractor.InfoItemsPage<StreamInfoItem> page) {
             for (StreamInfoItem item : page.getItems()) {
                 if (item.getDuration() == -1) continue;
                 episodes.add(Episode.create(item.getName(), item.getUrl()));
-            }
-            if (page.hasNextPage()) {
-                try {
-                    add(extractor, episodes, extractor.getPage(page.getNextPage()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
         }
     }

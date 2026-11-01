@@ -42,6 +42,10 @@ public final class VodPlayRequest {
         return builtin;
     }
 
+    public VodPlayRequest withEpisode(Episode episode) {
+        return new VodPlayRequest(key, flag, episode.getUrl(), builtin, qualityPosition, startPositionMs);
+    }
+
     public String getFlag() {
         return flag;
     }

@@ -27,6 +27,7 @@ import org.simpleframework.xml.Path;
 import org.simpleframework.xml.Root;
 import org.simpleframework.xml.core.Persister;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -61,6 +62,9 @@ public class Result implements Parcelable {
     private Map<String, String> header;
 
     private transient Auth.Context auth;
+    private transient List<Episode> resolvedEpisodes;
+    private transient File torrentFile;
+    private transient boolean direct;
 
     @SerializedName("msg")
     @JsonAdapter(MsgAdapter.class)
@@ -193,6 +197,22 @@ public class Result implements Parcelable {
 
     public List<Vod> getList() {
         return list == null ? Collections.emptyList() : list;
+    }
+
+    public List<Episode> getResolvedEpisodes() {
+        return resolvedEpisodes == null ? Collections.emptyList() : resolvedEpisodes;
+    }
+
+    public void setResolvedEpisodes(List<Episode> episodes) {
+        this.resolvedEpisodes = episodes;
+    }
+
+    public File getTorrentFile() {
+        return torrentFile;
+    }
+
+    public void setTorrentFile(File file) {
+        this.torrentFile = file;
     }
 
     public void setList(List<Vod> list) {
@@ -346,6 +366,13 @@ public class Result implements Parcelable {
         this.parse = parse;
     }
 
+    public void setDirect() {
+        parse = 0;
+        jx = 0;
+        playUrl = "";
+        direct = true;
+    }
+
     public Integer getCode() {
         return code == null ? 0 : code;
     }
@@ -387,7 +414,7 @@ public class Result implements Parcelable {
     }
 
     public boolean isUseParse() {
-        if (!VodConfig.hasParse()) return false;
+        if (direct || !VodConfig.hasParse()) return false;
         return (getPlayUrl().isEmpty() && VodConfig.get().getFlags().contains(getFlag())) || getJx() == 1;
     }
 

@@ -1,13 +1,18 @@
 package com.fongmi.android.tv.player.extractor;
 
+import android.content.ContentResolver;
 import android.net.Uri;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Episode;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.exception.ExtractException;
+import com.fongmi.android.tv.utils.FileUtil;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.TorrentUrl;
 import com.github.catvod.net.Download;
 import com.github.catvod.runtime.ThunderRuntime;
+import com.github.catvod.utils.Auth;
 import com.github.catvod.utils.Crypto;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.RuntimeModule;
@@ -17,13 +22,18 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
+
+import okhttp3.Headers;
+import okhttp3.Request;
 
 public class Thunder implements Source.Extractor {
 
-    private static final List<String> SCHEMES = List.of("magnet", "ed2k", "ftp");
+    private static final List<String> SCHEMES = List.of("magnet", "thunder", "ed2k", "ftp");
     private ThunderRuntime runtime;
     private ThunderRuntime.Task taskId;
 
@@ -34,7 +44,71 @@ public class Thunder implements Source.Extractor {
 
     @Override
     public boolean match(Uri uri) {
-        return SCHEMES.contains(UriUtil.scheme(uri));
+        return SCHEMES.contains(UriUtil.scheme(uri)) || Parser.isTorrent(uri.toString());
+    }
+
+    @Override
+    public String fetch(Result result) throws Exception {
+        return fetch(result, result.getUrl().v());
+    }
+
+    @Override
+    public String fetch(Result result, String id) throws Exception {
+        if (Thread.currentThread().isInterrupted()) throw new CancellationException();
+        result.setDirect();
+        String url = result.getUrl().v();
+        TorrentUrl selected = TorrentUrl.match(id) ? TorrentUrl.from(id) : null;
+        return Parser.isDeferred(url) ? fetchTorrent(result, id, url, selected) : fetchDownload(url, selected);
+    }
+
+    private String fetchTorrent(Result result, String id, String url, TorrentUrl selected) throws Exception {
+        url = TorrentUrl.original(url);
+        File cached = result.getTorrentFile();
+        List<Episode> files = readFiles(result, url, cached);
+        if (!"magnet".equals(UriUtil.scheme(files.get(0).getUrl()))) return fetchDownload(files.get(0).getUrl(), selected);
+        String original = TorrentUrl.original(id);
+        List<Episode> episodes = files.stream().map(file -> createResolvedEpisode(original, file)).toList();
+        int position = findSelectedFile(episodes, selected);
+        episodes.get(position).setSelected(true);
+        if (cached == null) {
+            result.setTorrentFile(getSelection(UriUtil.uri(files.get(0).getUrl())).torrent());
+            result.setResolvedEpisodes(episodes);
+            return url;
+        }
+        return fetchTorrentFile(result, files.get(position));
+    }
+
+    private List<Episode> readFiles(Result result, String url, File cached) throws Exception {
+        ThunderRuntime runtime = runtime();
+        List<Episode> files = cached != null && cached.isFile() ? Parser.get(url).readEpisodes(runtime, cached) : Parser.get(url, result).call();
+        if (files.isEmpty()) throw new ExtractException(ResUtil.getString(R.string.error_play_url));
+        return files;
+    }
+
+    private String fetchTorrentFile(Result result, Episode file) throws Exception {
+        String localUrl = fetch(file.getUrl());
+        result.setResolvedEpisodes(List.of());
+        return localUrl;
+    }
+
+    private String fetchDownload(String url, TorrentUrl selected) throws Exception {
+        if (selected != null) throw new IllegalArgumentException("Torrent source is no longer available");
+        return fetch(url);
+    }
+
+    private Episode createResolvedEpisode(String id, Episode file) {
+        Uri uri = UriUtil.uri(file.getUrl());
+        TorrentUrl selection = new TorrentUrl(id, uri.getQueryParameter("name"), Integer.parseInt(uri.getQueryParameter("index")));
+        return Episode.create(file.getName(), file.getDesc(), selection.url());
+    }
+
+    private int findSelectedFile(List<Episode> episodes, TorrentUrl selected) {
+        if (selected == null) return 0;
+        for (int i = 0; i < episodes.size(); i++) {
+            TorrentUrl item = TorrentUrl.from(episodes.get(i).getUrl());
+            if (item.index() == selected.index() && item.name().equals(selected.name())) return i;
+        }
+        throw new IllegalArgumentException("Torrent file is no longer available");
     }
 
     @Override
@@ -111,30 +185,63 @@ public class Thunder implements Source.Extractor {
 
     @Override
     public synchronized void exit() {
+        Throwable failure = null;
         try {
             stop();
+        } catch (RuntimeException | Error e) {
+            failure = e;
+            throw e;
         } finally {
-            if (runtime != null) runtime.release();
+            releaseRuntime(failure);
+        }
+    }
+
+    private void releaseRuntime(Throwable failure) {
+        ThunderRuntime runtime = this.runtime;
+        this.runtime = null;
+        if (runtime == null) return;
+        try {
+            runtime.release();
+        } catch (RuntimeException | Error e) {
+            if (failure == null) throw e;
+            failure.addSuppressed(e);
         }
     }
 
     private record Selection(File torrent, File media, int index) {
     }
 
-    public record Parser(String url) implements Callable<List<Episode>> {
+    public record Parser(String url, Result result) implements Callable<List<Episode>> {
 
         private static final Pattern PATTERN = Pattern.compile("^(magnet|thunder|ed2k):.*", Pattern.CASE_INSENSITIVE);
+        private static final Pattern MAGNET = Pattern.compile("^magnet:/*\\?", Pattern.CASE_INSENSITIVE);
+        private static final Semaphore PARSE_LOCK = new Semaphore(1, true);
+
+        private static boolean isRawMagnet(String url) {
+            return MAGNET.matcher(url).find();
+        }
+
+        public static boolean isDeferred(String url) {
+            return isRawMagnet(url) || TorrentUrl.match(url) || isTorrent(url) || "thunder".equals(UriUtil.scheme(url));
+        }
 
         public static boolean match(String url) {
             return PATTERN.matcher(url).find() || isTorrent(url);
         }
 
         public static Parser get(String url) {
-            return new Parser(url);
+            return get(url, null);
         }
 
-        private static boolean isTorrent(String url) {
-            return !"magnet".equals(UriUtil.scheme(url)) && UriUtil.path(url.split(";", 2)[0]).toLowerCase(Locale.ROOT).endsWith(".torrent");
+        public static Parser get(String url, Result result) {
+            return new Parser(url, result);
+        }
+
+        public static boolean isTorrent(String url) {
+            if ("magnet".equals(UriUtil.scheme(url))) return false;
+            Uri uri = UriUtil.uri(url);
+            String name = ContentResolver.SCHEME_CONTENT.equals(UriUtil.scheme(uri)) ? FileUtil.getDisplayName(uri) : UriUtil.path(url.split(";", 2)[0]);
+            return name.toLowerCase(Locale.ROOT).endsWith(".torrent");
         }
 
         private Episode create(ThunderRuntime.Media info) {
@@ -143,20 +250,37 @@ public class Thunder implements Source.Extractor {
 
         @Override
         public List<Episode> call() throws Exception {
+            if (Thread.interrupted()) throw new InterruptedException();
+            if (!isRawMagnet(url) && !"thunder".equals(UriUtil.scheme(url))) return parseEpisodes();
+            PARSE_LOCK.acquire();
+            try {
+                return parseEpisodes();
+            } finally {
+                PARSE_LOCK.release();
+            }
+        }
+
+        private List<Episode> parseEpisodes() throws Exception {
             ThunderRuntime runtime = RuntimeModule.THUNDER.entry(ThunderRuntime.class);
-            ThunderRuntime.Task taskId = runtime.parse(url, Path.thunder(Crypto.md5(url)));
+            File directory = Path.thunder(Crypto.md5(url));
+            if (ContentResolver.SCHEME_CONTENT.equals(UriUtil.scheme(url))) return readEpisodes(runtime, importTorrent(directory));
+            ThunderRuntime.Task taskId = runtime.parse(url, directory);
             Exception failure = null;
             try {
-                String realUrl = taskId.getRealUrl();
-                boolean torrent = isTorrent(realUrl);
-                if (!torrent && !"magnet".equals(UriUtil.scheme(realUrl))) return List.of(Episode.create(taskId.getFileName(), taskId.getRealUrl()));
-                return readEpisodes(runtime, resolveTorrent(runtime, taskId, torrent));
+                return readTaskEpisodes(runtime, taskId);
             } catch (Exception e) {
                 failure = e;
                 throw e;
             } finally {
                 stopParseTask(runtime, taskId, failure);
             }
+        }
+
+        private List<Episode> readTaskEpisodes(ThunderRuntime runtime, ThunderRuntime.Task taskId) throws Exception {
+            String realUrl = taskId.getRealUrl();
+            boolean torrent = isTorrent(realUrl);
+            if (!torrent && !"magnet".equals(UriUtil.scheme(realUrl))) return List.of(Episode.create(taskId.getFileName(), taskId.getRealUrl()));
+            return readEpisodes(runtime, resolveTorrent(runtime, taskId, torrent));
         }
 
         private void stopParseTask(ThunderRuntime runtime, ThunderRuntime.Task taskId, Exception failure) throws Exception {
@@ -168,10 +292,25 @@ public class Thunder implements Source.Extractor {
             }
         }
 
+        private File importTorrent(File directory) throws IOException {
+            File torrent = new File(directory, "source.torrent");
+            Path.writeAtomically(torrent, Path.open(UriUtil.uri(url), "Unable to open torrent file"));
+            return torrent;
+        }
+
         private File resolveTorrent(ThunderRuntime runtime, ThunderRuntime.Task taskId, boolean torrent) throws Exception {
-            if (torrent && taskId.getRealUrl().startsWith("http")) Download.create(taskId.getRealUrl(), taskId.getSaveFile()).get();
+            if (torrent && taskId.getRealUrl().startsWith("http")) downloadTorrent(taskId);
             if (!torrent) waitDone(runtime, taskId);
             return taskId.getSaveFile();
+        }
+
+        private void downloadTorrent(ThunderRuntime.Task taskId) {
+            Map<String, String> headers = result == null ? Map.of() : result.getHeader();
+            Auth.Context auth = result == null ? null : result.getAuth();
+            String url = auth == null ? taskId.getRealUrl() : auth.getUrl(taskId.getRealUrl(), headers);
+            Request.Builder builder = new Request.Builder().url(url).headers(Headers.of(headers)).tag(Auth.Context.class, auth);
+            if (auth != null) auth.getHeaders(url, headers).forEach(builder::header);
+            new Download(builder.build(), taskId.getSaveFile()).get();
         }
 
         private List<Episode> readEpisodes(ThunderRuntime runtime, File torrent) {

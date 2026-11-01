@@ -22,6 +22,7 @@ import com.fongmi.android.tv.player.extractor.Source;
 import com.fongmi.android.tv.player.media.LocalSubtitleScanner;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Sniffer;
+import com.fongmi.android.tv.utils.SourceUrl;
 import com.github.catvod.crawler.Spider;
 import com.github.catvod.crawler.SpiderDebug;
 import com.github.catvod.utils.Trans;
@@ -182,8 +183,14 @@ public class SiteApi {
         Source.get().stop();
         Result result = loadPlayerContent(key, flag, id, builtin);
         if (qualityPosition >= 0 && !result.getUrl().getValues().isEmpty()) result.getUrl().set(qualityPosition);
-        result.setUrl(Source.get().fetch(result));
-        if (LOCAL.equals(key) && !id.equals(result.getUrl().v()) && result.getSubs().isEmpty()) result.setSubs(LocalSubtitleScanner.scan(result.getUrl().v()));
+        return resolvePlayerContent(key, id, result);
+    }
+
+    @NonNull
+    public static Result resolvePlayerContent(@NonNull String key, @NonNull String id, @NonNull Result result) throws Exception {
+        result.setUrl(Source.get().fetch(result, id));
+        String originalId = SourceUrl.original(id);
+        if (LOCAL.equals(key) && !originalId.equals(result.getUrl().v()) && result.getSubs().isEmpty()) result.setSubs(LocalSubtitleScanner.scan(result.getUrl().v()));
         SpiderDebug.log("player", result.toString());
         return result;
     }
@@ -201,6 +208,7 @@ public class SiteApi {
 
     @NonNull
     private static Result loadPlayerContent(@NonNull String key, @NonNull String flag, @NonNull String id, boolean builtin) throws Exception {
+        id = SourceUrl.original(id);
         if (PUSH.equals(key) && SpiderTestSession.isPreview(id)) {
             Result result = Result.fromJson(SpiderTestSession.previewResult(id));
             result.setKey(key);

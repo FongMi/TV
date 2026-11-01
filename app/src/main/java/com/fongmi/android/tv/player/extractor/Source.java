@@ -7,6 +7,8 @@ import com.fongmi.android.tv.bean.Episode;
 import com.fongmi.android.tv.bean.Flag;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Vod;
+import com.fongmi.android.tv.utils.SourceUrl;
+import com.fongmi.android.tv.utils.TorrentUrl;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.utils.Task;
 import com.github.catvod.utils.UriUtil;
@@ -59,7 +61,7 @@ public class Source {
     }
 
     public boolean canPreload(Uri uri) {
-        return getExtractor(uri) == null;
+        return !SourceUrl.isResolved(uri.toString()) && getExtractor(uri) == null;
     }
 
     private synchronized void begin() {
@@ -78,7 +80,7 @@ public class Source {
         String url = iterator.next().getUrl();
         String scheme = UriUtil.scheme(url);
         if ("push".equals(scheme) || "video".equals(scheme) || "webview".equals(scheme)) return;
-        if (Thunder.Parser.match(url)) {
+        if (Thunder.Parser.match(url) && !Thunder.Parser.isDeferred(url)) {
             items.add(Thunder.Parser.get(url));
             iterator.remove();
         } else if (YouTube.Parser.match(url)) {
@@ -100,28 +102,45 @@ public class Source {
         List<Callable<List<Episode>>> items = new ArrayList<>();
         Iterator<Episode> iterator = flag.getEpisodes().iterator();
         while (iterator.hasNext()) addCallable(iterator, items);
-        for (Future<List<Episode>> future : executor.invokeAll(items, 30, TimeUnit.SECONDS)) {
-            try {
-                flag.getEpisodes().addAll(future.get());
-            } catch (CancellationException ignored) {
-            }
-        }
+        for (Future<List<Episode>> future : executor.invokeAll(items, 30, TimeUnit.SECONDS)) flag.getEpisodes().addAll(future.get());
     }
 
     public String fetch(Result result) throws Exception {
+        String url = fetch(result, result.getUrl().v());
+        if (result.getResolvedEpisodes().isEmpty()) return url;
+        result.setUrl(url);
+        Episode selected = result.getResolvedEpisodes().stream().filter(Episode::isSelected).findFirst().orElseThrow();
+        return fetch(result, selected.getUrl());
+    }
+
+    public String fetch(Result result, String id) throws Exception {
         begin();
         try {
-            Uri uri = result.getUrl().uri();
+            id = resolveEpisode(result, id);
+            Uri uri = TorrentUrl.match(id) ? UriUtil.uri(id) : result.getUrl().uri();
             String url = result.getUrl().v();
             Extractor extractor = getExtractor(uri);
-            if (extractor != null) result.setParse(0);
-            if (extractor instanceof Video) result.setParse(1);
-            url = extractor == null ? url : extractor.fetch(result);
+            if (extractor != null) result.setParse(extractor instanceof Video ? 1 : 0);
+            url = extractor == null ? url : extractor.fetch(result, id);
+            validateEpisode(result, id);
             BaseLoader.get().requireProxy(url);
             return url;
         } finally {
             end();
         }
+    }
+
+    private String resolveEpisode(Result result, String id) {
+        if (!SourceUrl.match(id) || result.getResolvedEpisodes().isEmpty()) return id;
+        Episode selected = result.getResolvedEpisodes().stream().filter(episode -> SourceUrl.same(episode.getUrl(), id)).findFirst().orElseThrow(() -> new IllegalArgumentException("Source episode is no longer available"));
+        String target = SourceUrl.from(selected.getUrl()).target();
+        result.setResolvedEpisodes(List.of());
+        result.setUrl(target);
+        return target;
+    }
+
+    private void validateEpisode(Result result, String id) {
+        if (SourceUrl.match(id) && result.getResolvedEpisodes().stream().noneMatch(episode -> SourceUrl.same(episode.getUrl(), id))) throw new IllegalArgumentException("Source episode is no longer available");
     }
 
     public synchronized void stop() {
@@ -144,6 +163,10 @@ public class Source {
     }
 
     public interface Extractor {
+
+        default String fetch(Result result, String id) throws Exception {
+            return fetch(result);
+        }
 
         default String fetch(Result result) throws Exception {
             return fetch(result.getUrl().v());

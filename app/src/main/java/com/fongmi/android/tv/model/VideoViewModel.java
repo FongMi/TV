@@ -68,6 +68,16 @@ public class VideoViewModel extends SiteViewModel implements VodDataSource {
     }
 
     @Override
+    public void resolveContent(VodPlayRequest request, Result result) {
+        requestTasks.execute(
+                TaskType.PLAYBACK,
+                Constant.TIMEOUT_VOD,
+                () -> new PlaybackResult<>(request, SiteApi.resolvePlayerContent(request.getKey(), request.getId(), result)),
+                playback::postValue,
+                error -> playback.postValue(new PlaybackResult<>(request, handleError(error))));
+    }
+
+    @Override
     public void preloadContent(VodPlayRequest request) {
         loadPlayback(request, TaskType.PRELOAD, preload);
     }

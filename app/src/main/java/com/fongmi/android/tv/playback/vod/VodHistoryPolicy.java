@@ -11,6 +11,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Vod;
 import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.setting.Setting;
+import com.fongmi.android.tv.utils.SourceUrl;
 import com.github.catvod.utils.Task;
 
 public class VodHistoryPolicy {
@@ -89,12 +90,21 @@ public class VodHistoryPolicy {
 
     public void updateEpisode(History history, Flag flag, Episode episode) {
         if (history == null || flag == null || episode == null) return;
-        boolean match = episode.matchesName(history.getEpisode());
+        boolean match = matchesEpisode(history, flag, episode);
         if (!match) history.setPosition(C.TIME_UNSET);
         if (!match) history.setDuration(C.TIME_UNSET);
         history.setVodFlag(flag.getFlag());
         history.setVodRemarks(episode.getName());
         history.setEpisodeUrl(episode.getUrl());
+    }
+
+    private boolean matchesEpisode(History history, Flag flag, Episode episode) {
+        String previous = history.getEpisodeUrl();
+        String current = episode.getUrl();
+        boolean previousResolved = SourceUrl.isResolved(previous);
+        boolean currentResolved = SourceUrl.isResolved(current);
+        if (!previousResolved && !currentResolved) return episode.matchesName(history.getEpisode());
+        return previousResolved && currentResolved && flag.getFlag().equals(history.getVodFlag()) && SourceUrl.same(previous, current);
     }
 
     public void updateProgress(History history, long time, long position, long duration) {

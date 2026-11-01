@@ -11,6 +11,7 @@ import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.playback.PlaybackResult;
 import com.fongmi.android.tv.player.extractor.Source;
+import com.fongmi.android.tv.utils.SourceUrl;
 
 import java.util.function.LongSupplier;
 
@@ -104,7 +105,7 @@ final class VodPreloader {
         History history = state.getHistory();
         int offset = history != null && history.isRevPlay() ? -1 : 1;
         Episode episode = state.getRelativeEpisode(offset);
-        return episode.isSelected() ? null : episode;
+        return episode.isSelected() || SourceUrl.isResolved(episode.getUrl()) ? null : episode;
     }
 
     private void apply(VodPlayRequest request, Result result) {
