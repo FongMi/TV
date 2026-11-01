@@ -380,7 +380,9 @@ public final class ModuleViewModel extends AndroidViewModel {
         }
         int status = result.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
         Phase phase = status == PackageInstaller.STATUS_SUCCESS ? Phase.IDLE : status == PackageInstaller.STATUS_FAILURE_ABORTED ? Phase.CANCELLED : Phase.FAILED;
-        finishInstallation(phase, phase == Phase.FAILED ? result.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) : null);
+        String error = phase == Phase.FAILED ? result.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) : null;
+        if (phase == Phase.FAILED && (error == null || error.isEmpty())) error = getApplication().getString(R.string.module_failed_title);
+        finishInstallation(phase, error);
     }
 
     private void finishInstallation(Phase phase, String error) {
