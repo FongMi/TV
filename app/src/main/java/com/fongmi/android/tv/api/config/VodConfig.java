@@ -81,6 +81,14 @@ public class VodConfig extends BaseConfig {
     }
 
     public VodConfig clear() {
+        return clear(false);
+    }
+
+    public void destroy() {
+        clear(true);
+    }
+
+    private VodConfig clear(boolean exiting) {
         ads = null;
         doh = null;
         home = null;
@@ -90,7 +98,8 @@ public class VodConfig extends BaseConfig {
         flags = null;
         rules = null;
         parses = null;
-        BaseLoader.get().clear();
+        if (exiting) BaseLoader.get().destroy();
+        else BaseLoader.get().clear();
         RuleConfig.get().invalidate();
         return this;
     }

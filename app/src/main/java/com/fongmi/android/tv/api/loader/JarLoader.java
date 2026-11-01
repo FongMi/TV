@@ -33,102 +33,34 @@ import java.util.Objects;
 import java.util.TreeSet;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
 
 import dalvik.system.DexClassLoader;
 import dalvik.system.DexFile;
 
-public class JarLoader {
+public class JarLoader extends SpiderLoader {
 
     private final ConcurrentHashMap<String, DexClassLoader> loaders;
     private final ConcurrentHashMap<String, Method> methods;
-    private final Map<String, Spider> spiders;
-    private final Map<String, FutureTask<Spider>> loading;
     private final ConcurrentHashMap<String, Object> locks;
     private volatile String recent;
-    private boolean closed;
 
     public JarLoader() {
         loaders = new ConcurrentHashMap<>();
         methods = new ConcurrentHashMap<>();
-        spiders = new HashMap<>();
-        loading = new HashMap<>();
         locks = new ConcurrentHashMap<>();
     }
 
-    public void clear() {
-        List<FutureTask<Spider>> pending;
-        List<Spider> active;
-        synchronized (this) {
-            if (closed) return;
-            closed = true;
-            pending = new ArrayList<>(loading.values());
-            active = new ArrayList<>(spiders.values());
-            loading.clear();
-            spiders.clear();
-            recent = null;
-        }
-        for (FutureTask<Spider> task : pending) task.cancel(true);
-        Throwable failure = destroySpiders(active);
-        clearJars();
-        if (failure instanceof RuntimeException error) throw error;
-        if (failure instanceof Error error) throw error;
-    }
-
-    private void clearJars() {
+    @Override
+    protected void clearReferences() {
         loaders.clear();
         methods.clear();
         locks.clear();
+        recent = null;
     }
 
     public synchronized void setRecent(String recent) {
         checkOpen();
         this.recent = recent;
-    }
-
-    private Throwable destroySpiders(List<Spider> active) {
-        Throwable failure = null;
-        for (Spider spider : active) failure = destroySpider(spider, failure);
-        return failure;
-    }
-
-    private Throwable destroySpider(Spider spider, Throwable failure) {
-        try {
-            destroy(spider);
-        } catch (RuntimeException | Error error) {
-            if (failure == null) failure = error;
-            else if (failure != error) failure.addSuppressed(error);
-        }
-        return failure;
-    }
-
-    private void destroy(Spider spider) {
-        spider.closeDialog();
-        Throwable failure = destroySpider(spider);
-        failure = closeNetwork(spider, failure);
-        if (failure instanceof RuntimeException error) throw error;
-        if (failure instanceof Error error) throw error;
-    }
-
-    private Throwable destroySpider(Spider spider) {
-        try {
-            spider.destroy();
-            return null;
-        } catch (RuntimeException | Error error) {
-            return error;
-        }
-    }
-
-    private Throwable closeNetwork(Spider spider, Throwable failure) {
-        spider.js.close();
-        try {
-            if (spider.net != null) spider.net.close();
-        } catch (RuntimeException | Error error) {
-            if (failure == null) failure = error;
-            else if (failure != error) failure.addSuppressed(error);
-        }
-        return failure;
     }
 
     private void load(String key, File file) {
@@ -206,60 +138,7 @@ public class JarLoader {
     }
 
     public Spider getSpider(String key, String api, String ext, String jar) {
-        String spKey = Crypto.md5(jar) + key;
-        FutureTask<Spider> task;
-        synchronized (this) {
-            checkOpen();
-            Spider spider = spiders.get(spKey);
-            if (spider != null) return spider;
-            task = loading.computeIfAbsent(spKey, k -> new FutureTask<>(() -> createSpider(key, api, ext, jar)));
-        }
-        try {
-            task.run();
-            return awaitSpider(task);
-        } finally {
-            synchronized (this) {
-                if (task.isDone()) loading.remove(spKey, task);
-            }
-        }
-    }
-
-    private Spider awaitSpider(FutureTask<Spider> task) {
-        try {
-            Spider spider = task.get();
-            checkOpen();
-            return spider;
-        } catch (InterruptedException error) {
-            Thread.currentThread().interrupt();
-            throw new SpiderLoadException(error);
-        } catch (ExecutionException error) {
-            if (error.getCause() instanceof Error fatal) throw fatal;
-            throw (RuntimeException) error.getCause();
-        }
-    }
-
-    private synchronized void checkOpen() {
-        if (closed) throw new CancellationException("Java loader is closed");
-    }
-
-    private Spider createSpider(String key, String api, String ext, String jar) {
-        Spider spider = null;
-        try {
-            spider = newSpider(key, api, jar);
-            checkOpen();
-            spider.init(App.get(), ext);
-            cacheSpider(key, jar, spider);
-            return spider;
-        } catch (Exception | Error error) {
-            if (spider != null) destroySpider(spider, error);
-            if (error instanceof Error fatal) throw fatal;
-            throw new SpiderLoadException(error);
-        }
-    }
-
-    private synchronized void cacheSpider(String key, String jar, Spider spider) {
-        checkOpen();
-        spiders.put(Crypto.md5(jar) + key, spider);
+        return load(Crypto.md5(jar) + key, App.get(), ext, () -> newSpider(key, api, jar));
     }
 
     Spider newSpider(String key, String api, String jar) throws Exception {

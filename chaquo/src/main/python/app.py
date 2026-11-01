@@ -66,11 +66,8 @@ def boolean_result(value):
 
 
 def init(ru, extend):
-    try:
-        ru.runtime.prepare(ru)
-        sync_result(ru.init(extend))
-    except BaseException as error:
-        release(ru, error)
+    ru.runtime.prepare(ru)
+    sync_result(ru.init(extend))
 
 
 def bindNet(ru, net, user_agent=None, local=None, streams=None, js=None):

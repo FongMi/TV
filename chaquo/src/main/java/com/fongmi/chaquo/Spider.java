@@ -32,6 +32,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
     private final Net.Cookies cookies;
     private final UserAgent userAgent;
     private final Streams streams = new Streams();
+    private boolean closed;
+    private boolean destroyed;
 
     public Spider(PyObject app, PyObject obj, String api) {
         this(app, obj, api, null);
@@ -62,17 +64,13 @@ public class Spider extends com.github.catvod.crawler.Spider {
             app.callAttr("bindNet", obj, net, userAgent, local, streams, js);
             app.callAttr("init", obj, extend);
         } catch (RuntimeException | Error e) {
-            releaseSpider(e);
+            closeSpider(e);
+            try {
+                app.callAttr("release", obj);
+            } catch (RuntimeException | Error error) {
+                if (e != error) e.addSuppressed(error);
+            }
             throw e;
-        }
-    }
-
-    private void releaseSpider(Throwable failure) {
-        closeResources(failure);
-        try {
-            app.callAttr("release", obj);
-        } catch (RuntimeException | Error error) {
-            if (error != failure) failure.addSuppressed(error);
         }
     }
 
@@ -183,8 +181,32 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     @Override
-    public void destroy() {
-        Throwable failure = destroyPython(closeResources(null));
+    public synchronized void close() {
+        throwFailure(closeSpider(null));
+    }
+
+    private synchronized Throwable closeSpider(Throwable failure) {
+        if (closed) return failure;
+        closed = true;
+        closeDialog();
+        failure = closeResources(failure);
+        try {
+            app.callAttr("close_dialog", obj);
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
+        }
+        return failure;
+    }
+
+    @Override
+    public synchronized void destroy() {
+        if (destroyed) return;
+        destroyed = true;
+        throwFailure(destroyPython(closeSpider(null)));
+    }
+
+    private void throwFailure(Throwable failure) {
         if (failure instanceof RuntimeException error) throw error;
         if (failure instanceof Error error) throw error;
     }

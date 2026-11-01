@@ -492,7 +492,7 @@ public final class SpiderTestSession implements AutoCloseable {
 
         private static Throwable cancelJavaScript(JsLoader loader, Throwable failure) {
             try {
-                if (loader != null) loader.cancel();
+                if (loader != null) loader.clear();
             } catch (RuntimeException | Error error) {
                 if (failure == null) failure = error;
                 else if (failure != error) failure.addSuppressed(error);

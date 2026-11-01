@@ -294,7 +294,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     protected void onDestroy() {
-        if (--instanceCount == 0) {
+        if (--instanceCount == 0 && !isChangingConfigurations()) {
             BackupManager.backup();
             releaseResources();
         }
@@ -304,7 +304,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
     public static void releaseResources() {
         if (isRunning() || PlaybackService.isRunning()) return;
         LiveConfig.get().clear();
-        VodConfig.get().clear();
+        VodConfig.get().destroy();
         OkHttp.get().clear();
         Source.get().exit();
         Server.get().stop();

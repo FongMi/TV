@@ -528,7 +528,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void onDestroy() {
-        if (--instanceCount == 0) {
+        if (--instanceCount == 0 && !isChangingConfigurations()) {
             BackupManager.backup();
             releaseResources();
         }
@@ -539,7 +539,7 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
         if (isRunning() || PlaybackService.isRunning()) return;
         DLNARendererService.stop(App.get());
         LiveConfig.get().clear();
-        VodConfig.get().clear();
+        VodConfig.get().destroy();
         OkHttp.get().clear();
         Source.get().exit();
         Server.get().stop();

@@ -22,7 +22,7 @@ public final class NodeSpider extends Spider {
     private final NodeClient client;
     private final long session;
     private volatile Boolean videoCheck;
-    private volatile boolean destroyed;
+    private volatile boolean closed;
 
     public NodeSpider(NodeClient client, String api) {
         this.client = client;
@@ -69,11 +69,18 @@ public final class NodeSpider extends Spider {
 
     @Override
     public void destroy() {
-        destroyed = true;
+        close();
+    }
+
+    @Override
+    public synchronized void close() {
+        if (closed) return;
+        closed = true;
+        super.close();
     }
 
     private void checkActive() {
-        if (destroyed) throw new CancellationException("Spider destroyed");
+        if (closed) throw new CancellationException("Spider closed");
     }
 
     @Override

@@ -44,6 +44,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private QuickJS ctx;
     private volatile Global global;
+    private volatile boolean closed;
     private volatile boolean destroyed;
 
     public Spider(String api, DexClassLoader dex) {
@@ -62,7 +63,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private void await(CompletableFuture<Object> future) throws Exception {
-        if (destroyed) future.cancel(false);
+        if (closed) future.cancel(false);
         try {
             future.get();
         } catch (InterruptedException error) {
@@ -95,7 +96,7 @@ public class Spider extends com.github.catvod.crawler.Spider {
     }
 
     private void beginCall(Invocation current, String func) {
-        if (destroyed && !"destroy".equals(func)) throw new IllegalStateException("Spider destroyed");
+        if (closed && !"destroy".equals(func)) throw new IllegalStateException("Spider closed");
         global.beginCall(current);
     }
 
@@ -110,17 +111,8 @@ public class Spider extends com.github.catvod.crawler.Spider {
             initializeJS();
             call("init", extend);
         } catch (Exception | Error error) {
-            failInitialization(error);
+            closeContext(closeResources(error));
             throw error;
-        }
-    }
-
-    private void failInitialization(Throwable error) {
-        destroyed = true;
-        try {
-            releaseJS();
-        } catch (Exception failure) {
-            error.addSuppressed(failure);
         }
     }
 
@@ -200,30 +192,57 @@ public class Spider extends com.github.catvod.crawler.Spider {
         return () -> {
             if (!closed.compareAndSet(false, true)) return;
             global.removeDanmaku(token);
-            if (!destroyed) call("stopDanmaku", token);
+            if (!this.closed) call("stopDanmaku", token);
         };
+    }
+
+    @Override
+    public synchronized void close() {
+        throwFailure(closeResources(null));
+    }
+
+    private synchronized Throwable closeResources(Throwable failure) {
+        if (closed) return failure;
+        closed = true;
+        failure = cancelRequests(failure);
+        failure = cancelPending(failure);
+        return closeHost(failure);
+    }
+
+    private Throwable closeHost(Throwable failure) {
+        try {
+            super.close();
+        } catch (RuntimeException | Error error) {
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
+        }
+        return failure;
     }
 
     @Override
     public synchronized void destroy() {
         if (destroyed) return;
         destroyed = true;
-        Throwable failure = cancelRequests();
-        failure = cancelPending(failure);
+        Throwable failure = closeResources(null);
         failure = destroyScript(failure);
         failure = closeContext(failure);
+        throwFailure(failure);
+    }
+
+    private void throwFailure(Throwable failure) {
         if (failure instanceof RuntimeException error) throw error;
         if (failure instanceof Error error) throw error;
         if (failure != null) throw new IllegalStateException("Cannot destroy JavaScript spider", failure);
     }
 
-    private Throwable cancelRequests() {
+    private Throwable cancelRequests(Throwable failure) {
         try {
             if (global != null) global.cancelRequests();
         } catch (RuntimeException | Error error) {
-            return error;
+            if (failure == null) failure = error;
+            else if (failure != error) failure.addSuppressed(error);
         }
-        return null;
+        return failure;
     }
 
     private Throwable cancelPending(Throwable failure) {
@@ -248,17 +267,12 @@ public class Spider extends com.github.catvod.crawler.Spider {
 
     private Throwable closeContext(Throwable failure) {
         try {
-            releaseJS();
+            if (ctx != null) ctx.close();
         } catch (RuntimeException | Error error) {
             if (failure == null) failure = error;
             else if (failure != error) failure.addSuppressed(error);
         }
         return failure;
-    }
-
-    private void releaseJS() {
-        if (ctx == null) return;
-        ctx.close();
     }
 
     private void initializeJS() throws Exception {
