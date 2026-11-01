@@ -4,8 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -14,10 +12,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.CancellationSignal;
-import android.os.Handler;
-import android.os.Looper;
 
-import androidx.annotation.MainThread;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.media3.exoplayer.offline.Downloader;
@@ -37,31 +32,26 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Closeable;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.UUID;
 
 import okhttp3.Call;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class RuntimeInstaller extends BroadcastReceiver {
+public class RuntimeInstaller {
 
     public static final String RESULT = "com.fongmi.android.tv.RUNTIME_INSTALL_RESULT";
-    private static final String CONFIRM_SESSION = "runtimeConfirmSession";
-    private static final String CONFIRM_INTENT = "runtimeConfirmIntent";
-    private static final String CONFIRM_PACKAGE = "runtimeConfirmPackage";
+    private static final String INSTALL_REQUEST = "runtimeInstallRequest";
+    private static final String INSTALL_PACKAGE = "runtimeInstallPackage";
+    private static final String INSTALL_FILE = "runtimeInstallFile";
+    private static final String INSTALL_VERSION = "runtimeInstallVersion";
+    private static final String INSTALL_OPENED = "runtimeInstallOpened";
     private static final String REMOVE_PACKAGE = "runtimeRemovePackage";
-    private static final Set<Integer> finishedSessions = new HashSet<>();
-    private static int confirmationSession = -1;
+    private static String confirmationRequest = "";
+    private static Closeable retainedApk;
     private static boolean removing;
 
     public static String getAbi() {
@@ -225,24 +215,15 @@ public class RuntimeInstaller extends BroadcastReceiver {
         if (code != asset.optLong("versionCode") || !update.version().equals(info.versionName)) throw new IOException("Runtime asset version mismatch");
     }
 
-    public static boolean hasPendingSession() {
-        PackageInstaller installer = App.get().getBaseContext().getPackageManager().getPackageInstaller();
-        return getPendingSessions(installer).stream().anyMatch(info -> getRuntime(info.getAppPackageName()) != null) || getRuntime(Prefers.getPrefers().getString(REMOVE_PACKAGE, "")) != null;
+    public static boolean hasPendingInstallation() {
+        var prefs = Prefers.getPrefers();
+        return getRuntime(prefs.getString(INSTALL_PACKAGE, "")) != null || getRuntime(prefs.getString(REMOVE_PACKAGE, "")) != null;
     }
 
-    public static boolean hasPendingSession(RuntimeModule module) {
+    public static boolean hasPendingInstallation(RuntimeModule module) {
+        var prefs = Prefers.getPrefers();
         String target = module.getPackageName();
-        PackageInstaller installer = App.get().getBaseContext().getPackageManager().getPackageInstaller();
-        return getPendingSessions(installer).stream().anyMatch(info -> target.equals(info.getAppPackageName())) || target.equals(Prefers.getPrefers().getString(REMOVE_PACKAGE, ""));
-    }
-
-    private static synchronized List<PackageInstaller.SessionInfo> getPendingSessions(PackageInstaller installer) {
-        List<PackageInstaller.SessionInfo> sessions = new ArrayList<>(installer.getMySessions());
-        Set<Integer> existing = new HashSet<>();
-        for (PackageInstaller.SessionInfo info : sessions) existing.add(info.getSessionId());
-        finishedSessions.retainAll(existing);
-        sessions.removeIf(info -> finishedSessions.contains(info.getSessionId()));
-        return sessions;
+        return target.equals(prefs.getString(INSTALL_PACKAGE, "")) || target.equals(prefs.getString(REMOVE_PACKAGE, ""));
     }
 
     private static RuntimeModule getRuntime(String target) {
@@ -257,7 +238,7 @@ public class RuntimeInstaller extends BroadcastReceiver {
     public static synchronized void remove(RuntimeModule module, CancellationSignal signal) throws IOException {
         signal.throwIfCanceled();
         if (!isRemovable(module)) throw new IOException(module.title + " is not removable");
-        if (hasPendingSession()) throw new IOException("A runtime installation is already in progress");
+        if (hasPendingInstallation()) throw new IOException("A runtime installation is already in progress");
         signal.throwIfCanceled();
         if (!Prefers.getPrefers().edit().putString(REMOVE_PACKAGE, module.getPackageName()).commit()) throw new IOException("Unable to save runtime removal");
         App.post(RuntimeInstaller::requestRemoval);
@@ -284,183 +265,114 @@ public class RuntimeInstaller extends BroadcastReceiver {
         }
     }
 
-    private static void saveConfirmation(int id, String target, Intent confirm) throws IOException {
-        if (confirm == null) throw new IOException("Runtime confirmation is unavailable");
-        if (id < 0 || confirm.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1) != id) throw new IOException("Invalid runtime confirmation session");
-        if (getRuntime(target) == null) throw new IOException("Runtime confirmation package mismatch");
-        if (!Prefers.getPrefers().edit().putInt(CONFIRM_SESSION, id).putString(CONFIRM_PACKAGE, target).putString(CONFIRM_INTENT, confirm.toUri(Intent.URI_INTENT_SCHEME)).commit()) throw new IOException("Unable to save runtime confirmation");
-    }
-
-    private static void clearConfirmation(int id) throws IOException {
-        var prefs = Prefers.getPrefers();
-        if (prefs.getInt(CONFIRM_SESSION, -1) != id) return;
-        if (!prefs.edit().remove(CONFIRM_SESSION).remove(CONFIRM_INTENT).remove(CONFIRM_PACKAGE).commit()) throw new IOException("Unable to clear runtime confirmation");
-        if (confirmationSession == id) confirmationSession = -1;
-    }
-
     public static void confirmInstallation(Activity activity) {
+        resumeConfirmation(activity, true);
+    }
+
+    public static synchronized void cancelInstallation(RuntimeModule module) throws IOException {
+        var prefs = Prefers.getPrefers();
+        if (module.getPackageName().equals(prefs.getString(INSTALL_PACKAGE, ""))) clearInstallation(prefs.getString(INSTALL_REQUEST, ""));
+    }
+
+    private static synchronized boolean clearInstallation(String request) throws IOException {
+        var prefs = Prefers.getPrefers();
+        if (request.isEmpty() || !request.equals(prefs.getString(INSTALL_REQUEST, ""))) return false;
+        if (!prefs.edit().remove(INSTALL_REQUEST).remove(INSTALL_PACKAGE).remove(INSTALL_FILE).remove(INSTALL_VERSION).remove(INSTALL_OPENED).commit()) throw new IOException("Unable to clear runtime installation");
         try {
-            resumeConfirmation(activity, true);
+            if (retainedApk != null) retainedApk.close();
+        } finally {
+            retainedApk = null;
+            wakeInstallers();
+        }
+        return true;
+    }
+
+    private static synchronized void retainInstallation(String request, String name) throws IOException {
+        if (request.equals(Prefers.getPrefers().getString(INSTALL_REQUEST, "")) && retainedApk == null) retainedApk = Download.retain(new File(Path.cache(), ApkCache.MODULE_DIRECTORY + "/" + name));
+    }
+
+    private static void resumeConfirmation(Activity activity, boolean requested) {
+        var prefs = Prefers.getPrefers();
+        String request = prefs.getString(INSTALL_REQUEST, "");
+        if (request.isEmpty() || request.equals(confirmationRequest)) return;
+        String target = prefs.getString(INSTALL_PACKAGE, "");
+        String name = prefs.getString(INSTALL_FILE, "");
+        long version = prefs.getLong(INSTALL_VERSION, 0);
+        boolean returned = prefs.getBoolean(INSTALL_OPENED, false) && !requested;
+        confirmationRequest = request;
+        Task.execute(() -> checkInstallation(activity, request, target, name, version, returned));
+    }
+
+    private static void checkInstallation(Activity activity, String request, String target, String name, long version, boolean returned) {
+        try {
+            boolean installed = checkInstalledVersion(request, target, name, version, returned);
+            App.post(() -> finishConfirmation(activity, request, target, name, installed, returned, null));
+        } catch (IOException | RuntimeException e) {
+            App.post(() -> finishConfirmation(activity, request, target, name, false, returned, e));
+        }
+    }
+
+    private static boolean checkInstalledVersion(String request, String target, String name, long version, boolean returned) throws IOException {
+        RuntimeModule module = getRuntime(target);
+        if (module == null || version <= 0 || !name.equals(version + "-" + getFileName(module))) throw new IOException("Invalid runtime installation");
+        retainInstallation(request, name);
+        RuntimeModule.refresh();
+        boolean installed = module.getVersionCode() >= version;
+        if (!installed && !returned) {
+            PackageInfo info = module.validate(new File(Path.cache(), ApkCache.MODULE_DIRECTORY + "/" + name));
+            long code = Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+            if (code != version) throw new IOException("Runtime installation version mismatch");
+        }
+        return installed;
+    }
+
+    private static void finishConfirmation(Activity activity, String request, String target, String name, boolean installed, boolean returned, Exception error) {
+        if (request.equals(confirmationRequest)) confirmationRequest = "";
+        if (!request.equals(Prefers.getPrefers().getString(INSTALL_REQUEST, ""))) return;
+        if (error != null) {
+            failInstallation(request, target, name, error);
+            return;
+        }
+        try {
+            if (installed || returned) {
+                Integer status = installed ? Integer.valueOf(PackageInstaller.STATUS_SUCCESS) : null;
+                finishInstallation(request, target, name, status, null);
+            } else if (activity.isFinishing() || activity.isDestroyed() || activity != App.activity()) {
+                notifyConfirmation(false);
+            } else {
+                openInstallation(name);
+            }
+        } catch (IOException | RuntimeException e) {
+            failInstallation(request, target, name, e);
+        }
+    }
+
+    private static void failInstallation(String request, String target, String name, Exception error) {
+        String message = error.getMessage() == null ? error.toString() : error.getMessage();
+        Notify.show(message);
+        try {
+            finishInstallation(request, target, name, PackageInstaller.STATUS_FAILURE, message);
         } catch (IOException | RuntimeException e) {
             Notify.show(e.getMessage() == null ? e.toString() : e.getMessage());
         }
     }
 
-    @MainThread
-    public static Runnable cancelInstallation(RuntimeModule module, BiConsumer<Boolean, String> callback) {
-        String target = module.getPackageName();
-        PackageInstaller installer = App.get().getBaseContext().getPackageManager().getPackageInstaller();
-        CancelCallback observer = new CancelCallback(target, installer, callback);
-        observer.start();
-        return observer.completed ? null : () -> observer.complete(null);
+    private static void openInstallation(String name) throws IOException {
+        File file = new File(Path.cache(), ApkCache.MODULE_DIRECTORY + "/" + name);
+        if (!Prefers.getPrefers().edit().putBoolean(INSTALL_OPENED, true).commit()) throw new IOException("Unable to save runtime installation");
+        FileUtil.openFile(file, "application/vnd.android.package-archive");
     }
 
-    private static class CancelCallback extends PackageInstaller.SessionCallback {
-
-        private final String target;
-        private final PackageInstaller installer;
-        private final BiConsumer<Boolean, String> callback;
-        private final List<Integer> pending = new ArrayList<>();
-        private boolean requestsFinished;
-        private boolean completed;
-        private boolean success = true;
-
-        private CancelCallback(String target, PackageInstaller installer, BiConsumer<Boolean, String> callback) {
-            this.target = target;
-            this.installer = installer;
-            this.callback = callback;
-        }
-
-        private void complete(String error) {
-            if (completed) return;
-            completed = true;
-            try {
-                installer.unregisterSessionCallback(this);
-            } catch (RuntimeException e) {
-                error = e.getMessage() == null ? e.toString() : e.getMessage();
-            }
-            callback.accept(error == null && success, error);
-        }
-
-        private void start() {
-            try {
-                installer.registerSessionCallback(this, new Handler(Looper.getMainLooper()));
-                for (PackageInstaller.SessionInfo info : getPendingSessions(installer)) if (target.equals(info.getAppPackageName())) pending.add(info.getSessionId());
-                if (pending.isEmpty()) {
-                    finishMissingSession();
-                    return;
-                }
-                List<Integer> sessions = List.copyOf(pending);
-                Task.execute(() -> abandonSessions(sessions));
-            } catch (IOException | RuntimeException e) {
-                complete(e.getMessage() == null ? e.toString() : e.getMessage());
-            }
-        }
-
-        private void finishMissingSession() throws IOException {
-            success = false;
-            var prefs = Prefers.getPrefers();
-            int id = prefs.getInt(CONFIRM_SESSION, -1);
-            if (target.equals(prefs.getString(CONFIRM_PACKAGE, "")) && installer.getSessionInfo(id) == null) clearConfirmation(id);
-            complete(null);
-        }
-
-        private void abandonSessions(List<Integer> sessions) {
-            String error = null;
-            try {
-                for (int id : sessions) installer.abandonSession(id);
-            } catch (RuntimeException e) {
-                error = e.getMessage() == null ? e.toString() : e.getMessage();
-            }
-            String message = error;
-            App.post(() -> finishRequests(message));
-        }
-
-        private void finishRequests(String error) {
-            requestsFinished = true;
-            if (error != null || pending.isEmpty()) complete(error);
-        }
-
-        @Override
-        public void onCreated(int sessionId) {
-        }
-
-        @Override
-        public void onBadgingChanged(int sessionId) {
-        }
-
-        @Override
-        public void onActiveChanged(int sessionId, boolean active) {
-        }
-
-        @Override
-        public void onProgressChanged(int sessionId, float progress) {
-        }
-
-        @Override
-        public void onFinished(int sessionId, boolean succeeded) {
-            if (completed || !pending.remove(Integer.valueOf(sessionId))) return;
-            finishSession(sessionId);
-            success &= succeeded;
-            String error = null;
-            try {
-                clearConfirmation(sessionId);
-            } catch (IOException | RuntimeException e) {
-                error = e.getMessage() == null ? e.toString() : e.getMessage();
-            }
-            if (error != null || requestsFinished && pending.isEmpty()) complete(error);
-        }
-    }
-
-    private static void resumeConfirmation(Activity activity, boolean requested) throws IOException {
-        var prefs = Prefers.getPrefers();
-        String uri = prefs.getString(CONFIRM_INTENT, "");
-        if (uri.isEmpty()) return;
-        int id = prefs.getInt(CONFIRM_SESSION, -1);
-        String target = prefs.getString(CONFIRM_PACKAGE, "");
-        PackageInstaller installer = App.get().getBaseContext().getPackageManager().getPackageInstaller();
-        PackageInstaller.SessionInfo info = installer.getSessionInfo(id);
-        if (info == null) {
-            clearConfirmation(id);
-            return;
-        }
-        if (getRuntime(target) == null || !target.equals(info.getAppPackageName())) throw new IOException("Runtime confirmation package mismatch");
-        if (!requested && confirmationSession == id) return;
-        try {
-            Intent confirm = Intent.parseUri(uri, Intent.URI_INTENT_SCHEME);
-            if (confirm.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1) != id) throw new IOException("Runtime confirmation session mismatch");
-            activity.startActivity(confirm);
-            confirmationSession = id;
-        } catch (URISyntaxException e) {
-            throw new IOException("Invalid runtime confirmation", e);
-        } catch (ActivityNotFoundException | SecurityException e) {
-            failConfirmation(installer, id, target, e);
-        }
-    }
-
-    private static void failConfirmation(PackageInstaller installer, int session, String target, Exception error) throws IOException {
+    private static void finishInstallation(String request, String target, String name, Integer status, String message) throws IOException {
+        if (!clearInstallation(request)) return;
         Context context = App.get().getBaseContext();
+        Intent result = new Intent(RESULT).setPackage(context.getPackageName()).setData(Uri.fromParts("package", target, null));
+        if (status != null) result.putExtra(PackageInstaller.EXTRA_STATUS, status);
+        if (message != null) result.putExtra(PackageInstaller.EXTRA_STATUS_MESSAGE, message);
         try {
-            Intent result = new Intent(context, RuntimeInstaller.class).setAction(RESULT);
-            PendingIntent pending = PendingIntent.getBroadcast(context, session, result, PendingIntent.FLAG_NO_CREATE | PendingIntent.FLAG_MUTABLE);
-            if (pending != null) pending.cancel();
+            if (status != null && status == PackageInstaller.STATUS_SUCCESS) ApkCache.installed(new File(Path.cache(), ApkCache.MODULE_DIRECTORY), getRuntime(target).id, name);
         } finally {
-            try {
-                installer.abandonSession(session);
-            } finally {
-                finishInstallation(context, session, target, PackageInstaller.STATUS_FAILURE, error.getMessage() == null ? error.toString() : error.getMessage());
-            }
-        }
-    }
-
-    private static void finishInstallation(Context context, int session, String target, int status, String message) throws IOException {
-        try {
-            clearConfirmation(session);
-        } finally {
-            finishSession(session);
-            if (message == null || message.isEmpty()) message = context.getString(R.string.module_failed_title);
-            if (status != PackageInstaller.STATUS_SUCCESS) Notify.show(status == PackageInstaller.STATUS_FAILURE_ABORTED ? context.getString(R.string.module_cancelled) : message);
-            context.sendBroadcast(new Intent(RESULT).setPackage(context.getPackageName()).setData(Uri.fromParts("package", target, null)).putExtra(PackageInstaller.EXTRA_STATUS, status).putExtra(PackageInstaller.EXTRA_STATUS_MESSAGE, message));
+            context.sendBroadcast(result);
         }
     }
 
@@ -505,97 +417,50 @@ public class RuntimeInstaller extends BroadcastReceiver {
 
     public static void install(RuntimeModule module, File file, CancellationSignal signal) throws IOException {
         signal.throwIfCanceled();
-        module.validate(file);
-        signal.throwIfCanceled();
-        String target = module.getPackageName();
+        PackageInfo info = module.validate(file);
+        long version = Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+        File directory = new File(Path.cache(), ApkCache.MODULE_DIRECTORY).getCanonicalFile();
+        if (!directory.equals(file.getCanonicalFile().getParentFile()) || !file.getName().equals(version + "-" + getFileName(module))) throw new IOException("Invalid runtime installation file");
         Path.requireSpace(file, file.length());
-        PackageInstaller installer = App.get().getBaseContext().getPackageManager().getPackageInstaller();
-        PackageInstaller.SessionParams params = new PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-        params.setAppPackageName(target);
-        int id = createSession(installer, params, signal);
-        boolean committed = false;
-        Throwable failure = null;
-        try (PackageInstaller.Session session = installer.openSession(id)) {
-            writeSession(session, file, signal);
-            commitSession(session, id, target, file, signal);
-            committed = true;
-        } catch (IOException | RuntimeException | Error e) {
-            failure = e;
-            throw e;
-        } finally {
-            if (!committed) abandonSession(installer, id, failure);
-        }
-    }
-
-    private static void abandonSession(PackageInstaller installer, int id, Throwable failure) {
-        try {
-            installer.abandonSession(id);
-        } catch (RuntimeException | Error e) {
-            if (failure == null) throw e;
-            if (failure != e) failure.addSuppressed(e);
-        }
-    }
-
-    private static void writeSession(PackageInstaller.Session session, File file, CancellationSignal signal) throws IOException {
-        try (InputStream input = new FileInputStream(file); OutputStream output = session.openWrite(file.getName(), 0, file.length())) {
-            byte[] buffer = new byte[16 * 1024];
-            int count;
-            while ((count = input.read(buffer)) != -1) {
-                signal.throwIfCanceled();
-                output.write(buffer, 0, count);
-            }
-            session.fsync(output);
-        }
-    }
-
-    private static void commitSession(PackageInstaller.Session session, int id, String target, File file, CancellationSignal signal) throws IOException {
-        Context context = App.get().getBaseContext();
-        Intent result = new Intent(context, RuntimeInstaller.class).setAction(RESULT).putExtra("runtimePackage", target);
-        if (file.getCanonicalFile().getParentFile().equals(new File(Path.cache(), ApkCache.MODULE_DIRECTORY).getCanonicalFile())) result.putExtra("runtimeFile", file.getName());
-        PendingIntent pending = PendingIntent.getBroadcast(context, id, result, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
-        signal.throwIfCanceled();
-        session.commit(pending.getIntentSender());
-    }
-
-    private static int createSession(PackageInstaller installer, PackageInstaller.SessionParams params, CancellationSignal signal) throws IOException {
-        PackageInstaller.SessionCallback callback = new PackageInstaller.SessionCallback() {
-            @Override
-            public void onCreated(int sessionId) {
-            }
-
-            @Override
-            public void onBadgingChanged(int sessionId) {
-            }
-
-            @Override
-            public void onActiveChanged(int sessionId, boolean active) {
-            }
-
-            @Override
-            public void onProgressChanged(int sessionId, float progress) {
-            }
-
-            @Override
-            public void onFinished(int sessionId, boolean success) {
-                finishSession(sessionId);
-            }
-        };
-        installer.registerSessionCallback(callback, new Handler(Looper.getMainLooper()));
+        String request = UUID.randomUUID().toString();
         signal.setOnCancelListener(RuntimeInstaller::wakeInstallers);
         try {
             synchronized (RuntimeInstaller.class) {
-                awaitPendingSessions(signal);
+                awaitPendingInstallations(signal);
                 signal.throwIfCanceled();
-                return installer.createSession(params);
+                saveInstallation(request, module, file, version);
             }
         } finally {
             signal.setOnCancelListener(null);
-            installer.unregisterSessionCallback(callback);
+        }
+        App.post(() -> requestInstallation(request, module.getPackageName(), file.getName(), signal));
+    }
+
+    private static void saveInstallation(String request, RuntimeModule module, File file, long version) throws IOException {
+        Closeable retained = Download.retain(file);
+        boolean saved = false;
+        try {
+            if (!Prefers.getPrefers().edit().putString(INSTALL_REQUEST, request).putString(INSTALL_PACKAGE, module.getPackageName()).putString(INSTALL_FILE, file.getName()).putLong(INSTALL_VERSION, version).putBoolean(INSTALL_OPENED, false).commit()) throw new IOException("Unable to save runtime installation");
+            retainedApk = retained;
+            saved = true;
+        } finally {
+            if (!saved) retained.close();
         }
     }
 
-    private static void awaitPendingSessions(CancellationSignal signal) throws IOException {
-        while (hasPendingSession()) {
+    private static void requestInstallation(String request, String target, String name, CancellationSignal signal) {
+        if (!request.equals(Prefers.getPrefers().getString(INSTALL_REQUEST, ""))) return;
+        try {
+            if (signal.isCanceled()) finishInstallation(request, target, name, PackageInstaller.STATUS_FAILURE_ABORTED, null);
+            else if (App.activity() != null) resumeConfirmation(App.activity(), false);
+            else notifyConfirmation(false);
+        } catch (IOException | RuntimeException e) {
+            Notify.show(e.getMessage() == null ? e.toString() : e.getMessage());
+        }
+    }
+
+    private static void awaitPendingInstallations(CancellationSignal signal) throws IOException {
+        while (hasPendingInstallation()) {
             signal.throwIfCanceled();
             try {
                 RuntimeInstaller.class.wait();
@@ -608,58 +473,6 @@ public class RuntimeInstaller extends BroadcastReceiver {
 
     private static synchronized void wakeInstallers() {
         RuntimeInstaller.class.notifyAll();
-    }
-
-    private static synchronized void finishSession(int id) {
-        finishedSessions.add(id);
-        RuntimeInstaller.class.notifyAll();
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) {
-        if (!RESULT.equals(intent.getAction())) return;
-        try {
-            handleResult(context, intent);
-        } catch (IOException | RuntimeException e) {
-            Notify.show(e.getMessage() == null ? e.toString() : e.getMessage());
-        }
-    }
-
-    private static void handleResult(Context context, Intent intent) throws IOException {
-        int status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
-        int session = intent.getIntExtra(PackageInstaller.EXTRA_SESSION_ID, -1);
-        String target = intent.getStringExtra("runtimePackage");
-        RuntimeModule module = getRuntime(target);
-        if (module == null) throw new IOException("Runtime result package mismatch");
-        if (status == PackageInstaller.STATUS_PENDING_USER_ACTION) {
-            requestConfirmation(context, session, target, intent.getParcelableExtra(Intent.EXTRA_INTENT));
-            return;
-        }
-        try {
-            if (status == PackageInstaller.STATUS_SUCCESS) clearInstalledApk(module, intent);
-        } finally {
-            finishInstallation(context, session, target, status, intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE));
-        }
-    }
-
-    private static void clearInstalledApk(RuntimeModule module, Intent intent) throws IOException {
-        File directory = new File(Path.cache(), ApkCache.MODULE_DIRECTORY);
-        ApkCache.installed(directory, module.id, intent.getStringExtra("runtimeFile"));
-    }
-
-    private static void requestConfirmation(Context context, int session, String target, Intent confirm) throws IOException {
-        PackageInstaller installer = context.getPackageManager().getPackageInstaller();
-        PackageInstaller.SessionInfo info = installer.getSessionInfo(session);
-        if (info == null || !target.equals(info.getAppPackageName())) throw new IOException("Runtime confirmation package mismatch");
-        try {
-            saveConfirmation(session, target, confirm);
-        } catch (IOException | RuntimeException e) {
-            failConfirmation(installer, session, target, e);
-            return;
-        }
-        Activity activity = App.activity();
-        if (activity != null) resumeConfirmation(activity, true);
-        else notifyConfirmation(false);
     }
 
     private static void notifyConfirmation(boolean remove) {

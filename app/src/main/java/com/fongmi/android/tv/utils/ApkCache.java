@@ -25,7 +25,7 @@ public final class ApkCache {
 
     public static File modules() throws IOException {
         File directory = directory(Path.cache(), "modules");
-        if (!RuntimeInstaller.hasPendingSession()) clearModules(directory, null, System.currentTimeMillis() - MAX_AGE);
+        if (!RuntimeInstaller.hasPendingInstallation()) clearModules(directory, null, System.currentTimeMillis() - MAX_AGE);
         return directory;
     }
 

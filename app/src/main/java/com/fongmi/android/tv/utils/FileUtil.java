@@ -24,10 +24,14 @@ import java.text.DecimalFormat;
 public class FileUtil {
 
     public static void openFile(File file) {
+        openFile(file, getMimeType(file.getName()));
+    }
+
+    public static void openFile(File file, String mimeType) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.setDataAndType(getShareUri(file), FileUtil.getMimeType(file.getName()));
+        intent.setDataAndType(getShareUri(file), mimeType);
         App.get().startActivity(intent);
     }
 

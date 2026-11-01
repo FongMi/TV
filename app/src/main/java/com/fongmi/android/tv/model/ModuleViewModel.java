@@ -84,7 +84,6 @@ public final class ModuleViewModel extends AndroidViewModel {
     private final MutableLiveData<Health> health = new MutableLiveData<>(new Health(HealthPhase.UNKNOWN, null));
     private BroadcastReceiver receiver;
     private Intent installResult;
-    private Runnable pendingCancellation;
     private CancellationSignal cancellation;
     private boolean packageChanged;
     private boolean cleared;
@@ -129,8 +128,7 @@ public final class ModuleViewModel extends AndroidViewModel {
         if (cleared || intent.getData() == null || !module.getPackageName().equals(intent.getData().getSchemeSpecificPart())) return;
         if (RuntimeInstaller.RESULT.equals(intent.getAction())) {
             installResult = intent;
-            if (pendingCancellation != null) pendingCancellation.run();
-            else if (!state.getValue().isBusy()) finishInstallation();
+            if (!state.getValue().isBusy()) finishInstallation();
             return;
         }
         if (Intent.ACTION_PACKAGE_REMOVED.equals(intent.getAction()) && intent.getBooleanExtra(Intent.EXTRA_REPLACING, false)) return;
@@ -254,7 +252,7 @@ public final class ModuleViewModel extends AndroidViewModel {
         Status runtime = current.runtime();
         try {
             signal.throwIfCanceled();
-            boolean pending = !changed && RuntimeInstaller.hasPendingSession(module);
+            boolean pending = !changed && RuntimeInstaller.hasPendingInstallation(module);
             if (!pending) {
                 runtime = getInstalledStatus();
                 runtime = getStatus(runtime, signal);
@@ -376,6 +374,10 @@ public final class ModuleViewModel extends AndroidViewModel {
     private void finishInstallation() {
         Intent result = installResult;
         installResult = null;
+        if (!result.hasExtra(PackageInstaller.EXTRA_STATUS)) {
+            check();
+            return;
+        }
         int status = result.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE);
         Phase phase = status == PackageInstaller.STATUS_SUCCESS ? Phase.IDLE : status == PackageInstaller.STATUS_FAILURE_ABORTED ? Phase.CANCELLED : Phase.FAILED;
         finishInstallation(phase, phase == Phase.FAILED ? result.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) : null);
@@ -409,7 +411,8 @@ public final class ModuleViewModel extends AndroidViewModel {
         cancellation = null;
         if (cleared) return;
         if (checked != null) health.setValue(checked);
-        state.setValue(result);
+        if (result.phase() == Phase.READY && state.getValue().phase() == Phase.CANCELLING) cancelInstallation();
+        else state.setValue(result);
         if (notify && result.error() != null) Notify.show(result.error());
         if (installResult != null) finishInstallation();
         else if (packageChanged) check();
@@ -441,8 +444,7 @@ public final class ModuleViewModel extends AndroidViewModel {
         State current = state.getValue();
         if (cleared || current.phase() == Phase.CANCELLING || current.phase() == Phase.REMOVING) return;
         if (current.phase() == Phase.READY) {
-            state.setValue(new State(Phase.CANCELLING, current.runtime(), -1, -1, null));
-            pendingCancellation = RuntimeInstaller.cancelInstallation(module, this::onInstallationCancelled);
+            cancelInstallation();
             return;
         }
         if (cancellation == null) return;
@@ -450,18 +452,20 @@ public final class ModuleViewModel extends AndroidViewModel {
         Task.execute(cancellation::cancel);
     }
 
-    private void onInstallationCancelled(boolean success, String error) {
-        pendingCancellation = null;
-        if (cleared) return;
-        if (installResult != null) finishInstallation();
-        else finishInstallation(success ? Phase.IDLE : error == null ? Phase.CANCELLED : Phase.FAILED, error);
-        if (error != null) Notify.show(error);
+    private void cancelInstallation() {
+        try {
+            RuntimeInstaller.cancelInstallation(module);
+            finishInstallation(Phase.CANCELLED, null);
+        } catch (IOException | RuntimeException e) {
+            String error = e.getMessage() == null ? e.toString() : e.getMessage();
+            finishInstallation(Phase.FAILED, error);
+            Notify.show(error);
+        }
     }
 
     @Override
     protected void onCleared() {
         cleared = true;
-        if (pendingCancellation != null) pendingCancellation.run();
         if (receiver != null) getApplication().unregisterReceiver(receiver);
         if (cancellation != null) Task.execute(cancellation::cancel);
     }

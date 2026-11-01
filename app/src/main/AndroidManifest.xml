@@ -105,8 +105,6 @@
             android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
 
-        <receiver android:name=".utils.RuntimeInstaller" android:exported="false" />
-
         <receiver
             android:name=".receiver.ActionReceiver"
             android:exported="false">
