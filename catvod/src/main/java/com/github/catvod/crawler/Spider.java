@@ -83,7 +83,11 @@ public abstract class Spider implements AutoCloseable {
         url.appendQueryParameter(name, text);
     }
 
+    public void init(Context context) throws Exception {
+    }
+
     public void init(Context context, String extend) throws Exception {
+        init(context);
     }
 
     public String homeContent(boolean filter) throws Exception {
