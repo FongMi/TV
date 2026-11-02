@@ -1,0 +1,1 @@
+package com.github.catvod.utils; import java.io.*;import java.nio.file.*;import java.util.zip.*;public class Archive {public static boolean gzipDecompress(File a,File b){try(InputStream in=new GZIPInputStream(new FileInputStream(a))){Files.copy(in,b.toPath(),StandardCopyOption.REPLACE_EXISTING);return true;}catch(IOException e){return false;}}}

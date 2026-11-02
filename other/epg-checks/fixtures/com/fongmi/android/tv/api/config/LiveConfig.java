@@ -1,0 +1,1 @@
+package com.fongmi.android.tv.api.config;import com.fongmi.android.tv.bean.*;import java.util.*;public class LiveConfig{public static LiveConfig get(){return new LiveConfig();}public void setKeep(Channel c){}public void applyKeepsToGroups(List<Group> g){} }

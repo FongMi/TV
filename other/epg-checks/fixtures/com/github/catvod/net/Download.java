@@ -1,0 +1,1 @@
+package com.github.catvod.net;import java.io.*;import java.nio.file.*;public class Download {File file;String url;public static int calls;public static Download create(String url,File file){Download d=new Download();d.url=url;d.file=file;return d;}public File get()throws IOException{calls++;Files.writeString(file.toPath(),OkHttp.string(url));return file;}}

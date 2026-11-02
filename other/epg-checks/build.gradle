@@ -1,0 +1,61 @@
+plugins { id 'java' }
+repositories { google(); mavenCentral() }
+
+def application = file('../../app/src')
+def sdk = providers.gradleProperty('androidSdk').orElse(providers.environmentVariable('ANDROID_HOME')).orElse(providers.environmentVariable('ANDROID_SDK_ROOT')).get()
+layout.buildDirectory = file(providers.gradleProperty('epgCheckBuildDir').getOrElse('build'))
+sourceSets { main.java.srcDirs = ['fixtures']; test.java.srcDirs = ['checks'] }
+compileJava.source files([
+    'main/java/com/fongmi/android/tv/bean/Epg.java',
+    'main/java/com/fongmi/android/tv/bean/EpgData.java',
+    'main/java/com/fongmi/android/tv/bean/EpgProgramme.java',
+    'main/java/com/fongmi/android/tv/bean/Catchup.java',
+    'main/java/com/fongmi/android/tv/bean/Tv.java',
+    'main/java/com/fongmi/android/tv/api/parser/EpgParser.java',
+    'main/java/com/fongmi/android/tv/api/LiveApi.java',
+    'main/java/com/fongmi/android/tv/model/LiveViewModel.java',
+    'main/java/com/fongmi/android/tv/model/ViewModelTaskRunner.java',
+    'main/java/com/fongmi/android/tv/playback/PlaybackResult.java',
+    'main/java/com/fongmi/android/tv/playback/live/LivePlaybackController.java',
+    'main/java/com/fongmi/android/tv/playback/live/LivePlayRequest.java',
+    'main/java/com/fongmi/android/tv/playback/live/LivePlaybackState.java',
+    'main/java/com/fongmi/android/tv/playback/live/LivePlaybackHost.java',
+    'main/java/com/fongmi/android/tv/playback/live/LiveDataSource.java',
+    'main/java/com/fongmi/android/tv/utils/EpgTimeline.java',
+    'main/java/com/fongmi/android/tv/utils/EpgHistory.java',
+    'main/java/com/fongmi/android/tv/utils/EpgRefreshPolicy.java',
+    'main/java/com/fongmi/android/tv/utils/Formatters.java',
+    'mobile/java/com/fongmi/android/tv/ui/custom/LiveProgrammeInfo.java'
+].collect { new File(application, it) })
+dependencies {
+    compileOnly files(new File(sdk, 'platforms/android-37.0/android.jar'))
+    implementation 'com.google.code.gson:gson:2.14.0'
+    implementation('org.simpleframework:simple-xml:2.7.1') { exclude group: 'stax'; exclude group: 'xpp3' }
+    implementation 'com.google.guava:guava:33.7.2-android'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.16'
+    testImplementation 'org.robolectric:android-all:16-robolectric-13921718'
+}
+test {
+    maxParallelForks = 1
+    systemProperty 'robolectric.dependency.repo.url', 'https://repo.maven.apache.org/maven2'
+    ['http.proxyHost', 'http.proxyPort', 'https.proxyHost', 'https.proxyPort', 'javax.net.ssl.trustStore'].each { key ->
+        if (System.getProperty(key)) systemProperty key, System.getProperty(key)
+    }
+    testLogging { events 'passed', 'failed'; exceptionFormat 'full' }
+}
+
+abstract class ExtractAar implements org.gradle.api.artifacts.transform.TransformAction<org.gradle.api.artifacts.transform.TransformParameters.None> {
+    @org.gradle.api.artifacts.transform.InputArtifact
+    abstract org.gradle.api.provider.Provider<org.gradle.api.file.FileSystemLocation> getInputArtifact()
+    @Override void transform(org.gradle.api.artifacts.transform.TransformOutputs outputs) {
+        def input = inputArtifact.get().asFile
+        def output = outputs.file(input.name.replace('.aar', '.jar'))
+        new java.util.zip.ZipFile(input).withCloseable { zip ->
+            zip.getInputStream(zip.getEntry('classes.jar')).withCloseable { stream -> output.bytes = stream.bytes }
+        }
+    }
+}
+def artifactType = org.gradle.api.attributes.Attribute.of('artifactType', String)
+dependencies.registerTransform(ExtractAar) { from.attribute(artifactType, 'aar'); to.attribute(artifactType, 'jar') }
+configurations.configureEach { attributes.attribute(artifactType, 'jar') }
