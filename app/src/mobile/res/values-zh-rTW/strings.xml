@@ -36,8 +36,6 @@
     <string name="seek_seconds">%+d 秒</string>
     <string name="control_speed">倍速</string>
     <string name="pinch_zoom">縮放 %1$d%%</string>
-    <string name="pinch_width">寬度 %1$d%%</string>
-    <string name="pinch_height">高度 %1$d%%</string>
     <string name="pinch_size">寬 %1$d%% · 高 %2$d%%</string>
     <string name="control_track">軌道</string>
     <string name="control_other">其它</string>

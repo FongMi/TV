@@ -1,21 +1,15 @@
 package com.fongmi.android.tv.ui.custom;
 
-public final class PinchScale {
+final class PinchScale {
 
-    private static final float AXIS_DOMINANCE_RATIO = 2.0f;
     private static final float CENTER_REGION_HALF_FRACTION = 0.15f;
     private static final float EDGE_CONTACT_SLOP_PX = 1.0f;
     private static final float EDGE_ELASTIC_SCALE = 0.12f;
     private static final float MIN_ELASTIC_SCALE = 0.12f;
     private static final float MAX_ELASTIC_SCALE = 0.20f;
     private static final float MIN_SCALE = 0.5f;
-    private static final float MAX_AXIS_SCALE = 2.0f;
     private static final float MAX_UNIFORM_SCALE = 5.0f;
 
-    public enum Axis {HORIZONTAL, VERTICAL, BOTH}
-
-    private Axis axis = Axis.BOTH;
-    private Axis activeAxis;
     private float scaleX = 1.0f;
     private float scaleY = 1.0f;
     private float visualScaleX = 1.0f;
@@ -32,56 +26,40 @@ public final class PinchScale {
         captureBaseline();
     }
 
-    void begin(float spanX, float spanY, float edgeScaleX, float edgeScaleY) {
-        axis = axisForSpans(spanX, spanY);
+    void begin(float edgeScaleX, float edgeScaleY) {
         this.edgeScaleX = edgeScaleX;
         this.edgeScaleY = edgeScaleY;
         captureBaseline();
     }
 
-    static Axis axisForSpans(float spanX, float spanY) {
-        if (spanX >= spanY * AXIS_DOMINANCE_RATIO) return Axis.HORIZONTAL;
-        if (spanY >= spanX * AXIS_DOMINANCE_RATIO) return Axis.VERTICAL;
-        return Axis.BOTH;
-    }
-
-    static boolean useCenterPivot(boolean multiTouch, float spanX, float spanY, float focusX, float focusY, float width, float height) {
+    static boolean useCenterPivot(boolean multiTouch, float focusX, float focusY, float width, float height) {
         if (!multiTouch || width <= 0 || height <= 0) return false;
-        if (axisForSpans(spanX, spanY) != Axis.BOTH) return true;
         return Math.abs(focusX - width / 2.0f) <= width * CENTER_REGION_HALF_FRACTION && Math.abs(focusY - height / 2.0f) <= height * CENTER_REGION_HALF_FRACTION;
     }
 
-    Axis update(float factor, boolean multiTouch) {
-        Axis current = multiTouch ? axis : Axis.BOTH;
-        if (activeAxis != current) captureBaseline();
-        activeAxis = current;
+    void update(float factor) {
         rawFactor *= factor;
-        float minBase = current == Axis.HORIZONTAL ? baseScaleX : current == Axis.VERTICAL ? baseScaleY : Math.min(baseScaleX, baseScaleY);
-        float maxBase = current == Axis.HORIZONTAL ? baseScaleX : current == Axis.VERTICAL ? baseScaleY : Math.max(baseScaleX, baseScaleY);
+        float minBase = Math.min(baseScaleX, baseScaleY);
+        float maxBase = Math.max(baseScaleX, baseScaleY);
         float minScaleX = getMinScale(baseScaleX);
         float minScaleY = getMinScale(baseScaleY);
-        float minFactor = current == Axis.HORIZONTAL ? minScaleX / baseScaleX : current == Axis.VERTICAL ? minScaleY / baseScaleY : Math.max(minScaleX / baseScaleX, minScaleY / baseScaleY);
-        float maxScale = Math.max(current == Axis.BOTH ? MAX_UNIFORM_SCALE : MAX_AXIS_SCALE, maxBase);
+        float minFactor = Math.max(minScaleX / baseScaleX, minScaleY / baseScaleY);
+        float maxScale = Math.max(MAX_UNIFORM_SCALE, maxBase);
         float maxScaleX = getMaxScale(baseScaleX, maxScale);
         float maxScaleY = getMaxScale(baseScaleY, maxScale);
-        float maxFactor = current == Axis.HORIZONTAL ? maxScaleX / baseScaleX : current == Axis.VERTICAL ? maxScaleY / baseScaleY : Math.min(maxScaleX / baseScaleX, maxScaleY / baseScaleY);
+        float maxFactor = Math.min(maxScaleX / baseScaleX, maxScaleY / baseScaleY);
         float edgeFactorX = edgeScaleX / baseScaleX;
         float edgeFactorY = edgeScaleY / baseScaleY;
-        float edgeFactor = current == Axis.HORIZONTAL ? edgeFactorX : current == Axis.VERTICAL ? edgeFactorY : Math.min(edgeFactorX, edgeFactorY);
-        float edgeBase = current == Axis.HORIZONTAL ? baseScaleX : current == Axis.VERTICAL ? baseScaleY : edgeFactorX <= edgeFactorY ? baseScaleX : baseScaleY;
+        float edgeFactor = Math.min(edgeFactorX, edgeFactorY);
+        float edgeBase = edgeFactorX <= edgeFactorY ? baseScaleX : baseScaleY;
         float limitFactor = Math.min(edgeFactor, maxFactor);
         float elasticDistance = edgeFactor < maxFactor ? EDGE_ELASTIC_SCALE / edgeBase : MAX_ELASTIC_SCALE / maxBase;
         float committedFactor = Math.clamp(rawFactor, minFactor, limitFactor);
         float visualFactor = resist(rawFactor, minFactor, limitFactor, MIN_ELASTIC_SCALE / minBase, elasticDistance);
-        if (current != Axis.VERTICAL) {
-            scaleX = Math.clamp(baseScaleX * committedFactor, minScaleX, maxScaleX);
-            visualScaleX = baseScaleX * visualFactor;
-        }
-        if (current != Axis.HORIZONTAL) {
-            scaleY = Math.clamp(baseScaleY * committedFactor, minScaleY, maxScaleY);
-            visualScaleY = baseScaleY * visualFactor;
-        }
-        return current;
+        scaleX = Math.clamp(baseScaleX * committedFactor, minScaleX, maxScaleX);
+        visualScaleX = baseScaleX * visualFactor;
+        scaleY = Math.clamp(baseScaleY * committedFactor, minScaleY, maxScaleY);
+        visualScaleY = baseScaleY * visualFactor;
     }
 
     private static float getMinScale(float baseScale) {
@@ -93,7 +71,6 @@ public final class PinchScale {
     }
 
     private void captureBaseline() {
-        activeAxis = null;
         baseScaleX = scaleX;
         baseScaleY = scaleY;
         rawFactor = 1.0f;
@@ -115,11 +92,6 @@ public final class PinchScale {
         float left = focus > start ? (focus + translation) / (focus - start) : Float.POSITIVE_INFINITY;
         float right = focus < end ? (viewport - focus - translation) / (end - focus) : Float.POSITIVE_INFINITY;
         return Math.min(left, right);
-    }
-
-    static float centeredEdgeScale(float start, float end, float focus, float viewport, float translation, float scale) {
-        float edge = edgeContactScale(start, end, focus, viewport, translation, scale);
-        return Float.isFinite(edge) ? viewport / (end - start) : edge;
     }
 
     static float localFocus(float focus, float translation, float pivot, float scale) {

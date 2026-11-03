@@ -57,7 +57,6 @@ import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.ui.adapter.ChannelAdapter;
 import com.fongmi.android.tv.ui.adapter.EpgDataAdapter;
 import com.fongmi.android.tv.ui.adapter.GroupAdapter;
-import com.fongmi.android.tv.ui.custom.PinchScale;
 import com.fongmi.android.tv.ui.custom.PinchScaleFeedback;
 import com.fongmi.android.tv.ui.custom.TouchInput;
 import com.fongmi.android.tv.ui.dialog.CastDialog;
@@ -1110,9 +1109,9 @@ public class LiveActivity extends PlaybackActivity implements TouchInput.Listene
     }
 
     @Override
-    public void onPinchScale(PinchScale.Axis axis, float scaleX, float scaleY) {
+    public void onPinchScale(float scaleX, float scaleY) {
         if (!mScaleFeedback.isActive()) PlaybackAction.hideSpeedHint(mBinding.widget.message);
-        mScaleFeedback.show(axis, scaleX, scaleY);
+        mScaleFeedback.show(scaleX, scaleY);
     }
 
     @Override

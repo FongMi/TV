@@ -36,8 +36,6 @@
     <string name="seek_seconds">%+d s</string>
     <string name="control_speed">Speed</string>
     <string name="pinch_zoom">Zoom %1$d%%</string>
-    <string name="pinch_width">Width %1$d%%</string>
-    <string name="pinch_height">Height %1$d%%</string>
     <string name="pinch_size">W %1$d%% · H %2$d%%</string>
     <string name="control_track">Track</string>
     <string name="control_other">Other</string>

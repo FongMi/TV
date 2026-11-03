@@ -86,7 +86,6 @@ import com.fongmi.android.tv.ui.adapter.FlagAdapter;
 import com.fongmi.android.tv.ui.adapter.QualityAdapter;
 import com.fongmi.android.tv.ui.adapter.QuickAdapter;
 import com.fongmi.android.tv.ui.base.ViewType;
-import com.fongmi.android.tv.ui.custom.PinchScale;
 import com.fongmi.android.tv.ui.custom.PinchScaleFeedback;
 import com.fongmi.android.tv.ui.custom.TouchInput;
 import com.fongmi.android.tv.ui.custom.TapSeekFeedback;
@@ -1753,9 +1752,9 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     @Override
-    public void onPinchScale(PinchScale.Axis axis, float scaleX, float scaleY) {
+    public void onPinchScale(float scaleX, float scaleY) {
         if (!mScaleFeedback.isActive()) PlaybackAction.hideSpeedHint(mBinding.widget.message);
-        mScaleFeedback.show(axis, scaleX, scaleY);
+        mScaleFeedback.show(scaleX, scaleY);
     }
 
     @Override
