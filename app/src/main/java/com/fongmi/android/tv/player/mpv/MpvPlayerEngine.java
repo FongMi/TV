@@ -16,6 +16,7 @@ import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.mpvplayer.MpvDecoderMode;
 import androidx.media3.mpvplayer.MpvPlayer;
+import androidx.media3.mpvplayer.MpvPlayerConfig;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Sub;
@@ -26,6 +27,7 @@ import com.fongmi.android.tv.player.media.ConcatenatingUrl;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.server.LogSession;
+import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
 import org.json.JSONException;
@@ -38,12 +40,19 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvPlayerEffect effect;
     private final MpvScriptSession scripts;
     private final MpvPlayer player;
+    private final MpvUtil.VideoOptions videoOptions;
+    private int configuredMotionFps;
+    private final Runnable motionListener = this::updateMotionFps;
     private final Runnable updateLog = this::updateLogLevel;
     private final Runnable logListener = () -> App.post(updateLog);
 
     public MpvPlayerEngine(Player.Listener listener) {
         List<MpvScripts.Item> scriptItems = MpvUtil.readScripts();
-        this.player = MpvUtil.buildPlayer(listener);
+        this.videoOptions = MpvUtil.getVideoOptions();
+        MpvPlayerConfig config = MpvUtil.buildConfig(videoOptions);
+        this.configuredMotionFps = videoOptions.motionFps();
+        this.player = MpvUtil.buildPlayer(listener, config);
+        this.player.addMotionInterpolationListener(motionListener);
         this.scripts = new MpvScriptSession(player, scriptItems);
         this.provider = new MpvErrorMessageProvider();
         this.effect = new MpvPlayerEffect(player);
@@ -65,6 +74,18 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     @Override
     public Type getType() {
         return Type.MPV;
+    }
+
+    private void updateMotionFps() {
+        if (!player.isMotionInterpolationSupported() || player.isMotionInterpolationUpdatePending()) return;
+        int fps = player.getMotionInterpolationFps();
+        if (fps == PlayerSetting.getMotionFps()) configuredMotionFps = fps;
+    }
+
+    @Override
+    public boolean needsRebuild() {
+        MpvUtil.VideoOptions options = MpvUtil.getVideoOptions();
+        return configuredMotionFps != options.motionFps() || !videoOptions.hasSameOutput(options);
     }
 
     @Override
@@ -92,6 +113,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
         LogSession.get().removeListener(logListener);
         App.removeCallbacks(updateLog);
         scripts.release();
+        player.removeMotionInterpolationListener(motionListener);
         player.removeListener(this);
         player.setAudioOutputListener(null);
         player.release();

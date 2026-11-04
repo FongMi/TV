@@ -17,6 +17,7 @@ import androidx.media3.common.Tracks;
 import androidx.media3.common.text.SubtitleContent;
 import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
+import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController;
 import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.exoplayer.analytics.AnalyticsListener;
 import androidx.media3.exoplayer.audio.AudioSink;
@@ -121,12 +122,20 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
 
     @Override
     public boolean needsRebuild() {
-        return session.hasLibassSettingChanged();
+        return session.hasSettingsChanged();
     }
 
     @Override
     public Player getPlayer() {
         return navigation.getPlayer();
+    }
+
+    public ExoPlayer getExoPlayer() {
+        return player;
+    }
+
+    public FfmpegMotionInterpolationController getMotionInterpolationController() {
+        return session.motionController();
     }
 
     @Override

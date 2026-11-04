@@ -54,7 +54,6 @@ public final class ExoPlayerEffect implements PlayerEffect {
         return switch (player.getVideoEffectsSupport()) {
             case ExoPlayer.VIDEO_EFFECTS_SUPPORTED -> 0;
             case ExoPlayer.VIDEO_EFFECTS_UNSUPPORTED_DRM -> R.string.error_video_effect_drm;
-            case ExoPlayer.VIDEO_EFFECTS_UNSUPPORTED_RENDERER -> R.string.error_video_effect_decode;
             case ExoPlayer.VIDEO_EFFECTS_UNSUPPORTED_TUNNELING -> R.string.error_video_effect_tunnel;
             default -> R.string.error_video_effect_unsupported;
         };

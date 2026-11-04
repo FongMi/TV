@@ -355,6 +355,12 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
+    <string name="player_motion_restart">下次開啟影片時套用</string>
+    <string name="player_motion">畫面補幀</string>
+    <string name="player_motion_unavailable">不支援</string>
+    <string name="player_motion_fps">%1$d fps</string>
+    <string name="player_motion_capped">目標：%1$.2f fps（螢幕上限）</string>
+    <string name="player_motion_failed">無法切換畫面補幀</string>
     <string name="player_mpv_conf_priority_hint">重進播放頁載入 mpv.conf；片源參數、腳本與介面之後仍可改寫，最後寫入者生效。volume 作為介面音量基準。</string>
     <string name="player_mpv_conf_conflict_hint">介面會管理：%1$s。片源參數、腳本與介面以最後寫入者為準；volume 作為介面音量基準。</string>
     <string name="player_mpv_conf_import_success">已載入 mpv.conf，按確定後儲存</string>
@@ -406,7 +412,6 @@
     <string name="error_audio_effect_passthrough">音訊直通音軌不支援音質設定</string>
     <string name="error_audio_effect_apply">音質設定套用失敗</string>
     <string name="error_video_effect_unsupported">目前播放方式不支援畫質設定</string>
-    <string name="error_video_effect_decode">畫質設定需要視訊硬解</string>
     <string name="error_video_effect_drm">DRM 影片不支援畫質設定</string>
     <string name="error_video_effect_tunnel">Tunnel 模式下不支援畫質設定</string>
     <string name="error_video_effect_dolby_vision_passthrough">杜比視界直通不支援畫質設定</string>

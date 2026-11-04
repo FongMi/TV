@@ -25,6 +25,7 @@ import androidx.media3.common.VideoSize;
 import androidx.media3.common.text.SubtitleContent;
 import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
+import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController;
 import androidx.media3.exoplayer.iso.IsoDiscPreparation;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.danmaku.DanmakuConfig;
@@ -123,6 +124,16 @@ public class PlayerManager implements ParseCallback {
 
     public Player getPlayer() {
         return player;
+    }
+
+    @Nullable
+    public Player getVideoSettingEventSource() {
+        return engine instanceof ExoPlayerEngine exo ? exo.getExoPlayer() : player;
+    }
+
+    @Nullable
+    public FfmpegMotionInterpolationController getExoMotionController() {
+        return engine instanceof ExoPlayerEngine exo ? exo.getMotionInterpolationController() : null;
     }
 
     public TimeshiftPlayback getTimeshift() {

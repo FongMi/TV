@@ -75,6 +75,22 @@ public class PlayerSetting {
         Prefers.put("mpv_vulkan", vulkan);
     }
 
+    public static int getMotion() {
+        return Math.clamp(Prefers.getInt("player_motion"), 0, 2);
+    }
+
+    public static void putMotion(int motion) {
+        Prefers.put("player_motion", Math.clamp(motion, 0, 2));
+    }
+
+    public static int getMotionFps() {
+        return switch (getMotion()) {
+            case 1 -> 60;
+            case 2 -> 120;
+            default -> 0;
+        };
+    }
+
     public static int getRender() {
         return Math.clamp(Prefers.getInt("render", RENDER_SURFACE), RENDER_SURFACE, RENDER_TEXTURE);
     }
