@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -18,6 +19,7 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
 import com.fongmi.android.tv.ui.dialog.MpvConfDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class SettingPlayerActivity extends BaseActivity implements UaListener, BufferListener {
@@ -43,8 +45,7 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
         mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
         mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
-        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
-        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
+        setMpvOptions();
         mBinding.backgroundText.setText(Setting.getSwitch(PlayerSetting.isBackgroundOn()));
     }
 
@@ -57,6 +58,8 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
+        mBinding.mpvMotion.setOnClickListener(this::setMpvMotion);
+        mBinding.exoMotion.setOnClickListener(this::setExoMotion);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.buffer.setOnClickListener(this::onBuffer);
@@ -66,14 +69,23 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
 
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
+        boolean exoMotion = exo && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O;
+        mBinding.exoMotion.setVisibility(exoMotion ? View.VISIBLE : View.GONE);
+        setExoMotionText();
         boolean vulkan = !exo && MpvUtil.isVulkanSupported();
+        boolean motion = !exo && MpvUtil.isMotionEnabled();
         if (PlayerSetting.isBackgroundPiP()) PlayerSetting.putBackground(1);
         mBinding.exoRow.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.mpvRow.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.adblock.setNextFocusDownId(exo ? R.id.libass : R.id.mpvConf);
-        mBinding.background.setNextFocusDownId(exo ? R.id.buffer : R.id.mpvGpuNext);
-        mBinding.ua.setNextFocusUpId(exo ? R.id.libass : vulkan ? R.id.mpvVulkan : R.id.mpvConf);
+        mBinding.background.setNextFocusDownId(exo ? R.id.buffer : motion ? R.id.mpvConf : R.id.mpvGpuNext);
+        mBinding.mpvConf.setNextFocusDownId(motion ? R.id.mpvMotion : vulkan ? R.id.mpvVulkan : R.id.ua);
+        mBinding.mpvMotion.setNextFocusUpId(motion ? R.id.mpvConf : R.id.mpvVulkan);
+        mBinding.libass.setNextFocusDownId(exoMotion ? R.id.exoMotion : R.id.ua);
+        mBinding.buffer.setNextFocusDownId(exoMotion ? R.id.exoMotion : R.id.ua);
+        mBinding.ua.setNextFocusUpId(exoMotion ? R.id.exoMotion : exo ? R.id.libass : vulkan ? R.id.mpvMotion : R.id.mpvConf);
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
+        mBinding.mpvMotion.setVisibility(vulkan ? View.VISIBLE : View.GONE);
     }
 
     private void setEngine(View view) {
@@ -90,12 +102,39 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
 
     private void setMpvGpuNext(View view) {
         PlayerSetting.putMpvGpuNext(!PlayerSetting.isMpvGpuNext());
-        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
+        setMpvOptions();
     }
 
     private void setMpvVulkan(View view) {
         PlayerSetting.putMpvVulkan(!PlayerSetting.isMpvVulkan());
-        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
+        setMpvOptions();
+    }
+
+    private void setExoMotion(View view) {
+        PlayerSetting.putExoMotion((PlayerSetting.getExoMotion() + 1) % ResUtil.getStringArray(R.array.select_mpv_motion).length);
+        setExoMotionText();
+        Notify.show(R.string.player_motion_restart);
+    }
+
+    private void setExoMotionText() {
+        mBinding.exoMotionText.setText(ResUtil.getStringArray(R.array.select_mpv_motion)[PlayerSetting.getExoMotion()]);
+    }
+
+    private void setMpvMotion(View view) {
+        PlayerSetting.putMpvMotion((PlayerSetting.getMpvMotion() + 1) % ResUtil.getStringArray(R.array.select_mpv_motion).length);
+        setMpvOptions();
+        setVisible();
+    }
+
+    private void setMpvOptions() {
+        boolean motion = MpvUtil.isMotionEnabled();
+        mBinding.mpvMotionText.setText(ResUtil.getStringArray(R.array.select_mpv_motion)[PlayerSetting.getMpvMotion()]);
+        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext() || motion));
+        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan() || motion));
+        mBinding.mpvGpuNext.setEnabled(!motion);
+        mBinding.mpvVulkan.setEnabled(!motion);
+        mBinding.mpvGpuNext.setAlpha(motion ? 0.5f : 1f);
+        mBinding.mpvVulkan.setAlpha(motion ? 0.5f : 1f);
     }
 
     private void setRender(View view) {

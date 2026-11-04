@@ -355,6 +355,13 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
+    <string name="player_motion_restart">下次開啟影片時套用</string>
+    <string name="player_mpv_motion">插幀（SDR）</string>
+    <string name="player_mpv_motion_unavailable">目前播放模式不支援插幀</string>
+    <string name="player_mpv_motion_applying">正在套用…</string>
+    <string name="player_mpv_motion_target">目標：%1$d fps</string>
+    <string name="player_mpv_motion_capped">目標：%1$.2f fps（螢幕上限）</string>
+    <string name="player_mpv_motion_failed">無法切換插幀</string>
     <string name="player_mpv_conf_priority_hint">重進播放頁載入 mpv.conf；片源參數、腳本與介面之後仍可改寫，最後寫入者生效。volume 作為介面音量基準。</string>
     <string name="player_mpv_conf_conflict_hint">介面會管理：%1$s。片源參數、腳本與介面以最後寫入者為準；volume 作為介面音量基準。</string>
     <string name="player_mpv_conf_import_success">已載入 mpv.conf，按確定後儲存</string>

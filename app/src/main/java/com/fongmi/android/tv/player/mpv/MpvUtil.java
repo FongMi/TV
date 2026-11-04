@@ -47,6 +47,7 @@ public final class MpvUtil {
     private static final List<String> FONT_OPTIONS = List.of("sub-font", "sub-fonts-dir", "sub-ass-style-overrides");
     private static final List<String> SCALE_OPTIONS = List.of("sub-scale", "sub-scale-signs", "secondary-sub-scale");
     private static final List<String> CACHE_OPTIONS = List.of("cache", "cache-on-disk", "demuxer-cache-dir", "cache-secs");
+    private static final List<String> MOTION_OPTIONS = List.of("motion-interpolation", "video-sync", "display-fps-override");
     private static final List<String> PLAYER_OPTIONS = List.of("vo", "gpu-api", "gpu-context", "force-window", "audio-spdif", "android-dolby-vision-output", "demuxer-dovi-profile7");
     private static final List<String> STYLE_OPTIONS = List.of("sub-color", "sub-back-color", "sub-border-style", "sub-outline-color", "sub-outline-size", "sub-shadow-offset");
     private static final List<String> IMAGE_SUBTITLE_OPTIONS = List.of("image-subs-brightness", "image-subs-override", "image-subs-color");
@@ -93,6 +94,10 @@ public final class MpvUtil {
         return App.get().getPackageManager().hasSystemFeature(PackageManager.FEATURE_VULKAN_HARDWARE_VERSION, VULKAN_1_2);
     }
 
+    public static boolean isMotionEnabled() {
+        return PlayerSetting.getMpvMotionFps() > 0 && isVulkanSupported();
+    }
+
     public static MpvPlayer buildPlayer(Player.Listener listener) {
         MpvDecoderMode mode = MpvDecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_MPV, C.TRACK_TYPE_VIDEO));
         MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(mode).setConfig(buildConfig()).build();
@@ -115,6 +120,7 @@ public final class MpvUtil {
         options.addAll(SCALE_OPTIONS);
         boolean hasFontOverride = SubtitleSetting.getFont() != null;
         if (PreloadSetting.isEnabled()) options.addAll(CACHE_OPTIONS);
+        if (isMotionEnabled()) options.addAll(MOTION_OPTIONS);
         if (hasFontOverride) options.addAll(FONT_OPTIONS);
         options.addAll(STYLE_OPTIONS);
         options.addAll(IMAGE_SUBTITLE_OPTIONS);
@@ -137,7 +143,14 @@ public final class MpvUtil {
         builder.addPreInitStringOption("proxy-url", "http://127.0.0.1:" + Proxy.getPort() + "/proxy?");
         builder.addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions(font));
         if (PreloadSetting.isEnabled()) builder.addDiskCacheOptions(cacheDir, PreloadSetting.getTimeSeconds());
+        addMotionOptions(builder);
         return builder.build();
+    }
+
+    static void addMotionOptions(MpvPlayerConfig.Builder builder) {
+        int fps = PlayerSetting.getMpvMotionFps();
+        if (fps == 0 || !isVulkanSupported()) return;
+        builder.setMotionInterpolationFps(fps);
     }
 
     public static List<MpvScripts.Item> readScripts() {
@@ -149,10 +162,11 @@ public final class MpvUtil {
         }
     }
 
-    private static MpvAndroidOptions buildAndroidOptions(File shaderCacheDirectory) {
+    static MpvAndroidOptions buildAndroidOptions(File shaderCacheDirectory) {
+        boolean motion = isMotionEnabled();
         MpvAndroidOptions.Builder builder = new MpvAndroidOptions.Builder().setShaderCacheDirectory(shaderCacheDirectory).setAudioPassthroughEnabled(DecodeSetting.isAudioPassThrough()).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
-        builder.setVulkanEnabled(isVulkanSupported() && PlayerSetting.isMpvVulkan());
-        builder.setGpuNextEnabled(PlayerSetting.isMpvGpuNext());
+        builder.setVulkanEnabled(isVulkanSupported() && (PlayerSetting.isMpvVulkan() || motion));
+        builder.setGpuNextEnabled(PlayerSetting.isMpvGpuNext() || motion);
         return builder.build();
     }
 

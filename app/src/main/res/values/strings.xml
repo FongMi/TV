@@ -357,6 +357,13 @@
     <string name="player_mpv_conf">mpv.conf</string>
     <string name="player_mpv_gpu_next">gpu-next</string>
     <string name="player_mpv_vulkan">vulkan</string>
+    <string name="player_motion_restart">Applies the next time you open a video</string>
+    <string name="player_mpv_motion">Frame interpolation (SDR)</string>
+    <string name="player_mpv_motion_unavailable">Interpolation is unavailable in this playback mode</string>
+    <string name="player_mpv_motion_applying">Applying…</string>
+    <string name="player_mpv_motion_target">Target: %1$d fps</string>
+    <string name="player_mpv_motion_capped">Target: %1$.2f fps (display limit)</string>
+    <string name="player_mpv_motion_failed">Unable to change interpolation</string>
     <string name="player_mpv_conf_priority_hint">Reopen playback to load mpv.conf. Media options, scripts, and controls can change settings afterward; the last write applies. volume is the control volume baseline.</string>
     <string name="player_mpv_conf_conflict_hint">Player controls manage: %1$s. Media options, scripts, and controls follow the last write; volume is the control volume baseline.</string>
     <string name="player_mpv_conf_import_success">Loaded mpv.conf. Tap OK to save.</string>
@@ -453,6 +460,12 @@
     <string-array name="select_engine">
         <item>EXO</item>
         <item>MPV</item>
+    </string-array>
+
+    <string-array name="select_mpv_motion">
+        <item>@string/setting_off</item>
+        <item>60 fps</item>
+        <item>120 fps</item>
     </string-array>
 
     <string-array name="select_render">
