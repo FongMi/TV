@@ -21,7 +21,6 @@ import androidx.media3.common.Player;
 import androidx.media3.common.Timeline;
 import androidx.media3.common.TrackSelectionOverride;
 import androidx.media3.common.Tracks;
-import androidx.media3.common.VideoSize;
 import androidx.media3.common.text.SubtitleContent;
 import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
@@ -81,7 +80,6 @@ public class PlayerManager implements ParseCallback {
     private PendingPreload pendingPreload;
     private PendingPreload queuedPreload;
     private PlayerEngine engine;
-    private VideoSize videoSize;
     private ParseJob parseJob;
     private PlaySpec spec;
     private Player player;
@@ -344,11 +342,11 @@ public class PlayerManager implements ParseCallback {
     }
 
     public int getVideoWidth() {
-        return videoSize == null ? 0 : videoSize.width;
+        return player == null ? 0 : player.getVideoSize().width;
     }
 
     public int getVideoHeight() {
-        return videoSize == null ? 0 : videoSize.height;
+        return player == null ? 0 : player.getVideoSize().height;
     }
 
     public long getPosition() {
@@ -833,6 +831,7 @@ public class PlayerManager implements ParseCallback {
     }
 
     public void start(PlaySpec spec, long timeout, long startPositionMs) {
+        stopParse();
         this.spec = spec;
         setMediaItem(timeout, startPositionMs, true);
     }
@@ -1149,11 +1148,6 @@ public class PlayerManager implements ParseCallback {
                 App.removeCallbacks(runnable);
                 clearPreload();
             }
-        }
-
-        @Override
-        public void onVideoSizeChanged(@NonNull VideoSize size) {
-            videoSize = size;
         }
 
         @Override

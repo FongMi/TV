@@ -539,10 +539,15 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
                 player().reset();
                 break;
             case Player.STATE_ENDED:
-                mLive.playbackEnded();
+                if (isWebPlaybackActive()) onPlaybackEnded();
                 updatePlayControl(false);
                 break;
         }
+    }
+
+    @Override
+    protected void onPlaybackEnded() {
+        mLive.playbackEnded();
     }
 
     @Override
