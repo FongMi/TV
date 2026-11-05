@@ -614,7 +614,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void loadDanmaku(Result result, History history, Episode episode) {
-        VodPlaybackMedia.searchDanmaku(result, history, episode, player()::setDanmaku, player()::addDanmaku);
+        VodPlaybackMedia.searchDanmaku(result, history, episode, () -> isNativePlaybackCurrent() && mVod.isCurrentResult(result), player()::setDanmaku, player()::addDanmaku);
     }
 
     @Override
@@ -1700,7 +1700,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         mInput.cancelSeek();
         mClock.release();
         saveHistory(true);
-        DanmakuApi.cancel();
+        if (isBindingOwner()) DanmakuApi.cancel();
         RefreshEvent.keep();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
         super.onDestroy();
