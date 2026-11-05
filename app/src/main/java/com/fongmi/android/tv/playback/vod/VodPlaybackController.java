@@ -132,6 +132,10 @@ public class VodPlaybackController {
         applyPlaybackResult(playback.result(), playback.request());
     }
 
+    public boolean isCurrentResult(Result result) {
+        return !host.isHostFinishing() && state.getPendingRequest() == null && state.getQuality() == result;
+    }
+
     private boolean redirectPush(Result result) {
         if (result.hasMsg() || !Source.isPush(result.getUrl().v())) return false;
         redirectPush(result.getUrl().v());

@@ -436,7 +436,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
             mBinding.video.setLayoutParams(new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.MATCH_PARENT, RelativeLayout.LayoutParams.MATCH_PARENT));
         } else {
             mBinding.video.setLayoutParams(mFrameParams);
-            if (!isWebPlaybackActive()) changeHeight(player().getPlayer().getVideoSize());
+            if (isNativePlaybackCurrent()) changeHeight(player().getPlayer().getVideoSize());
         }
     }
 
@@ -664,7 +664,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
 
     @Override
     public void loadDanmaku(Result result, History history, Episode episode) {
-        VodPlaybackMedia.searchDanmaku(result, history, episode, player()::setDanmaku, player()::addDanmaku);
+        VodPlaybackMedia.searchDanmaku(result, history, episode, () -> isNativePlaybackCurrent() && mVod.isCurrentResult(result), player()::setDanmaku, player()::addDanmaku);
     }
 
     @Override
@@ -1631,7 +1631,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         int viewWidth = Math.min(screenWidth, screenHeight);
         int minHeight = ResUtil.dp2px(150);
         int maxHeight = Math.max(screenWidth, screenHeight) / 2;
-        int calculated = (int) (viewWidth * ((float) videoHeight / videoWidth));
+        float aspectRatio = (videoWidth * size.pixelWidthHeightRatio) / videoHeight;
+        int calculated = (int) (viewWidth / aspectRatio);
         int finalHeight = Math.clamp(calculated, minHeight, Math.max(minHeight, maxHeight));
         if (mAnimator.isRunning()) mAnimator.cancel();
         if (finalHeight == mFrameParams.height) return;
@@ -1946,7 +1947,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         mClock.release();
         saveHistory(true);
         Timer.get().reset();
-        DanmakuApi.cancel();
+        if (isBindingOwner()) DanmakuApi.cancel();
         RefreshEvent.keep();
         App.removeCallbacks(mR1, mR2, mR3, mR4);
         super.onDestroy();

@@ -11,6 +11,7 @@ import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 public final class VodPlaybackMedia {
@@ -22,10 +23,11 @@ public final class VodPlaybackMedia {
         return MediaItemFactory.buildMetadata(title, name, history.getVodPic());
     }
 
-    public static void searchDanmaku(Result result, History history, Episode episode, Consumer<Danmaku> set, Consumer<Danmaku> add) {
+    public static void searchDanmaku(Result result, History history, Episode episode, BooleanSupplier isCurrent, Consumer<Danmaku> set, Consumer<Danmaku> add) {
         if (!DanmakuApi.canSearch()) return;
         if (VodConfig.get().getSite(result.getKey()).getDanmaku() == 0) return;
         DanmakuApi.search(history.getVodName(), episode.getName(), danmaku -> {
+            if (!isCurrent.getAsBoolean()) return;
             if (DanmakuSetting.isSpiderFirst() && !result.getDanmaku().isEmpty()) add.accept(danmaku);
             else set.accept(danmaku);
         });
