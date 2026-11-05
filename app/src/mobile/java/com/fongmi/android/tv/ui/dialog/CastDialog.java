@@ -19,6 +19,7 @@ import com.fongmi.android.tv.dlna.DLNACast;
 import com.fongmi.android.tv.impl.Callback;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.server.Server;
+import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.net.OkHttp;
@@ -111,9 +112,16 @@ public class CastDialog extends DeviceDialog {
         else OkHttp.newCall(client, item.getIp().concat("/action?do=cast"), buildBody()).enqueue(callback);
     }
 
+    private PlayerManager getSourcePlayer() {
+        PlaybackService service = Server.get().getService();
+        PlayerManager player = service == null ? null : service.player();
+        if (player == null || player.isReleased() || player.isEmpty()) return null;
+        return video.equals(CastVideo.create(player, video.position())) ? player : null;
+    }
+
     private Callback getCallback(int id) {
-        PlayerManager player = Server.get().getService() == null ? null : Server.get().getService().player();
-        MediaItem source = player != null && !player.isEmpty() && video.equals(CastVideo.create(player, video.position())) ? player.getCurrentMediaItem() : null;
+        PlayerManager player = getSourcePlayer();
+        MediaItem source = player == null ? null : player.getCurrentMediaItem();
         return new Callback() {
             @Override
             public void success() {
@@ -147,9 +155,17 @@ public class CastDialog extends DeviceDialog {
         };
     }
 
+    private History getCastHistory() {
+        History history = History.objectFrom(requireArguments().getString("history"));
+        PlayerManager player = getSourcePlayer();
+        if (player != null) history.setPosition(player.getPosition());
+        return history;
+    }
+
     private FormBody buildBody() {
+        History history = getCastHistory();
         Bundle args = requireArguments();
-        return new FormBody.Builder().add("device", Device.get().toString()).add("config", args.getString("config")).add("history", args.getString("history")).build();
+        return new FormBody.Builder().add("device", Device.get().toString()).add("config", args.getString("config")).add("history", history.toString()).build();
     }
 
     public interface Listener {

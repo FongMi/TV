@@ -604,7 +604,7 @@ public class VodPlaybackController {
         List<Flag> flags = item.getFlags();
         for (Flag flag : flags) restoreExpandedEpisodes(flag);
         state.setFlags(flags);
-        History history = historyPolicy.findOrCreate(host.getHistoryKey(), host.getVodMark(), item);
+        History history = findHistory(item);
         state.setHistory(history);
         restoreSavedEpisode(history);
         lastHistory = history;
@@ -613,6 +613,14 @@ public class VodPlaybackController {
         host.renderHistory(history);
         host.onDetailFallbackCancelled();
         return history;
+    }
+
+    private History findHistory(Vod item) {
+        String key = host.getHistoryKey();
+        History history = host.takeCastHistory();
+        History current = state.getHistory();
+        if (history == null && current != null && key.equals(current.getKey())) history = current;
+        return historyPolicy.findOrCreate(key, host.getVodMark(), item, history);
     }
 
     private void restoreExpandedEpisodes(Flag flag) {

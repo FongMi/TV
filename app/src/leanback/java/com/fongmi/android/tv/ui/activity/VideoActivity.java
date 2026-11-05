@@ -143,7 +143,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     public static void cast(Activity activity, History history) {
-        start(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic(), null, false, true);
+        history = history.copy();
+        history.setVodPic(ImgUtil.cache(history.getVodPic()));
+        Intent intent = createIntent(activity, history.getSiteKey(), history.getVodId(), history.getVodName(), history.getVodPic());
+        intent.putExtra("history", history.toString());
+        intent.putExtra("cast", true);
+        activity.startActivity(intent);
     }
 
     public static void collect(Activity activity, String key, String id, String name, String pic) {
@@ -167,15 +172,20 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     public static void start(Activity activity, String key, String id, String name, String pic, String mark, boolean collect, boolean cast) {
-        Intent intent = new Intent(activity, VideoActivity.class);
+        Intent intent = createIntent(activity, key, id, name, pic);
         intent.putExtra("collect", collect);
         intent.putExtra("cast", cast);
         intent.putExtra("mark", mark);
+        activity.startActivity(intent);
+    }
+
+    private static Intent createIntent(Activity activity, String key, String id, String name, String pic) {
+        Intent intent = new Intent(activity, VideoActivity.class);
         intent.putExtra("name", name);
         intent.putExtra("key", key);
         intent.putExtra("id", id);
         putPic(intent, pic);
-        activity.startActivity(intent);
+        return intent;
     }
 
     private static void putPic(Intent intent, String pic) {
@@ -217,6 +227,14 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     public String getHistoryKey() {
         return getKey().concat(AppDatabase.SYMBOL).concat(getId()).concat(AppDatabase.SYMBOL) + VodConfig.getCid();
+    }
+
+    @Override
+    public History takeCastHistory() {
+        Intent intent = getIntent();
+        History history = History.objectFrom(intent.getStringExtra("history"));
+        intent.removeExtra("history");
+        return history;
     }
 
     private Site getSite() {
@@ -270,7 +288,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (TextUtils.isEmpty(intent.getStringExtra("id")) || isSameVideo(intent)) return;
+        if (TextUtils.isEmpty(intent.getStringExtra("id")) || (isSameVideo(intent) && !intent.hasExtra("history"))) return;
         mInput.cancelSeek();
         externalPlaybackCompleted = false;
         saveHistory(true);
