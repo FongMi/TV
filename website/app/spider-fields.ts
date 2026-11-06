@@ -265,6 +265,7 @@ export const objectGroups = [
       ["vod_director / vod_actor", "人員資訊。"],
       ["vod_content", "詳細描述。"],
       ["vod_play_from / vod_play_url", "播放分組與集數，分隔方式見下節。"],
+      ["vod_play_id", "選填字串。點入時指定播放 ID 或集名／集數。"],
       ["vod_tag / action", "folder 表示資料夾；非空 action 在點擊時觸發操作。type 3 傳給爬蟲 action()；type 4 填回傳 JSON 的接口網址。"],
       ["cate", "提供此物件時也視為資料夾，可含 land、circle、ratio。"],
       ["land / circle / ratio / style", "卡片外觀覆蓋。"],

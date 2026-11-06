@@ -406,6 +406,7 @@
     <string name="error_play_drm">This device does not support the required DRM scheme</string>
     <string name="error_play_url">Unable to load url</string>
     <string name="error_episode_missing">Cannot restore the saved episode. Select another episode.</string>
+    <string name="error_episode_not_found">Cannot find the requested episode. Select another episode.</string>
     <string name="error_play_flag">No flag data</string>
     <string name="error_play_timeout">Timed out</string><string name="error_audio_effect_unsupported">Audio settings are unavailable for the current playback mode</string>
     <string name="bdj_preparing">Preparing BD-J menu</string>

@@ -404,6 +404,7 @@
     <string name="error_play_drm">本設備不支援所需的 DRM scheme</string>
     <string name="error_play_url">播放網址載入失敗</string>
     <string name="error_episode_missing">無法恢復上次的播放項目，請重新選集</string>
+    <string name="error_episode_not_found">找不到指定的播放項目，請重新選集</string>
     <string name="error_play_flag">暫無線路資料</string>
     <string name="error_play_timeout">連線逾時</string>
     <string name="bdj_preparing">正在準備 BD-J 選單</string>

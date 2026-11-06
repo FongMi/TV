@@ -155,6 +155,18 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         start(activity, key, id, name, pic, null, true, false);
     }
 
+    public static void collect(Activity activity, String key, Vod item) {
+        Intent intent = createIntent(activity, key, item);
+        intent.putExtra("collect", true);
+        activity.startActivity(intent);
+    }
+
+    public static void start(Activity activity, String key, Vod item, String mark) {
+        Intent intent = createIntent(activity, key, item);
+        intent.putExtra("mark", item.getPlayId().isEmpty() ? mark : null);
+        activity.startActivity(intent);
+    }
+
     public static void start(Activity activity, String url) {
         start(activity, SiteApi.PUSH, url, url);
     }
@@ -177,6 +189,12 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         intent.putExtra("cast", cast);
         intent.putExtra("mark", mark);
         activity.startActivity(intent);
+    }
+
+    private static Intent createIntent(Activity activity, String key, Vod item) {
+        Intent intent = createIntent(activity, key, item.getId(), item.getName(), item.getPic());
+        intent.putExtra("playId", item.getPlayId());
+        return intent;
     }
 
     private static Intent createIntent(Activity activity, String key, String id, String name, String pic) {
@@ -288,7 +306,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (TextUtils.isEmpty(intent.getStringExtra("id")) || (isSameVideo(intent) && !intent.hasExtra("history"))) return;
+        if (TextUtils.isEmpty(intent.getStringExtra("id")) || (isSameVideo(intent) && !intent.hasExtra("history") && TextUtils.isEmpty(intent.getStringExtra("playId")))) return;
         mInput.cancelSeek();
         externalPlaybackCompleted = false;
         saveHistory(true);
@@ -465,6 +483,16 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     @Override
+    public String getVodPlayId() {
+        return Objects.toString(getIntent().getStringExtra("playId"), "");
+    }
+
+    @Override
+    public void clearVodPlayId() {
+        getIntent().removeExtra("playId");
+    }
+
+    @Override
     public boolean isSiteChangeable() {
         return getSite().isChangeable();
     }
@@ -536,6 +564,8 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
         ExternalPlayback.clearOptions(getIntent());
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getId());
+        getIntent().putExtra("playId", item.getPlayId());
+        if (!item.getPlayId().isEmpty()) getIntent().removeExtra("mark");
         putPic(getIntent(), item.getPic());
         mBinding.scroll.scrollTo(0, 0);
         mClock.setCallback(null);

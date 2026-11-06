@@ -289,6 +289,7 @@ export default function SpiderPage() {
           ["result", "Result 回傳格式"],
           ["objects", "資料物件"],
           ["episodes", "播放分組與集數"],
+          ["episode-selection", "指定播放"],
           ["proxy", "Proxy 回傳"],
           ["live-danmaku", "即時彈幕"],
           ["timeshift", "直播回看"],
@@ -924,6 +925,32 @@ if (second === null) return {};`}</CodeBlock>
               使用者點擊某集後，<code>$</code> 右側的 value 會成為{" "}
               <code>playerContent(flag, id, …)</code> 的 <code>id</code>。
             </p>
+          </section>
+          <section id="episode-selection">
+            <h2>指定播放</h2>
+            <p>
+              推薦、分類與搜尋的 <code>list[]</code> 項目可用選填字串 <code>vod_play_id</code> 指定集數，不限 folder。
+              <code>vod_id</code> 維持作品 ID，<code>vod_remarks</code> 只顯示角標。
+            </p>
+            <CodeBlock label="JSON / 列表項目" path="list[] 中的 Vod 項目">{`{
+  "list": [{
+    "vod_id": "demo-01",
+    "vod_name": "示範影片",
+    "vod_remarks": "看到第4集",
+    "vod_play_id": "episode-4"
+  }]
+}`}</CodeBlock>
+            <p>
+              上例對應詳情的 <code>第4集$episode-4</code>；以 <code>$</code> 右側的播放值為準。
+              也可填 <code>第4集</code>、<code>第04集</code>、<code>EP04</code> 或 <code>4</code>，數字為集數，非索引。
+              Java 用 <code>{'.playId("episode-4")'}</code>；Python／QuickJS 填同名欄位。
+            </p>
+            <ul>
+              <li>先精確比對所有線路的原始 ID，再於各線路按完整集名、集數與文字相符程度選集；集名沿用 App 轉字規則。</li>
+              <li>每階段優先本機歷史線路，其餘依詳情順序；找不到則提示重選，不改播第一集或其他來源。</li>
+              <li>指定值優先於本機選集，只生效一次；同 ID 保留本機進度，換 ID 清除進度，不含官方觀看秒數。</li>
+              <li>省略、null 或空字串維持續播；folder 仍依列表名稱選集。</li>
+            </ul>
           </section>
           <section id="proxy">
             <h2>Proxy 回傳</h2>

@@ -169,6 +169,13 @@ const entries: Entry[] = [
       .map((field) => `${field.name} ${field.type} ${field.description}`)
       .join(" "),
   },
+  {
+    title: "指定播放",
+    description: "vod_play_id 的 ID、集名與集數匹配",
+    href: "/spider#episode-selection",
+    names: ["vod_play_id", "playId"],
+    keywords: "官方歷史 官方觀看歷史 觀看紀錄 看到第4集 第4集 第04集 EP04 續播 進度 folder",
+  },
   ...objectGroups.map((group) => ({
     title: `${group.name} 資料物件`,
     description: group.fields

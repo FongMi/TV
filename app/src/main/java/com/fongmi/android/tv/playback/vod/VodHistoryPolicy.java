@@ -94,8 +94,12 @@ public class VodHistoryPolicy {
     }
 
     public void updateEpisode(History history, Flag flag, Episode episode) {
+        updateEpisode(history, flag, episode, false);
+    }
+
+    public void updateEpisode(History history, Flag flag, Episode episode, boolean matchId) {
         if (history == null || flag == null || episode == null) return;
-        boolean match = matchesEpisode(history, flag, episode);
+        boolean match = matchId ? episode.getUrl().equals(history.getEpisodeUrl()) : matchesEpisode(history, flag, episode);
         if (!match) history.setPosition(C.TIME_UNSET);
         if (!match) history.setDuration(C.TIME_UNSET);
         history.setVodFlag(flag.getFlag());

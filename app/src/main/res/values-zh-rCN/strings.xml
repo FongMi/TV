@@ -404,6 +404,7 @@
     <string name="error_play_drm">此设备不支持所需的 DRM scheme</string>
     <string name="error_play_url">播放地址加载失败</string>
     <string name="error_episode_missing">无法恢复上次的播放项目，请重新选集</string>
+    <string name="error_episode_not_found">找不到指定的播放项目，请重新选集</string>
     <string name="error_play_flag">暂无线路数据</string>
     <string name="error_play_timeout">连接超时</string>
     <string name="bdj_preparing">正在准备 BD-J 菜单</string>
