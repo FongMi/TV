@@ -1,0 +1,1 @@
+package com.fongmi.android.tv.player.extractor;import com.fongmi.android.tv.bean.Result;public class Source{public static Source get(){return new Source();}public void stop(){}public String fetch(Result r){return r.getRealUrl();}public static boolean isPush(String s){return s.startsWith("push://");} }
