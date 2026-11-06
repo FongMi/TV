@@ -164,7 +164,7 @@ public class CollectFragment extends BaseFragment implements MenuProvider, Colle
     public void onItemClick(Vod item) {
         if (item.isAction()) mViewModel.action(item.getSiteKey(), item.getAction());
         else if (item.isFolder()) FolderActivity.start(requireActivity(), item.getSiteKey(), Result.folder(item));
-        else VideoActivity.collect(requireActivity(), item.getSiteKey(), item.getId(), item.getName(), item.getPic());
+        else VideoActivity.collect(requireActivity(), item.getSiteKey(), item);
     }
 
     @Override

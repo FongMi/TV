@@ -174,6 +174,18 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         start(activity, key, id, name, pic, null, true);
     }
 
+    public static void collect(Activity activity, String key, Vod item) {
+        Intent intent = createIntent(activity, key, item);
+        intent.putExtra("collect", true);
+        activity.startActivity(intent);
+    }
+
+    public static void start(Activity activity, String key, Vod item, String mark) {
+        Intent intent = createIntent(activity, key, item);
+        intent.putExtra("mark", item.getPlayId().isEmpty() ? mark : null);
+        activity.startActivity(intent);
+    }
+
     public static void start(Activity activity, String url) {
         start(activity, SiteApi.PUSH, url, url);
     }
@@ -195,6 +207,12 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         intent.putExtra("collect", collect);
         intent.putExtra("mark", mark);
         activity.startActivity(intent);
+    }
+
+    private static Intent createIntent(Activity activity, String key, Vod item) {
+        Intent intent = createIntent(activity, key, item.getId(), item.getName(), item.getPic());
+        intent.putExtra("playId", item.getPlayId());
+        return intent;
     }
 
     private static Intent createIntent(Activity activity, String key, String id, String name, String pic) {
@@ -311,7 +329,7 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        if (TextUtils.isEmpty(intent.getStringExtra("id")) || (isSameVideo(intent) && !intent.hasExtra("history"))) return;
+        if (TextUtils.isEmpty(intent.getStringExtra("id")) || (isSameVideo(intent) && !intent.hasExtra("history") && TextUtils.isEmpty(intent.getStringExtra("playId")))) return;
         externalPlaybackCompleted = false;
         mBinding.swipeLayout.setRefreshing(true);
         saveHistory(true);
@@ -515,6 +533,16 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
     }
 
     @Override
+    public String getVodPlayId() {
+        return Objects.toString(getIntent().getStringExtra("playId"), "");
+    }
+
+    @Override
+    public void clearVodPlayId() {
+        getIntent().removeExtra("playId");
+    }
+
+    @Override
     public boolean isSiteChangeable() {
         return getSite().isChangeable();
     }
@@ -584,6 +612,8 @@ public class VideoActivity extends PlaybackActivity implements Clock.Callback, T
         ExternalPlayback.clearOptions(getIntent());
         getIntent().putExtra("key", item.getSiteKey());
         getIntent().putExtra("id", item.getId());
+        getIntent().putExtra("playId", item.getPlayId());
+        if (!item.getPlayId().isEmpty()) getIntent().removeExtra("mark");
         mBinding.swipeLayout.setRefreshing(true);
         mBinding.swipeLayout.setEnabled(false);
         putPic(getIntent(), item.getPic());
