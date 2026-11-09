@@ -349,6 +349,7 @@
     <string name="player_preload_setting">Preload setting</string>
     <string name="player_preload">Preload</string>
     <string name="player_preload_next">Preload next episode</string>
+    <string name="player_preload_decoder">Decoder prewarming</string>
     <string name="player_preload_threads">Preload threads</string>
     <string name="player_preload_threads_value">%1$d threads</string>
     <string name="player_preload_size">Preload size</string>
