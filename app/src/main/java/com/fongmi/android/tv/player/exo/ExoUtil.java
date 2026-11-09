@@ -86,8 +86,8 @@ public final class ExoUtil {
         return new ExoRenderersFactory(null, null, null, null, 0);
     }
 
-    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor, TextOutput secondaryTextOutput, LibassPlaybackSession libassPlaybackSession, DecoderManager decoderManager, int motionFps) {
-        return new ExoRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession, decoderManager, motionFps);
+    static RenderersFactory buildRenderersFactory(AudioProcessor audioProcessor, TextOutput secondaryTextOutput, LibassPlaybackSession libassPlaybackSession, DecoderManager decoderManager, int motionFps, boolean decoderPrewarmingEnabled) {
+        return new ExoRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession, decoderManager, motionFps).experimentalSetEnableMediaCodecVideoRendererPrewarming(decoderPrewarmingEnabled);
     }
 
     private static AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams, @Nullable AudioProcessor audioProcessor) {
@@ -111,7 +111,6 @@ public final class ExoUtil {
             if (decoderManager != null) setDecoderManager(decoderManager);
             setEnableDecoderFallback(false);
             setEnableSurfaceControlFrameRetention(true);
-            experimentalSetEnableMediaCodecVideoRendererPrewarming(true);
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);
             setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
         }

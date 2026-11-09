@@ -347,6 +347,7 @@
     <string name="player_preload_setting">預載設定</string>
     <string name="player_preload">預載</string>
     <string name="player_preload_next">預載下集</string>
+    <string name="player_preload_decoder">解碼預熱</string>
     <string name="player_preload_threads">預載線程</string>
     <string name="player_preload_threads_value">%1$d 條</string>
     <string name="player_preload_size">預載容量</string>

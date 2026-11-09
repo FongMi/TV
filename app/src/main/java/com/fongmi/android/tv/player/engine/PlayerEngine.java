@@ -34,6 +34,10 @@ public interface PlayerEngine {
         return false;
     }
 
+    default boolean canReuseForPreload() {
+        return false;
+    }
+
     Player getPlayer();
 
     @Nullable

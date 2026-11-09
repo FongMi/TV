@@ -125,6 +125,11 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     }
 
     @Override
+    public boolean canReuseForPreload() {
+        return !session.hasPlaybackSettingsChanged();
+    }
+
+    @Override
     public Player getPlayer() {
         return navigation.getPlayer();
     }

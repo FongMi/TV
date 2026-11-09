@@ -35,8 +35,8 @@ public final class PlayerEngineFactory {
         return engine != null && engine.getType() == resolve(spec) && !engine.needsRebuild();
     }
 
-    public static boolean canPreload(PlaySpec spec) {
-        return !isCmg(spec);
+    public static boolean canPreload(PlayerEngine engine, PlaySpec spec) {
+        return !isCmg(spec) && engine.getType() == resolve(spec) && engine.canReuseForPreload();
     }
 
     private static PlayerEngine.Type resolve(PlaySpec spec) {

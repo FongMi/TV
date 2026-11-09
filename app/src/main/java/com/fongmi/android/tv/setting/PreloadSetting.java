@@ -29,6 +29,22 @@ public class PreloadSetting {
         Prefers.put("preload_next_episode", enabled);
     }
 
+    public static boolean shouldPreloadNextEpisode() {
+        return isEnabled() && isNextEpisodeEnabled();
+    }
+
+    public static boolean isDecoderPrewarmingEnabled() {
+        return Prefers.getBoolean("preload_decoder_prewarming", true);
+    }
+
+    public static void putDecoderPrewarmingEnabled(boolean enabled) {
+        Prefers.put("preload_decoder_prewarming", enabled);
+    }
+
+    public static boolean shouldPrewarmDecoder() {
+        return shouldPreloadNextEpisode() && isDecoderPrewarmingEnabled();
+    }
+
     public static int getThreads() {
         return Math.clamp(Prefers.getInt("preload_threads", MIN_THREADS), MIN_THREADS, MAX_THREADS);
     }

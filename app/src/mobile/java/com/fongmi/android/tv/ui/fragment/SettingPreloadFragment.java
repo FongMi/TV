@@ -39,6 +39,7 @@ public class SettingPreloadFragment extends BaseFragment {
     protected void initEvent() {
         mBinding.preload.setOnClickListener(this::setPreload);
         mBinding.preloadNext.setOnClickListener(this::setPreloadNext);
+        mBinding.preloadDecoder.setOnClickListener(this::setPreloadDecoder);
         mBinding.preloadSize.setOnClickListener(view -> PreloadDialog.show(this, PreloadDialog.SIZE));
         mBinding.preloadTime.setOnClickListener(view -> PreloadDialog.show(this, PreloadDialog.TIME));
         mBinding.preloadThread.setOnClickListener(view -> PreloadDialog.show(this, PreloadDialog.THREADS));
@@ -47,6 +48,7 @@ public class SettingPreloadFragment extends BaseFragment {
     private void refresh() {
         mBinding.preloadText.setText(Setting.getSwitch(PreloadSetting.isEnabled()));
         mBinding.preloadNextText.setText(Setting.getSwitch(PreloadSetting.isNextEpisodeEnabled()));
+        setPreloadDecoderText();
         setPreloadThreadsText();
         setPreloadSizeText();
         setPreloadTimeText();
@@ -54,12 +56,13 @@ public class SettingPreloadFragment extends BaseFragment {
     }
 
     private void setVisible() {
-        boolean exo = PlayerSetting.isExo();
         boolean preload = PreloadSetting.isEnabled();
+        boolean exoPreload = preload && PlayerSetting.isExo();
         mBinding.preloadTime.setVisibility(preload ? View.VISIBLE : View.GONE);
-        mBinding.preloadNext.setVisibility(preload && exo ? View.VISIBLE : View.GONE);
-        mBinding.preloadSize.setVisibility(preload && exo ? View.VISIBLE : View.GONE);
-        mBinding.preloadThread.setVisibility(preload && exo ? View.VISIBLE : View.GONE);
+        mBinding.preloadNext.setVisibility(exoPreload ? View.VISIBLE : View.GONE);
+        mBinding.preloadDecoder.setVisibility(exoPreload && PreloadSetting.isNextEpisodeEnabled() ? View.VISIBLE : View.GONE);
+        mBinding.preloadSize.setVisibility(exoPreload ? View.VISIBLE : View.GONE);
+        mBinding.preloadThread.setVisibility(exoPreload ? View.VISIBLE : View.GONE);
     }
 
     private void setPreload(View view) {
@@ -71,6 +74,12 @@ public class SettingPreloadFragment extends BaseFragment {
     private void setPreloadNext(View view) {
         PreloadSetting.putNextEpisodeEnabled(!PreloadSetting.isNextEpisodeEnabled());
         mBinding.preloadNextText.setText(Setting.getSwitch(PreloadSetting.isNextEpisodeEnabled()));
+        setVisible();
+    }
+
+    private void setPreloadDecoder(View view) {
+        PreloadSetting.putDecoderPrewarmingEnabled(!PreloadSetting.isDecoderPrewarmingEnabled());
+        setPreloadDecoderText();
     }
 
     public void setPreload(int type, int value) {
@@ -84,6 +93,10 @@ public class SettingPreloadFragment extends BaseFragment {
             PreloadSetting.putTimeSeconds(value);
             setPreloadTimeText();
         }
+    }
+
+    private void setPreloadDecoderText() {
+        mBinding.preloadDecoderText.setText(Setting.getSwitch(PreloadSetting.isDecoderPrewarmingEnabled()));
     }
 
     private void setPreloadSizeText() {
