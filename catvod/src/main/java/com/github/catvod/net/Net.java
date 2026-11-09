@@ -33,12 +33,14 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -76,11 +78,7 @@ public final class Net implements AutoCloseable {
         R apply(T item, int index) throws Exception;
     }
 
-    static final ScheduledExecutorService DEADLINES = Executors.newSingleThreadScheduledExecutor(runnable -> {
-        Thread thread = new Thread(runnable, "Spider WebSocket timeout");
-        thread.setDaemon(true);
-        return thread;
-    });
+    static final ScheduledExecutorService DEADLINES = deadlines();
 
     private final Cookies cookies;
     private final OkHttpClient client;
@@ -95,6 +93,16 @@ public final class Net implements AutoCloseable {
     private final Set<NetMap<?, ?>> maps = new HashSet<>();
     private final NetCache cache;
     private boolean closed;
+
+    private static ScheduledExecutorService deadlines() {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, runnable -> {
+            Thread thread = new Thread(runnable, "Spider network deadline");
+            thread.setDaemon(true);
+            return thread;
+        });
+        executor.setRemoveOnCancelPolicy(true);
+        return executor;
+    }
 
     public Net() {
         this(null);
@@ -573,9 +581,7 @@ public final class Net implements AutoCloseable {
         } catch (Exception e) {
             return CompletableFuture.completedFuture(Result.failure(e));
         }
-        future.whenComplete((result, error) -> {
-            if (future.isCancelled()) call.cancel();
-        });
+        bindDeadline(call, options, future, () -> future.complete(Result.failure(new SocketTimeoutException())));
         call.enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -611,9 +617,7 @@ public final class Net implements AutoCloseable {
             return Task.failedFuture(error);
         }
         CompletableFuture<StreamResult> future = new CompletableFuture<>();
-        future.whenComplete((result, error) -> {
-            if (future.isCancelled()) call.cancel();
-        });
+        bindDeadline(call, options, future, () -> future.completeExceptionally(new SocketTimeoutException()));
         call.enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException error) {
@@ -627,6 +631,23 @@ public final class Net implements AutoCloseable {
             }
         });
         return future;
+    }
+
+    private void bindDeadline(Call call, NetOptions options, CompletableFuture<?> future, BooleanSupplier expire) {
+        int timeout = options.getCallTimeout();
+        ScheduledFuture<?> timer = timeout == 0 ? null : scheduleDeadline(call, timeout, expire);
+        future.whenComplete((result, error) -> {
+            if (timer != null) timer.cancel(false);
+            if (future.isCancelled()) call.cancel();
+        });
+    }
+
+    private ScheduledFuture<?> scheduleDeadline(Call call, int timeout, BooleanSupplier expire) {
+        long end = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeout);
+        call.timeout().deadlineNanoTime(end);
+        return DEADLINES.schedule(() -> client.dispatcher().executorService().execute(() -> {
+            if (expire.getAsBoolean()) call.cancel();
+        }), end - System.nanoTime(), TimeUnit.NANOSECONDS);
     }
 
     private void acceptStream(Call call, Response response, CompletableFuture<StreamResult> future) {
