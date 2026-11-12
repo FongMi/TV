@@ -1,24 +1,57 @@
-# 影視TV
+> **声明**：本文只整理公开可访问的第三方配置接口，如有侵权请联系本人删除。
 
-Android TV、手機、平板都能用，支援本地檔案與網址播放。
+**播放器项目地址**：https://github.com/FongMi/TV
 
-[使用指南](https://fongmi.github.io/TV) · [討論群組](https://t.me/fongmi_official)
+**安装包下载地址**：https://github.com/FongMi/Release/releases
 
-## 主要功能
+> **手机安装包选择**：mobile-arm64_v8a.apk
 
-- **瀏覽**：分類篩選、跨站搜尋、收藏、播放記錄與無痕模式。
-- **播放**：倍速、字幕、彈幕、片段跳過、畫中畫與背景音訊。
-- **直播**：分組選台、節目表、頻道收藏與線路切換。
-- **操作**：電視遙控器、手機手勢、DLNA 投放與接收。
-- **互通**：網頁遙控、檔案傳輸、記錄同步與 Android Auto。
+**下方片源实测可用，不需要 VPN**｜更新时间：2026-11-12
 
-爬蟲開發說明與 Java、Python、QuickJS 範例見 [CatVodSpider](https://github.com/FongMi/CatVodSpider)。
+<table style="table-layout:fixed;width:100%;border-collapse:collapse;">
+  <colgroup>
+    <col style="width:16%">
+    <col style="width:42%">
+    <col style="width:26%">
+    <col style="width:16%">
+  </colgroup>
+  <thead>
+    <tr>
+      <th style="text-align:left;">名称</th>
+      <th style="text-align:left;">链接</th>
+      <th style="text-align:left;">片源数量</th>
+      <th style="text-align:left;">画质</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="vertical-align:top;"><strong>hucongrong</strong></td>
+      <td style="vertical-align:top;word-break:break-all;"><code>http://hucongrong.web3v.work/风水/fxz/fxz.json</code></td>
+      <td style="vertical-align:top;">341 站 / 约 70 万条，去重后 5 个独立片库</td>
+      <td style="vertical-align:top;">真 1080p（3.5 Mbps）</td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;"><strong>0825</strong></td>
+      <td style="vertical-align:top;word-break:break-all;"><code>https://ghproxy.net/https://raw.githubusercontent.com/qist/tvbox/master/0825.json</code></td>
+      <td style="vertical-align:top;">135 站 / 约 40 万条</td>
+      <td style="vertical-align:top;">1080p</td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;"><strong>GYCK</strong></td>
+      <td style="vertical-align:top;word-break:break-all;"><code>https://ztha.top/TVBox/GYCK.json</code></td>
+      <td style="vertical-align:top;">46 站 / 切换站约 125 万部</td>
+      <td style="vertical-align:top;">1080p</td>
+    </tr>
+    <tr>
+      <td style="vertical-align:top;"><strong>pure-maccms.json</strong></td>
+      <td style="vertical-align:top;">本地文件，点击文件图标选择配置</td>
+      <td style="vertical-align:top;">4 站 / 约 50 万条</td>
+      <td style="vertical-align:top;">一般</td>
+    </tr>
+  </tbody>
+</table>
 
-## Star History
 
-<a href="https://www.star-history.com/?repos=FongMi%2FTV&amp;type=date">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=FongMi/TV&amp;type=date&amp;theme=dark" />
-    <img alt="FongMi/TV Star History" src="https://api.star-history.com/chart?repos=FongMi/TV&amp;type=date" />
-  </picture>
-</a>
+> **填写方法**：App底部工具栏设置（齿轮）→ 点播（最上面） → 弹窗输入链接或者选择文件 → 首页直接搜索
+
+> **补充说明**：有些多站点的点击点播右侧的房子图标切换可用站点即可，当前搜不到资源可以切换片源或者站点
