@@ -1,6 +1,7 @@
 [versions]
 agp = "9.5.1"
 python = "17.2.0"
+chaquopy = "17.2.0"
 minSdk = "24"
 targetSdk = "37"
 compileSdk = "37"
@@ -56,6 +57,7 @@ zxingCore = "3.5.4"
 annotation = { group = "androidx.annotation", name = "annotation", version.ref = "annotation" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 biometric = { group = "androidx.biometric", name = "biometric", version.ref = "biometric" }
+chaquopy = { module = "com.chaquo.python.runtime:chaquopy_java", version.ref = "chaquopy" }
 desugar = { group = "com.android.tools", name = "desugar_jdk_libs_nio", version.ref = "desugar" }
 leanback = { group = "androidx.leanback", name = "leanback", version.ref = "leanback" }
 lifecycle-service = { group = "androidx.lifecycle", name = "lifecycle-service", version.ref = "lifecycleService" }

@@ -21,7 +21,7 @@ android {
 }
 
 dependencies {
-    api "com.chaquo.python.runtime:chaquopy_java:${libs.versions.python.get()}@jar"
+    api libs.chaquopy
     compileOnly project(':catvod')
     coreLibraryDesugaring libs.desugar
 }
