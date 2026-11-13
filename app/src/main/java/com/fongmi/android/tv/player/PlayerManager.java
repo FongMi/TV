@@ -763,12 +763,25 @@ public class PlayerManager implements ParseCallback {
         if (spec == null || spec.getUrl() == null) return;
         endSpeedPress();
         PlayerEngine.Type previousType = engine.getType();
-        boolean live = player.isCurrentMediaItemLive() && player.isCurrentMediaItemDynamic() && !timeshift.isReplaying();
+        boolean replaying = timeshift.isReplaying();
+        boolean live = player.isCurrentMediaItemLive() && player.isCurrentMediaItemDynamic() && !replaying;
+        long timeshiftMediaPositionMs = replaying ? player.getCurrentPosition() : C.TIME_UNSET;
         PlaybackSnapshot snapshot = PlaybackSnapshot.capture(this);
         spec.setIsoEditionIndex(snapshot.selectedIsoEditionIndex());
         ensureEngine(spec.checkUa());
-        startCurrent(live && previousType != engine.getType() ? C.TIME_UNSET : snapshot.positionMs());
+        boolean engineTypeChanged = previousType != engine.getType();
+        long startPositionMs = live && engineTypeChanged ? C.TIME_UNSET : snapshot.positionMs();
+        restartMedia(engineTypeChanged, startPositionMs, timeshiftMediaPositionMs);
         snapshot.restorePlayerState(this);
+    }
+
+    private void restartMedia(boolean engineTypeChanged, long startPositionMs, long timeshiftMediaPositionMs) {
+        if (!engineTypeChanged && timeshift.isActive()) {
+            timeshift.onSourceRestart();
+            setMediaItem(Constant.TIMEOUT_PLAY, timeshiftMediaPositionMs, false);
+        } else {
+            startCurrent(startPositionMs);
+        }
     }
 
     private void onPlayTimeout() {

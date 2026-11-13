@@ -40,7 +40,8 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvPlayerEffect effect;
     private final MpvScriptSession scripts;
     private final MpvPlayer player;
-    private final MpvUtil.VideoOptions videoOptions;
+    private final boolean gpuNext;
+    private final boolean vulkan;
     private int configuredMotionFps;
     private final Runnable motionListener = this::updateMotionFps;
     private final Runnable updateLog = this::updateLogLevel;
@@ -48,7 +49,9 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     public MpvPlayerEngine(Player.Listener listener) {
         List<MpvScripts.Item> scriptItems = MpvUtil.readScripts();
-        this.videoOptions = MpvUtil.getVideoOptions();
+        this.gpuNext = PlayerSetting.isMpvGpuNext();
+        this.vulkan = PlayerSetting.isMpvVulkan();
+        MpvUtil.VideoOptions videoOptions = MpvUtil.getVideoOptions();
         MpvPlayerConfig config = MpvUtil.buildConfig(videoOptions);
         this.configuredMotionFps = videoOptions.motionFps();
         this.player = MpvUtil.buildPlayer(listener, config);
@@ -84,8 +87,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     @Override
     public boolean needsRebuild() {
-        MpvUtil.VideoOptions options = MpvUtil.getVideoOptions();
-        return configuredMotionFps != options.motionFps() || !videoOptions.hasSameOutput(options);
+        return configuredMotionFps != MpvUtil.getMotionFps() || gpuNext != PlayerSetting.isMpvGpuNext() || vulkan != PlayerSetting.isMpvVulkan();
     }
 
     @Override

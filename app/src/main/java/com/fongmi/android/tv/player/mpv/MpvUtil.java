@@ -95,7 +95,15 @@ public final class MpvUtil {
     }
 
     public static boolean isMotionEnabled() {
-        return PlayerSetting.getMotionFps() > 0 && isVulkanSupported();
+        return getMotionFps() > 0;
+    }
+
+    static int getMotionFps() {
+        return getMotionFps(isVulkanSupported());
+    }
+
+    private static int getMotionFps(boolean vulkanSupported) {
+        return vulkanSupported ? PlayerSetting.getMotionFps() : 0;
     }
 
     static MpvPlayer buildPlayer(Player.Listener listener, MpvPlayerConfig config) {
@@ -157,25 +165,20 @@ public final class MpvUtil {
     }
 
     static VideoOptions getVideoOptions() {
-        boolean vulkan = isVulkanSupported();
-        int fps = vulkan ? PlayerSetting.getMotionFps() : 0;
+        boolean vulkanSupported = isVulkanSupported();
+        int fps = getMotionFps(vulkanSupported);
         boolean motion = fps > 0;
-        return new VideoOptions(fps, PlayerSetting.isMpvGpuNext() || motion, vulkan && (PlayerSetting.isMpvVulkan() || motion));
+        return new VideoOptions(fps, PlayerSetting.isMpvGpuNext() || motion, vulkanSupported && (PlayerSetting.isMpvVulkan() || motion), vulkanSupported);
     }
 
     static void addAndroidOptions(MpvPlayerConfig.Builder config, File shaderCacheDirectory, VideoOptions videoOptions) {
         MpvAndroidOptions.Builder options = new MpvAndroidOptions.Builder().setShaderCacheDirectory(shaderCacheDirectory).setAudioPassthroughEnabled(DecodeSetting.isAudioPassThrough()).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
         options.setGpuNextEnabled(videoOptions.gpuNext());
         options.setVulkanEnabled(videoOptions.vulkan());
-        config.addAndroidDefaults(options.build()).setMotionInterpolationFps(videoOptions.motionFps());
+        config.addAndroidDefaults(options.build()).setMotionInterpolationFps(videoOptions.motionFps()).setAllowMotionInterpolationOutputChange(videoOptions.vulkanSupported());
     }
 
-    record VideoOptions(int motionFps, boolean gpuNext, boolean vulkan) {
-
-        boolean hasSameOutput(VideoOptions options) {
-            return gpuNext == options.gpuNext && vulkan == options.vulkan;
-        }
-    }
+    record VideoOptions(int motionFps, boolean gpuNext, boolean vulkan, boolean vulkanSupported) {}
 
     static void setPreferredTextLanguages(MpvPlayer player) {
         player.setTrackSelectionParameters(player.getTrackSelectionParameters().buildUpon().setPreferredTextLanguages(LangUtil.getPreferredTextLanguages()).build());

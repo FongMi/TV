@@ -6,7 +6,6 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.Player;
-import androidx.media3.common.Tracks;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogVideoSettingBinding;
@@ -46,7 +45,7 @@ final class VideoSettingPanel implements Player.Listener {
 
     private final DialogVideoSettingBinding binding;
     private final PlayerManager player;
-    @Nullable private final Player trackSource;
+    @Nullable private final Player eventSource;
     private final MotionSettingPanel motionPanel;
     private int currentTab;
     private boolean previewOriginal;
@@ -54,8 +53,8 @@ final class VideoSettingPanel implements Player.Listener {
     VideoSettingPanel(DialogVideoSettingBinding binding, PlayerManager player) {
         this.binding = binding;
         this.player = player;
-        this.trackSource = player.getVideoSettingEventSource();
-        this.motionPanel = new MotionSettingPanel(binding.motion, player.getPlayer(), player.getExoMotionController());
+        this.eventSource = player.getVideoSettingEventSource();
+        this.motionPanel = new MotionSettingPanel(binding.motion, eventSource, player.getExoMotionController());
     }
 
     void bind() {
@@ -68,19 +67,23 @@ final class VideoSettingPanel implements Player.Listener {
         showTab(0);
         updateControls();
         PlaybackDialogFocus.selectFirstTab(binding.getRoot(), binding.tabGroup, binding.tabPreset);
-        if (trackSource != null) trackSource.addListener(this);
+        if (eventSource != null) eventSource.addListener(this);
     }
 
     void release() {
-        if (trackSource != null) trackSource.removeListener(this);
+        if (eventSource != null) eventSource.removeListener(this);
         motionPanel.release();
         binding.tabGroup.clearOnButtonCheckedListeners();
         previewOriginal(false);
     }
 
     @Override
-    public void onTracksChanged(Tracks tracks) {
-        if (trackSource == player.getVideoSettingEventSource()) updateControls();
+    public void onEvents(Player source, Player.Events events) {
+        if (source != player.getVideoSettingEventSource()) return;
+        boolean tracksChanged = events.contains(Player.EVENT_TRACKS_CHANGED);
+        boolean firstFrame = events.contains(Player.EVENT_RENDERED_FIRST_FRAME);
+        if (tracksChanged || firstFrame) updateControls();
+        if (tracksChanged || firstFrame || events.contains(Player.EVENT_PLAYBACK_STATE_CHANGED)) motionPanel.updateMotion();
     }
 
     private void onPresetChecked(ChipGroup group, List<Integer> checkedIds) {

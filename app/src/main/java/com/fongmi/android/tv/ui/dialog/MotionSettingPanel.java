@@ -39,9 +39,9 @@ final class MotionSettingPanel implements Slider.OnSliderTouchListener {
     @Nullable private Integer pendingFps;
     private boolean released;
 
-    MotionSettingPanel(ViewSettingSliderBinding binding, @Nullable Player player, @Nullable FfmpegMotionInterpolationController exo) {
+    MotionSettingPanel(ViewSettingSliderBinding binding, @Nullable Player eventSource, @Nullable FfmpegMotionInterpolationController exo) {
         this.binding = binding;
-        this.mpv = player instanceof MpvPlayer mpvPlayer ? mpvPlayer : null;
+        this.mpv = eventSource instanceof MpvPlayer mpvPlayer ? mpvPlayer : null;
         this.exo = exo;
     }
 
@@ -117,17 +117,17 @@ final class MotionSettingPanel implements Slider.OnSliderTouchListener {
         updateMotion();
     }
 
-    private void updateMotion() {
+    void updateMotion() {
         if (released || !hasController()) return;
-        boolean supported = isSupported();
+        boolean enabled = canSetTarget();
         if (touchState == TouchState.TRACKING) {
-            if (supported && !isUpdatePending()) return;
+            if (enabled && !isUpdatePending()) return;
             touchState = TouchState.BLOCKED;
         }
         int fps = pendingFps == null ? getTargetFps() : pendingFps;
-        binding.slider.setEnabled(supported || touchState == TouchState.BLOCKED);
+        binding.slider.setEnabled(enabled || touchState == TouchState.BLOCKED);
         SliderUtil.setValue(binding.slider, fps);
-        setValueText(getValueText(supported, fps));
+        setValueText(getValueText(enabled, fps));
     }
 
     private boolean hasController() {
@@ -135,11 +135,11 @@ final class MotionSettingPanel implements Slider.OnSliderTouchListener {
     }
 
     private boolean canChangeMotion() {
-        return isSupported() && !isUpdatePending();
+        return !released && !isUpdatePending() && canSetTarget();
     }
 
-    private boolean isSupported() {
-        return mpv != null ? mpv.isMotionInterpolationSupported() : exo != null && exo.isSupported();
+    private boolean canSetTarget() {
+        return mpv != null ? mpv.canSetMotionInterpolationFps() : exo != null && exo.isSupported();
     }
 
     private boolean isUpdatePending() {
@@ -155,12 +155,11 @@ final class MotionSettingPanel implements Slider.OnSliderTouchListener {
         return fps == 0 ? ResUtil.getString(R.string.setting_off) : ResUtil.getString(R.string.player_motion_fps, fps);
     }
 
-    private String getValueText(boolean supported, int fps) {
-        if (!supported) return ResUtil.getString(R.string.player_motion_unavailable);
-        if (mpv != null && pendingFps == null) {
-            float effectiveFps = mpv.getMotionInterpolationEffectiveTargetFps();
-            if (effectiveFps > 0 && effectiveFps < fps - 0.001f) return ResUtil.getString(R.string.player_motion_capped, effectiveFps);
-        }
+    private String getValueText(boolean enabled, int fps) {
+        if (!enabled) return ResUtil.getString(R.string.player_motion_unavailable);
+        if (mpv == null || pendingFps != null || fps == 0) return formatRate(fps);
+        float effectiveFps = mpv.getMotionInterpolationEffectiveTargetFps();
+        if (effectiveFps > 0 && effectiveFps < fps - 0.001f) return ResUtil.getString(R.string.player_motion_capped, effectiveFps);
         return formatRate(fps);
     }
 
