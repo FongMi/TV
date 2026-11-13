@@ -91,7 +91,11 @@ public class ResUtil {
     }
 
     public static int dp2px(int dp) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getDisplayMetrics());
+        return dp2px(App.get(), dp);
+    }
+
+    public static int dp2px(Context context, int dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getDisplayMetrics(context));
     }
 
     public static String getString(@StringRes int resId) {

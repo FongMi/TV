@@ -53,13 +53,13 @@ public class LocalConnectDialog extends BaseAlertDialog {
     protected void initView() {
         String tab = requireArguments().getString("tab");
         String url = Server.get().getPageAddress(tab);
-        binding.getRoot().setImageBitmap(QRCode.getBitmap(url, 220, 4));
+        binding.getRoot().setImageBitmap(QRCode.getWhiteBitmap(url, QRCode.DEFAULT_SIZE, 4));
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        int size = ResUtil.dp2px(220);
+        int size = ResUtil.dp2px(QRCode.DEFAULT_SIZE);
         requireDialog().getWindow().setLayout(size, size);
     }
 }

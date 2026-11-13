@@ -7,6 +7,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -35,11 +36,13 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.databinding.ViewQrcodeBinding;
 import com.fongmi.android.tv.utils.QRCode;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.github.catvod.Runtime;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.color.MaterialColors;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -76,6 +79,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
     private TextView message;
     private Button copy;
     private ImageView qrcode;
+    private int qrcodeSize;
     private ImageView image;
     private RequestManager images;
 
@@ -125,31 +129,32 @@ public final class SpiderDialog implements LifecycleEventObserver {
     }
 
     private void bindContent(MaterialAlertDialogBuilder builder, JSONObject options) throws JSONException {
-        LinearLayout content = new LinearLayout(activity);
+        LinearLayout content = new LinearLayout(builder.getContext());
         content.setOrientation(LinearLayout.VERTICAL);
         content.setPadding(ResUtil.dp2px(24), ResUtil.dp2px(8), ResUtil.dp2px(24), ResUtil.dp2px(8));
         bindMessage(content, flag(options, "copyable", false));
         setMessage(options.optString("message"));
-        qrcode = addImage(content);
+        qrcodeSize = readQRCodeSize(options);
+        qrcode = addQRCode(content);
         image = addImage(content);
         image.setContentDescription(activity.getString(R.string.dialog_image));
         if (options.has("qrcode")) setQRCode(options.get("qrcode"));
         if (options.has("image")) setImage(options.get("image"));
         bindInputs(content, options.has("inputs") ? options.getJSONArray("inputs") : null);
-        ScrollView scroll = new ScrollView(activity);
+        ScrollView scroll = new ScrollView(content.getContext());
         scroll.addView(content);
         builder.setView(scroll);
     }
 
     private void bindMessage(LinearLayout content, boolean copyable) {
-        message = new MaterialTextView(activity);
+        message = new MaterialTextView(content.getContext());
         message.setTextAppearance(com.google.android.material.R.style.TextAppearance_Material3_BodyLarge);
         message.setTextIsSelectable(copyable);
         message.setOnKeyListener(this::onFocusKey);
         message.setPadding(0, 0, 0, ResUtil.dp2px(8));
         content.addView(message, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         if (!copyable) return;
-        copy = new MaterialButton(activity, null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
+        copy = new MaterialButton(content.getContext(), null, com.google.android.material.R.attr.materialButtonOutlinedStyle);
         copy.setText(android.R.string.copy);
         copy.setOnClickListener(this::copyMessage);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -190,8 +195,28 @@ public final class SpiderDialog implements LifecycleEventObserver {
         Util.copy(message.getText().toString());
     }
 
+    private ImageView addQRCode(LinearLayout content) {
+        ImageView view = ViewQrcodeBinding.inflate(LayoutInflater.from(content.getContext()), content, false).getRoot();
+        int size = ResUtil.dp2px(view.getContext(), qrcodeSize);
+        view.setMaxWidth(size);
+        view.setMaxHeight(size);
+        view.setVisibility(View.GONE);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) view.getLayoutParams();
+        params.gravity = Gravity.CENTER_HORIZONTAL;
+        params.topMargin = params.bottomMargin = ResUtil.dp2px(8);
+        content.addView(view, params);
+        return view;
+    }
+
+    private int readQRCodeSize(JSONObject options) throws JSONException {
+        if (!options.has("qrcodeSize")) return QRCode.DEFAULT_SIZE;
+        Object value = options.get("qrcodeSize");
+        if (!(value instanceof Number size) || size.doubleValue() != size.intValue() || size.intValue() < 1 || size.intValue() > QRCode.DEFAULT_SIZE) throw new IllegalArgumentException("Dialog qrcodeSize must be a whole number from 1 to " + QRCode.DEFAULT_SIZE);
+        return size.intValue();
+    }
+
     private ImageView addImage(LinearLayout content) {
-        ImageView view = new ImageView(activity);
+        ImageView view = new ImageView(content.getContext());
         view.setVisibility(View.GONE);
         view.setScaleType(ImageView.ScaleType.FIT_CENTER);
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ResUtil.dp2px(220));
@@ -202,7 +227,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
 
     private void setQRCode(Object code) {
         if (!(code instanceof String value) || value.isBlank()) throw new IllegalArgumentException("Dialog qrcode must be a nonempty string");
-        Bitmap bitmap = QRCode.getBitmap(value, 220, 4);
+        Bitmap bitmap = QRCode.getThemedBitmap(qrcode.getContext(), value, qrcodeSize, 4);
         if (bitmap == null) throw new IllegalArgumentException("Dialog qrcode cannot be encoded");
         qrcode.setImageBitmap(bitmap);
         qrcode.setContentDescription(value);
@@ -248,7 +273,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
         if (name.isBlank() || inputs.containsKey(name)) throw new IllegalArgumentException("Dialog input names must be nonempty and unique");
         String type = field.optString("type", "text");
         int style = type.equals("select") ? com.google.android.material.R.attr.textInputOutlinedExposedDropdownMenuStyle : com.google.android.material.R.attr.textInputStyle;
-        TextInputLayout layout = new TextInputLayout(activity, null, style);
+        TextInputLayout layout = new TextInputLayout(content.getContext(), null, style);
         layout.setHint(field.optString("label", name));
         layout.setHelperText(field.optString("helperText"));
         layout.setBoxBackgroundMode(TextInputLayout.BOX_BACKGROUND_OUTLINE);
@@ -274,12 +299,7 @@ public final class SpiderDialog implements LifecycleEventObserver {
     }
 
     private EditText createInput(TextInputLayout layout, String type) {
-        if (type.equals("select")) {
-            MaterialAutoCompleteTextView input = new MaterialAutoCompleteTextView(layout.getContext());
-            input.setInputType(InputType.TYPE_NULL);
-            input.setKeyListener(null);
-            return input;
-        }
+        if (type.equals("select")) return createSelect(layout);
         TextInputEditText input = new TextInputEditText(layout.getContext());
         if (type.equals("multiselect")) {
             input.setInputType(InputType.TYPE_NULL);
@@ -295,6 +315,16 @@ public final class SpiderDialog implements LifecycleEventObserver {
             input.setMinLines(3);
             input.setGravity(Gravity.TOP | Gravity.START);
         }
+        return input;
+    }
+
+    private MaterialAutoCompleteTextView createSelect(TextInputLayout layout) {
+        layout.setBoxBackgroundColor(MaterialColors.getColor(layout, com.google.android.material.R.attr.colorSurfaceContainerHigh));
+        MaterialAutoCompleteTextView input = new MaterialAutoCompleteTextView(layout.getContext());
+        input.setInputType(InputType.TYPE_NULL);
+        input.setKeyListener(null);
+        input.setDropDownBackgroundDrawable(null);
+        input.setDropDownBackgroundTint(MaterialColors.getColor(layout, com.google.android.material.R.attr.colorSurfaceContainerHighest));
         return input;
     }
 
