@@ -473,16 +473,16 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         return positionMs < 0 ? 0 : Math.clamp(positionMs + deltaMs, 0, durationMs);
     }
 
-    protected boolean seekTo(long deltaMs) {
+    protected void seekTo(long deltaMs) {
         if (isWebPlaybackActive()) {
             long positionMs = getActivePlaybackPosition();
             long durationMs = getActivePlaybackDuration();
-            if (positionMs < 0 || durationMs <= 0) return false;
+            if (positionMs < 0 || durationMs <= 0) return;
             long targetMs = Math.max(0, positionMs + deltaMs);
             boolean seekToEnd = targetMs >= durationMs;
             webView.seekVideo(seekToEnd ? durationMs : targetMs);
             if (!seekToEnd) webView.resumeVideo();
-            return seekToEnd;
+            return;
         }
         PlayerManager player = player();
         long targetMs = Math.max(0, player.getPosition() + deltaMs);
@@ -490,7 +490,6 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         boolean seekToEnd = durationMs > 0 && targetMs >= durationMs;
         mController.seekTo(seekToEnd ? durationMs : targetMs);
         if (!seekToEnd) mController.play();
-        return seekToEnd;
     }
 
     protected void startPlayer(String key, Result result, boolean useParse, long timeout, MediaMetadata metadata) {

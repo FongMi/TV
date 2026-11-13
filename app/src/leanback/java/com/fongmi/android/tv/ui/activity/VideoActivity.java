@@ -1150,9 +1150,9 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void showProgress() {
+        hideCenter();
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         App.post(mR3, 0);
-        hideCenter();
         hideError();
     }
 
@@ -1175,6 +1175,7 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
     }
 
     private void showInfo() {
+        if (isVisible(mBinding.progress.getRoot())) return;
         mBinding.widget.top.setVisibility(View.VISIBLE);
         mBinding.widget.center.setVisibility(View.VISIBLE);
         setSeekPreviewTime(mBinding.widget.duration, mBinding.widget.position, 0);
@@ -1626,15 +1627,16 @@ public class VideoActivity extends PlaybackActivity implements VodPlaybackHost, 
 
     @Override
     public void onSeeking(long time) {
+        hideProgress();
         mBinding.widget.center.setVisibility(View.VISIBLE);
         setSeekPreviewTime(mBinding.widget.duration, mBinding.widget.position, time);
         mBinding.widget.statusIcon.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
-        hideProgress();
     }
 
     @Override
     public void onSeekEnd(long time) {
-        if (seekTo(time)) hideCenter();
+        hideCenter();
+        seekTo(time);
     }
 
     @Override

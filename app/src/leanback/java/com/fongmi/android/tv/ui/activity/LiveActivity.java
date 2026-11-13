@@ -584,9 +584,9 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void showProgress() {
+        hideCenter();
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         App.post(mR2, 0);
-        hideCenter();
         hideError();
     }
 
@@ -1064,10 +1064,10 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     @Override
     public void onSeeking(long time) {
         if (!player().canSeek()) return;
+        hideProgress();
         mBinding.widget.center.setVisibility(View.VISIBLE);
         setSeekPreviewTime(mBinding.widget.duration, mBinding.widget.position, time);
         mBinding.widget.statusIcon.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
-        hideProgress();
     }
 
     @Override
@@ -1084,6 +1084,7 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
 
     @Override
     public void onSeekEnd(long time) {
+        hideCenter();
         seekTo(time);
     }
 

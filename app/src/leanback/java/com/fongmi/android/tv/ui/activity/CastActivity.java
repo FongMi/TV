@@ -234,9 +234,9 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     }
 
     private void showProgress() {
+        hideCenter();
         mBinding.progress.getRoot().setVisibility(View.VISIBLE);
         App.post(mR2, 0);
-        hideCenter();
         hideError();
     }
 
@@ -259,6 +259,7 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     }
 
     private void showInfo() {
+        if (isVisible(mBinding.progress.getRoot())) return;
         mBinding.widget.top.setVisibility(View.VISIBLE);
         mBinding.widget.center.setVisibility(View.VISIBLE);
         mBinding.widget.duration.setText(player().getDurationTime());
@@ -438,17 +439,17 @@ public class CastActivity extends PlaybackActivity implements VodInput.Listener 
     @Override
     public void onSeeking(long time) {
         if (player().isEmpty()) return;
+        hideProgress();
         mBinding.widget.center.setVisibility(View.VISIBLE);
         mBinding.widget.duration.setText(player().getDurationTime());
         mBinding.widget.position.setText(player().getPositionTime(time));
         mBinding.widget.statusIcon.setImageResource(time > 0 ? R.drawable.ic_widget_forward : R.drawable.ic_widget_rewind);
-        hideProgress();
     }
 
     @Override
     public void onSeekEnd(long time) {
-        if (player().isEmpty()) return;
-        seekTo(time);
+        hideCenter();
+        if (!player().isEmpty()) seekTo(time);
     }
 
     @Override
