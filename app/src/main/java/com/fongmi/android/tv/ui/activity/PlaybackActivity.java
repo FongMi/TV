@@ -25,6 +25,7 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.media3.common.C;
 import androidx.media3.common.DiscMenuController;
 import androidx.media3.common.DiscMenuState;
@@ -50,6 +51,7 @@ import com.fongmi.android.tv.player.LiveDanmaku;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.service.PlaybackService;
+import com.fongmi.android.tv.service.PlaybackServiceConnection;
 import com.fongmi.android.tv.setting.DanmakuSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
@@ -84,6 +86,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private ListenableFuture<MediaController> mControllerFuture;
     private MediaController mController;
     private PlaybackService mService;
+    private PlaybackServiceConnection serviceConnection;
     private PlaybackResume pendingResume;
     private boolean playbackReplaced;
     @Nullable private BrowserWebView webView;
@@ -97,7 +100,6 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private boolean audioOnly;
     private boolean scrubbing;
     private boolean redirect;
-    private boolean bound;
     private boolean stop;
     private boolean lock;
 
@@ -659,9 +661,8 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void bindPlaybackService() {
-        startService(new Intent(this, PlaybackService.class));
-        bindService(new Intent(this, PlaybackService.class).setAction(PlaybackService.LOCAL_BIND_ACTION), this, BIND_AUTO_CREATE);
-        bound = true;
+        serviceConnection = new ViewModelProvider(this).get(PlaybackServiceConnection.class);
+        serviceConnection.attach(this);
     }
 
     private void buildControllerAsync() {
@@ -969,10 +970,9 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void releaseBinding() {
         playbackPlayerState.setValue(null);
-        if (!bound) return;
-        bound = false;
         if (mService != null) mService.removePlayerCallback(mPlayerCallback);
-        unbindService(this);
+        if (serviceConnection != null) serviceConnection.detach(this);
+        serviceConnection = null;
         mService = null;
     }
 
@@ -1157,6 +1157,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
         super.onResume();
         claimBinding();
         setRedirect(false);
+        if (!initialized) activateService();
         dispatchPendingObservers();
         updatePlaybackPlayerState();
         getPlayerView().setDiscMenuController(discMenu());
