@@ -257,7 +257,7 @@ public class Channel {
         return getData(ZoneId.systemDefault());
     }
 
-    public void setData(Epg data) {
+    public synchronized void setData(Epg data) {
         if (dataList == null) dataList = new ArrayList<>();
         dataList.removeIf(e -> e.equal(data.getDate()));
         dataList.add(data);
@@ -267,7 +267,7 @@ public class Channel {
         return getData(zoneId, LocalDate.now(zoneId));
     }
 
-    Epg getData(ZoneId zoneId, LocalDate day) {
+    public Epg getData(ZoneId zoneId, LocalDate day) {
         String date = day.format(Formatters.DATE);
         List<Epg> days = getDataList();
         Epg today = days.stream().filter(e -> e.equal(date)).findFirst().orElseGet(() -> Epg.create(getTvgId(), date));
@@ -285,11 +285,11 @@ public class Channel {
         return result;
     }
 
-    public List<Epg> getDataList() {
-        return dataList == null ? Collections.emptyList() : dataList;
+    public synchronized List<Epg> getDataList() {
+        return dataList == null ? Collections.emptyList() : new ArrayList<>(dataList);
     }
 
-    public void setDataList(List<Epg> list) {
+    public synchronized void setDataList(List<Epg> list) {
         this.dataList = new ArrayList<>(list);
     }
 

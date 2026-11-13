@@ -11,6 +11,7 @@ import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.EpgData;
+import com.fongmi.android.tv.bean.EpgProgramme;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.playback.PlaybackResult;
@@ -18,6 +19,9 @@ import com.fongmi.android.tv.player.extractor.Source;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.setting.LiveSetting;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.fongmi.android.tv.utils.EpgTimeline;
+
+import java.util.Comparator;
 
 public class LivePlaybackController {
 
@@ -58,7 +62,8 @@ public class LivePlaybackController {
 
     public boolean selectEpg(EpgData data, long startPositionMs) {
         Channel channel = state.getChannel();
-        if (channel == null || data == null) return false;
+        if (channel == null || data == null || data.isFuture()) return false;
+        if (EpgTimeline.isPlaceholder(data) && !channel.hasCatchup() && !channel.isRtsp()) return false;
         if (data.isSelected()) return requestCatchup(data, startPositionMs);
         if (!channel.hasCatchup() && !channel.isRtsp()) return false;
         host.renderEpgSelection(data);
@@ -106,12 +111,31 @@ public class LivePlaybackController {
 
     public void playbackEnded() {
         if (state.getPendingRequest() != null) return;
+        LivePlayRequest request = state.getActiveRequest();
+        if (request != null && request.isCatchup() && request.matches(state.getChannel())
+                && request.getCatchupData() instanceof EpgProgramme) {
+            EpgData next = getNextEpgData(state.getChannel());
+            if (next == null || !selectEpg(next)) requestLive();
+            return;
+        }
         if (host.isPlayerLive()) playNextProgram();
         else nextChannel();
     }
 
     public void onEpgChanged(EpgData data) {
         if (state.getChannel() != null && state.getPendingRequest() == null) publishPlaybackMetadata(data);
+    }
+
+    @Nullable
+    public EpgData getPlayingEpgData() {
+        LivePlayRequest request = state.getActiveRequest();
+        return request == null || !request.matches(state.getChannel())
+                ? getCurrentEpgData(state.getChannel()) : getEpgData(request);
+    }
+
+    public boolean isCatchup() {
+        LivePlayRequest request = state.getActiveRequest();
+        return request != null && request.matches(state.getChannel()) && request.isCatchup();
     }
 
     public void refresh() {
@@ -252,6 +276,17 @@ public class LivePlaybackController {
     @Nullable
     private EpgData getNextEpgData(Channel channel) {
         if (channel == null) return null;
+        LivePlayRequest request = state.getActiveRequest();
+        if (request != null && request.isCatchup() && request.matches(channel)) {
+            if (request.getCatchupData() instanceof EpgProgramme)
+                return EpgTimeline.next(channel, request.getCatchupData(), host.getZoneId(), System.currentTimeMillis(),
+                        ResUtil.getString(R.string.epg_history_empty));
+            long start = request.getCatchupData().getStartTime();
+            long now = System.currentTimeMillis();
+            return channel.getDataList().stream().flatMap(day -> day.getList().stream())
+                    .filter(data -> data.getStartTime() > start && data.getStartTime() <= now)
+                    .min(Comparator.comparingLong(EpgData::getStartTime)).orElse(null);
+        }
         Epg epg = channel.getData(host.getZoneId());
         int current = epg.getInRange();
         int position = epg.getSelected() + 1;
@@ -268,6 +303,7 @@ public class LivePlaybackController {
 
     private MediaMetadata publishPlaybackMetadata(@Nullable EpgData liveData) {
         LivePlayRequest request = state.getActiveRequest();
+        if (request != null && !request.matches(state.getChannel())) request = null;
         boolean catchup = request != null && request.isCatchup();
         Channel channel = request == null ? state.getChannel() : request.getChannel();
         EpgData data = catchup ? request.getCatchupData() : liveData;

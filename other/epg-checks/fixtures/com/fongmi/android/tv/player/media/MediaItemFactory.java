@@ -1,0 +1,1 @@
+package com.fongmi.android.tv.player.media;import androidx.media3.common.MediaMetadata;import com.fongmi.android.tv.bean.EpgData;public class MediaItemFactory{public static MediaMetadata buildLiveMetadata(String title,EpgData data,String logo){return new MediaMetadata(title,data==null?"":data.format(),17);} }
