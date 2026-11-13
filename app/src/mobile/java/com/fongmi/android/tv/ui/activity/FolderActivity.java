@@ -8,12 +8,14 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.bean.Class;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.databinding.ActivityFolderBinding;
+import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.fragment.FolderFragment;
 
@@ -52,6 +54,7 @@ public class FolderActivity extends BaseActivity {
 
     @Override
     protected void initView(Bundle savedInstanceState) {
+        new ViewModelProvider(this).get(SiteViewModel.class).getAction().observe(this, result -> WebActivity.handleAction(this, result));
         setSupportActionBar(mBinding.toolbar);
         Class type = getResult().getTypes().get(0);
         setTitle(type.getTypeName());

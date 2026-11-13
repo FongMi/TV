@@ -44,6 +44,7 @@ public class Action implements Process {
         Map<String, String> params = session.getParms();
         String param = params.get("do");
         if ("sync".equals(param)) return onSync(params);
+        if ("refresh".equals(param)) return onRefresh(params);
         if (!TextUtils.isEmpty(param)) doJob(param, params);
         return Nano.ok();
     }
@@ -55,7 +56,6 @@ public class Action implements Process {
             case "cast" -> onCast(params);
             case "search" -> onSearch(params);
             case "setting" -> onSetting(params);
-            case "refresh" -> onRefresh(params);
             case "control" -> onControl(params);
             case "danmaku" -> onDanmaku(params);
         }
@@ -88,11 +88,15 @@ public class Action implements Process {
         ServerEvent.setting(text, name);
     }
 
-    private void onRefresh(Map<String, String> params) {
+    private Response onRefresh(Map<String, String> params) {
         String type = params.get("type");
         String path = params.get("path");
-        if (TextUtils.isEmpty(type)) return;
+        if (TextUtils.isEmpty(type)) return Nano.ok();
         switch (type) {
+            case "home" -> {
+                RefreshEvent.homeContent(params.get("siteKey"));
+                return Nano.ok("home");
+            }
             case "live" -> RefreshEvent.live();
             case "detail" -> RefreshEvent.detail();
             case "player" -> RefreshEvent.player();
@@ -100,6 +104,7 @@ public class Action implements Process {
             case "danmaku" -> RefreshEvent.danmaku(path);
             case "subtitle" -> RefreshEvent.subtitle(path);
         }
+        return Nano.ok();
     }
 
     private void onControl(Map<String, String> params) {

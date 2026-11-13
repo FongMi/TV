@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -17,10 +18,16 @@ final class ViewModelTaskRunner<T extends Enum<T>> {
 
     private final Map<T, ListenableFuture<?>> futures;
     private final Map<T, AtomicInteger> taskIds;
+    private final Executor callbackExecutor;
 
     ViewModelTaskRunner(Class<T> typeClass) {
+        this(typeClass, MoreExecutors.directExecutor());
+    }
+
+    ViewModelTaskRunner(Class<T> typeClass, Executor callbackExecutor) {
         futures = new EnumMap<>(typeClass);
         taskIds = new EnumMap<>(typeClass);
+        this.callbackExecutor = callbackExecutor;
         for (T type : typeClass.getEnumConstants()) taskIds.put(type, new AtomicInteger(0));
     }
 
@@ -39,7 +46,7 @@ final class ViewModelTaskRunner<T extends Enum<T>> {
                     if (error instanceof CancellationException) return;
                     if (taskId.get() == currentId) onError.accept(error);
                 }
-        ), MoreExecutors.directExecutor());
+        ), callbackExecutor);
     }
 
     void cancel(T type) {
@@ -49,7 +56,6 @@ final class ViewModelTaskRunner<T extends Enum<T>> {
     }
 
     void cancelAll() {
-        futures.values().forEach(future -> future.cancel(true));
-        futures.clear();
+        for (T type : taskIds.keySet()) cancel(type);
     }
 }

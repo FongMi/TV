@@ -10,6 +10,7 @@ import com.fongmi.android.tv.api.SiteApi;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.event.RefreshEvent;
 import com.fongmi.android.tv.utils.Notify;
 
 import java.util.HashMap;
@@ -24,12 +25,13 @@ public class SiteViewModel extends ViewModel {
 
     private final ViewModelTaskRunner<TaskType> tasks;
     private final ViewModelSearchRunner searches;
+    private boolean loadingHome;
 
     public SiteViewModel() {
         result = new MutableLiveData<>();
         search = new MutableLiveData<>();
         action = new MutableLiveData<>();
-        tasks = new ViewModelTaskRunner<>(TaskType.class);
+        tasks = new ViewModelTaskRunner<>(TaskType.class, App::post);
         searches = new ViewModelSearchRunner();
     }
 
@@ -53,7 +55,30 @@ public class SiteViewModel extends ViewModel {
     }
 
     public void homeContent() {
-        execute(TaskType.RESULT, result, () -> SiteApi.homeContent(VodConfig.get().getHome()));
+        loadingHome = true;
+        loadHomeContent(VodConfig.get().getHome(), false);
+    }
+
+    public void refreshHomeContent(Site site) {
+        if (!site.isEmpty()) loadHomeContent(site, true);
+    }
+
+    private void loadHomeContent(Site site, boolean notifyCategories) {
+        tasks.execute(TaskType.RESULT, Constant.TIMEOUT_VOD, () -> SiteApi.homeContent(site), value -> onHomeContent(site.getKey(), value, notifyCategories), this::handleHomeError);
+    }
+
+    private void onHomeContent(String siteKey, Result value, boolean notifyCategories) {
+        boolean success = value.getCode() == 0;
+        if (!loadingHome && !success) return;
+        loadingHome = false;
+        result.setValue(value);
+        if (notifyCategories && success) RefreshEvent.homeContentLoaded(siteKey, value);
+    }
+
+    private void handleHomeError(Throwable error) {
+        MutableLiveData<Result> output = loadingHome ? result : null;
+        loadingHome = false;
+        handleError(TaskType.RESULT, output, error);
     }
 
     public void categoryContent(String key, String tid, String page, boolean filter, HashMap<String, String> extend) {
@@ -77,13 +102,13 @@ public class SiteViewModel extends ViewModel {
     }
 
     private void execute(TaskType type, MutableLiveData<Result> liveData, Callable<Result> callable) {
-        tasks.execute(type, Constant.TIMEOUT_VOD, callable, liveData::postValue, error -> handleError(type, liveData, error));
+        tasks.execute(type, Constant.TIMEOUT_VOD, callable, liveData::setValue, error -> handleError(type, liveData, error));
     }
 
     private void handleError(TaskType type, MutableLiveData<Result> liveData, Throwable error) {
         String message = Notify.getError(error);
-        liveData.postValue(message != null ? Result.error(message) : Result.empty());
-        if (type == TaskType.RESULT && message != null) App.post(() -> Notify.show(message));
+        if (liveData != null) liveData.setValue(message == null ? Result.empty() : Result.error(message));
+        if (type == TaskType.RESULT && message != null) Notify.show(message);
         error.printStackTrace();
     }
 

@@ -1,14 +1,24 @@
 package com.fongmi.android.tv.event;
 
+import com.fongmi.android.tv.bean.Result;
+
 import org.greenrobot.eventbus.EventBus;
 
 public class RefreshEvent {
 
     private final Type type;
-    private String path;
+    private final String path;
 
     public static void home() {
         EventBus.getDefault().post(new RefreshEvent(Type.HOME));
+    }
+
+    public static void homeContent(String siteKey) {
+        EventBus.getDefault().post(new HomeContent(siteKey));
+    }
+
+    public static void homeContentLoaded(String siteKey, Result result) {
+        EventBus.getDefault().post(new HomeContentLoaded(siteKey, result));
     }
 
     public static void category() {
@@ -52,10 +62,10 @@ public class RefreshEvent {
     }
 
     private RefreshEvent(Type type) {
-        this.type = type;
+        this(type, null);
     }
 
-    public RefreshEvent(Type type, String path) {
+    private RefreshEvent(Type type, String path) {
         this.type = type;
         this.path = path;
     }
@@ -67,6 +77,15 @@ public class RefreshEvent {
     public String getPath() {
         return path;
     }
+
+    public record HomeContent(String siteKey) {
+
+        public boolean matchesSite(String key) {
+            return siteKey == null || siteKey.isEmpty() || siteKey.equals(key);
+        }
+    }
+
+    public record HomeContentLoaded(String siteKey, Result result) {}
 
     public enum Type {
         HOME, CATEGORY, HISTORY, KEEP, SIZE, THEME, LIVE, DETAIL, PLAYER, SUBTITLE, DANMAKU
