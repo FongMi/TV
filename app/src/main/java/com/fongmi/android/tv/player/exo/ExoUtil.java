@@ -19,10 +19,12 @@ import androidx.media3.exoplayer.LoadControl;
 import androidx.media3.exoplayer.Renderer;
 import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.analytics.PlayerId;
+import androidx.media3.exoplayer.audio.AudioRendererEventListener;
 import androidx.media3.exoplayer.audio.AudioSink;
 import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider;
 import androidx.media3.exoplayer.audio.DefaultAudioSink;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector;
 import androidx.media3.exoplayer.source.preload.DefaultPreloadManager;
 import androidx.media3.exoplayer.text.TextOutput;
 import androidx.media3.exoplayer.text.TextRenderer;
@@ -109,10 +111,15 @@ public final class ExoUtil {
             this.secondaryTextOutput = secondaryTextOutput;
             this.libassPlaybackSession = libassPlaybackSession;
             if (decoderManager != null) setDecoderManager(decoderManager);
-            setEnableDecoderFallback(false);
+            setEnableDecoderFallback(decoderManager != null);
             setEnableSurfaceControlFrameRetention(true);
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);
             setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
+        }
+
+        @Override
+        protected void buildAudioRenderers(@NonNull Context context, @ExtensionRendererMode int extensionRendererMode, @NonNull MediaCodecSelector mediaCodecSelector, boolean enableDecoderFallback, @NonNull AudioSink audioSink, @NonNull Handler eventHandler, @NonNull AudioRendererEventListener eventListener, @NonNull ArrayList<Renderer> out) {
+            super.buildAudioRenderers(context, extensionRendererMode, mediaCodecSelector, false, audioSink, eventHandler, eventListener, out);
         }
 
         @Override
