@@ -6,6 +6,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.Nullable;
+import androidx.media3.common.Player;
+
 import com.fongmi.android.tv.utils.Util;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;
@@ -15,6 +18,12 @@ import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 
 final class SettingPanelViews {
+
+    static boolean isPlaybackPrepared(@Nullable Player player) {
+        if (player == null) return false;
+        int state = player.getPlaybackState();
+        return state == Player.STATE_READY || state == Player.STATE_ENDED;
+    }
 
     static void applyEnabled(View view, boolean enabled) {
         view.setAlpha(enabled ? 1.0f : 0.38f);
@@ -49,14 +58,24 @@ final class SettingPanelViews {
         for (ChipGroup group : groups) group.setOnCheckedStateChangeListener(listener);
     }
 
+    static void bindPlaybackTabs(MaterialButtonToggleGroup group, MaterialButton[] tabs, IntConsumer onSelected) {
+        int selectedId = group.getCheckedButtonId();
+        bindTabs(group, tabs, onSelected);
+        if (selectedId == View.NO_ID) PlaybackDialogFocus.selectFirstTab(group, group, tabs[0]);
+        else selectTab(tabs, selectedId, onSelected);
+    }
+
     static void bindTabs(MaterialButtonToggleGroup group, MaterialButton[] tabs, IntConsumer onSelected) {
         if (Util.isLeanback()) for (MaterialButton tab : tabs) tab.setOnFocusChangeListener((view, focused) -> {
             if (focused) group.check(tab.getId());
         });
         group.addOnButtonCheckedListener((buttons, checkedId, checked) -> {
-            if (!checked) return;
-            for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) onSelected.accept(i);
+            if (checked) selectTab(tabs, checkedId, onSelected);
         });
+    }
+
+    private static void selectTab(MaterialButton[] tabs, int checkedId, IntConsumer onSelected) {
+        for (int i = 0; i < tabs.length; i++) if (checkedId == tabs[i].getId()) onSelected.accept(i);
     }
 
     @SuppressLint("ClickableViewAccessibility")

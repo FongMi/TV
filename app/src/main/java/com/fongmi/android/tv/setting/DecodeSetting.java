@@ -68,7 +68,7 @@ public class DecodeSetting {
 
     public static void putTunnel(boolean tunnel) {
         Prefers.put("decode_tunnel", tunnel);
-        if (PlayerSetting.isExo() && tunnel) PlayerSetting.putRender(PlayerSetting.RENDER_SURFACE);
+        if (tunnel) PlayerSetting.putRender(PlayerSetting.RENDER_SURFACE);
     }
 
     public static boolean isTunnelingEnabled() {

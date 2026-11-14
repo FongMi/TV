@@ -1,5 +1,7 @@
 package com.fongmi.android.tv.ui.fragment;
 
+import android.content.DialogInterface;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +13,14 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.FragmentSettingDecodeBinding;
+import com.fongmi.android.tv.player.mpv.MpvUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.base.BaseFragment;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 public class SettingDecodeFragment extends BaseFragment {
 
@@ -38,6 +43,7 @@ public class SettingDecodeFragment extends BaseFragment {
 
     @Override
     protected void initEvent() {
+        mBinding.motion.setOnClickListener(this::setMotion);
         mBinding.aac.setOnClickListener(this::setAAC);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.dolbyVisionOutput.setOnClickListener(this::setDolbyVisionOutput);
@@ -46,15 +52,34 @@ public class SettingDecodeFragment extends BaseFragment {
 
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
+        boolean motionSupported = exo ? Build.VERSION.SDK_INT >= Build.VERSION_CODES.O : MpvUtil.isVulkanSupported();
+        mBinding.motion.setVisibility(motionSupported ? View.VISIBLE : View.GONE);
         mBinding.aac.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
     private void refresh() {
+        updateMotion();
         mBinding.aacText.setText(Setting.getSwitch(DecodeSetting.isPreferAAC()));
         mBinding.tunnelText.setText(Setting.getSwitch(DecodeSetting.isTunnel()));
         mBinding.dolbyVisionOutputText.setText(ResUtil.getStringArray(R.array.select_dolby_vision_output)[DecodeSetting.getDolbyVisionOutputPolicy()]);
         mBinding.audioPassThroughText.setText(Setting.getSwitch(DecodeSetting.isAudioPassThrough()));
+    }
+
+    private void setMotion(View view) {
+        String[] items = ResUtil.getStringArray(R.array.select_motion);
+        new MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.player_motion).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(items, PlayerSetting.getMotion(), this::onMotion).show();
+    }
+
+    private void onMotion(DialogInterface dialog, int which) {
+        PlayerSetting.putMotion(which);
+        updateMotion();
+        Notify.show(R.string.player_motion_restart);
+        dialog.dismiss();
+    }
+
+    private void updateMotion() {
+        mBinding.motionText.setText(ResUtil.getStringArray(R.array.select_motion)[PlayerSetting.getMotion()]);
     }
 
     private void setTunnel(View view) {

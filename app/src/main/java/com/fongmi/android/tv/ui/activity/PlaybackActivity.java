@@ -12,6 +12,7 @@ import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewConfiguration;
 import android.view.ViewGroup;
@@ -860,13 +861,22 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     }
 
     private void syncPlayerView(Player player) {
-        getPlayerView().setPlayer(player);
-        player().bindPlayerView(getPlayerView());
-        danmakuController.bind(getPlayerView());
+        PlayerView playerView = getPlayerView();
+        bindPlayerOutput(playerView, player, PlayerSetting.getRender());
+        player().bindPlayerView(playerView);
+        danmakuController.bind(playerView);
         danmakuController.setConfig(player().getDanmakuConfig());
-        getPlayerView().setDiscMenuController(discMenu());
+        playerView.setDiscMenuController(discMenu());
         syncDanmakuSource();
         restoreDebugView();
+    }
+
+    private static void bindPlayerOutput(PlayerView playerView, Player player, int render) {
+        Player previous = playerView.getPlayer();
+        boolean renderChanged = (playerView.getVideoSurfaceView() instanceof TextureView) != (render == PlayerSetting.RENDER_TEXTURE);
+        if (previous != null && previous != player && renderChanged) playerView.setPlayer(null);
+        playerView.setRender(render);
+        playerView.setPlayer(player);
     }
 
     private void restoreDebugView() {
@@ -875,7 +885,6 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void configurePlayerView() {
         PlayerView playerView = getPlayerView();
-        playerView.setRender(PlayerSetting.getRender());
         danmakuController.setOkHttpClient(OkHttp.player());
         danmakuController.setEnabled(DanmakuSetting.isShow());
         liveDanmaku.setEnabled(DanmakuSetting.isShow());

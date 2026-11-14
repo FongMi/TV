@@ -58,6 +58,14 @@
             android:layout_weight="1"
             android:text="@string/video_effect_tab_adjust" />
 
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/tabAdvanced"
+            style="@style/PlaybackDialogTab"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/audio_effect_tab_advanced" />
+
     </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <com.google.android.material.textview.MaterialTextView
@@ -295,10 +303,6 @@
                 android:visibility="gone">
 
                 <include
-                    android:id="@+id/motion"
-                    layout="@layout/view_setting_slider" />
-
-                <include
                     android:id="@+id/saturation"
                     layout="@layout/view_setting_slider" />
 
@@ -329,6 +333,86 @@
                 <include
                     android:id="@+id/shadow"
                     layout="@layout/view_setting_slider" />
+
+            </androidx.appcompat.widget.LinearLayoutCompat>
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/advancedSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <FrameLayout
+                    android:id="@+id/tunnelRow"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/playback_dialog_inset"
+                    android:minHeight="48dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:importantForAccessibility="no"
+                        android:paddingEnd="64dp"
+                        android:text="@string/player_tunnel"
+                        android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                    <FrameLayout
+                        style="@style/PlaybackDialogSwitchContainer"
+                        android:layout_gravity="end|center_vertical">
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/tunnel"
+                            style="@style/PlaybackDialogSwitch"
+                            android:contentDescription="@string/player_tunnel" />
+
+                    </FrameLayout>
+
+                </FrameLayout>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/playback_dialog_inset"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="4dp"
+                    android:text="@string/player_dolby_vision_output"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                <com.google.android.material.chip.ChipGroup
+                    android:id="@+id/dolbyVisionGroup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="@dimen/playback_dialog_inset"
+                    app:chipSpacingVertical="0dp"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/dolbyVisionAuto"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/dolbyVisionOn"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/dolbyVisionOff"
+                        style="@style/Widget.Material3.Chip.Filter"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </com.google.android.material.chip.ChipGroup>
+
+                <include
+                    android:id="@+id/motion"
+                    layout="@layout/view_motion_setting" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
 

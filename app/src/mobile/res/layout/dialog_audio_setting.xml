@@ -319,6 +319,34 @@
                 android:orientation="vertical"
                 android:visibility="gone">
 
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/playback_dialog_inset"
+                    android:minHeight="48dp">
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:importantForAccessibility="no"
+                        android:paddingEnd="64dp"
+                        android:text="@string/player_audio_pass_through"
+                        android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+                    <FrameLayout
+                        style="@style/PlaybackDialogSwitchContainer"
+                        android:layout_gravity="end|center_vertical">
+
+                        <com.google.android.material.materialswitch.MaterialSwitch
+                            android:id="@+id/audioPassThrough"
+                            style="@style/PlaybackDialogSwitch"
+                            android:contentDescription="@string/player_audio_pass_through" />
+
+                    </FrameLayout>
+
+                </FrameLayout>
+
                 <androidx.appcompat.widget.LinearLayoutCompat
                     android:id="@+id/audioSettingOptions"
                     android:layout_width="match_parent"

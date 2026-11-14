@@ -74,6 +74,7 @@ public final class MpvPlayerEffect implements PlayerEffect {
     @Override
     public int getAudioEffectError() {
         return switch (player.getAudioEffectsSupport()) {
+            case MpvPlayer.AUDIO_EFFECTS_UNAVAILABLE -> 0;
             case MpvPlayer.AUDIO_EFFECTS_SUPPORTED -> audioEffectFailed ? R.string.error_audio_effect_apply : 0;
             case MpvPlayer.AUDIO_EFFECTS_UNSUPPORTED_PASSTHROUGH -> R.string.error_audio_effect_passthrough;
             default -> R.string.error_audio_effect_unsupported;

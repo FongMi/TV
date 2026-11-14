@@ -2,6 +2,7 @@ package com.fongmi.android.tv.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 
@@ -10,10 +11,12 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ActivitySettingDecodeBinding;
+import com.fongmi.android.tv.player.mpv.MpvUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 
 public class SettingDecodeActivity extends BaseActivity {
@@ -31,13 +34,15 @@ public class SettingDecodeActivity extends BaseActivity {
 
     @Override
     protected void initView(Bundle savedInstanceState) {
-        (PlayerSetting.isExo() ? mBinding.tunnel : mBinding.audioPassThrough).requestFocus();
         setVisible();
+        if (mBinding.motion.getVisibility() == View.VISIBLE) mBinding.motion.requestFocus();
+        else (PlayerSetting.isExo() ? mBinding.tunnel : mBinding.audioPassThrough).requestFocus();
         refresh();
     }
 
     @Override
     protected void initEvent() {
+        mBinding.motion.setOnClickListener(this::setMotion);
         mBinding.aac.setOnClickListener(this::setAAC);
         mBinding.tunnel.setOnClickListener(this::setTunnel);
         mBinding.dolbyVisionOutput.setOnClickListener(this::setDolbyVisionOutput);
@@ -46,15 +51,30 @@ public class SettingDecodeActivity extends BaseActivity {
 
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
+        boolean motionSupported = exo ? Build.VERSION.SDK_INT >= Build.VERSION_CODES.O : MpvUtil.isVulkanSupported();
+        mBinding.motion.setVisibility(motionSupported ? View.VISIBLE : View.GONE);
         mBinding.aac.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.tunnel.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
 
     private void refresh() {
+        updateMotion();
         mBinding.aacText.setText(Setting.getSwitch(DecodeSetting.isPreferAAC()));
         mBinding.tunnelText.setText(Setting.getSwitch(DecodeSetting.isTunnel()));
         mBinding.dolbyVisionOutputText.setText(ResUtil.getStringArray(R.array.select_dolby_vision_output)[DecodeSetting.getDolbyVisionOutputPolicy()]);
         mBinding.audioPassThroughText.setText(Setting.getSwitch(DecodeSetting.isAudioPassThrough()));
+    }
+
+    private void setMotion(View view) {
+        String[] items = ResUtil.getStringArray(R.array.select_motion);
+        int index = (PlayerSetting.getMotion() + 1) % items.length;
+        PlayerSetting.putMotion(index);
+        updateMotion();
+        Notify.show(R.string.player_motion_restart);
+    }
+
+    private void updateMotion() {
+        mBinding.motionText.setText(ResUtil.getStringArray(R.array.select_motion)[PlayerSetting.getMotion()]);
     }
 
     private void setTunnel(View view) {

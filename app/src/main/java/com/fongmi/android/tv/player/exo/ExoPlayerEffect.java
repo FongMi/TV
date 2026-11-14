@@ -85,6 +85,7 @@ public final class ExoPlayerEffect implements PlayerEffect {
     @Override
     public int getAudioEffectError() {
         return switch (player.getAudioProcessingSupport()) {
+            case ExoPlayer.AUDIO_PROCESSING_UNAVAILABLE -> 0;
             case ExoPlayer.AUDIO_PROCESSING_SUPPORTED -> audioEffectFailed ? R.string.error_audio_effect_apply : 0;
             case ExoPlayer.AUDIO_PROCESSING_UNSUPPORTED_PASSTHROUGH -> R.string.error_audio_effect_passthrough;
             default -> R.string.error_audio_effect_unsupported;

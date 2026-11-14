@@ -84,7 +84,11 @@ public class PlayerSetting {
     }
 
     public static int getMotionFps() {
-        return switch (getMotion()) {
+        return getMotionFps(getMotion());
+    }
+
+    public static int getMotionFps(int motion) {
+        return switch (motion) {
             case 1 -> 60;
             case 2 -> 120;
             default -> 0;

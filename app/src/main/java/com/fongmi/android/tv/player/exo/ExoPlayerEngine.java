@@ -52,6 +52,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     private final ExoPlaybackLog playbackLog = new ExoPlaybackLog();
     private final Runnable updateLog = this::updateEventLogger;
     private final Runnable logListener = () -> App.post(updateLog);
+    @Nullable private Runnable audioOutputListener;
     private EventLogger eventLogger;
     private PlaySpec spec;
     private PlaySpec preloadSpec;
@@ -89,12 +90,22 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
 
     @Override
     public void onAudioTrackInitialized(@NonNull EventTime eventTime, @NonNull AudioSink.AudioTrackConfig audioTrackConfig) {
-        effect.applyAudioEffect();
+        onAudioOutputChanged();
     }
 
     @Override
     public void onAudioTrackReleased(@NonNull EventTime eventTime, @NonNull AudioSink.AudioTrackConfig audioTrackConfig) {
+        onAudioOutputChanged();
+    }
+
+    private void onAudioOutputChanged() {
         effect.applyAudioEffect();
+        if (audioOutputListener != null) audioOutputListener.run();
+    }
+
+    @Override
+    public void setAudioOutputListener(@Nullable Runnable listener) {
+        audioOutputListener = listener;
     }
 
     @Override
@@ -128,6 +139,10 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public boolean canReuseForPreload() {
         return !session.hasPlaybackSettingsChanged();
+    }
+
+    public void setTunnelingEnabled(boolean enabled) {
+        session.setTunnelingEnabled(enabled);
     }
 
     @Override

@@ -1,7 +1,5 @@
 package com.fongmi.android.tv.ui.fragment;
 
-import android.content.DialogInterface;
-import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,7 +20,6 @@ import com.fongmi.android.tv.ui.base.BaseFragment;
 import com.fongmi.android.tv.ui.dialog.BufferDialog;
 import com.fongmi.android.tv.ui.dialog.MpvConfDialog;
 import com.fongmi.android.tv.ui.dialog.UaDialog;
-import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -49,7 +46,7 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
         mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
         mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
-        setMotionOptions();
+        setMpvOptions();
         mBinding.backgroundText.setText((background = ResUtil.getStringArray(R.array.select_background))[PlayerSetting.getBackground()]);
     }
 
@@ -62,7 +59,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
         mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
         mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
-        mBinding.motion.setOnClickListener(this::setMotion);
         mBinding.render.setOnClickListener(this::setRender);
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.buffer.setOnClickListener(this::onBuffer);
@@ -73,8 +69,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
         boolean vulkan = !exo && MpvUtil.isVulkanSupported();
-        boolean motionSupported = exo ? Build.VERSION.SDK_INT >= Build.VERSION_CODES.O : vulkan;
-        mBinding.motion.setVisibility(motionSupported ? View.VISIBLE : View.GONE);
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
         mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
@@ -102,23 +96,6 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
 
     private void setMpvVulkan(View view) {
         PlayerSetting.putMpvVulkan(!PlayerSetting.isMpvVulkan());
-        setMpvOptions();
-    }
-
-    private void setMotion(View view) {
-        String[] items = ResUtil.getStringArray(R.array.select_motion);
-        new MaterialAlertDialogBuilder(requireActivity()).setTitle(R.string.player_motion).setNegativeButton(R.string.dialog_negative, null).setSingleChoiceItems(items, PlayerSetting.getMotion(), this::onMotion).show();
-    }
-
-    private void onMotion(DialogInterface dialog, int which) {
-        PlayerSetting.putMotion(which);
-        setMotionOptions();
-        Notify.show(R.string.player_motion_restart);
-        dialog.dismiss();
-    }
-
-    private void setMotionOptions() {
-        mBinding.motionText.setText(ResUtil.getStringArray(R.array.select_motion)[PlayerSetting.getMotion()]);
         setMpvOptions();
     }
 

@@ -102,6 +102,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/adblock"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -122,6 +123,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusDown="@id/background"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -133,37 +135,6 @@
                     android:textSize="18sp" />
 
             </androidx.appcompat.widget.LinearLayoutCompat>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
-
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/motion"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/selector_item"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:nextFocusUp="@id/preload"
-            android:nextFocusDown="@id/background"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:text="@string/player_motion"
-                android:textColor="@color/white"
-                android:textSize="18sp" />
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/motionText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                tools:text="Off" />
 
         </androidx.appcompat.widget.LinearLayoutCompat>
 
@@ -182,6 +153,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusUp="@id/decode"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textview.MaterialTextView
@@ -211,6 +183,7 @@
                 android:background="@drawable/selector_item"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
+                android:nextFocusUp="@id/preload"
                 android:orientation="horizontal">
 
                 <com.google.android.material.textview.MaterialTextView

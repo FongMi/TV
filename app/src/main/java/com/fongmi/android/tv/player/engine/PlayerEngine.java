@@ -47,6 +47,9 @@ public interface PlayerEngine {
 
     int getAudioChannelCount();
 
+    default void setAudioOutputListener(@Nullable Runnable listener) {
+    }
+
     void release();
 
     default List<DecoderMode> getSupportedDecoderModes(@C.TrackType int trackType) {

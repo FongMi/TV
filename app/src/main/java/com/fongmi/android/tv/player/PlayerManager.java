@@ -397,6 +397,14 @@ public class PlayerManager implements ParseCallback {
         return effects.getAudioSettingError();
     }
 
+    @Nullable
+    public Runnable observeAudioOutput(Runnable listener) {
+        PlayerEngine current = engine;
+        if (current == null) return null;
+        current.setAudioOutputListener(listener);
+        return () -> current.setAudioOutputListener(null);
+    }
+
     public boolean canSetVideoSetting() {
         return effects.canSetVideoSetting();
     }
@@ -418,6 +426,23 @@ public class PlayerManager implements ParseCallback {
         PlayerSetting.putEngine(targetEngine);
         if (isEmpty() || PlayerEngineFactory.matches(engine, spec)) return;
         restartCurrent();
+    }
+
+    public void refreshDecodeSettings() {
+        if (!isReleased() && !isEmpty() && engine.needsRebuild()) restartCurrent();
+    }
+
+    public boolean canSetTunneling() {
+        return engine instanceof ExoPlayerEngine && PlayerSetting.getRender() == PlayerSetting.RENDER_SURFACE;
+    }
+
+    public void setTunnelingEnabled(boolean enabled) {
+        if (!canSetTunneling() || enabled == DecodeSetting.isTunnelingEnabled()) return;
+        ExoPlayerEngine exo = (ExoPlayerEngine) engine;
+        changeDecoder(() -> {
+            exo.setTunnelingEnabled(enabled);
+            DecodeSetting.putTunnel(enabled);
+        });
     }
 
     public String getPositionTime(long delta) {

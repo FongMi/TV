@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.DecoderMode;
 import androidx.media3.common.DiscMenuController;
+import androidx.media3.common.DolbyVisionOutputPolicy;
 import androidx.media3.common.Format;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
@@ -27,6 +28,7 @@ import com.fongmi.android.tv.player.media.ConcatenatingUrl;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.server.LogSession;
+import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
@@ -42,15 +44,20 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvPlayer player;
     private final boolean gpuNext;
     private final boolean vulkan;
+    private final boolean audioPassThrough;
+    private final @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
     private int configuredMotionFps;
     private final Runnable motionListener = this::updateMotionFps;
     private final Runnable updateLog = this::updateLogLevel;
     private final Runnable logListener = () -> App.post(updateLog);
+    @Nullable private Runnable audioOutputListener;
 
     public MpvPlayerEngine(Player.Listener listener) {
         List<MpvScripts.Item> scriptItems = MpvUtil.readScripts();
         this.gpuNext = PlayerSetting.isMpvGpuNext();
         this.vulkan = PlayerSetting.isMpvVulkan();
+        this.audioPassThrough = DecodeSetting.isAudioPassThrough();
+        this.dolbyVisionOutputPolicy = DecodeSetting.getDolbyVisionOutputPolicy();
         MpvUtil.VideoOptions videoOptions = MpvUtil.getVideoOptions();
         MpvPlayerConfig config = MpvUtil.buildConfig(videoOptions);
         this.configuredMotionFps = videoOptions.motionFps();
@@ -59,7 +66,7 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
         this.scripts = new MpvScriptSession(player, scriptItems);
         this.provider = new MpvErrorMessageProvider();
         this.effect = new MpvPlayerEffect(player);
-        this.player.setAudioOutputListener(effect::applyAudioEffect);
+        this.player.setAudioOutputListener(this::onAudioOutputChanged);
         this.player.addListener(this);
         applySecondarySubtitleMode(SubtitleSetting.getSecondaryMode());
         LogSession.get().addListener(logListener);
@@ -87,7 +94,8 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     @Override
     public boolean needsRebuild() {
-        return configuredMotionFps != MpvUtil.getMotionFps() || gpuNext != PlayerSetting.isMpvGpuNext() || vulkan != PlayerSetting.isMpvVulkan();
+        boolean decodeChanged = audioPassThrough != DecodeSetting.isAudioPassThrough() || dolbyVisionOutputPolicy != DecodeSetting.getDolbyVisionOutputPolicy();
+        return decodeChanged || configuredMotionFps != MpvUtil.getMotionFps() || gpuNext != PlayerSetting.isMpvGpuNext() || vulkan != PlayerSetting.isMpvVulkan();
     }
 
     @Override
@@ -103,6 +111,16 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     @Override
     public int getAudioChannelCount() {
         return player.getAudioChannelCount();
+    }
+
+    @Override
+    public void setAudioOutputListener(@Nullable Runnable listener) {
+        audioOutputListener = listener;
+    }
+
+    private void onAudioOutputChanged() {
+        effect.applyAudioEffect();
+        if (audioOutputListener != null) audioOutputListener.run();
     }
 
     @Override
