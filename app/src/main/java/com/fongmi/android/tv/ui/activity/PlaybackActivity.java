@@ -54,6 +54,7 @@ import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.service.PlaybackService;
 import com.fongmi.android.tv.service.PlaybackServiceConnection;
 import com.fongmi.android.tv.setting.DanmakuSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.fongmi.android.tv.ui.base.BaseActivity;
@@ -862,7 +863,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private void syncPlayerView(Player player) {
         PlayerView playerView = getPlayerView();
-        bindPlayerOutput(playerView, player, PlayerSetting.getRender());
+        bindPlayerOutput(playerView, player, OutputSetting.getRender());
         player().bindPlayerView(playerView);
         danmakuController.bind(playerView);
         danmakuController.setConfig(player().getDanmakuConfig());
@@ -873,7 +874,7 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
 
     private static void bindPlayerOutput(PlayerView playerView, Player player, int render) {
         Player previous = playerView.getPlayer();
-        boolean renderChanged = (playerView.getVideoSurfaceView() instanceof TextureView) != (render == PlayerSetting.RENDER_TEXTURE);
+        boolean renderChanged = (playerView.getVideoSurfaceView() instanceof TextureView) != (render == OutputSetting.RENDER_TEXTURE);
         if (previous != null && previous != player && renderChanged) playerView.setPlayer(null);
         playerView.setRender(render);
         playerView.setPlayer(player);

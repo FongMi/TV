@@ -30,7 +30,7 @@ import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
@@ -54,9 +54,8 @@ final class ExoPlayerSession {
     private final SubtitleTranscriptSession subtitleTranscriptSession;
     private final DefaultPreloadManager preloadManager;
     private final List<DecodeTrackSelector> trackSelectors = new ArrayList<>(2);
-    private final boolean audioPassThrough;
-    private final @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
-    private final boolean libassEnabled;
+    private boolean audioPassThrough;
+    private @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
     private final boolean decoderPrewarmingEnabled;
     private final int initialMotionFps;
     private final ExoPlayer player;
@@ -66,18 +65,17 @@ final class ExoPlayerSession {
     private PreloadRequest preloadRequest;
 
     ExoPlayerSession(AudioProcessor audioProcessor) {
-        this.audioPassThrough = DecodeSetting.isAudioPassThrough();
-        this.dolbyVisionOutputPolicy = DecodeSetting.getDolbyVisionOutputPolicy();
-        this.initialMotionFps = PlayerSetting.getMotionFps();
+        this.audioPassThrough = OutputSetting.isAudioPassThrough();
+        this.dolbyVisionOutputPolicy = OutputSetting.getDolbyVisionOutputPolicy();
+        this.initialMotionFps = OutputSetting.getMotionFps();
         this.decoderPrewarmingEnabled = PreloadSetting.shouldPrewarmDecoder();
-        DecoderMode audioMode = DecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_EXO, C.TRACK_TYPE_AUDIO));
-        DecoderMode videoMode = DecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_EXO, C.TRACK_TYPE_VIDEO));
+        DecoderMode audioMode = DecoderMode.fromCommonDecoderMode(PlayerSetting.getDecoderMode(PlayerSetting.ENGINE_EXO, C.TRACK_TYPE_AUDIO));
+        DecoderMode videoMode = DecoderMode.fromCommonDecoderMode(PlayerSetting.getDecoderMode(PlayerSetting.ENGINE_EXO, C.TRACK_TYPE_VIDEO));
         this.decoderManager = new DecoderManager(audioMode, videoMode);
         TrackSelector.Factory decodeTrackSelectorFactory = context -> createTrackSelector();
         SecondaryTextTrackSelector.Factory secondaryTextTrackSelectorFactory = new SecondaryTextTrackSelector.Factory(decodeTrackSelectorFactory);
         SecondaryTextOutput secondaryTextOutput = new SecondaryTextOutput();
-        this.libassEnabled = PlayerSetting.isLibass();
-        this.libassPlaybackSession = createLibassPlaybackSession(libassEnabled);
+        this.libassPlaybackSession = createLibassPlaybackSession();
         this.subtitleTranscriptSession = new SubtitleTranscriptSession();
         this.subtitleTranscriptSession.setLoader(new SubtitleFileContent());
         DefaultPreloadManager.Builder builder = createPreloadManagerBuilder(audioProcessor, secondaryTextTrackSelectorFactory, secondaryTextOutput);
@@ -115,8 +113,22 @@ final class ExoPlayerSession {
     }
 
     boolean hasPlaybackSettingsChanged() {
-        boolean decodeChanged = isTunnelingEnabled() != DecodeSetting.isTunnelingEnabled() || audioPassThrough != DecodeSetting.isAudioPassThrough() || dolbyVisionOutputPolicy != DecodeSetting.getDolbyVisionOutputPolicy();
-        return decodeChanged || libassEnabled != PlayerSetting.isLibass() || getConfiguredMotionFps() != PlayerSetting.getMotionFps();
+        boolean outputChanged = isTunnelingEnabled() != OutputSetting.isTunnelingEnabled() || audioPassThrough != OutputSetting.isAudioPassThrough() || dolbyVisionOutputPolicy != OutputSetting.getDolbyVisionOutputPolicy();
+        return outputChanged || getConfiguredMotionFps() != OutputSetting.getMotionFps();
+    }
+
+    void setDolbyVisionOutputPolicy(@DolbyVisionOutputPolicy.Mode int policy) {
+        if (dolbyVisionOutputPolicy == policy) return;
+        preloadManager.setDolbyVisionOutputPolicy(policy);
+        player.setDolbyVisionOutputPolicy(policy);
+        dolbyVisionOutputPolicy = policy;
+    }
+
+    void setAudioPassThrough(boolean enabled) {
+        if (audioPassThrough == enabled) return;
+        preloadManager.setAudioPassthroughEnabled(enabled);
+        player.setAudioPassthroughEnabled(enabled);
+        audioPassThrough = enabled;
     }
 
     void setTunnelingEnabled(boolean enabled) {
@@ -206,14 +218,14 @@ final class ExoPlayerSession {
         return new DefaultPreloadManager.Builder(App.get(), ignored -> DefaultPreloadManager.PreloadStatus.specifiedRangeLoaded(getPreloadStartPositionMs(), PRELOAD_DURATION_MS)).setMediaSourceFactorySupplier(ExoMediaSourceFactory.supplier(libassPlaybackSession, subtitleTranscriptSession)).setRenderersFactory(ExoUtil.buildRenderersFactory(audioProcessor, secondaryTextOutput, libassPlaybackSession, decoderManager, initialMotionFps, decoderPrewarmingEnabled)).setTrackSelectorFactory(secondaryTextTrackSelectorFactory).setLoadControl(ExoUtil.buildLoadControl(MAX_PRELOAD_BUFFER_BYTES));
     }
 
-    private static LibassPlaybackSession createLibassPlaybackSession(boolean libassEnabled) {
-        File fontConfig = libassEnabled ? AndroidFontConfig.prepare() : null;
+    private static LibassPlaybackSession createLibassPlaybackSession() {
+        File fontConfig = AndroidFontConfig.prepare();
         String fontConfigPath = fontConfig != null && fontConfig.length() > 0 ? fontConfig.getAbsolutePath() : null;
-        ExternalFont.Item font = libassEnabled ? SubtitleSetting.getFont() : null;
+        ExternalFont.Item font = SubtitleSetting.getFont();
         String fontFamily = font == null ? null : font.familyName();
-        String fontsDirectory = libassEnabled ? (font == null ? ExternalFont.getDirectory() : font.directory()).getAbsolutePath() : null;
+        String fontsDirectory = (font == null ? ExternalFont.getDirectory() : font.directory()).getAbsolutePath();
         LibassConfiguration configuration = new LibassConfiguration.Builder().setFontConfig(fontConfigPath).setFontsDirectory(fontsDirectory).setDefaultFontFamily(fontFamily).setMaximumRenderPixels(LIBASS_MAX_RENDER_PIXELS).setMaximumGlyphCount(LIBASS_MAX_GLYPH_COUNT).setMaximumBitmapCacheSizeMb(LIBASS_MAX_BITMAP_CACHE_SIZE_MB).build();
-        return new LibassPlaybackSession(configuration, libassEnabled);
+        return new LibassPlaybackSession(configuration);
     }
 
     private final class PreloadListener implements PreloadManagerListener {

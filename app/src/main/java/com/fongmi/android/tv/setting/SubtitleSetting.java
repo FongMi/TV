@@ -12,7 +12,6 @@ import androidx.media3.ui.SubtitleView;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.api.config.VodConfig;
-import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.github.catvod.utils.Prefers;
 
@@ -56,8 +55,10 @@ public class SubtitleSetting {
     private static final int DEFAULT_EDGE_TYPE = CaptionStyleCompat.EDGE_TYPE_OUTLINE;
     private static final int DEFAULT_EDGE_COLOR = SUBTITLE_COLOR_BLACK;
     private static final float DEFAULT_SCALE = 1.0f;
+    public static final double DEFAULT_TEXT_SIZE_FRACTION = 0.046;
     private static final float DEFAULT_BITMAP_BRIGHTNESS = 1.0f;
     private static final float DEFAULT_POSITION = 0.0f;
+    private static final float DEFAULT_BOTTOM_PADDING = 0.04f;
     private static final float DEFAULT_TEXT_OPACITY = 1.0f;
     private static final float DEFAULT_EDGE_OPACITY = 1.0f;
     private static final float DEFAULT_BACKGROUND_OPACITY = 1.0f;
@@ -82,8 +83,7 @@ public class SubtitleSetting {
     }
 
     public static int getStyleMode() {
-        int legacy = Prefers.getBoolean("caption") ? STYLE_SYSTEM : STYLE_ORIGINAL;
-        return Math.clamp(Prefers.getInt("subtitle_style", legacy), STYLE_ORIGINAL, STYLE_CUSTOM);
+        return Math.clamp(Prefers.getInt("subtitle_style", STYLE_ORIGINAL), STYLE_ORIGINAL, STYLE_CUSTOM);
     }
 
     public static void putStyleMode(int style) {
@@ -99,9 +99,7 @@ public class SubtitleSetting {
     }
 
     public static float getScale() {
-        float textSize = Prefers.getFloat("subtitle_text_size");
-        float legacy = textSize == 0 ? DEFAULT_SCALE : textSize / SubtitleView.DEFAULT_TEXT_SIZE_FRACTION;
-        return Math.clamp(Prefers.getFloat("subtitle_scale", legacy), MIN_SCALE, MAX_SCALE);
+        return Math.clamp(Prefers.getFloat("subtitle_scale", DEFAULT_SCALE), MIN_SCALE, MAX_SCALE);
     }
 
     public static float getAppliedScale() {
@@ -131,9 +129,7 @@ public class SubtitleSetting {
     }
 
     public static float getPosition() {
-        float value = Prefers.getFloat("subtitle_position", DEFAULT_POSITION);
-        if (value != 0 && Math.abs(value) < 0.5f) value *= 100.0f;
-        return Math.clamp(value, MIN_POSITION, MAX_POSITION);
+        return Math.clamp(Prefers.getFloat("subtitle_position", DEFAULT_POSITION), MIN_POSITION, MAX_POSITION);
     }
 
     public static void putPosition(float value) {
@@ -242,7 +238,7 @@ public class SubtitleSetting {
 
     @Nullable
     public static ExternalFont.Item getFont() {
-        return ExternalFont.find(Prefers.getString("subtitle_font", ""), MpvConfigFile.getSubtitleFontsDirectory());
+        return ExternalFont.find(Prefers.getString("subtitle_font", ""), null);
     }
 
     public static void putFont(@Nullable ExternalFont.Item font) {
@@ -274,18 +270,6 @@ public class SubtitleSetting {
 
     public static boolean isStyleForced() {
         return getStyleMode() != STYLE_ORIGINAL;
-    }
-
-    public static boolean isScaleForced() {
-        return getScale() != DEFAULT_SCALE;
-    }
-
-    public static boolean isScaleApplied() {
-        return isSystemStyle() || isScaleForced();
-    }
-
-    public static boolean isPositionSet() {
-        return getPosition() != DEFAULT_POSITION;
     }
 
     public static CaptionStyleCompat getStyle() {
@@ -322,13 +306,13 @@ public class SubtitleSetting {
 
     public static void applyStyle(@Nullable SubtitleView subtitleView) {
         if (subtitleView == null) return;
-        subtitleView.reset();
         subtitleView.setStyle(getStyle());
         subtitleView.setApplyEmbeddedStyles(!isStyleForced());
         subtitleView.setApplyEmbeddedFontSizes(true);
         subtitleView.setBitmapSubtitleBrightness(getBitmapBrightness());
-        if (isScaleApplied()) subtitleView.setTextSizeScale(getAppliedScale());
-        if (isPositionSet()) subtitleView.setBottomPosition(getPosition() / 100.0f);
+        subtitleView.setBottomPaddingFraction(DEFAULT_BOTTOM_PADDING);
+        subtitleView.setTextSizeScale(getAppliedScale(), (float) DEFAULT_TEXT_SIZE_FRACTION);
+        subtitleView.setBottomPosition(getPosition() / 100.0f);
     }
 
     public static void resetAdjust() {

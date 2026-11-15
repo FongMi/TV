@@ -8,6 +8,7 @@ import androidx.media3.common.AudioAttributes;
 import androidx.media3.common.C;
 import androidx.media3.common.DecoderMode;
 import androidx.media3.common.DiscMenuController;
+import androidx.media3.common.DolbyVisionOutputPolicy;
 import androidx.media3.common.Format;
 import androidx.media3.common.MediaItem;
 import androidx.media3.common.PlaybackException;
@@ -35,7 +36,7 @@ import com.fongmi.android.tv.player.engine.PlayerEngine;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.server.LogSession;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -116,7 +117,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
         AudioAttributes attributes = player.getAudioAttributes();
         Log.e("TV-Playback", "player=" + Integer.toHexString(System.identityHashCode(navigation.getPlayer())) + " event=audioSinkError"
                 + " elapsedRealtimeMs=" + eventTime.realtimeMs + " positionMs=" + eventTime.currentPlaybackPositionMs
-                + " playerAudioSessionId=" + player.getAudioSessionId() + " tunnelingSettingEnabled=" + DecodeSetting.isTunnelingEnabled()
+                + " playerAudioSessionId=" + player.getAudioSessionId() + " tunnelingSettingEnabled=" + OutputSetting.isTunnelingEnabled()
                 + " playerAudioUsage=" + attributes.usage + " playerAudioFlags=" + attributes.flags
                 + " error=" + message.substring(0, end) + (end < message.length() ? " [truncated]" : ""));
     }
@@ -139,6 +140,14 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public boolean canReuseForPreload() {
         return !session.hasPlaybackSettingsChanged();
+    }
+
+    public void setDolbyVisionOutputPolicy(@DolbyVisionOutputPolicy.Mode int policy) {
+        session.setDolbyVisionOutputPolicy(policy);
+    }
+
+    public void setAudioPassThrough(boolean enabled) {
+        session.setAudioPassThrough(enabled);
     }
 
     public void setTunnelingEnabled(boolean enabled) {

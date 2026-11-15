@@ -29,8 +29,7 @@ import com.fongmi.android.tv.player.media.ConcatenatingUrl;
 import com.fongmi.android.tv.player.media.MediaItemFactory;
 import com.fongmi.android.tv.player.media.PlaySpec;
 import com.fongmi.android.tv.server.LogSession;
-import com.fongmi.android.tv.setting.DecodeSetting;
-import com.fongmi.android.tv.setting.PlayerSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -46,8 +45,8 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvPlayerEffect effect;
     private final MpvScriptSession scripts;
     private final MpvPlayer player;
-    private final boolean audioPassThrough;
-    private final @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
+    private boolean audioPassThrough;
+    private @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
     private boolean gpuNext;
     private boolean vulkan;
     private int configuredMotionFps;
@@ -58,10 +57,10 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
 
     public MpvPlayerEngine(Player.Listener listener) {
         List<MpvScripts.Item> scriptItems = MpvUtil.readScripts();
-        this.gpuNext = PlayerSetting.isMpvGpuNext();
-        this.vulkan = PlayerSetting.isMpvVulkan();
-        this.audioPassThrough = DecodeSetting.isAudioPassThrough();
-        this.dolbyVisionOutputPolicy = DecodeSetting.getDolbyVisionOutputPolicy();
+        this.gpuNext = OutputSetting.isMpvGpuNext();
+        this.vulkan = OutputSetting.isMpvVulkan();
+        this.audioPassThrough = OutputSetting.isAudioPassThrough();
+        this.dolbyVisionOutputPolicy = OutputSetting.getDolbyVisionOutputPolicy();
         MpvUtil.VideoOptions videoOptions = MpvUtil.getVideoOptions();
         MpvPlayerConfig config = MpvUtil.buildConfig(videoOptions);
         this.configuredMotionFps = videoOptions.motionFps();
@@ -93,13 +92,27 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private void updateMotionFps() {
         if (!player.isMotionInterpolationSupported() || player.isMotionInterpolationUpdatePending()) return;
         int fps = player.getMotionInterpolationFps();
-        if (fps == PlayerSetting.getMotionFps()) configuredMotionFps = fps;
+        if (fps == OutputSetting.getMotionFps()) configuredMotionFps = fps;
     }
 
     @Override
     public boolean needsRebuild() {
-        boolean decodeChanged = audioPassThrough != DecodeSetting.isAudioPassThrough() || dolbyVisionOutputPolicy != DecodeSetting.getDolbyVisionOutputPolicy();
-        return decodeChanged || configuredMotionFps != MpvUtil.getMotionFps() || gpuNext != PlayerSetting.isMpvGpuNext() || vulkan != PlayerSetting.isMpvVulkan();
+        boolean outputChanged = audioPassThrough != OutputSetting.isAudioPassThrough() || dolbyVisionOutputPolicy != OutputSetting.getDolbyVisionOutputPolicy();
+        return outputChanged || configuredMotionFps != MpvUtil.getMotionFps() || gpuNext != OutputSetting.isMpvGpuNext() || vulkan != OutputSetting.isMpvVulkan();
+    }
+
+    public ListenableFuture<Boolean> setDolbyVisionOutputPolicy(@DolbyVisionOutputPolicy.Mode int policy) {
+        return Futures.transform(player.setDolbyVisionOutputPolicy(policy), reloaded -> {
+            dolbyVisionOutputPolicy = policy;
+            return reloaded;
+        }, MoreExecutors.directExecutor());
+    }
+
+    public ListenableFuture<Void> setAudioPassThrough(boolean enabled) {
+        return Futures.transform(player.setAudioPassthroughEnabled(enabled), result -> {
+            audioPassThrough = enabled;
+            return null;
+        }, MoreExecutors.directExecutor());
     }
 
     @Nullable
@@ -117,10 +130,10 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private void onVideoOutputApplied(VideoOutputOption option, boolean enabled) {
         if (option == VideoOutputOption.GPU_NEXT) {
             gpuNext = enabled;
-            PlayerSetting.putMpvGpuNext(gpuNext);
+            OutputSetting.putMpvGpuNext(gpuNext);
         } else {
             vulkan = enabled;
-            PlayerSetting.putMpvVulkan(vulkan);
+            OutputSetting.putMpvVulkan(vulkan);
         }
         effect.applyVideoEffect();
     }

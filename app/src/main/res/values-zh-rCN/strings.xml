@@ -333,7 +333,6 @@
     <string name="player_engine">播放引擎</string>
     <string name="player_debug">调试</string>
     <string name="player_render">视频输出</string>
-    <string name="player_libass">字幕特效</string>
     <string name="player_background">后台播放</string>
     <string name="player_audio_pass_through">音频直通</string>
     <string name="player_audio_decode">音频软解</string>
@@ -343,7 +342,7 @@
     <string name="player_adblock">智能去广</string>
     <string name="player_tunnel">隧道模式</string>
     <string name="player_buffer">缓冲时间</string>
-    <string name="player_decode_setting">解码设置</string>
+    <string name="player_output_setting">输出设置</string>
     <string name="player_preload_setting">预载设置</string>
     <string name="player_preload">预载</string>
     <string name="player_preload_next">预载下集</string>
@@ -362,7 +361,7 @@
     <string name="player_motion_fps">%1$d fps</string>
     <string name="player_motion_capped">目标：%1$.2f fps（屏幕上限）</string>
     <string name="player_motion_failed">无法切换画面补帧</string>
-    <string name="player_mpv_conf_priority_hint">重进播放页加载 mpv.conf；片源参数、脚本与界面之后仍可改写，最后写入者生效。volume 作为界面音量基准。</string>
+    <string name="player_mpv_conf_priority_hint">重进播放页加载 mpv.conf。字幕排版使用 App 设置。片源参数、脚本与界面仍可在加载后改写选项。volume 作为界面音量基准。</string>
     <string name="player_mpv_conf_conflict_hint">界面会管理：%1$s。片源参数、脚本与界面以最后写入者为准；volume 作为界面音量基准。</string>
     <string name="player_mpv_conf_import_success">已载入 mpv.conf，按确定后保存</string>
     <string name="player_mpv_conf_import_failed">无法导入 mpv.conf</string>

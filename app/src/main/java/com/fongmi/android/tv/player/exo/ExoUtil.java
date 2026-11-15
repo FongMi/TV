@@ -21,7 +21,6 @@ import androidx.media3.exoplayer.RenderersFactory;
 import androidx.media3.exoplayer.analytics.PlayerId;
 import androidx.media3.exoplayer.audio.AudioRendererEventListener;
 import androidx.media3.exoplayer.audio.AudioSink;
-import androidx.media3.exoplayer.audio.AudioTrackAudioOutputProvider;
 import androidx.media3.exoplayer.audio.DefaultAudioSink;
 import androidx.media3.exoplayer.libass.LibassPlaybackSession;
 import androidx.media3.exoplayer.mediacodec.MediaCodecSelector;
@@ -33,7 +32,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.player.track.LangUtil;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
 import com.github.catvod.utils.Auth;
@@ -76,9 +75,9 @@ public final class ExoUtil {
     static DecodeTrackSelector buildTrackSelector(DecoderManager decoderManager) {
         DecodeTrackSelector trackSelector = decoderManager.createTrackSelector(App.get());
         DefaultTrackSelector.Parameters.Builder builder = trackSelector.buildUponParameters();
-        if (DecodeSetting.isPreferAAC()) builder.setPreferredAudioMimeType(MimeTypes.AUDIO_AAC);
+        if (OutputSetting.isPreferAAC()) builder.setPreferredAudioMimeType(MimeTypes.AUDIO_AAC);
         builder.setPreferredTextLanguages(LangUtil.getPreferredTextLanguages());
-        builder.setTunnelingEnabled(DecodeSetting.isTunnelingEnabled());
+        builder.setTunnelingEnabled(OutputSetting.isTunnelingEnabled());
         builder.setForceHighestSupportedBitrate(true);
         trackSelector.setParameters(builder.build());
         return trackSelector;
@@ -94,7 +93,6 @@ public final class ExoUtil {
 
     private static AudioSink buildAudioSink(Context context, boolean enableFloatOutput, boolean enableAudioOutputPlaybackParams, @Nullable AudioProcessor audioProcessor) {
         DefaultAudioSink.Builder builder = new DefaultAudioSink.Builder(context).setEnableFloatOutput(enableFloatOutput).setEnableAudioOutputPlaybackParameters(enableAudioOutputPlaybackParams);
-        if (!DecodeSetting.isAudioPassThrough()) builder.setAudioOutputProvider(new AudioTrackAudioOutputProvider.Builder(null).build());
         if (audioProcessor != null) builder.setAudioProcessors(new AudioProcessor[]{audioProcessor});
         return builder.build();
     }
@@ -114,7 +112,8 @@ public final class ExoUtil {
             setEnableDecoderFallback(decoderManager != null);
             setEnableSurfaceControlFrameRetention(true);
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_ON);
-            setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
+            setAudioPassthroughEnabled(OutputSetting.isAudioPassThrough());
+            setDolbyVisionOutputPolicy(OutputSetting.getDolbyVisionOutputPolicy());
         }
 
         @Override

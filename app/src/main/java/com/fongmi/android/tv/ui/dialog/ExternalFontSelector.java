@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.R;
-import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.utils.FileChooser;
 import com.fongmi.android.tv.utils.Notify;
@@ -24,6 +23,7 @@ import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 final class ExternalFontSelector {
 
@@ -32,6 +32,7 @@ final class ExternalFontSelector {
     private final ActivityResultLauncher<Intent> launcher;
     private final Listener listener;
     private final Fragment fragment;
+    private final Supplier<List<ExternalFont.Entry>> fontSource;
 
     @Nullable private ChipGroup group;
     @Nullable private ExternalFont.Item selected;
@@ -40,8 +41,13 @@ final class ExternalFontSelector {
     private boolean loading;
 
     ExternalFontSelector(Fragment fragment, Listener listener) {
+        this(fragment, listener, ExternalFont::getAll);
+    }
+
+    ExternalFontSelector(Fragment fragment, Listener listener, Supplier<List<ExternalFont.Entry>> fontSource) {
         this.fragment = fragment;
         this.listener = listener;
+        this.fontSource = fontSource;
         this.launcher = fragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> FileChooser.getUri(result, this::importFont));
     }
 
@@ -66,7 +72,7 @@ final class ExternalFontSelector {
 
     private void readFonts() {
         try {
-            List<ExternalFont.Entry> loaded = ExternalFont.getAll(MpvConfigFile.getSubtitleFontsDirectory());
+            List<ExternalFont.Entry> loaded = fontSource.get();
             App.post(() -> onLoaded(loaded));
         } catch (RuntimeException e) {
             App.post(() -> onLoadFailed(e));

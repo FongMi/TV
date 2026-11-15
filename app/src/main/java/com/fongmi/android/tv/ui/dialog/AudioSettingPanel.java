@@ -12,6 +12,7 @@ import androidx.media3.common.Format;
 import androidx.media3.common.Player;
 import androidx.media3.common.Tracks;
 import androidx.media3.common.audio.AudioChannelMode;
+import androidx.media3.exoplayer.ExoPlayer;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogAudioSettingBinding;
@@ -22,16 +23,22 @@ import com.fongmi.android.tv.player.effect.audio.AudioEffectConfig;
 import com.fongmi.android.tv.player.effect.audio.AudioEffectPreset;
 import com.fongmi.android.tv.player.effect.audio.AudioPresetLevels;
 import com.fongmi.android.tv.setting.AudioSetting;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.SliderUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.LabelFormatter;
 import com.google.android.material.slider.Slider;
+import com.github.catvod.utils.Task;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CancellationException;
 import java.util.function.IntConsumer;
 
 final class AudioSettingPanel implements Player.Listener {
@@ -71,7 +78,9 @@ final class AudioSettingPanel implements Player.Listener {
     private final List<ViewSettingSliderBinding> bandViews;
     private AudioEffectBands bands;
     private int currentTab;
+    private int unsupportedReason;
     private boolean previewOriginal;
+    private boolean released;
 
     AudioSettingPanel(DialogAudioSettingBinding binding, PlayerManager player) {
         this.binding = binding;
@@ -87,8 +96,7 @@ final class AudioSettingPanel implements Player.Listener {
         bindSliders();
         bindChannelMode();
         bindLoudness();
-        binding.audioPassThrough.setChecked(DecodeSetting.isAudioPassThrough());
-        binding.audioPassThrough.setOnCheckedChangeListener(this::onAudioPassThroughChanged);
+        bindAudioPassThrough();
         SettingPanelViews.bindCompare(binding.compare, this::previewOriginal);
         bindReset();
         SettingPanelViews.bindPlaybackTabs(binding.tabGroup, getTabs(), this::showTab);
@@ -98,6 +106,7 @@ final class AudioSettingPanel implements Player.Listener {
     }
 
     void release() {
+        released = true;
         if (eventSource != null) eventSource.removeListener(this);
         if (stopObservingAudioOutput != null) stopObservingAudioOutput.run();
         binding.tabGroup.clearOnButtonCheckedListeners();
@@ -113,6 +122,7 @@ final class AudioSettingPanel implements Player.Listener {
 
     private void updateAudioOutput() {
         if (eventSource != player.getPlayer()) return;
+        if (isAudioPassThroughChanging() || (!canSetAudioSetting() && !isAudioOutputReady())) return;
         AudioEffectBands updatedBands = getAudioBands();
         if (bands != updatedBands) {
             bands = updatedBands;
@@ -122,10 +132,35 @@ final class AudioSettingPanel implements Player.Listener {
         updateControls();
     }
 
+    private void bindAudioPassThrough() {
+        PlayerManager.AudioPassThroughChange change = player.getAudioPassThroughChange(eventSource);
+        binding.audioPassThrough.setOnCheckedChangeListener(null);
+        binding.audioPassThrough.setChecked(change == null ? OutputSetting.isAudioPassThrough() : change.enabled());
+        binding.audioPassThrough.setOnCheckedChangeListener(this::onAudioPassThroughChanged);
+        binding.audioPassThrough.setEnabled(change == null);
+        if (change != null) observeAudioPassThrough(change.result());
+    }
+
+    private boolean isAudioPassThroughChanging() {
+        return player.getAudioPassThroughChange(eventSource) != null;
+    }
+
     private void onAudioPassThroughChanged(CompoundButton button, boolean enabled) {
+        button.setEnabled(false);
+        ListenableFuture<Void> change = player.setAudioPassThrough(eventSource, enabled);
         previewOriginal(false);
-        DecodeSetting.putAudioPassThrough(enabled);
-        player.refreshDecodeSettings();
+        observeAudioPassThrough(change);
+    }
+
+    private void observeAudioPassThrough(ListenableFuture<Void> change) {
+        Futures.addCallback(change, Task.callback(result -> onAudioPassThroughFinished(null), this::onAudioPassThroughFinished), MoreExecutors.directExecutor());
+    }
+
+    private void onAudioPassThroughFinished(@Nullable Throwable error) {
+        if (released) return;
+        bindAudioPassThrough();
+        updateAudioOutput();
+        if (error != null && !(error instanceof CancellationException)) Notify.show(Notify.getError(R.string.player_audio_pass_through, error));
     }
 
     private void onPresetChecked(ChipGroup group, List<Integer> checkedIds) {
@@ -350,11 +385,9 @@ final class AudioSettingPanel implements Player.Listener {
     }
 
     private void updateControls() {
+        if (isAudioPassThroughChanging()) return;
         boolean supported = canSetAudioSetting();
-        if (!supported && eventSource != null && !isAudioOutputReady()) {
-            binding.unsupported.setVisibility(View.GONE);
-            return;
-        }
+        if (!supported && eventSource != null && !isAudioOutputReady()) return;
         supported = cancelUnsupportedPreview(supported);
         boolean hasBands = !bands.isEmpty();
         int channelCount = getAudioChannelCount();
@@ -362,7 +395,8 @@ final class AudioSettingPanel implements Player.Listener {
         boolean channelMix = AudioChannelMode.isAvailable(channelCount);
         boolean centerGain = AudioEffectConfig.isCenterGainAvailable(channelCount);
         boolean balance = channelMix && AudioChannelMode.canBalance(AudioSetting.getChannelMode());
-        updateUnsupported(supported);
+        unsupportedReason = !supported && isAudioOutputReady() ? getUnsupportedText() : 0;
+        updateUnsupported();
         updateVisibility(hasBands, channelCount, channelMix, centerGain, balance);
         updateAvailability(supported, hasBands, active, balance);
     }
@@ -393,10 +427,10 @@ final class AudioSettingPanel implements Player.Listener {
         applyEnabled(binding.bands, enabled && hasBands);
     }
 
-    private void updateUnsupported(boolean supported) {
-        boolean visible = !supported && currentTab != TAB_ADVANCED && isAudioOutputReady();
+    private void updateUnsupported() {
+        boolean visible = unsupportedReason != 0 && currentTab != TAB_ADVANCED;
         binding.unsupported.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if (visible) binding.unsupported.setText(getUnsupportedText());
+        if (visible) binding.unsupported.setText(unsupportedReason);
     }
 
     private void apply() {
@@ -449,7 +483,9 @@ final class AudioSettingPanel implements Player.Listener {
 
     private boolean isAudioOutputReady() {
         if (eventSource == null || !isPlayerAvailable() || !SettingPanelViews.isPlaybackPrepared(eventSource)) return false;
-        if (player.getAudioSettingError() != 0) return true;
+        if (player.getVideoSettingEventSource() instanceof ExoPlayer exo) {
+            if (exo.getAudioProcessingSupport() != ExoPlayer.AUDIO_PROCESSING_UNAVAILABLE) return true;
+        } else if (player.getAudioSettingError() != 0) return true;
         Tracks tracks = eventSource.getCurrentTracks();
         return !tracks.isEmpty() && !tracks.isTypeSelected(C.TRACK_TYPE_AUDIO);
     }
@@ -459,7 +495,7 @@ final class AudioSettingPanel implements Player.Listener {
         MaterialButton[] tabs = getTabs();
         for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
         currentTab = index;
-        updateUnsupported(canSetAudioSetting());
+        updateUnsupported();
         int focusId = tabs[index].getId();
         binding.reset.setNextFocusDownId(focusId);
         binding.compare.setNextFocusDownId(focusId);

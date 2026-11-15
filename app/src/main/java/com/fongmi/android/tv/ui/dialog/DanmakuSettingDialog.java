@@ -12,14 +12,21 @@ import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.databinding.DialogDanmakuSettingBinding;
 import com.fongmi.android.tv.player.PlayerManager;
+import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
+
+import java.util.List;
 
 public final class DanmakuSettingDialog {
 
     public static DanmakuSettingDialog create() {
         return new DanmakuSettingDialog();
+    }
+
+    private static List<ExternalFont.Entry> getFonts() {
+        return ExternalFont.getAll(MpvConfigFile.getSubtitleFontsDirectory());
     }
 
     public void show(FragmentActivity activity) {
@@ -32,7 +39,7 @@ public final class DanmakuSettingDialog {
 
     public static final class BottomSheet extends BaseBottomSheetDialog {
 
-        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
+        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected, DanmakuSettingDialog::getFonts);
         private DialogDanmakuSettingBinding binding;
         private DanmakuSettingPanel panel;
 
@@ -77,7 +84,7 @@ public final class DanmakuSettingDialog {
 
     public static final class SideSheet extends BaseSideSheetDialog {
 
-        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
+        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected, DanmakuSettingDialog::getFonts);
         private DialogDanmakuSettingBinding binding;
         private DanmakuSettingPanel panel;
 

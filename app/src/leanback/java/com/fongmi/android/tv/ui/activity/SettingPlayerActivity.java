@@ -23,7 +23,6 @@ import com.fongmi.android.tv.utils.ResUtil;
 public class SettingPlayerActivity extends BaseActivity implements UaListener, BufferListener {
 
     private ActivitySettingPlayerBinding mBinding;
-    private String[] render;
     private String[] engine;
 
     public static void start(Activity activity) {
@@ -38,25 +37,19 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
     @Override
     protected void initView(Bundle savedInstanceState) {
         setVisible();
-        setPlaybackModeText();
+        updateEngine();
         mBinding.engine.requestFocus();
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
-        mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
         mBinding.bufferText.setText(String.valueOf(PlayerSetting.getBuffer()));
-        setMpvOptions();
         mBinding.backgroundText.setText(Setting.getSwitch(PlayerSetting.isBackgroundOn()));
     }
 
     @Override
     protected void initEvent() {
         mBinding.engine.setOnClickListener(this::setEngine);
-        mBinding.decode.setOnClickListener(this::onDecodeSetting);
+        mBinding.output.setOnClickListener(this::onOutputSetting);
         mBinding.adblock.setOnClickListener(this::setAdblock);
-        mBinding.libass.setOnClickListener(this::setLibass);
         mBinding.mpvConf.setOnClickListener(this::onMpvConf);
-        mBinding.mpvGpuNext.setOnClickListener(this::setMpvGpuNext);
-        mBinding.mpvVulkan.setOnClickListener(this::setMpvVulkan);
-        mBinding.render.setOnClickListener(this::setRender);
         mBinding.background.setOnClickListener(this::onBackground);
         mBinding.buffer.setOnClickListener(this::onBuffer);
         mBinding.preload.setOnClickListener(this::onPreloadSetting);
@@ -65,59 +58,30 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
 
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
-        boolean showMpvOptions = !exo && !MpvUtil.isMotionEnabled();
-        boolean vulkan = showMpvOptions && MpvUtil.isVulkanSupported();
         if (PlayerSetting.isBackgroundPiP()) PlayerSetting.putBackground(1);
-        mBinding.exoRow.setVisibility(exo ? View.VISIBLE : View.GONE);
-        mBinding.mpvRow.setVisibility(exo ? View.GONE : View.VISIBLE);
-        mBinding.adblock.setNextFocusDownId(exo ? R.id.libass : R.id.mpvConf);
-        mBinding.background.setNextFocusDownId(exo ? R.id.buffer : showMpvOptions ? R.id.mpvGpuNext : R.id.mpvConf);
-        mBinding.mpvConf.setNextFocusDownId(vulkan ? R.id.mpvVulkan : R.id.ua);
-        mBinding.mpvGpuNext.setNextFocusDownId(vulkan ? R.id.mpvVulkan : R.id.ua);
-        mBinding.ua.setNextFocusUpId(exo ? R.id.libass : vulkan ? R.id.mpvVulkan : R.id.mpvConf);
-        mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
-        mBinding.mpvGpuNext.setVisibility(showMpvOptions ? View.VISIBLE : View.GONE);
+        mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
+        mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
+        int nextFocusDownId = exo ? R.id.buffer : R.id.ua;
+        mBinding.adblock.setNextFocusDownId(nextFocusDownId);
+        mBinding.background.setNextFocusDownId(nextFocusDownId);
+        mBinding.ua.setNextFocusUpId(exo ? R.id.buffer : View.NO_ID);
     }
 
     private void setEngine(View view) {
         int index = (PlayerSetting.getEngine() + 1) % PlayerSetting.getEngineCount();
         if (index == PlayerSetting.ENGINE_MPV && !MpvUtil.checkInstalled()) return;
         PlayerSetting.putEngine(index);
-        setPlaybackModeText();
+        updateEngine();
         setVisible();
-        setMpvOptions();
     }
 
     private void onMpvConf(View view) {
         MpvConfDialog.show(this);
     }
 
-    private void setMpvGpuNext(View view) {
-        PlayerSetting.putMpvGpuNext(!PlayerSetting.isMpvGpuNext());
-        setMpvOptions();
-    }
-
-    private void setMpvVulkan(View view) {
-        PlayerSetting.putMpvVulkan(!PlayerSetting.isMpvVulkan());
-        setMpvOptions();
-    }
-
-    private void setMpvOptions() {
-        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
-        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
-    }
-
-    private void setRender(View view) {
-        int index = (PlayerSetting.getRender() + 1) % render.length;
-        PlayerSetting.putRender(index);
-        setPlaybackModeText();
-    }
-
-    private void setPlaybackModeText() {
+    private void updateEngine() {
         engine = ResUtil.getStringArray(R.array.select_engine);
-        render = ResUtil.getStringArray(R.array.select_render);
         mBinding.engineText.setText(engine[PlayerSetting.getEngine()]);
-        mBinding.renderText.setText(render[PlayerSetting.getRender()]);
     }
 
     private void onBuffer(View view) {
@@ -140,17 +104,12 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
         mBinding.adblockText.setText(Setting.getSwitch(Setting.isAdblock()));
     }
 
-    private void setLibass(View view) {
-        PlayerSetting.putLibass(!PlayerSetting.isLibass());
-        mBinding.libassText.setText(Setting.getSwitch(PlayerSetting.isLibass()));
-    }
-
     private void onPreloadSetting(View view) {
         SettingPreloadActivity.start(this);
     }
 
-    private void onDecodeSetting(View view) {
-        SettingDecodeActivity.start(this);
+    private void onOutputSetting(View view) {
+        SettingOutputActivity.start(this);
     }
 
     private void onUa(View view) {
@@ -166,9 +125,8 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
     protected void onResume() {
         super.onResume();
         if (mBinding != null) {
-            setPlaybackModeText();
+            updateEngine();
             setVisible();
-            setMpvOptions();
         }
     }
 }
