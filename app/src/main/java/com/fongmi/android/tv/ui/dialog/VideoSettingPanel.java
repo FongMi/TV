@@ -4,10 +4,13 @@ import static com.fongmi.android.tv.ui.dialog.SettingPanelViews.applyEnabled;
 
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.CompoundButton;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.DolbyVisionOutputPolicy;
 import androidx.media3.common.Player;
+import androidx.media3.mpvplayer.MpvPlayer;
+import androidx.media3.mpvplayer.MpvPlayer.VideoOutputOption;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.DialogVideoSettingBinding;
@@ -15,18 +18,24 @@ import com.fongmi.android.tv.databinding.ViewSettingSliderBinding;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.effect.video.VideoEffectPreset;
 import com.fongmi.android.tv.player.effect.video.VideoEffectProfile;
+import com.fongmi.android.tv.player.mpv.MpvUtil;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.VideoSetting;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.SliderUtil;
+import com.github.catvod.utils.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.slider.Slider;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CancellationException;
 import java.util.function.Consumer;
 
 final class VideoSettingPanel implements Player.Listener {
@@ -53,8 +62,10 @@ final class VideoSettingPanel implements Player.Listener {
     private final PlayerManager player;
     @Nullable private final Player eventSource;
     private final MotionSettingPanel motionPanel;
+    private final Runnable mpvMotionListener = this::updateMpvControls;
     private int currentTab;
     private boolean previewOriginal;
+    private boolean released;
 
     VideoSettingPanel(DialogVideoSettingBinding binding, PlayerManager player) {
         this.binding = binding;
@@ -76,11 +87,15 @@ final class VideoSettingPanel implements Player.Listener {
     }
 
     void release() {
+        released = true;
         if (eventSource != null) eventSource.removeListener(this);
+        if (eventSource instanceof MpvPlayer mpv) mpv.removeMotionInterpolationListener(mpvMotionListener);
         motionPanel.release();
         binding.tabGroup.clearOnButtonCheckedListeners();
         binding.tunnel.setOnCheckedChangeListener(null);
         binding.dolbyVisionGroup.setOnCheckedStateChangeListener(null);
+        binding.mpvOutput.mpvGpuNext.setOnClickListener(null);
+        binding.mpvOutput.mpvVulkan.setOnClickListener(null);
         previewOriginal(false);
     }
 
@@ -89,13 +104,17 @@ final class VideoSettingPanel implements Player.Listener {
         if (source != player.getVideoSettingEventSource()) return;
         boolean tracksChanged = events.contains(Player.EVENT_TRACKS_CHANGED);
         boolean firstFrame = events.contains(Player.EVENT_RENDERED_FIRST_FRAME);
-        if (tracksChanged || firstFrame) updateControls();
+        if (tracksChanged || firstFrame) {
+            updateControls();
+            updateMpvOutput();
+        }
         if (tracksChanged || firstFrame || events.contains(Player.EVENT_PLAYBACK_STATE_CHANGED)) motionPanel.updateMotion();
     }
 
     private void bindAdvanced() {
         bindTunneling();
         bindDolbyVision();
+        bindMpvOutput();
     }
 
     private void bindTunneling() {
@@ -132,6 +151,86 @@ final class VideoSettingPanel implements Player.Listener {
         if (mode == DecodeSetting.getDolbyVisionOutputPolicy()) return;
         DecodeSetting.putDolbyVisionOutputPolicy(mode);
         player.refreshDecodeSettings();
+    }
+
+    private void bindMpvOutput() {
+        updateMpvOutput();
+        if (!(eventSource instanceof MpvPlayer mpv)) return;
+        binding.mpvOutput.mpvGpuNext.setOnClickListener(this::onMpvGpuNextClicked);
+        binding.mpvOutput.mpvVulkan.setOnClickListener(this::onMpvVulkanClicked);
+        mpv.addMotionInterpolationListener(mpvMotionListener);
+    }
+
+    private void updateMpvControls() {
+        updateMpvOutput();
+        updateControls();
+    }
+
+    private void updateMpvOutput() {
+        Boolean gpuNext = player.getPendingMpvVideoOutput(eventSource, VideoOutputOption.GPU_NEXT);
+        Boolean vulkan = player.getPendingMpvVideoOutput(eventSource, VideoOutputOption.VULKAN);
+        boolean switchingOutput = gpuNext != null || vulkan != null;
+        boolean motionPending = !switchingOutput && isMpvMotionPending();
+        boolean pending = switchingOutput || motionPending;
+        if (!pending && isMpvOutputPreparing()) return;
+        boolean available = switchingOutput || isMpvOutputAvailable();
+        boolean visible = available || (pending && binding.mpvOutput.getRoot().getVisibility() == View.VISIBLE);
+        binding.mpvOutput.getRoot().setVisibility(visible ? View.VISIBLE : View.GONE);
+        if (!visible) return;
+        boolean canChange = canChangeMpvOutput();
+        updateMpvOutputSwitch(binding.mpvOutput.mpvGpuNext, gpuNext, PlayerSetting.isMpvGpuNext(), canChange);
+        updateMpvOutputSwitch(binding.mpvOutput.mpvVulkan, vulkan, PlayerSetting.isMpvVulkan(), canChange);
+        binding.mpvOutput.mpvVulkanRow.setVisibility(MpvUtil.isVulkanSupported() ? View.VISIBLE : View.GONE);
+    }
+
+    private void updateMpvOutputSwitch(CompoundButton button, @Nullable Boolean pending, boolean enabled, boolean canChange) {
+        button.setChecked(pending != null ? pending : enabled);
+        if (canChange || pending != null) button.setEnabled(pending == null);
+        button.setClickable(canChange && pending == null);
+    }
+
+    private boolean isMpvOutputAvailable() {
+        return !player.isReleased() && eventSource instanceof MpvPlayer mpv && mpv.canSetVideoOutput() && !MpvUtil.isMotionEnabled();
+    }
+
+    private boolean canChangeMpvOutput() {
+        return !player.isReleased() && eventSource instanceof MpvPlayer mpv && mpv.canSetVideoOutputOption() && !MpvUtil.isMotionEnabled();
+    }
+
+    private boolean isMpvGpuOutputPending() {
+        return player.getPendingMpvVideoOutput(eventSource, VideoOutputOption.GPU_NEXT) != null || player.getPendingMpvVideoOutput(eventSource, VideoOutputOption.VULKAN) != null;
+    }
+
+    private boolean isMpvMotionPending() {
+        return eventSource instanceof MpvPlayer mpv && mpv.isMotionInterpolationUpdatePending();
+    }
+
+    private boolean isMpvOutputPreparing() {
+        return eventSource instanceof MpvPlayer mpv && mpv.getPlaybackState() == Player.STATE_BUFFERING && mpv.getVideoEffectsSupport() == MpvPlayer.VIDEO_EFFECTS_UNAVAILABLE;
+    }
+
+    private void onMpvGpuNextClicked(View view) {
+        setMpvVideoOutput(VideoOutputOption.GPU_NEXT, binding.mpvOutput.mpvGpuNext.isChecked());
+    }
+
+    private void onMpvVulkanClicked(View view) {
+        setMpvVideoOutput(VideoOutputOption.VULKAN, binding.mpvOutput.mpvVulkan.isChecked());
+    }
+
+    private void setMpvVideoOutput(VideoOutputOption option, boolean enabled) {
+        if (!canChangeMpvOutput() || player.getPendingMpvVideoOutput(eventSource, option) != null) {
+            updateMpvOutput();
+            return;
+        }
+        Futures.addCallback(player.setMpvVideoOutput(eventSource, option, enabled), Task.callback(
+                result -> onMpvOutputFinished(null), this::onMpvOutputFinished), MoreExecutors.directExecutor());
+        updateMpvOutput();
+    }
+
+    private void onMpvOutputFinished(@Nullable Throwable error) {
+        if (released) return;
+        updateMpvControls();
+        if (error != null && !(error instanceof CancellationException)) Notify.show(Notify.getError(R.string.mpv_script_error, error));
     }
 
     private void onPresetChecked(ChipGroup group, List<Integer> checkedIds) {
@@ -260,6 +359,7 @@ final class VideoSettingPanel implements Player.Listener {
     }
 
     private void updateControls() {
+        if (isMpvGpuOutputPending() || isMpvMotionPending() || isMpvOutputPreparing()) return;
         boolean mpv = isMpv();
         boolean sharpnessSupported = supportsSharpness();
         boolean supported = canSetVideoSetting();

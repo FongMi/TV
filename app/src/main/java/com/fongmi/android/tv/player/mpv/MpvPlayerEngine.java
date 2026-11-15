@@ -17,6 +17,7 @@ import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.mpvplayer.MpvDecoderMode;
 import androidx.media3.mpvplayer.MpvPlayer;
+import androidx.media3.mpvplayer.MpvPlayer.VideoOutputOption;
 import androidx.media3.mpvplayer.MpvPlayerConfig;
 
 import com.fongmi.android.tv.App;
@@ -31,6 +32,9 @@ import com.fongmi.android.tv.server.LogSession;
 import com.fongmi.android.tv.setting.DecodeSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 
 import org.json.JSONException;
 
@@ -42,10 +46,10 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     private final MpvPlayerEffect effect;
     private final MpvScriptSession scripts;
     private final MpvPlayer player;
-    private final boolean gpuNext;
-    private final boolean vulkan;
     private final boolean audioPassThrough;
     private final @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
+    private boolean gpuNext;
+    private boolean vulkan;
     private int configuredMotionFps;
     private final Runnable motionListener = this::updateMotionFps;
     private final Runnable updateLog = this::updateLogLevel;
@@ -96,6 +100,29 @@ public class MpvPlayerEngine implements PlayerEngine, Player.Listener {
     public boolean needsRebuild() {
         boolean decodeChanged = audioPassThrough != DecodeSetting.isAudioPassThrough() || dolbyVisionOutputPolicy != DecodeSetting.getDolbyVisionOutputPolicy();
         return decodeChanged || configuredMotionFps != MpvUtil.getMotionFps() || gpuNext != PlayerSetting.isMpvGpuNext() || vulkan != PlayerSetting.isMpvVulkan();
+    }
+
+    @Nullable
+    public Boolean getPendingVideoOutput(VideoOutputOption option) {
+        return player.getPendingVideoOutput(option);
+    }
+
+    public ListenableFuture<Void> setVideoOutput(VideoOutputOption option, boolean enabled) {
+        return Futures.transform(player.setVideoOutput(option, enabled), result -> {
+            onVideoOutputApplied(option, enabled);
+            return null;
+        }, MoreExecutors.directExecutor());
+    }
+
+    private void onVideoOutputApplied(VideoOutputOption option, boolean enabled) {
+        if (option == VideoOutputOption.GPU_NEXT) {
+            gpuNext = enabled;
+            PlayerSetting.putMpvGpuNext(gpuNext);
+        } else {
+            vulkan = enabled;
+            PlayerSetting.putMpvVulkan(vulkan);
+        }
+        effect.applyVideoEffect();
     }
 
     @Override

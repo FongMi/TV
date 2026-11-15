@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/playback_dialog_inset"
+        android:minHeight="48dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:paddingEnd="64dp"
+            android:text="@string/player_mpv_gpu_next"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout
+            style="@style/PlaybackDialogSwitchContainer"
+            android:layout_gravity="end|center_vertical">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/mpvGpuNext"
+                style="@style/PlaybackDialogSwitch"
+                android:contentDescription="@string/player_mpv_gpu_next" />
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/mpvVulkanRow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/playback_dialog_inset"
+        android:minHeight="48dp">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:importantForAccessibility="no"
+            android:paddingEnd="64dp"
+            android:text="@string/player_mpv_vulkan"
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <FrameLayout
+            style="@style/PlaybackDialogSwitchContainer"
+            android:layout_gravity="end|center_vertical">
+
+            <com.google.android.material.materialswitch.MaterialSwitch
+                android:id="@+id/mpvVulkan"
+                style="@style/PlaybackDialogSwitch"
+                android:contentDescription="@string/player_mpv_vulkan" />
+
+        </FrameLayout>
+
+    </FrameLayout>
+
+</androidx.appcompat.widget.LinearLayoutCompat>

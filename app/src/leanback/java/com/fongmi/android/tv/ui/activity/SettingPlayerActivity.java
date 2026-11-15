@@ -65,15 +65,18 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
 
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
-        boolean vulkan = !exo && MpvUtil.isVulkanSupported();
+        boolean showMpvOptions = !exo && !MpvUtil.isMotionEnabled();
+        boolean vulkan = showMpvOptions && MpvUtil.isVulkanSupported();
         if (PlayerSetting.isBackgroundPiP()) PlayerSetting.putBackground(1);
         mBinding.exoRow.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.mpvRow.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.adblock.setNextFocusDownId(exo ? R.id.libass : R.id.mpvConf);
+        mBinding.background.setNextFocusDownId(exo ? R.id.buffer : showMpvOptions ? R.id.mpvGpuNext : R.id.mpvConf);
         mBinding.mpvConf.setNextFocusDownId(vulkan ? R.id.mpvVulkan : R.id.ua);
         mBinding.mpvGpuNext.setNextFocusDownId(vulkan ? R.id.mpvVulkan : R.id.ua);
         mBinding.ua.setNextFocusUpId(exo ? R.id.libass : vulkan ? R.id.mpvVulkan : R.id.mpvConf);
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
+        mBinding.mpvGpuNext.setVisibility(showMpvOptions ? View.VISIBLE : View.GONE);
     }
 
     private void setEngine(View view) {
@@ -100,14 +103,8 @@ public class SettingPlayerActivity extends BaseActivity implements UaListener, B
     }
 
     private void setMpvOptions() {
-        boolean motion = MpvUtil.isMotionEnabled();
-        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext() || motion));
-        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan() || motion));
-        mBinding.mpvGpuNext.setEnabled(!motion);
-        mBinding.mpvVulkan.setEnabled(!motion);
-        mBinding.mpvGpuNext.setAlpha(motion ? 0.5f : 1f);
-        mBinding.mpvVulkan.setAlpha(motion ? 0.5f : 1f);
-        mBinding.background.setNextFocusDownId(PlayerSetting.isExo() ? R.id.buffer : motion ? R.id.mpvConf : R.id.mpvGpuNext);
+        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
+        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
     }
 
     private void setRender(View view) {

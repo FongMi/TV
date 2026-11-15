@@ -414,6 +414,10 @@
                     android:id="@+id/motion"
                     layout="@layout/view_motion_setting" />
 
+                <include
+                    android:id="@+id/mpvOutput"
+                    layout="@layout/view_mpv_video_output" />
+
             </androidx.appcompat.widget.LinearLayoutCompat>
 
         </androidx.appcompat.widget.LinearLayoutCompat>

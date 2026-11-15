@@ -68,10 +68,11 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
 
     private void setVisible() {
         boolean exo = PlayerSetting.isExo();
-        boolean vulkan = !exo && MpvUtil.isVulkanSupported();
+        boolean showMpvOptions = !exo && !MpvUtil.isMotionEnabled();
+        boolean vulkan = showMpvOptions && MpvUtil.isVulkanSupported();
         mBinding.mpvConf.setVisibility(exo ? View.GONE : View.VISIBLE);
         mBinding.mpvVulkan.setVisibility(vulkan ? View.VISIBLE : View.GONE);
-        mBinding.mpvGpuNext.setVisibility(exo ? View.GONE : View.VISIBLE);
+        mBinding.mpvGpuNext.setVisibility(showMpvOptions ? View.VISIBLE : View.GONE);
         mBinding.libass.setVisibility(exo ? View.VISIBLE : View.GONE);
         mBinding.buffer.setVisibility(exo ? View.VISIBLE : View.GONE);
     }
@@ -100,13 +101,8 @@ public class SettingPlayerFragment extends BaseFragment implements UaListener, B
     }
 
     private void setMpvOptions() {
-        boolean motion = MpvUtil.isMotionEnabled();
-        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext() || motion));
-        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan() || motion));
-        mBinding.mpvGpuNext.setEnabled(!motion);
-        mBinding.mpvVulkan.setEnabled(!motion);
-        mBinding.mpvGpuNext.setAlpha(motion ? 0.5f : 1f);
-        mBinding.mpvVulkan.setAlpha(motion ? 0.5f : 1f);
+        mBinding.mpvGpuNextText.setText(Setting.getSwitch(PlayerSetting.isMpvGpuNext()));
+        mBinding.mpvVulkanText.setText(Setting.getSwitch(PlayerSetting.isMpvVulkan()));
     }
 
     private void setRender(View view) {

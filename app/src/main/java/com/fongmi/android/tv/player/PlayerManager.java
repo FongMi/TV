@@ -26,6 +26,7 @@ import androidx.media3.common.text.SubtitleOffsets;
 import androidx.media3.common.text.SubtitleSelectionState;
 import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController;
 import androidx.media3.exoplayer.iso.IsoDiscPreparation;
+import androidx.media3.mpvplayer.MpvPlayer.VideoOutputOption;
 import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.danmaku.DanmakuConfig;
 
@@ -61,6 +62,8 @@ import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.fongmi.android.tv.utils.Util;
 import com.google.common.net.HttpHeaders;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -426,6 +429,16 @@ public class PlayerManager implements ParseCallback {
         PlayerSetting.putEngine(targetEngine);
         if (isEmpty() || PlayerEngineFactory.matches(engine, spec)) return;
         restartCurrent();
+    }
+
+    public ListenableFuture<Void> setMpvVideoOutput(@Nullable Player source, VideoOutputOption option, boolean enabled) {
+        if (isReleased() || !(engine instanceof MpvPlayerEngine mpv) || mpv.getPlayer() != source) return Futures.immediateCancelledFuture();
+        return mpv.setVideoOutput(option, enabled);
+    }
+
+    @Nullable
+    public Boolean getPendingMpvVideoOutput(@Nullable Player source, VideoOutputOption option) {
+        return engine instanceof MpvPlayerEngine mpv && mpv.getPlayer() == source ? mpv.getPendingVideoOutput(option) : null;
     }
 
     public void refreshDecodeSettings() {
