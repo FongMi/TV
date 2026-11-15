@@ -24,7 +24,7 @@ import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
 import com.fongmi.android.tv.player.track.LangUtil;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SubtitleSetting;
@@ -103,11 +103,11 @@ public final class MpvUtil {
     }
 
     private static int getMotionFps(boolean vulkanSupported) {
-        return vulkanSupported ? PlayerSetting.getMotionFps() : 0;
+        return vulkanSupported ? OutputSetting.getMotionFps() : 0;
     }
 
     static MpvPlayer buildPlayer(Player.Listener listener, MpvPlayerConfig config) {
-        MpvDecoderMode mode = MpvDecoderMode.fromCommonDecoderMode(DecodeSetting.getDecoderMode(PlayerSetting.ENGINE_MPV, C.TRACK_TYPE_VIDEO));
+        MpvDecoderMode mode = MpvDecoderMode.fromCommonDecoderMode(PlayerSetting.getDecoderMode(PlayerSetting.ENGINE_MPV, C.TRACK_TYPE_VIDEO));
         MpvPlayer player = new MpvPlayer.Builder(App.get()).setVideoDecoderMode(mode).setConfig(config).build();
         player.setSubtitleContentLoader(new SubtitleFileContent());
         setPreferredTextLanguages(player);
@@ -168,11 +168,11 @@ public final class MpvUtil {
         boolean vulkanSupported = isVulkanSupported();
         int fps = getMotionFps(vulkanSupported);
         boolean motion = fps > 0;
-        return new VideoOptions(fps, PlayerSetting.isMpvGpuNext() || motion, vulkanSupported && (PlayerSetting.isMpvVulkan() || motion), vulkanSupported);
+        return new VideoOptions(fps, OutputSetting.isMpvGpuNext() || motion, vulkanSupported && (OutputSetting.isMpvVulkan() || motion), vulkanSupported);
     }
 
     static void addAndroidOptions(MpvPlayerConfig.Builder config, File shaderCacheDirectory, VideoOptions videoOptions) {
-        MpvAndroidOptions.Builder options = new MpvAndroidOptions.Builder().setShaderCacheDirectory(shaderCacheDirectory).setAudioPassthroughEnabled(DecodeSetting.isAudioPassThrough()).setDolbyVisionOutputPolicy(DecodeSetting.getDolbyVisionOutputPolicy());
+        MpvAndroidOptions.Builder options = new MpvAndroidOptions.Builder().setShaderCacheDirectory(shaderCacheDirectory).setAudioPassthroughEnabled(OutputSetting.isAudioPassThrough()).setDolbyVisionOutputPolicy(OutputSetting.getDolbyVisionOutputPolicy());
         options.setGpuNextEnabled(videoOptions.gpuNext());
         options.setVulkanEnabled(videoOptions.vulkan());
         config.addAndroidDefaults(options.build()).setMotionInterpolationFps(videoOptions.motionFps()).setAllowMotionInterpolationOutputChange(videoOptions.vulkanSupported());

@@ -4,7 +4,6 @@ import static com.fongmi.android.tv.ui.dialog.SettingPanelViews.applyEnabled;
 
 import android.view.View;
 import android.widget.CompoundButton;
-import android.widget.CompoundButton;
 
 import androidx.annotation.Nullable;
 import androidx.media3.common.DolbyVisionOutputPolicy;
@@ -19,7 +18,7 @@ import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.effect.video.VideoEffectPreset;
 import com.fongmi.android.tv.player.effect.video.VideoEffectProfile;
 import com.fongmi.android.tv.player.mpv.MpvUtil;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.VideoSetting;
 import com.fongmi.android.tv.utils.Notify;
@@ -65,6 +64,8 @@ final class VideoSettingPanel implements Player.Listener {
     private final Runnable mpvMotionListener = this::updateMpvControls;
     private int currentTab;
     private boolean previewOriginal;
+    private boolean effectsSupported;
+    private int effectsError;
     private boolean released;
 
     VideoSettingPanel(DialogVideoSettingBinding binding, PlayerManager player) {
@@ -102,13 +103,11 @@ final class VideoSettingPanel implements Player.Listener {
     @Override
     public void onEvents(Player source, Player.Events events) {
         if (source != player.getVideoSettingEventSource()) return;
-        boolean tracksChanged = events.contains(Player.EVENT_TRACKS_CHANGED);
-        boolean firstFrame = events.contains(Player.EVENT_RENDERED_FIRST_FRAME);
-        if (tracksChanged || firstFrame) {
+        if (events.containsAny(Player.EVENT_TRACKS_CHANGED, Player.EVENT_RENDERED_FIRST_FRAME, Player.EVENT_PLAYBACK_STATE_CHANGED)) {
             updateControls();
             updateMpvOutput();
+            motionPanel.updateMotion();
         }
-        if (tracksChanged || firstFrame || events.contains(Player.EVENT_PLAYBACK_STATE_CHANGED)) motionPanel.updateMotion();
     }
 
     private void bindAdvanced() {
@@ -120,7 +119,7 @@ final class VideoSettingPanel implements Player.Listener {
     private void bindTunneling() {
         boolean tunnelingAvailable = player.canSetTunneling();
         binding.tunnelRow.setVisibility(tunnelingAvailable ? View.VISIBLE : View.GONE);
-        binding.tunnel.setChecked(DecodeSetting.isTunnelingEnabled());
+        binding.tunnel.setChecked(OutputSetting.isTunnelingEnabled());
         if (tunnelingAvailable) binding.tunnel.setOnCheckedChangeListener(this::onTunnelChanged);
     }
 
@@ -129,13 +128,23 @@ final class VideoSettingPanel implements Player.Listener {
         binding.dolbyVisionAuto.setText(modes[DolbyVisionOutputPolicy.AUTO]);
         binding.dolbyVisionOn.setText(modes[DolbyVisionOutputPolicy.ASSUME_SUPPORTED]);
         binding.dolbyVisionOff.setText(modes[DolbyVisionOutputPolicy.ASSUME_UNSUPPORTED]);
-        Chip chip = switch (DecodeSetting.getDolbyVisionOutputPolicy()) {
+        updateDolbyVision();
+        binding.dolbyVisionGroup.setOnCheckedStateChangeListener(this::onDolbyVisionChecked);
+    }
+
+    private void updateDolbyVision() {
+        Chip chip = switch (getDisplayedDolbyVisionPolicy()) {
             case DolbyVisionOutputPolicy.ASSUME_SUPPORTED -> binding.dolbyVisionOn;
             case DolbyVisionOutputPolicy.ASSUME_UNSUPPORTED -> binding.dolbyVisionOff;
             default -> binding.dolbyVisionAuto;
         };
         binding.dolbyVisionGroup.check(chip.getId());
-        binding.dolbyVisionGroup.setOnCheckedStateChangeListener(this::onDolbyVisionChecked);
+    }
+
+    @DolbyVisionOutputPolicy.Mode
+    private int getDisplayedDolbyVisionPolicy() {
+        Integer pending = eventSource instanceof MpvPlayer mpv ? mpv.getPendingDolbyVisionOutputPolicy() : null;
+        return pending == null ? OutputSetting.getDolbyVisionOutputPolicy() : pending;
     }
 
     private void onTunnelChanged(CompoundButton button, boolean enabled) {
@@ -148,9 +157,15 @@ final class VideoSettingPanel implements Player.Listener {
         int mode = DolbyVisionOutputPolicy.AUTO;
         if (chipId == R.id.dolbyVisionOn) mode = DolbyVisionOutputPolicy.ASSUME_SUPPORTED;
         else if (chipId == R.id.dolbyVisionOff) mode = DolbyVisionOutputPolicy.ASSUME_UNSUPPORTED;
-        if (mode == DecodeSetting.getDolbyVisionOutputPolicy()) return;
-        DecodeSetting.putDolbyVisionOutputPolicy(mode);
-        player.refreshDecodeSettings();
+        if (mode == getDisplayedDolbyVisionPolicy()) return;
+        Futures.addCallback(player.setDolbyVisionOutputPolicy(eventSource, mode), Task.callback(
+                result -> onDolbyVisionFinished(null), this::onDolbyVisionFinished), MoreExecutors.directExecutor());
+    }
+
+    private void onDolbyVisionFinished(@Nullable Throwable error) {
+        if (released) return;
+        updateMpvControls();
+        if (error != null && !(error instanceof CancellationException)) Notify.show(Notify.getError(R.string.player_dolby_vision_output, error));
     }
 
     private void bindMpvOutput() {
@@ -162,6 +177,7 @@ final class VideoSettingPanel implements Player.Listener {
     }
 
     private void updateMpvControls() {
+        updateDolbyVision();
         updateMpvOutput();
         updateControls();
     }
@@ -178,8 +194,8 @@ final class VideoSettingPanel implements Player.Listener {
         binding.mpvOutput.getRoot().setVisibility(visible ? View.VISIBLE : View.GONE);
         if (!visible) return;
         boolean canChange = canChangeMpvOutput();
-        updateMpvOutputSwitch(binding.mpvOutput.mpvGpuNext, gpuNext, PlayerSetting.isMpvGpuNext(), canChange);
-        updateMpvOutputSwitch(binding.mpvOutput.mpvVulkan, vulkan, PlayerSetting.isMpvVulkan(), canChange);
+        updateMpvOutputSwitch(binding.mpvOutput.mpvGpuNext, gpuNext, OutputSetting.isMpvGpuNext(), canChange);
+        updateMpvOutputSwitch(binding.mpvOutput.mpvVulkan, vulkan, OutputSetting.isMpvVulkan(), canChange);
         binding.mpvOutput.mpvVulkanRow.setVisibility(MpvUtil.isVulkanSupported() ? View.VISIBLE : View.GONE);
     }
 
@@ -362,14 +378,15 @@ final class VideoSettingPanel implements Player.Listener {
         if (isMpvGpuOutputPending() || isMpvMotionPending() || isMpvOutputPreparing()) return;
         boolean mpv = isMpv();
         boolean sharpnessSupported = supportsSharpness();
-        boolean supported = canSetVideoSetting();
-        if (!supported) previewOriginal(false);
-        boolean enabled = supported && VideoSetting.isEnabled();
-        updateEffectActions(supported, enabled);
+        effectsSupported = canSetVideoSetting();
+        if (!effectsSupported) previewOriginal(false);
+        effectsError = effectsSupported ? 0 : getUnsupportedText();
+        boolean enabled = effectsSupported && VideoSetting.isEnabled();
+        updateEffectActions();
         binding.temperature.getRoot().setVisibility(mpv ? View.GONE : View.VISIBLE);
         binding.sharpness.getRoot().setVisibility(sharpnessSupported ? View.VISIBLE : View.GONE);
         binding.shadow.getRoot().setVisibility(mpv ? View.GONE : View.VISIBLE);
-        applyEnabled(binding.presetSection, supported);
+        applyEnabled(binding.presetSection, effectsSupported);
         applyEnabled(binding.saturation.getRoot(), enabled);
         applyEnabled(binding.contrast.getRoot(), enabled);
         applyEnabled(binding.brightness.getRoot(), enabled);
@@ -380,13 +397,13 @@ final class VideoSettingPanel implements Player.Listener {
         applyEnabled(binding.shadow.getRoot(), enabled && !mpv);
     }
 
-    private void updateEffectActions(boolean supported, boolean enabled) {
+    private void updateEffectActions() {
         boolean effectsTab = currentTab != TAB_ADVANCED;
-        boolean visible = !supported && effectsTab;
-        applyEnabled(binding.compare, enabled && effectsTab);
+        boolean visible = effectsError != 0 && effectsTab;
+        applyEnabled(binding.compare, effectsSupported && VideoSetting.isEnabled() && effectsTab);
         applyEnabled(binding.reset, effectsTab);
         binding.unsupported.setVisibility(visible ? View.VISIBLE : View.GONE);
-        if (visible) binding.unsupported.setText(getUnsupportedText());
+        if (visible) binding.unsupported.setText(effectsError);
     }
 
     private void apply() {
@@ -430,8 +447,7 @@ final class VideoSettingPanel implements Player.Listener {
         MaterialButton[] tabs = getTabs();
         for (int i = 0; i < roots.length; i++) roots[i].setVisibility(index == i ? View.VISIBLE : View.GONE);
         currentTab = index;
-        boolean supported = canSetVideoSetting();
-        updateEffectActions(supported, supported && VideoSetting.isEnabled());
+        updateEffectActions();
         int focusId = tabs[index].getId();
         binding.reset.setNextFocusDownId(focusId);
         binding.compare.setNextFocusDownId(focusId);

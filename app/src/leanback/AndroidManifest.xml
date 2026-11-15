@@ -250,7 +250,7 @@
             android:screenOrientation="sensorLandscape" />
 
         <activity
-            android:name=".ui.activity.SettingDecodeActivity"
+            android:name=".ui.activity.SettingOutputActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:screenOrientation="sensorLandscape" />
 

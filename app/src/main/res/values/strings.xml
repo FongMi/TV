@@ -335,7 +335,6 @@
     <string name="player_engine">Engine</string>
     <string name="player_debug">Debug</string>
     <string name="player_render">Video output</string>
-    <string name="player_libass">libass</string>
     <string name="player_background">Background play</string>
     <string name="player_audio_pass_through">Audio passthrough</string>
     <string name="player_audio_decode">Audio software decode</string>
@@ -345,7 +344,7 @@
     <string name="player_adblock">Remove ads</string>
     <string name="player_tunnel">Tunnel mode</string>
     <string name="player_buffer">Buffer time</string>
-    <string name="player_decode_setting">Decode setting</string>
+    <string name="player_output_setting">Output settings</string>
     <string name="player_preload_setting">Preload setting</string>
     <string name="player_preload">Preload</string>
     <string name="player_preload_next">Preload next episode</string>

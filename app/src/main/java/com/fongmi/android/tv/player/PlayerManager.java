@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.DecoderMode;
+import androidx.media3.common.DolbyVisionOutputPolicy;
 import androidx.media3.common.DiscMenuController;
 import androidx.media3.common.DiscMenuState;
 import androidx.media3.common.Format;
@@ -54,7 +55,7 @@ import com.fongmi.android.tv.player.parse.ParseJob;
 import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.server.LogSession;
 import com.fongmi.android.tv.setting.DanmakuSetting;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
 import com.fongmi.android.tv.setting.SpeedSetting;
@@ -64,6 +65,7 @@ import com.fongmi.android.tv.utils.Util;
 import com.google.common.net.HttpHeaders;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.google.gson.JsonObject;
 
 import org.json.JSONException;
@@ -82,6 +84,7 @@ public class PlayerManager implements ParseCallback {
     private final TimeshiftPlayback timeshift;
     private PendingPreload pendingPreload;
     private PendingPreload queuedPreload;
+    @Nullable private AudioPassThroughChange audioPassThroughChange;
     private PlayerEngine engine;
     private ParseJob parseJob;
     private PlaySpec spec;
@@ -121,6 +124,7 @@ public class PlayerManager implements ParseCallback {
         if (engine != null) engine.release();
         engine = null;
         player = null;
+        audioPassThroughChange = null;
     }
 
     public Player getPlayer() {
@@ -204,6 +208,7 @@ public class PlayerManager implements ParseCallback {
 
     private void setPlayer(Player player) {
         clearSpeedPressState();
+        audioPassThroughChange = null;
         this.player = player;
         callback.onPlayerRebuild(player);
     }
@@ -373,7 +378,7 @@ public class PlayerManager implements ParseCallback {
         if (getDecoderMode(trackType) == null || !getSupportedDecoderModes(trackType).contains(mode)) return;
         changeDecoder(() -> {
             engine.setDecoderMode(trackType, mode);
-            DecodeSetting.putDecoderMode(getEngine(), trackType, mode);
+            PlayerSetting.putDecoderMode(getEngine(), trackType, mode);
         });
     }
 
@@ -441,20 +446,69 @@ public class PlayerManager implements ParseCallback {
         return engine instanceof MpvPlayerEngine mpv && mpv.getPlayer() == source ? mpv.getPendingVideoOutput(option) : null;
     }
 
-    public void refreshDecodeSettings() {
-        if (!isReleased() && !isEmpty() && engine.needsRebuild()) restartCurrent();
+    public ListenableFuture<Void> setAudioPassThrough(@Nullable Player source, boolean enabled) {
+        if (isReleased() || player != source) return Futures.immediateCancelledFuture();
+        if (engine instanceof MpvPlayerEngine mpv) {
+            if (getAudioPassThroughChange(source) != null) return Futures.immediateFailedFuture(new IllegalStateException("An audio output update is already in progress"));
+            ListenableFuture<Void> change = Futures.transform(mpv.setAudioPassThrough(enabled), result -> {
+                if (player == source) OutputSetting.putAudioPassThrough(enabled);
+                return null;
+            }, MoreExecutors.directExecutor());
+            audioPassThroughChange = new AudioPassThroughChange(enabled, change);
+            return change;
+        }
+        if (engine instanceof ExoPlayerEngine exo) updateExoOutputSettings(() -> {
+            exo.setAudioPassThrough(enabled);
+            OutputSetting.putAudioPassThrough(enabled);
+        });
+        return Futures.immediateVoidFuture();
+    }
+
+    @Nullable
+    public AudioPassThroughChange getAudioPassThroughChange(@Nullable Player source) {
+        AudioPassThroughChange change = audioPassThroughChange;
+        return source != null && player == source && change != null && !change.result().isDone() ? change : null;
+    }
+
+    public ListenableFuture<Void> setDolbyVisionOutputPolicy(@Nullable Player source, @DolbyVisionOutputPolicy.Mode int policy) {
+        if (isReleased() || source != getVideoSettingEventSource()) return Futures.immediateCancelledFuture();
+        if (engine instanceof MpvPlayerEngine mpv) {
+            return Futures.transform(mpv.setDolbyVisionOutputPolicy(policy), reloaded -> {
+                if (player == source) onDolbyVisionOutputApplied(policy, reloaded);
+                return null;
+            }, MoreExecutors.directExecutor());
+        }
+        if (engine instanceof ExoPlayerEngine exo) updateExoOutputSettings(() -> exo.setDolbyVisionOutputPolicy(policy));
+        OutputSetting.putDolbyVisionOutputPolicy(policy);
+        return Futures.immediateVoidFuture();
+    }
+
+    private void onDolbyVisionOutputApplied(@DolbyVisionOutputPolicy.Mode int policy, boolean reloaded) {
+        OutputSetting.putDolbyVisionOutputPolicy(policy);
+        if (!reloaded) return;
+        initTrack = false;
+        pendingTrackRestore.clear();
+        if (player.getPlaybackState() == Player.STATE_BUFFERING) App.post(runnable, Constant.TIMEOUT_PLAY);
+    }
+
+    private void updateExoOutputSettings(Runnable update) {
+        PendingPreload preload = queuedPreload != null ? queuedPreload : pendingPreload;
+        clearPreload();
+        update.run();
+        if (preload != null) pendingPreload = new PendingPreload(preload.spec(), preload.startPositionMs(), preload.tag());
+        startPreloadIfReady();
     }
 
     public boolean canSetTunneling() {
-        return engine instanceof ExoPlayerEngine && PlayerSetting.getRender() == PlayerSetting.RENDER_SURFACE;
+        return engine instanceof ExoPlayerEngine && OutputSetting.getRender() == OutputSetting.RENDER_SURFACE;
     }
 
     public void setTunnelingEnabled(boolean enabled) {
-        if (!canSetTunneling() || enabled == DecodeSetting.isTunnelingEnabled()) return;
+        if (!canSetTunneling() || enabled == OutputSetting.isTunnelingEnabled()) return;
         ExoPlayerEngine exo = (ExoPlayerEngine) engine;
         changeDecoder(() -> {
             exo.setTunnelingEnabled(enabled);
-            DecodeSetting.putTunnel(enabled);
+            OutputSetting.putTunnel(enabled);
         });
     }
 
@@ -1071,6 +1125,9 @@ public class PlayerManager implements ParseCallback {
         void onDanmakuEnabledChanged(boolean enabled);
 
         void onDanmakuSent(String text);
+    }
+
+    public record AudioPassThroughChange(boolean enabled, ListenableFuture<Void> result) {
     }
 
     private record PendingPreload(PlaySpec spec, long startPositionMs, Object tag) {

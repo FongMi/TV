@@ -6,11 +6,13 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.media3.common.Player;
 import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController;
+import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController.FormatSupport;
+import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController.OutputState;
 import androidx.media3.mpvplayer.MpvPlayer;
 
 import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.ViewMotionSettingBinding;
-import com.fongmi.android.tv.setting.PlayerSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.ResUtil;
 import com.github.catvod.utils.Task;
@@ -69,8 +71,8 @@ final class MotionSettingPanel {
     }
 
     private void applyMotion(int index) {
-        int fps = PlayerSetting.getMotionFps(index);
-        if (!canChangeMotion() || fps == getTargetFps()) {
+        int fps = OutputSetting.getMotionFps(index);
+        if (!canChangeMotion(fps) || fps == getTargetFps()) {
             updateMotion();
             return;
         }
@@ -82,7 +84,7 @@ final class MotionSettingPanel {
 
     private void onApplied(int index) {
         pendingFps = null;
-        PlayerSetting.putMotion(index);
+        OutputSetting.putMotion(index);
         updateMotion();
     }
 
@@ -94,18 +96,46 @@ final class MotionSettingPanel {
 
     void updateMotion() {
         if (released || !hasController()) return;
-        boolean supported = canSetTarget();
-        boolean pending = isUpdatePending();
-        if (!supported && !pending && !isVideoOutputReady()) {
-            checkOption(PlayerSetting.getMotion());
+        if (isUpdatePending()) {
+            if (pendingFps != null) checkOption(getOptionIndex(pendingFps));
+            else if (binding.motionGroup.getCheckedChipId() == View.NO_ID) checkOption(getOptionIndex(getTargetFps()));
+            for (Chip option : options) option.setClickable(false);
+            return;
+        }
+        if (mpv == null) {
+            updateExoMotion();
+            return;
+        }
+        boolean supported = mpv.canSetMotionInterpolationFps();
+        if (!supported && !isMpvVideoOutputReady()) {
+            checkOption(OutputSetting.getMotion());
             updateStatus("");
             return;
         }
-        int fps = pendingFps == null ? getTargetFps() : pendingFps;
+        int fps = getTargetFps();
         int index = getOptionIndex(fps);
         checkOption(index);
-        for (int i = 0; i < options.length; i++) options[i].setEnabled(pending ? i == index : supported);
-        updateStatus(getStatus(supported, pending, fps, index));
+        for (Chip option : options) {
+            option.setEnabled(supported);
+            option.setClickable(supported);
+        }
+        updateStatus(getStatus(supported, fps, index));
+    }
+
+    private void updateExoMotion() {
+        FormatSupport support = exo.getFormatSupport();
+        OutputState output = exo.getOutputState();
+        int fps = exo.getTargetFps();
+        int index = getOptionIndex(fps);
+        checkOption(index);
+        for (int i = 0; i < options.length; i++) {
+            boolean enabled = canSetExoTarget(OutputSetting.getMotionFps(i), support);
+            if (support != FormatSupport.UNKNOWN) options[i].setEnabled(enabled);
+            options[i].setClickable(enabled);
+        }
+        if (output == OutputState.SWITCHING || support == FormatSupport.UNKNOWN) updateStatus("");
+        else if (support == FormatSupport.UNSUPPORTED || output == OutputState.INACTIVE) updateStatus(ResUtil.getString(R.string.player_motion_unavailable));
+        else updateStatus(index < 0 ? formatRate(fps) : "");
     }
 
     private void checkOption(int index) {
@@ -116,7 +146,7 @@ final class MotionSettingPanel {
     }
 
     private int getOptionIndex(int fps) {
-        for (int i = 0; i < options.length; i++) if (PlayerSetting.getMotionFps(i) == fps) return i;
+        for (int i = 0; i < options.length; i++) if (OutputSetting.getMotionFps(i) == fps) return i;
         return -1;
     }
 
@@ -124,12 +154,13 @@ final class MotionSettingPanel {
         return mpv != null || exo != null;
     }
 
-    private boolean canChangeMotion() {
-        return !released && !isUpdatePending() && canSetTarget();
+    private boolean canChangeMotion(int fps) {
+        if (released || isUpdatePending()) return false;
+        return mpv != null ? mpv.canSetMotionInterpolationFps() : exo != null && canSetExoTarget(fps, exo.getFormatSupport());
     }
 
-    private boolean canSetTarget() {
-        return mpv != null ? mpv.canSetMotionInterpolationFps() : exo != null && exo.isSupported();
+    private boolean canSetExoTarget(int fps, FormatSupport support) {
+        return support == FormatSupport.SUPPORTED || (fps == 0 && exo.getTargetFps() > 0 && exo.isSupported());
     }
 
     private boolean isUpdatePending() {
@@ -144,17 +175,17 @@ final class MotionSettingPanel {
         return ResUtil.getString(R.string.player_motion_fps, fps);
     }
 
-    private String getStatus(boolean supported, boolean pending, int fps, int index) {
-        if (!supported) return pending ? "" : ResUtil.getString(R.string.player_motion_unavailable);
-        if (mpv != null && pendingFps == null && fps > 0) {
+    private String getStatus(boolean supported, int fps, int index) {
+        if (!supported) return ResUtil.getString(R.string.player_motion_unavailable);
+        if (fps > 0) {
             float effectiveFps = mpv.getMotionInterpolationEffectiveTargetFps();
             if (effectiveFps > 0 && effectiveFps < fps - 0.001f) return ResUtil.getString(R.string.player_motion_capped, effectiveFps);
         }
         return index < 0 ? formatRate(fps) : "";
     }
 
-    private boolean isVideoOutputReady() {
-        return SettingPanelViews.isPlaybackPrepared(eventSource) && (mpv == null || mpv.getVideoEffectsSupport() != MpvPlayer.VIDEO_EFFECTS_UNAVAILABLE);
+    private boolean isMpvVideoOutputReady() {
+        return SettingPanelViews.isPlaybackPrepared(eventSource) && mpv.getVideoEffectsSupport() != MpvPlayer.VIDEO_EFFECTS_UNAVAILABLE;
     }
 
     private void updateStatus(String text) {

@@ -4,6 +4,10 @@ import static androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FILL;
 import static androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_FIT;
 import static androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM;
 
+import androidx.annotation.Nullable;
+import androidx.media3.common.C;
+import androidx.media3.common.DecoderMode;
+
 import com.github.catvod.utils.Prefers;
 import com.github.catvod.utils.RuntimeModule;
 
@@ -11,8 +15,6 @@ public class PlayerSetting {
 
     public static final int ENGINE_EXO = 0;
     public static final int ENGINE_MPV = 1;
-    public static final int RENDER_SURFACE = 0;
-    public static final int RENDER_TEXTURE = 1;
     public static final int MIN_SCALE = 0;
     public static final int MAX_SCALE = 2;
     private static final int MIN_SIZE = 0;
@@ -32,7 +34,7 @@ public class PlayerSetting {
 
     public static void putEngine(int engine) {
         Prefers.put("player_engine", Math.clamp(engine, ENGINE_EXO, ENGINE_MPV));
-        if (isExo() && DecodeSetting.isTunnel()) putRender(RENDER_SURFACE);
+        if (isExo() && OutputSetting.isTunnel()) OutputSetting.putRender(OutputSetting.RENDER_SURFACE);
     }
 
     public static boolean isExo() {
@@ -43,65 +45,40 @@ public class PlayerSetting {
         return getEngine() == ENGINE_MPV;
     }
 
+    public static DecoderMode getDecoderMode(int engine, @C.TrackType int trackType) {
+        String key = getDecoderModeKey(engine, trackType);
+        if (key == null) return DecoderMode.AUTO;
+        String value = Prefers.getString(key);
+        for (DecoderMode mode : DecoderMode.values()) if (mode.name().equals(value) && isDecoderModeSupported(engine, mode)) return mode;
+        return DecoderMode.AUTO;
+    }
+
+    public static void putDecoderMode(int engine, @C.TrackType int trackType, DecoderMode mode) {
+        String key = getDecoderModeKey(engine, trackType);
+        if (key != null && isDecoderModeSupported(engine, mode)) Prefers.put(key, mode.name());
+    }
+
+    @Nullable
+    private static String getDecoderModeKey(int engine, @C.TrackType int trackType) {
+        if (engine == ENGINE_MPV) return trackType == C.TRACK_TYPE_VIDEO ? "decode_mpv_video_mode" : null;
+        if (engine != ENGINE_EXO) return null;
+        return switch (trackType) {
+            case C.TRACK_TYPE_AUDIO -> "decode_exo_audio_mode";
+            case C.TRACK_TYPE_VIDEO -> "decode_exo_video_mode";
+            default -> null;
+        };
+    }
+
+    private static boolean isDecoderModeSupported(int engine, DecoderMode mode) {
+        return engine != ENGINE_MPV || mode != DecoderMode.SOFTWARE;
+    }
+
     public static boolean isDebug() {
         return Prefers.getBoolean("player_debug");
     }
 
     public static void putDebug(boolean debug) {
         Prefers.put("player_debug", debug);
-    }
-
-    public static boolean isLibass() {
-        return Prefers.getBoolean("player_libass", true);
-    }
-
-    public static void putLibass(boolean libass) {
-        Prefers.put("player_libass", libass);
-    }
-
-    public static boolean isMpvGpuNext() {
-        return Prefers.getBoolean("mpv_gpu_next");
-    }
-
-    public static void putMpvGpuNext(boolean gpuNext) {
-        Prefers.put("mpv_gpu_next", gpuNext);
-    }
-
-    public static boolean isMpvVulkan() {
-        return Prefers.getBoolean("mpv_vulkan");
-    }
-
-    public static void putMpvVulkan(boolean vulkan) {
-        Prefers.put("mpv_vulkan", vulkan);
-    }
-
-    public static int getMotion() {
-        return Math.clamp(Prefers.getInt("player_motion"), 0, 2);
-    }
-
-    public static void putMotion(int motion) {
-        Prefers.put("player_motion", Math.clamp(motion, 0, 2));
-    }
-
-    public static int getMotionFps() {
-        return getMotionFps(getMotion());
-    }
-
-    public static int getMotionFps(int motion) {
-        return switch (motion) {
-            case 1 -> 60;
-            case 2 -> 120;
-            default -> 0;
-        };
-    }
-
-    public static int getRender() {
-        return Math.clamp(Prefers.getInt("render", RENDER_SURFACE), RENDER_SURFACE, RENDER_TEXTURE);
-    }
-
-    public static void putRender(int render) {
-        Prefers.put("render", Math.clamp(render, RENDER_SURFACE, RENDER_TEXTURE));
-        if (isExo() && DecodeSetting.isTunnel() && getRender() == RENDER_TEXTURE) DecodeSetting.putTunnel(false);
     }
 
     public static int getSize() {

@@ -16,7 +16,7 @@ import androidx.media3.common.Tracks;
 import androidx.media3.exoplayer.audio.AudioSink;
 
 import com.fongmi.android.tv.App;
-import com.fongmi.android.tv.setting.DecodeSetting;
+import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -65,8 +65,8 @@ public final class PlaybackLog {
         body.addProperty("playbackState", player.getPlaybackState());
         body.addProperty("playWhenReady", player.getPlayWhenReady());
         body.addProperty("audioSessionId", player.getAudioSessionId());
-        body.addProperty("tunnelingSettingEnabled", DecodeSetting.isTunnelingEnabled());
-        body.addProperty("passthroughAllowed", DecodeSetting.isAudioPassThrough());
+        body.addProperty("tunnelingSettingEnabled", OutputSetting.isTunnelingEnabled());
+        body.addProperty("passthroughAllowed", OutputSetting.isAudioPassThrough());
         body.addProperty("audioDecoderMode", audioMode == null ? null : audioMode.name());
         body.addProperty("videoDecoderMode", videoMode == null ? null : videoMode.name());
         addAudioAttributes(body, player);

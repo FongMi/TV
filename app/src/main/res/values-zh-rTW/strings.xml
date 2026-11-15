@@ -333,7 +333,6 @@
     <string name="player_engine">播放引擎</string>
     <string name="player_debug">偵錯</string>
     <string name="player_render">視訊輸出</string>
-    <string name="player_libass">字幕特效</string>
     <string name="player_background">背景播放</string>
     <string name="player_audio_pass_through">音訊直通</string>
     <string name="player_audio_decode">音訊軟解</string>
@@ -343,7 +342,7 @@
     <string name="player_adblock">智慧去廣</string>
     <string name="player_tunnel">隧道模式</string>
     <string name="player_buffer">緩衝時間</string>
-    <string name="player_decode_setting">解碼設定</string>
+    <string name="player_output_setting">輸出設定</string>
     <string name="player_preload_setting">預載設定</string>
     <string name="player_preload">預載</string>
     <string name="player_preload_next">預載下集</string>

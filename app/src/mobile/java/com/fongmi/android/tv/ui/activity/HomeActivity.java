@@ -43,8 +43,8 @@ import com.fongmi.android.tv.ui.base.BaseActivity;
 import com.fongmi.android.tv.ui.custom.FragmentStateManager;
 import com.fongmi.android.tv.ui.fragment.ModuleFragment;
 import com.fongmi.android.tv.ui.fragment.SettingDanmakuFragment;
-import com.fongmi.android.tv.ui.fragment.SettingDecodeFragment;
 import com.fongmi.android.tv.ui.fragment.SettingFragment;
+import com.fongmi.android.tv.ui.fragment.SettingOutputFragment;
 import com.fongmi.android.tv.ui.fragment.SettingPlayerFragment;
 import com.fongmi.android.tv.ui.fragment.SettingPreloadFragment;
 import com.fongmi.android.tv.ui.fragment.VodFragment;
@@ -149,7 +149,7 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
             case 2 -> SettingPlayerFragment.newInstance();
             case 3 -> SettingDanmakuFragment.newInstance();
             case 4 -> SettingPreloadFragment.newInstance();
-            case 5 -> SettingDecodeFragment.newInstance();
+            case 5 -> SettingOutputFragment.newInstance();
             case 6 -> ModuleFragment.newInstance();
             default -> null;
         };
