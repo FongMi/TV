@@ -110,6 +110,9 @@ public interface PlayerEngine {
     default void clearPreload() {
     }
 
+    default void onTrackRestoreRequested() {
+    }
+
     default void bindPlayerView(PlayerView playerView) {
     }
 

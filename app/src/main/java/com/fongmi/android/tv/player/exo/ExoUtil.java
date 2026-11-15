@@ -72,15 +72,13 @@ public final class ExoUtil {
         return item.localConfiguration != null && item.localConfiguration.tag instanceof Auth.Context auth ? auth : null;
     }
 
-    static DecodeTrackSelector buildTrackSelector(DecoderManager decoderManager) {
-        DecodeTrackSelector trackSelector = decoderManager.createTrackSelector(App.get());
+    static void configureTrackSelector(DecodeTrackSelector trackSelector) {
         DefaultTrackSelector.Parameters.Builder builder = trackSelector.buildUponParameters();
         if (OutputSetting.isPreferAAC()) builder.setPreferredAudioMimeType(MimeTypes.AUDIO_AAC);
         builder.setPreferredTextLanguages(LangUtil.getPreferredTextLanguages());
         builder.setTunnelingEnabled(OutputSetting.isTunnelingEnabled());
         builder.setForceHighestSupportedBitrate(true);
         trackSelector.setParameters(builder.build());
-        return trackSelector;
     }
 
     static RenderersFactory buildRenderersFactory() {
