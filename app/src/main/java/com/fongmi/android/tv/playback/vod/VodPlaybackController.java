@@ -561,7 +561,7 @@ public class VodPlaybackController {
     public void setOpening(long opening) {
         if (state.getHistory() != null) state.getHistory().setOpening(opening);
         activeSkip = null;
-        if (state.getPlayingRequest() != null) preloader.update(state.getQuality());
+        preloader.onOpeningChanged();
     }
 
     public void setEnding(long ending) {

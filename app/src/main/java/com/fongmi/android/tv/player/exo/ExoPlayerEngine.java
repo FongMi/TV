@@ -150,6 +150,10 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
         session.setAudioPassThrough(enabled);
     }
 
+    public void updatePreloadAudioPreference() {
+        session.updatePreloadAudioPreference();
+    }
+
     public void setTunnelingEnabled(boolean enabled) {
         session.setTunnelingEnabled(enabled);
     }
@@ -233,6 +237,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     @Override
     public boolean setMediaItem(PlaySpec spec, long startPositionMs) {
         this.spec = spec;
+        session.clearPreloadAudioPreference();
         clearPreloadQueue();
         MediaItem item = MediaItemFactory.from(this.spec);
         MediaSource source = navigation.prepareMediaSource(App.get(),
@@ -293,7 +298,7 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     public boolean seekToNext() {
         int index = player.getCurrentMediaItemIndex() + 1;
         if (!preloadAttached || preloadItem == null || index >= player.getMediaItemCount() || !preloadItem.equals(player.getMediaItemAt(index))) return false;
-        player.seekTo(index, session.getPreloadStartPositionMs());
+        player.seekToPreloadedMediaItem(index, session.getPreloadStartPositionMs());
         return true;
     }
 
@@ -320,6 +325,11 @@ public class ExoPlayerEngine implements PlayerEngine, AnalyticsListener {
     public void clearPreload() {
         clearPreloadQueue();
         session.clearPreload();
+    }
+
+    @Override
+    public void onTrackRestoreRequested() {
+        session.onTrackRestoreRequested();
     }
 
     private void clearPreloadQueue() {

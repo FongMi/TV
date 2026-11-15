@@ -7,6 +7,9 @@ import androidx.annotation.Nullable;
 import androidx.media3.common.C;
 import androidx.media3.common.DolbyVisionOutputPolicy;
 import androidx.media3.common.MediaItem;
+import androidx.media3.common.Timeline;
+import androidx.media3.common.TrackSelectionOverride;
+import androidx.media3.common.Tracks;
 import androidx.media3.common.audio.AudioProcessor;
 import androidx.media3.decoder.ffmpeg.FfmpegMotionInterpolationController;
 import androidx.media3.exoplayer.DecoderManager;
@@ -23,13 +26,17 @@ import androidx.media3.exoplayer.text.SecondaryTextOutput;
 import androidx.media3.exoplayer.text.SubtitleTranscriptSession;
 import androidx.media3.exoplayer.trackselection.DecodeTrackSelector;
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector;
+import androidx.media3.exoplayer.trackselection.ExoTrackSelection;
 import androidx.media3.exoplayer.trackselection.SecondaryTextTrackSelector;
+import androidx.media3.exoplayer.trackselection.TrackSelectionUtil;
 import androidx.media3.exoplayer.trackselection.TrackSelector;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.bean.Track;
 import com.fongmi.android.tv.player.subtitle.AndroidFontConfig;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.player.subtitle.SubtitleFileContent;
+import com.fongmi.android.tv.player.track.TrackUtil;
 import com.fongmi.android.tv.setting.OutputSetting;
 import com.fongmi.android.tv.setting.PlayerSetting;
 import com.fongmi.android.tv.setting.PreloadSetting;
@@ -38,6 +45,7 @@ import com.fongmi.android.tv.setting.SubtitleSetting;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 final class ExoPlayerSession {
 
@@ -53,7 +61,8 @@ final class ExoPlayerSession {
     private final LibassPlaybackSession libassPlaybackSession;
     private final SubtitleTranscriptSession subtitleTranscriptSession;
     private final DefaultPreloadManager preloadManager;
-    private final List<DecodeTrackSelector> trackSelectors = new ArrayList<>(2);
+    private final AtomicReference<AudioPreloadPreference> preloadAudioPreference = new AtomicReference<>();
+    private final List<EpisodeTrackSelector> trackSelectors = new ArrayList<>(2);
     private boolean audioPassThrough;
     private @DolbyVisionOutputPolicy.Mode int dolbyVisionOutputPolicy;
     private final boolean decoderPrewarmingEnabled;
@@ -140,7 +149,9 @@ final class ExoPlayerSession {
     }
 
     private DecodeTrackSelector createTrackSelector() {
-        DecodeTrackSelector selector = ExoUtil.buildTrackSelector(decoderManager);
+        EpisodeTrackSelector selector = new EpisodeTrackSelector();
+        decoderManager.registerTrackSelector(selector);
+        ExoUtil.configureTrackSelector(selector);
         trackSelectors.add(selector);
         return selector;
     }
@@ -168,11 +179,26 @@ final class ExoPlayerSession {
     void preload(MediaItem mediaItem, long startPositionMs, Runnable onReady, Runnable onError) {
         PreloadRequest request = new PreloadRequest(mediaItem, Math.max(0, startPositionMs), onReady, onError);
         clearPreload();
+        preloadAudioPreference.set(findAudioPreference(mediaItem));
         preloadRequest = request;
         libassPlaybackSession.setPreloadMediaItem(mediaItem);
         subtitleTranscriptSession.setPreloadMediaItem(mediaItem);
         preloadManager.add(request.mediaItem(), 0);
         preloadManager.invalidate();
+    }
+
+    void updatePreloadAudioPreference() {
+        PreloadRequest request = preloadRequest;
+        if (request == null) return;
+        preloadAudioPreference.set(findAudioPreference(request.mediaItem()));
+        preloadManager.invalidate();
+        for (EpisodeTrackSelector selector : trackSelectors) selector.invalidateEpisodeSelection();
+    }
+
+    @Nullable
+    private AudioPreloadPreference findAudioPreference(MediaItem mediaItem) {
+        Track track = Track.find(mediaItem.mediaId).stream().filter(item -> item.getType() == C.TRACK_TYPE_AUDIO && !item.isSecondary()).findFirst().orElse(null);
+        return track == null ? null : new AudioPreloadPreference(mediaItem.requestMetadata, track);
     }
 
     @Nullable
@@ -197,6 +223,17 @@ final class ExoPlayerSession {
         if (request == null) return;
         preloadRequest = null;
         preloadManager.remove(request.mediaItem());
+    }
+
+    void clearPreloadAudioPreference() {
+        preloadAudioPreference.set(null);
+    }
+
+    void onTrackRestoreRequested() {
+        AudioPreloadPreference preference = preloadAudioPreference.get();
+        if (preference != null && preference.matches(player.getCurrentMediaItem())) {
+            player.createMessage((type, payload) -> preloadAudioPreference.compareAndSet(preference, null)).send();
+        }
     }
 
     void release() {
@@ -254,6 +291,41 @@ final class ExoPlayerSession {
             Log.w(TAG, "Preload failed", exception);
             clearPreload();
             request.onError().run();
+        }
+    }
+
+    private final class EpisodeTrackSelector extends DecodeTrackSelector {
+
+        EpisodeTrackSelector() {
+            super(App.get());
+        }
+
+        void invalidateEpisodeSelection() {
+            invalidate(null);
+        }
+
+        @Override
+        protected Parameters resolveParametersForSelection(MappedTrackInfo mappedTrackInfo, MediaSource.MediaPeriodId periodId, Timeline timeline, Parameters parameters) {
+            AudioPreloadPreference preference = preloadAudioPreference.get();
+            if (preference == null || !preference.matches(getMediaItem(periodId, timeline))) return parameters;
+            Tracks tracks = TrackSelectionUtil.buildTracks(mappedTrackInfo, new ExoTrackSelection[mappedTrackInfo.getRendererCount()]);
+            TrackSelectionOverride override = TrackUtil.findRestorationOverride(tracks, preference.track());
+            return override == null ? parameters : parameters.buildUpon().setOverrideForType(override).build();
+        }
+
+        @Nullable
+        private MediaItem getMediaItem(MediaSource.MediaPeriodId periodId, Timeline timeline) {
+            int index = timeline.getIndexOfPeriod(periodId.periodUid);
+            if (index == C.INDEX_UNSET) return null;
+            int windowIndex = timeline.getPeriod(index, new Timeline.Period()).windowIndex;
+            return timeline.getWindow(windowIndex, new Timeline.Window()).mediaItem;
+        }
+    }
+
+    private record AudioPreloadPreference(MediaItem.RequestMetadata requestMetadata, Track track) {
+
+        boolean matches(@Nullable MediaItem mediaItem) {
+            return mediaItem != null && mediaItem.requestMetadata == requestMetadata;
         }
     }
 

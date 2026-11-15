@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.playback.vod;
 
 import androidx.annotation.Nullable;
+import androidx.media3.common.C;
 import androidx.media3.common.MediaMetadata;
 
 import com.fongmi.android.tv.bean.Episode;
@@ -218,11 +219,11 @@ public class VodPlaybackState {
     }
 
     void beginPreload(VodPlayRequest request) {
-        preload = new PreloadEntry(request, null);
+        preload = new PreloadEntry(request, null, C.TIME_UNSET);
     }
 
-    void completePreload(Result result) {
-        if (preload != null) preload = new PreloadEntry(preload.request(), result);
+    void completePreload(Result result, long startPositionMs) {
+        if (preload != null) preload = new PreloadEntry(preload.request(), result, startPositionMs);
     }
 
     @Nullable
@@ -286,7 +287,7 @@ public class VodPlaybackState {
         this.searchKeyword = searchKeyword == null ? "" : searchKeyword;
     }
 
-    record PreloadEntry(VodPlayRequest request, @Nullable Result result) {
+    record PreloadEntry(VodPlayRequest request, @Nullable Result result, long startPositionMs) {
 
         boolean isPending() {
             return result == null;

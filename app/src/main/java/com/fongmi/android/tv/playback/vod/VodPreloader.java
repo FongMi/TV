@@ -82,7 +82,19 @@ final class VodPreloader {
     void onResult(PlaybackResult<VodPlayRequest> preload) {
         VodPlaybackState.PreloadEntry pending = state.getPreload();
         if (preload == null || pending == null || !pending.isPending() || pending.request() != preload.request()) return;
-        apply(preload.request(), preload.result());
+        VodPlayRequest request = preload.request();
+        Result result = preload.result();
+        if (result != null && !result.getUrl().getValues().isEmpty()) result.getUrl().set(request.getQualityPosition());
+        prepare(request, result, C.TIME_UNSET);
+    }
+
+    void onOpeningChanged() {
+        VodPlaybackState.PreloadEntry preload = state.getPreload();
+        if (preload == null || preload.isPending()) return;
+        Result result = preload.result();
+        long positionMs = startPositionMs(result);
+        if (preload.startPositionMs() == positionMs) return;
+        prepare(preload.request(), result, positionMs);
     }
 
     void onError(VodPlayRequest request) {
@@ -108,10 +120,9 @@ final class VodPreloader {
         return episode.isSelected() || SourceUrl.isResolved(episode.getUrl()) ? null : episode;
     }
 
-    private void apply(VodPlayRequest request, Result result) {
-        if (result != null && !result.getUrl().getValues().isEmpty()) result.getUrl().set(request.getQualityPosition());
+    private void prepare(VodPlayRequest request, Result result, long positionMs) {
         Episode episode = state.findEpisode(host.getVodKey(), request);
-        if (isPreloadable(request, result, episode)) start(request, result, episode);
+        if (isPreloadable(request, result, episode)) start(request, result, episode, positionMs);
         else clear();
     }
 
@@ -119,10 +130,14 @@ final class VodPreloader {
         return episode != null && host.canPreloadNext() && request.accepts(result) && !result.hasMsg() && !result.needParse() && !result.isUseParse() && !result.getRealUrl().isEmpty() && Source.get().canPreload(result.getUrl().uri());
     }
 
-    private void start(VodPlayRequest request, Result result, Episode episode) {
+    private long startPositionMs(Result result) {
+        return Math.max(0, VodSkipPolicy.startPositionMs(state.getHistory(), result, C.TIME_UNSET));
+    }
+
+    private void start(VodPlayRequest request, Result result, Episode episode, long positionMs) {
+        if (positionMs == C.TIME_UNSET) positionMs = startPositionMs(result);
         MediaMetadata metadata = VodPlaybackMedia.metadata(state.getHistory(), episode);
-        long position = Math.max(0, VodSkipPolicy.startPositionMs(state.getHistory(), result, C.TIME_UNSET));
-        if (host.preloadPlayback(result, position, metadata, request)) state.completePreload(result);
+        if (host.preloadPlayback(result, positionMs, metadata, request)) state.completePreload(result, positionMs);
         else clear();
     }
 }

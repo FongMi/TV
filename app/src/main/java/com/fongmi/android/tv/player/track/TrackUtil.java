@@ -171,7 +171,7 @@ public class TrackUtil {
     }
 
     @Nullable
-    private static TrackSelectionOverride findRestorationOverride(Tracks tracks, Track track) {
+    public static TrackSelectionOverride findRestorationOverride(Tracks tracks, Track track) {
         if (track.isSecondary()) return null;
         TrackInfo info = find(tracks, track);
         if (info != null) return createOverride(track, info);

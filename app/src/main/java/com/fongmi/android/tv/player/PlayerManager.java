@@ -457,10 +457,10 @@ public class PlayerManager implements ParseCallback {
             audioPassThroughChange = new AudioPassThroughChange(enabled, change);
             return change;
         }
-        if (engine instanceof ExoPlayerEngine exo) updateExoOutputSettings(() -> {
+        if (engine instanceof ExoPlayerEngine exo) {
             exo.setAudioPassThrough(enabled);
             OutputSetting.putAudioPassThrough(enabled);
-        });
+        }
         return Futures.immediateVoidFuture();
     }
 
@@ -478,7 +478,7 @@ public class PlayerManager implements ParseCallback {
                 return null;
             }, MoreExecutors.directExecutor());
         }
-        if (engine instanceof ExoPlayerEngine exo) updateExoOutputSettings(() -> exo.setDolbyVisionOutputPolicy(policy));
+        if (engine instanceof ExoPlayerEngine exo) exo.setDolbyVisionOutputPolicy(policy);
         OutputSetting.putDolbyVisionOutputPolicy(policy);
         return Futures.immediateVoidFuture();
     }
@@ -489,14 +489,6 @@ public class PlayerManager implements ParseCallback {
         initTrack = false;
         pendingTrackRestore.clear();
         if (player.getPlaybackState() == Player.STATE_BUFFERING) App.post(runnable, Constant.TIMEOUT_PLAY);
-    }
-
-    private void updateExoOutputSettings(Runnable update) {
-        PendingPreload preload = queuedPreload != null ? queuedPreload : pendingPreload;
-        clearPreload();
-        update.run();
-        if (preload != null) pendingPreload = new PendingPreload(preload.spec(), preload.startPositionMs(), preload.tag());
-        startPreloadIfReady();
     }
 
     public boolean canSetTunneling() {
@@ -680,6 +672,7 @@ public class PlayerManager implements ParseCallback {
         }
         track.key(getKey()).save();
         clearPendingTrackRestore(track.getType(), track.getRole());
+        if (track.getType() == C.TRACK_TYPE_AUDIO) refreshPreloadAudioSelection();
     }
 
     public void setVideoSetting(int preset) {
@@ -831,6 +824,7 @@ public class PlayerManager implements ParseCallback {
     public void resetTrack() {
         pendingTrackRestore.clear();
         TrackUtil.reset(player);
+        refreshPreloadAudioSelection();
     }
 
     private void handleRefreshError(PlaybackException e) {
@@ -1042,6 +1036,10 @@ public class PlayerManager implements ParseCallback {
         if (!engine.preload(preload.spec(), preload.startPositionMs(), () -> onPreloadError(preload))) onPreloadError(preload);
     }
 
+    private void refreshPreloadAudioSelection() {
+        if (engine instanceof ExoPlayerEngine exo) exo.updatePreloadAudioPreference();
+    }
+
     private void onPreloadError(PendingPreload preload) {
         if (pendingPreload != preload && queuedPreload != preload) return;
         clearPreload();
@@ -1144,6 +1142,7 @@ public class PlayerManager implements ParseCallback {
             if (selection != null) engine.restoreSecondarySubtitleSelection(selection);
             else pendingTrackRestore.add(secondary);
         }
+        engine.onTrackRestoreRequested();
     }
 
     private void retryPendingTrackSelection() {
