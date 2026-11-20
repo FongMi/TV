@@ -1,5 +1,6 @@
 package com.fongmi.android.tv.playback.vod;
 
+import androidx.annotation.Nullable;
 import androidx.media3.common.MediaMetadata;
 
 import com.fongmi.android.tv.api.DanmakuApi;
@@ -16,11 +17,15 @@ import java.util.function.Consumer;
 
 public final class VodPlaybackMedia {
 
-    public static MediaMetadata metadata(History history, Episode episode) {
+    public static MediaMetadata metadata(History history, Episode episode, @Nullable Result result) {
         String title = history.getVodName();
         String name = episode.getName();
         if (name.equals(title)) name = "";
-        return MediaItemFactory.buildMetadata(title, name, history.getVodPic());
+        return MediaItemFactory.buildMetadata(title, name, artwork(history, result));
+    }
+
+    static String artwork(History history, @Nullable Result result) {
+        return result != null && result.hasArtwork() ? result.getArtwork() : history.getVodPic();
     }
 
     public static void searchDanmaku(Result result, History history, Episode episode, BooleanSupplier isCurrent, Consumer<Danmaku> set, Consumer<Danmaku> add) {

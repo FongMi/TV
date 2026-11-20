@@ -224,11 +224,12 @@ public class VodPlaybackController {
     }
 
     private void renderPlaybackResult(Result result, Episode episode) {
+        History history = state.getHistory();
         host.renderUseParse(state.isUseParse());
         host.renderQuality(result, result.getUrl().isMulti());
         if (result.hasDesc()) host.renderDescription(result.getDesc());
-        if (result.hasArtwork()) host.renderArtwork(result.getArtwork());
-        host.loadDanmaku(result, state.getHistory(), episode);
+        host.renderArtwork(VodPlaybackMedia.artwork(history, result));
+        host.loadDanmaku(result, history, episode);
     }
 
     private void applyPlaybackState(Result result, VodPlayRequest request) {
@@ -742,8 +743,10 @@ public class VodPlaybackController {
     }
 
     private MediaMetadata publishPlaybackMetadata(Episode episode) {
-        VodPlaybackInfo.update(state.getHistory(), state.getFlag(), episode);
-        MediaMetadata metadata = VodPlaybackMedia.metadata(state.getHistory(), episode);
+        History history = state.getHistory();
+        Result result = state.getPlayingRequest() == null ? null : state.getQuality();
+        VodPlaybackInfo.update(history, state.getFlag(), episode);
+        MediaMetadata metadata = VodPlaybackMedia.metadata(history, episode, result);
         state.setPlaybackMetadata(metadata);
         host.renderPlaybackMetadata(metadata);
         return metadata;
