@@ -28,6 +28,7 @@ public class VodHistoryPolicy {
         if (Setting.isIncognito()) history.delete();
         item.checkName(history.getVodName());
         history.setVodName(item.getName());
+        history.setVodPic(item.getPic());
         return history;
     }
 

@@ -136,7 +136,7 @@ final class VodPreloader {
 
     private void start(VodPlayRequest request, Result result, Episode episode, long positionMs) {
         if (positionMs == C.TIME_UNSET) positionMs = startPositionMs(result);
-        MediaMetadata metadata = VodPlaybackMedia.metadata(state.getHistory(), episode);
+        MediaMetadata metadata = VodPlaybackMedia.metadata(state.getHistory(), episode, result);
         if (host.preloadPlayback(result, positionMs, metadata, request)) state.completePreload(result, positionMs);
         else clear();
     }
