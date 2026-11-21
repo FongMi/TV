@@ -2,10 +2,12 @@ package com.fongmi.android.tv.player.subtitle;
 
 import android.graphics.Typeface;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.LruCache;
 
 import androidx.annotation.Nullable;
+import androidx.media3.common.text.SubtitleFontFile;
 import androidx.media3.exoplayer.libass.LibassFontFile;
 
 import com.fongmi.android.tv.utils.FileUtil;
@@ -32,6 +34,7 @@ import java.util.stream.Collectors;
 public final class ExternalFont {
 
     private static final String MPV_FONT_PREFIX = "mpv://";
+    private static final String SUBTITLE_FILE_PREFIX = "font:";
     private static final String TEMP_FILE_PREFIX = ".external-font-";
     private static final String TEMP_FILE_SUFFIX = ".tmp";
     private static final int COPY_BUFFER_SIZE = 64 * 1024;
@@ -56,13 +59,26 @@ public final class ExternalFont {
     }
 
     public static List<Entry> getAll(@Nullable File additionalDirectory) {
+        return getAll(additionalDirectory, null, false);
+    }
+
+    public static List<Entry> getSubtitleEntries(@Nullable File additionalDirectory, @Nullable Item selected) {
+        return getAll(additionalDirectory, selected, true);
+    }
+
+    private static List<Entry> getAll(@Nullable File additionalDirectory, @Nullable Item selected, boolean includeCollectionFaces) {
         List<File> directories = getDirectories(additionalDirectory);
         List<File[]> filesByDirectory = new ArrayList<>();
         List<Entry> entries = new ArrayList<>();
         for (int i = 0; i < directories.size(); i++) {
             File[] files = listSupportedFiles(directories.get(i));
             if (files != null) filesByDirectory.add(files);
-            addEntries(entries, files, i != 0);
+            addEntries(entries, files, i != 0, includeCollectionFaces);
+        }
+        if (selected != null && entries.stream().noneMatch(entry -> entry.item().sameFace(selected))) {
+            File file = selected.file();
+            filesByDirectory.add(new File[]{file});
+            entries.addAll(getEntries(file, selected.source() != null, includeCollectionFaces));
         }
         pruneCache(filesByDirectory);
         return entries;
@@ -81,12 +97,11 @@ public final class ExternalFont {
         directories.add(directory);
     }
 
-    private static void addEntries(List<Entry> entries, @Nullable File[] files, boolean additional) {
+    private static void addEntries(List<Entry> entries, @Nullable File[] files, boolean additional, boolean includeCollectionFaces) {
         if (files == null) return;
         Arrays.stream(files)
                 .sorted((first, second) -> first.getName().compareToIgnoreCase(second.getName()))
-                .map(file -> getEntry(file, additional))
-                .filter(Objects::nonNull)
+                .flatMap(file -> getEntries(file, additional, includeCollectionFaces).stream())
                 .forEach(entries::add);
     }
 
@@ -106,6 +121,29 @@ public final class ExternalFont {
         if (sameDirectory(directory, getMpvDirectory())) return getItem(file, true);
         if (additionalDirectory == null || !sameDirectory(directory, additionalDirectory)) return null;
         return getItem(file, true);
+    }
+
+    @Nullable
+    public static Item findSubtitle(String key) {
+        if (!key.startsWith(SUBTITLE_FILE_PREFIX)) return find(key, null);
+        int separator = key.indexOf(':', SUBTITLE_FILE_PREFIX.length());
+        if (separator < 0) return null;
+        try {
+            int index = Integer.parseInt(key.substring(SUBTITLE_FILE_PREFIX.length(), separator));
+            File file = new File(key.substring(separator + 1));
+            if (!file.isAbsolute() || !isSupportedFile(file)) return null;
+            boolean additional = !sameDirectory(file.getParentFile(), getDirectory());
+            return getItem(file, additional, index);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    public static List<Entry> readSubtitleFile(File file) throws IOException {
+        if (!isSupportedFile(file)) throw new IOException("Unsupported font file");
+        List<Entry> entries = getEntries(file, !sameDirectory(file.getParentFile(), getDirectory()), true);
+        if (entries.isEmpty()) throw new IOException("Unsupported font face");
+        return entries;
     }
 
     @Nullable
@@ -135,18 +173,22 @@ public final class ExternalFont {
 
     @Nullable
     private static Typeface loadTypeface(Item item, String cacheKey) {
-        File file = item.source() == null ? getFile(item.fileName()) : item.source();
+        File file = item.file();
         if (!isSupportedFile(file)) return null;
-        Typeface typeface = createTypeface(file);
+        Typeface typeface = createTypeface(file, item.faceIndex());
         if (typeface != null) TYPEFACE_CACHE.put(cacheKey, typeface);
         return typeface;
     }
 
-    @Nullable
-    private static Entry getEntry(File file, boolean additional) {
+    private static List<Entry> getEntries(File file, boolean additional, boolean includeCollectionFaces) {
         synchronized (CACHE_LOCK) {
-            Item item = getItemLocked(file, additional);
-            return item == null ? null : new Entry(item, getTypefaceLocked(item));
+            List<Entry> result = new ArrayList<>();
+            for (Item item : getItemsLocked(file, additional)) {
+                if (!includeCollectionFaces && item.faceIndex() != 0) continue;
+                Typeface typeface = getTypefaceLocked(item);
+                if (typeface != null) result.add(new Entry(item, typeface));
+            }
+            return result;
         }
     }
 
@@ -160,8 +202,8 @@ public final class ExternalFont {
 
     private static PreparedFont prepareFont(Uri uri, File temporary) throws IOException {
         byte[] sha256 = copyWithSha256(uri, temporary);
-        Typeface typeface = createTypefaceOrThrow(temporary);
-        return new PreparedFont(sha256, typeface, requireFamilyName(temporary));
+        if (createTypeface(temporary, 0) == null) throw new IOException("Unsupported font file");
+        return new PreparedFont(sha256, requireFamilyName(temporary));
     }
 
     private static byte[] copyWithSha256(Uri uri, File target) throws IOException {
@@ -197,22 +239,13 @@ public final class ExternalFont {
         String displayName = FileUtil.getDisplayName(uri, "font.ttf");
         File target = nextAvailableFile(directory, sanitizeFileName(displayName));
         Path.move(temporary, target);
-        Item item = createItem(target, font.familyName(), false);
-        cacheItem(target, item, font.typeface());
-        return item;
+        return new Item(target.getName(), font.familyName(), getRevision(target));
     }
 
     private static String requireFamilyName(File file) throws IOException {
         String familyName = LibassFontFile.getFamilyName(file);
         if (TextUtils.isEmpty(familyName)) throw new IOException("Font family name is missing");
         return familyName;
-    }
-
-    private static void cacheItem(File file, Item item, Typeface typeface) {
-        synchronized (CACHE_LOCK) {
-            ITEM_CACHE.put(file.getAbsolutePath(), new CachedItem(item, file.length(), file.lastModified()));
-            TYPEFACE_CACHE.put(item.cacheKey(), typeface);
-        }
     }
 
     @Nullable
@@ -222,38 +255,54 @@ public final class ExternalFont {
 
     @Nullable
     private static Item getItem(File file, boolean additional) {
-        synchronized (CACHE_LOCK) {
-            return getItemLocked(file, additional);
-        }
+        return getItem(file, additional, 0);
     }
 
     @Nullable
-    private static Item getItemLocked(File file, boolean additional) {
+    private static Item getItem(File file, boolean additional, int index) {
+        synchronized (CACHE_LOCK) {
+            for (Item item : getItemsLocked(file, additional)) {
+                if (item.faceIndex() == index) return getTypefaceLocked(item) == null ? null : item;
+            }
+            return null;
+        }
+    }
+
+    private static List<Item> getItemsLocked(File file, boolean additional) {
         String path = file.getAbsolutePath();
         long length = file.length();
         long modified = file.lastModified();
         CachedItem cached = ITEM_CACHE.get(path);
-        if (cached == null || !cached.matches(length, modified)) cached = refreshItem(file, cached, length, modified, additional);
-        return cached.item();
+        if (cached != null && cached.matches(length, modified, additional)) return cached.items();
+        removeTypeface(cached);
+        List<Item> items = readItems(file, additional);
+        ITEM_CACHE.put(path, new CachedItem(items, length, modified, additional));
+        return items;
     }
 
-    private static CachedItem refreshItem(File file, @Nullable CachedItem cached, long length, long modified, boolean additional) {
-        removeTypeface(cached);
-        Typeface typeface = createTypeface(file);
-        String familyName = typeface == null ? null : readFamilyName(file);
-        Item item = TextUtils.isEmpty(familyName) ? null : createItem(file, familyName, additional);
-        CachedItem current = new CachedItem(item, length, modified);
-        ITEM_CACHE.put(file.getAbsolutePath(), current);
-        if (item != null) TYPEFACE_CACHE.put(item.cacheKey(), typeface);
-        return current;
+    private static List<Item> readItems(File file, boolean additional) {
+        try {
+            List<Item> items = new ArrayList<>();
+            long revision = getRevision(file);
+            File source = additional ? file.getAbsoluteFile() : null;
+            for (LibassFontFile.Face face : LibassFontFile.listFaces(file)) {
+                if (face.index != 0 && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) continue;
+                String label = face.inCollection ? getFaceLabel(face) : file.getName();
+                items.add(new Item(file.getName(), face.familyName, revision, source, face.index, label));
+            }
+            return List.copyOf(items);
+        } catch (IOException | RuntimeException e) {
+            return List.of();
+        }
+    }
+
+    private static String getFaceLabel(LibassFontFile.Face face) {
+        return face.styleName == null ? face.familyName + " " + (face.index + 1) : face.familyName + " " + face.styleName;
     }
 
     private static void removeTypeface(@Nullable CachedItem cached) {
-        if (cached != null && cached.item() != null) TYPEFACE_CACHE.remove(cached.item().cacheKey());
-    }
-
-    private static Item createItem(File file, String familyName, boolean additional) {
-        return new Item(file.getName(), familyName, getRevision(file), additional ? file.getAbsoluteFile() : null);
+        if (cached == null) return;
+        for (Item item : cached.items()) TYPEFACE_CACHE.remove(item.cacheKey());
     }
 
     private static void pruneCache(List<File[]> filesByDirectory) {
@@ -350,6 +399,7 @@ public final class ExternalFont {
         String name = displayName.toLowerCase(Locale.US);
         if (name.endsWith(".otf")) return ".otf";
         if (name.endsWith(".ttc")) return ".ttc";
+        if (name.endsWith(".otc")) return ".otc";
         return ".ttf";
     }
 
@@ -361,68 +411,69 @@ public final class ExternalFont {
     }
 
     private static boolean isSupportedFile(File file) {
-        if (file == null || !file.isFile() || file.length() <= 0 || file.length() > MAX_FILE_BYTES) return false;
+        if (file == null || !file.isFile() || !file.canRead() || file.length() <= 0 || file.length() > MAX_FILE_BYTES) return false;
         String name = file.getName().toLowerCase(Locale.US);
-        return name.endsWith(".ttf") || name.endsWith(".otf") || name.endsWith(".ttc");
-    }
-
-    private static Typeface createTypefaceOrThrow(File file) throws IOException {
-        Typeface typeface = createTypeface(file);
-        if (typeface == null) throw new IOException("Unsupported font file");
-        return typeface;
+        return name.endsWith(".ttf") || name.endsWith(".otf") || name.endsWith(".ttc") || name.endsWith(".otc");
     }
 
     @Nullable
-    private static String readFamilyName(File file) {
+    private static Typeface createTypeface(File file, int faceIndex) {
         try {
-            return LibassFontFile.getFamilyName(file);
-        } catch (IOException | RuntimeException e) {
-            return null;
-        }
-    }
-
-    @Nullable
-    private static Typeface createTypeface(File file) {
-        try {
-            return Typeface.createFromFile(file);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) return new Typeface.Builder(file).setTtcIndex(faceIndex).build();
+            return faceIndex == 0 ? Typeface.createFromFile(file) : null;
         } catch (RuntimeException e) {
             return null;
         }
     }
 
-    public record Item(String fileName, String familyName, long revision, @Nullable File source) {
+    public record Item(String fileName, String familyName, long revision, @Nullable File source, int faceIndex, String displayName) {
 
         public Item(String fileName, String familyName, long revision) {
             this(fileName, familyName, revision, null);
         }
 
-        public String displayName() {
-            return fileName;
+        public Item(String fileName, String familyName, long revision, @Nullable File source) {
+            this(fileName, familyName, revision, source, 0, fileName);
         }
 
         public String storageKey() {
             return source == null ? fileName : MPV_FONT_PREFIX + source.getAbsolutePath();
         }
 
+        public String subtitleStorageKey() {
+            return SUBTITLE_FILE_PREFIX + faceIndex + ':' + file().getAbsolutePath();
+        }
+
+        public File file() {
+            return source == null ? new File(getDirectory(), fileName) : source;
+        }
+
         public File directory() {
-            return source == null ? getDirectory() : source.getParentFile();
+            return file().getParentFile();
+        }
+
+        public boolean sameFace(Item other) {
+            return faceIndex == other.faceIndex && file().equals(other.file());
+        }
+
+        public SubtitleFontFile subtitleFontFile() {
+            return new SubtitleFontFile(file(), faceIndex);
         }
 
         private String cacheKey() {
-            return directory().getAbsolutePath() + File.separator + fileName + ':' + revision;
+            return subtitleStorageKey() + ':' + revision;
         }
     }
 
     public record Entry(Item item, @Nullable Typeface typeface) {
     }
 
-    private record PreparedFont(byte[] sha256, Typeface typeface, String familyName) {
+    private record PreparedFont(byte[] sha256, String familyName) {
     }
 
-    private record CachedItem(@Nullable Item item, long length, long modified) {
-
-        private boolean matches(long length, long modified) {
-            return this.length == length && this.modified == modified;
+    private record CachedItem(List<Item> items, long length, long modified, boolean additional) {
+        private boolean matches(long length, long modified, boolean additional) {
+            return this.length == length && this.modified == modified && this.additional == additional;
         }
     }
 }

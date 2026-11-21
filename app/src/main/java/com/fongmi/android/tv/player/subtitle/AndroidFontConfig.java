@@ -3,7 +3,6 @@ package com.fongmi.android.tv.player.subtitle;
 import androidx.annotation.Nullable;
 import androidx.media3.exoplayer.libass.LibassFontConfig;
 
-import com.fongmi.android.tv.player.mpv.MpvConfigFile;
 import com.github.catvod.utils.Path;
 
 import java.io.File;
@@ -19,7 +18,7 @@ public final class AndroidFontConfig {
         File output = Path.mpv(FONTS_CONF);
         File temporary = new File(output.getParentFile(), UUID.randomUUID().toString());
         try {
-            LibassFontConfig.write(temporary, Path.mpvCache(), ExternalFont.getDirectories(MpvConfigFile.getSubtitleFontsDirectory()));
+            LibassFontConfig.write(temporary, Path.mpvCache(), ExternalFont.getDirectories(null));
             Path.move(temporary, output);
             return output;
         } catch (IOException | SecurityException e) {

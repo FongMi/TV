@@ -164,6 +164,7 @@
     <string name="subtitle_style">Style</string>
     <string name="playback_font">Font</string>
     <string name="playback_font_default">System default</string>
+    <string name="playback_font_choose">Choose font file</string>
     <string name="playback_font_import">Import font</string>
     <string name="playback_font_imported">Font imported: %1$s</string>
     <string name="playback_font_import_failed">Unable to import font</string>
@@ -363,7 +364,7 @@
     <string name="player_motion_fps">%1$d fps</string>
     <string name="player_motion_capped">Target: %1$.2f fps (display limit)</string>
     <string name="player_motion_failed">Unable to change interpolation</string>
-    <string name="player_mpv_conf_priority_hint">Reopen playback to load mpv.conf. Media options, scripts, and controls can change settings afterward; the last write applies. volume is the control volume baseline.</string>
+    <string name="player_mpv_conf_priority_hint">Reopen playback to load mpv.conf. Subtitle layout uses the app settings. Media options, scripts, and controls can modify options afterward. volume is the control volume baseline.</string>
     <string name="player_mpv_conf_conflict_hint">Player controls manage: %1$s. Media options, scripts, and controls follow the last write; volume is the control volume baseline.</string>
     <string name="player_mpv_conf_import_success">Loaded mpv.conf. Tap OK to save.</string>
     <string name="player_mpv_conf_import_failed">Unable to import mpv.conf</string>

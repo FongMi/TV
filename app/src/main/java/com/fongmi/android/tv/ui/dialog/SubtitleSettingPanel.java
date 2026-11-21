@@ -24,6 +24,7 @@ import com.fongmi.android.tv.databinding.ViewSettingSliderBinding;
 import com.fongmi.android.tv.player.PlayerManager;
 import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.setting.SubtitleSetting;
+import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.SliderUtil;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
@@ -107,7 +108,9 @@ final class SubtitleSettingPanel implements Player.Listener {
         var appearance = binding.appearance;
         bindSystemSetting();
         bindStyle();
-        fontSelector.bind(appearance.fontGroup, SubtitleSetting.getFont());
+        ExternalFont.Item font = SubtitleSetting.getFont();
+        fontSelector.bind(appearance.fontGroup, font);
+        if (font == null && SubtitleSetting.hasFontSelection()) Notify.show(R.string.playback_font_load_failed);
         setupChip(appearance.textColorGroup, SubtitleSetting.getTextBaseColor(), this::chipForTextColor, this::textColorForChip, SubtitleSetting::putTextColor);
         setupTransparency(appearance.textOpacity, R.string.subtitle_text_opacity, SubtitleSetting.getTextOpacity(), SubtitleSetting::putTextOpacity);
         setupChip(appearance.edgeGroup, SubtitleSetting.getEdgeType(), this::chipForEdgeType, this::edgeTypeForChip, value -> {

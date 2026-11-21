@@ -33,7 +33,7 @@ public final class SubtitleSettingDialog {
 
     public static final class BottomSheet extends BaseBottomSheetDialog {
 
-        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
+        private final ExternalFontSelector fontSelector = ExternalFontSelector.forSubtitles(this, this::onFontSelected);
         private DialogSubtitleSettingBinding binding;
         private SubtitleSettingPanel panel;
 
@@ -85,7 +85,7 @@ public final class SubtitleSettingDialog {
 
     public static final class SideSheet extends BaseSideSheetDialog {
 
-        private final ExternalFontSelector fontSelector = new ExternalFontSelector(this, this::onFontSelected);
+        private final ExternalFontSelector fontSelector = ExternalFontSelector.forSubtitles(this, this::onFontSelected);
         private DialogSubtitleSettingBinding binding;
         private SubtitleSettingPanel panel;
 

@@ -260,7 +260,7 @@ final class ExoPlayerSession {
         String fontConfigPath = fontConfig != null && fontConfig.length() > 0 ? fontConfig.getAbsolutePath() : null;
         ExternalFont.Item font = SubtitleSetting.getFont();
         String fontFamily = font == null ? null : font.familyName();
-        String fontsDirectory = (font == null ? ExternalFont.getDirectory() : font.directory()).getAbsolutePath();
+        String fontsDirectory = ExternalFont.getDirectory().getAbsolutePath();
         LibassConfiguration configuration = new LibassConfiguration.Builder().setFontConfig(fontConfigPath).setFontsDirectory(fontsDirectory).setDefaultFontFamily(fontFamily).setMaximumRenderPixels(LIBASS_MAX_RENDER_PIXELS).setMaximumGlyphCount(LIBASS_MAX_GLYPH_COUNT).setMaximumBitmapCacheSizeMb(LIBASS_MAX_BITMAP_CACHE_SIZE_MB).build();
         return new LibassPlaybackSession(configuration);
     }

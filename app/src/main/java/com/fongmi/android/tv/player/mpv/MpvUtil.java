@@ -44,17 +44,25 @@ import java.util.List;
 
 public final class MpvUtil {
 
-    private static final List<String> FONT_OPTIONS = List.of("sub-font", "sub-fonts-dir", "sub-ass-style-overrides");
-    private static final List<String> SCALE_OPTIONS = List.of("sub-scale", "sub-scale-signs", "secondary-sub-scale");
+    private static final List<String> SUBTITLE_LAYOUT_OPTIONS = List.of(
+            "sub-font", "sub-font-file", "sub-font-size", "sub-font-size-em", "sub-font-provider", "sub-fonts-dir", "embeddedfonts",
+            "sub-color", "sub-back-color", "sub-border-style", "sub-outline-color", "sub-outline-size", "sub-shadow-offset",
+            "sub-spacing", "sub-line-spacing", "sub-blur", "sub-bold", "sub-italic", "sub-align-x", "sub-align-y", "sub-justify",
+            "sub-margin-x", "sub-margin-y", "sub-margin-y-offset", "sub-use-margins", "sub-ass-force-margins",
+            "sub-scale", "sub-scale-signs", "sub-scale-by-window", "sub-scale-with-window", "sub-ass-scale-with-window",
+            "sub-pos", "sub-offset-y", "secondary-sub-pos", "secondary-sub-offset-y", "secondary-sub-scale",
+            "sub-ass", "sub-ass-override", "secondary-sub-ass-override", "sub-ass-style-overrides", "sub-ass-styles", "sub-ass-justify",
+            "sub-ass-use-video-data", "sub-ass-video-aspect-override", "sub-ass-vsfilter-color-compat", "sub-vsfilter-bidi-compat", "sub-hinting", "sub-shaper");
     private static final List<String> CACHE_OPTIONS = List.of("cache", "cache-on-disk", "demuxer-cache-dir", "cache-secs");
     private static final List<String> MOTION_OPTIONS = List.of("motion-interpolation", "video-sync", "display-fps-override");
     private static final List<String> PLAYER_OPTIONS = List.of("vo", "gpu-api", "gpu-context", "force-window", "audio-spdif", "android-dolby-vision-output", "demuxer-dovi-profile7");
-    private static final List<String> STYLE_OPTIONS = List.of("sub-color", "sub-back-color", "sub-border-style", "sub-outline-color", "sub-outline-size", "sub-shadow-offset");
     private static final List<String> IMAGE_SUBTITLE_OPTIONS = List.of("image-subs-brightness", "image-subs-override", "image-subs-color");
     private static final List<String> PLAYBACK_OPTIONS = List.of("pause", "loop-file", "speed", "pitch", "audio-delay", "sub-delay", "secondary-sub-delay", "panscan", "video-scale-x", "video-scale-y", "slang");
     private static final List<String> VIDEO_EFFECT_OPTIONS = List.of("brightness", "contrast", "saturation", "gamma", "hue", "sharpen");
 
     private static final String ASSET_CA_FILE = "cacert.pem";
+    private static final int SUBTITLE_REFERENCE_HEIGHT = 720;
+    private static final int SUBTITLE_BOTTOM_MARGIN = 29;
     private static final int VULKAN_1_2 = 0x00402000;
     private static String runtimeError;
 
@@ -124,13 +132,9 @@ public final class MpvUtil {
         options.add("hwdec-software-fallback");
         options.addAll(PLAYBACK_OPTIONS);
         options.addAll(VIDEO_EFFECT_OPTIONS);
-        options.addAll(List.of("sub-pos", "secondary-sub-pos", "sub-offset-y", "secondary-sub-offset-y", "sub-ass-override", "secondary-sub-ass-override", "embeddedfonts"));
-        options.addAll(SCALE_OPTIONS);
-        boolean hasFontOverride = SubtitleSetting.getFont() != null;
+        options.addAll(SUBTITLE_LAYOUT_OPTIONS);
         if (PreloadSetting.isEnabled()) options.addAll(CACHE_OPTIONS);
         if (isMotionEnabled()) options.addAll(MOTION_OPTIONS);
-        if (hasFontOverride) options.addAll(FONT_OPTIONS);
-        options.addAll(STYLE_OPTIONS);
         options.addAll(IMAGE_SUBTITLE_OPTIONS);
         if (SubtitleSetting.getSecondaryMode() != SubtitleSetting.SECONDARY_MODE_DEFAULT) options.add("secondary-sid");
         return options;
@@ -148,6 +152,9 @@ public final class MpvUtil {
         File defaultFontsDirectory = ExternalFont.getDirectory();
         AndroidFontConfig.prepare();
         MpvPlayerConfig.Builder builder = new MpvPlayerConfig.Builder().setDataSourceFactory(createDataSourceFactory()).setDefaultFontDirectories(defaultFontsDirectory, defaultFontsDirectory).addConfigDirectory(Path.mpv());
+        builder.addPreInitStringOption("config-ignore-options", String.join(",", SUBTITLE_LAYOUT_OPTIONS));
+        builder.addPreInitStringOption("sub-font-size-em", Double.toString(SUBTITLE_REFERENCE_HEIGHT * SubtitleSetting.DEFAULT_TEXT_SIZE_FRACTION));
+        builder.addPreInitStringOption("sub-margin-y", Integer.toString(SUBTITLE_BOTTOM_MARGIN));
         addAndroidOptions(builder, cacheDir, videoOptions);
         builder.addPreInitStringOption("proxy-url", "http://127.0.0.1:" + Proxy.getPort() + "/proxy?");
         builder.addTlsCaFileFromAsset(App.get(), ASSET_CA_FILE, Path.files(ASSET_CA_FILE)).addAndroidSubtitleOptions(App.get(), buildSubtitleOptions(font));
@@ -186,7 +193,6 @@ public final class MpvUtil {
 
     static MpvSubtitleOptions buildSubtitleOptions(@Nullable ExternalFont.Item font) {
         MpvSubtitleOptions.Builder builder = new MpvSubtitleOptions.Builder();
-        if (font != null) builder.setFontsDirectory(font.directory().getAbsolutePath());
         builder.setPosition(100.0);
         builder.setVerticalOffset(SubtitleSetting.getPosition());
         builder.setScale(SubtitleSetting.getAppliedScale());
@@ -194,7 +200,7 @@ public final class MpvUtil {
         builder.setSecondarySubtitlePosition(100.0);
         builder.setSecondaryVerticalOffset(100.0 - SubtitleSetting.getSecondaryPosition());
         builder.setSecondaryAssStyleOverride(SubtitleSetting.isStyleForced());
-        if (font != null) builder.setFontFamily(font.familyName());
+        if (font != null) builder.setFontFamily(font.familyName()).setFontFile(font.subtitleFontFile());
         setCaptionStyle(builder);
         return builder.build();
     }

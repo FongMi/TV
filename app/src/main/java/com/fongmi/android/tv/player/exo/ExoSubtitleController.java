@@ -10,6 +10,7 @@ import androidx.media3.ui.PlayerView;
 import androidx.media3.ui.SubtitleView;
 import androidx.media3.ui.libass.LibassPlayerViewController;
 
+import com.fongmi.android.tv.player.subtitle.ExternalFont;
 import com.fongmi.android.tv.setting.SubtitleSetting;
 
 final class ExoSubtitleController {
@@ -37,8 +38,9 @@ final class ExoSubtitleController {
     void applySubtitleStyle() {
         libassPlaybackSession.setBottomPositionFraction(SubtitleSetting.getPosition() / 100.0f);
         libassPlaybackSession.setSecondaryBottomPositionFraction(getSecondaryBottomPositionFraction());
-        libassPlaybackSession.setFontScale(SubtitleSetting.isScaleApplied() ? SubtitleSetting.getAppliedScale() : 1.0f, true);
-        playerViewController.setStyleOverride(SubtitleSetting.isStyleForced() ? SubtitleSetting.getStyle() : null, SubtitleSetting.getFontFamily());
+        libassPlaybackSession.setFontScale(SubtitleSetting.getAppliedScale(), true);
+        ExternalFont.Item font = SubtitleSetting.getFont();
+        playerViewController.setStyleOverride(SubtitleSetting.isStyleForced() ? SubtitleSetting.getStyle(font) : null, font == null ? null : font.familyName(), font == null ? null : font.subtitleFontFile());
         playerViewController.setSecondarySubtitleViewConfigurator(this::applySecondarySubtitleStyle);
     }
 
@@ -66,7 +68,6 @@ final class ExoSubtitleController {
 
     private void applySecondarySubtitleStyle(SubtitleView subtitleView) {
         SubtitleSetting.applyStyle(subtitleView);
-        subtitleView.setBottomPaddingFraction(0.0f);
         subtitleView.setBottomPosition(getSecondaryBottomPositionFraction());
     }
 

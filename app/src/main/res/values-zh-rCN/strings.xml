@@ -164,6 +164,7 @@
     <string name="subtitle_style">样式</string>
     <string name="playback_font">字体</string>
     <string name="playback_font_default">系统默认</string>
+    <string name="playback_font_choose">选择字体文件</string>
     <string name="playback_font_import">导入字体</string>
     <string name="playback_font_imported">已导入字体：%1$s</string>
     <string name="playback_font_import_failed">无法导入字体</string>
@@ -361,7 +362,7 @@
     <string name="player_motion_fps">%1$d fps</string>
     <string name="player_motion_capped">目标：%1$.2f fps（屏幕上限）</string>
     <string name="player_motion_failed">无法切换画面补帧</string>
-    <string name="player_mpv_conf_priority_hint">重进播放页加载 mpv.conf；片源参数、脚本与界面之后仍可改写，最后写入者生效。volume 作为界面音量基准。</string>
+    <string name="player_mpv_conf_priority_hint">重进播放页加载 mpv.conf。字幕排版使用 App 设置。片源参数、脚本与界面仍可在加载后改写选项。volume 作为界面音量基准。</string>
     <string name="player_mpv_conf_conflict_hint">界面会管理：%1$s。片源参数、脚本与界面以最后写入者为准；volume 作为界面音量基准。</string>
     <string name="player_mpv_conf_import_success">已载入 mpv.conf，按确定后保存</string>
     <string name="player_mpv_conf_import_failed">无法导入 mpv.conf</string>
