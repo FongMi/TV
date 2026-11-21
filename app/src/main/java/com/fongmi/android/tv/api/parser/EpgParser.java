@@ -68,10 +68,14 @@ public class EpgParser {
         }
     }
 
-    public static synchronized void start(Live live, String url) throws Exception {
+    public static void start(Live live, String url) throws Exception {
+        start(live, url, false);
+    }
+
+    public static synchronized void start(Live live, String url, boolean force) throws Exception {
         checkInterrupted();
         long t0 = System.currentTimeMillis();
-        XmlData data = loadXml(url, Path.epg(Crypto.md5(url) + ".xml"));
+        XmlData data = loadXml(url, Path.epg(Crypto.md5(url) + ".xml"), force);
         ProgrammeResult result = processProgramme(data, prepareLiveChannels(live), live.getZoneId());
         checkInterrupted();
         bindResultsToLive(live, result);
@@ -104,8 +108,8 @@ public class EpgParser {
         return channels;
     }
 
-    private static XmlData loadXml(String url, File file) throws Exception {
-        if (isFresh(file)) {
+    private static XmlData loadXml(String url, File file, boolean force) throws Exception {
+        if (!force && isFresh(file)) {
             try {
                 return parseXmlData(file);
             } catch (Exception e) {
@@ -124,15 +128,16 @@ public class EpgParser {
                 if (!Archive.gzipDecompress(download, xml)) throw new IOException("Invalid EPG gzip");
                 source = xml;
             }
-            return cacheXml(source, file);
+            return cacheXml(source, file, force);
         } finally {
             Path.clear(download);
             Path.clear(xml);
         }
     }
 
-    private static XmlData cacheXml(File source, File file) throws Exception {
+    private static XmlData cacheXml(File source, File file, boolean force) throws Exception {
         XmlData data = parseXmlData(source);
+        if (force && data.programmes.isEmpty()) throw new IOException("Empty XMLTV refresh");
         checkInterrupted();
         Path.move(source, file);
         return data;

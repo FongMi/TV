@@ -10,11 +10,13 @@ import com.fongmi.android.tv.api.parser.LiveParser;
 import com.fongmi.android.tv.bean.Channel;
 import com.fongmi.android.tv.bean.Epg;
 import com.fongmi.android.tv.bean.EpgData;
+import com.fongmi.android.tv.bean.EpgProgramme;
 import com.fongmi.android.tv.bean.Group;
 import com.fongmi.android.tv.bean.Live;
 import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.player.extractor.Source;
 import com.fongmi.android.tv.utils.Formatters;
+import com.fongmi.android.tv.utils.EpgTimeline;
 import com.github.catvod.net.OkHttp;
 
 import java.time.LocalDate;
@@ -38,8 +40,22 @@ public class LiveApi {
 
     @NonNull
     public static Epg getEpg(@NonNull Channel item, @NonNull ZoneId zoneId) {
-        for (int offset = -1; offset <= 1; offset++) fetchEpgDay(item, zoneId, offset);
-        return item.getData(zoneId).selected();
+        LocalDate today = LocalDate.now(zoneId);
+        for (int offset = -1; offset <= 1; offset++) fetchEpgDay(item, zoneId, today.plusDays(offset));
+        return item.getData(zoneId, today).selected();
+    }
+
+    @NonNull
+    public static Epg getEpg(@NonNull Channel item, @NonNull ZoneId zoneId, @NonNull LocalDate day) {
+        // Fetch only the selected day and its midnight carry-over. Browsing
+        // history must not refetch today's neighbours or change live metadata.
+        fetchEpgDay(item, zoneId, day);
+        try {
+            if (!Thread.currentThread().isInterrupted()) fetchEpgDay(item, zoneId, day.minusDays(1));
+        } catch (Exception ignored) {
+            // An unavailable previous day must not hide the requested schedule.
+        }
+        return item.getData(zoneId, day);
     }
 
     @NonNull
@@ -51,6 +67,7 @@ public class LiveApi {
 
     @NonNull
     public static Result getUrl(@NonNull Channel item, @NonNull EpgData data) throws Exception {
+        data = EpgProgramme.forRequest(data, System.currentTimeMillis());
         Result result = resolveUrl(item);
         if (Source.isPush(result.getUrl().v())) return result;
         result.setTimeshift(null);
@@ -78,10 +95,48 @@ public class LiveApi {
         }
     }
 
-    private static void fetchEpgDay(@NonNull Channel item, @NonNull ZoneId zoneId, int offset) {
-        String date = LocalDate.now(zoneId).plusDays(offset).format(Formatters.DATE);
+    /** Foreground recovery for a requested day; missing data never overwrites a valid cache. */
+    public static boolean refreshEpg(@NonNull Live live, @NonNull Channel item, @NonNull ZoneId zone, @NonNull LocalDate day) throws Exception {
+        if (item.getEpg().startsWith("http")) {
+            boolean fetched = fetchEpgDay(item, zone, day, true);
+            LocalDate previous = day.minusDays(1);
+            if (!Thread.currentThread().isInterrupted() && !hasRealDay(item, previous)) {
+                try { fetched |= fetchEpgDay(item, zone, previous, true); }
+                catch (Exception ignored) { }
+            }
+            return fetched;
+        }
+        boolean parsed = false;
+        for (String url : live.getEpgXml()) {
+            if (Thread.currentThread().isInterrupted()) break;
+            try { EpgParser.start(live, url, true); parsed = true; }
+            catch (Exception ignored) { }
+        }
+        return parsed;
+    }
+
+    public static boolean hasRealDay(Channel channel, LocalDate day) {
+        return channel.getDataList().stream().anyMatch(epg -> epg.equal(day.format(Formatters.DATE)) && validDay(epg, day));
+    }
+
+    public static boolean validDay(Epg epg, LocalDate day) {
+        return epg.equal(day.format(Formatters.DATE)) && epg.getList().stream().anyMatch(item -> item != null
+                && item.getStartTime() > 0 && item.getEndTime() > item.getStartTime()
+                && !EpgTimeline.unknown(item.getTitle(), item.getEndTime() - item.getStartTime()));
+    }
+
+    private static void fetchEpgDay(@NonNull Channel item, @NonNull ZoneId zoneId, @NonNull LocalDate day) {
+        fetchEpgDay(item, zoneId, day, false);
+    }
+
+    private static boolean fetchEpgDay(@NonNull Channel item, @NonNull ZoneId zoneId, @NonNull LocalDate day, boolean force) {
+        String date = day.format(Formatters.DATE);
         String url = item.getEpg().replace("{date}", date);
-        boolean need = url.startsWith("http") && item.getDataList().stream().noneMatch(epg -> epg.equal(date));
-        if (need) item.setData(Epg.objectFrom(OkHttp.string(url), item.getTvgId(), date, zoneId));
+        boolean need = url.startsWith("http") && (force || item.getDataList().stream().noneMatch(epg -> epg.equal(date)));
+        if (!need) return false;
+        Epg epg = Epg.objectFrom(OkHttp.string(url), item.getTvgId(), date, zoneId);
+        if (Thread.currentThread().isInterrupted() || !epg.equal(date) || (force && !validDay(epg, day))) return false;
+        item.setData(epg);
+        return true;
     }
 }
