@@ -15,6 +15,7 @@ import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.db.AppDatabase;
 import com.fongmi.android.tv.impl.Diffable;
+import com.fongmi.android.tv.setting.SpeedSetting;
 import com.github.catvod.utils.Task;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -68,7 +69,7 @@ public class History implements Diffable<History> {
     private transient long saveTime;
 
     public History() {
-        this.speed = 1;
+        this.speed = SpeedSetting.NORMAL;
         this.scale = -1;
         this.ending = C.TIME_UNSET;
         this.opening = C.TIME_UNSET;
@@ -242,7 +243,7 @@ public class History implements Diffable<History> {
     }
 
     public float getSpeed() {
-        return speed;
+        return Float.isFinite(speed) && speed > 0 ? speed : SpeedSetting.NORMAL;
     }
 
     public void setSpeed(float speed) {

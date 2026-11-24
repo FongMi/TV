@@ -183,6 +183,8 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
         mBinding.control.action.line.setOnClickListener(view -> onLine());
         mBinding.control.action.scale.setOnClickListener(view -> onScale());
         mBinding.control.action.speed.setOnClickListener(view -> onSpeed());
+        mBinding.control.action.speed.setUpListener(this::onSpeedAdd);
+        mBinding.control.action.speed.setDownListener(this::onSpeedSub);
         mBinding.control.action.config.setOnClickListener(view -> onConfig());
         mBinding.control.action.playPause.setOnClickListener(view -> onAction());
         mBinding.control.action.invert.setOnClickListener(view -> onInvert());
@@ -384,6 +386,14 @@ public class LiveActivity extends PlaybackActivity implements GroupAdapter.OnCli
     private void onSpeed() {
         SpeedSettingDialog.create().show(this);
         hideControl();
+    }
+
+    private void onSpeedAdd() {
+        PlaybackAction.adjustSpeed(player(), mBinding.widget.message, true);
+    }
+
+    private void onSpeedSub() {
+        PlaybackAction.adjustSpeed(player(), mBinding.widget.message, false);
     }
 
     private boolean onSpeedLong() {

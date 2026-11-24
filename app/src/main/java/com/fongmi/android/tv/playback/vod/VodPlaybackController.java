@@ -575,6 +575,13 @@ public class VodPlaybackController {
         if (state.getHistory() != null) state.getHistory().setScale(scale);
     }
 
+    public void setSpeed(float speed) {
+        History history = state.getHistory();
+        if (history == null || !host.getHistoryKey().equals(history.getKey()) || history.getSpeed() == speed) return;
+        history.setSpeed(speed);
+        historyPolicy.saveCurrent(history);
+    }
+
     public void setRevSort(boolean revSort) {
         if (state.getHistory() != null) state.getHistory().setRevSort(revSort);
     }

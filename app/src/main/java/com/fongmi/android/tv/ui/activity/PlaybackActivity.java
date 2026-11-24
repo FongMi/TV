@@ -654,12 +654,20 @@ public abstract class PlaybackActivity extends BaseActivity implements MediaCont
     private void startPlayerInternal(String key, Result result, boolean useParse, long timeout, long startPositionMs, MediaMetadata metadata) {
         discMenuHeldKeys.clear();
         updateNavigationKey(key);
-        if (result.needParse() || useParse) player().parse(key, result, useParse, metadata, startPositionMs, endingDurationMs());
-        else player().start(PlaySpec.from(result, key, metadata).setEnding(endingDurationMs()), timeout, startPositionMs);
+        boolean parse = result.needParse() || useParse;
+        PlaySpec spec = parse ? PlaySpec.fromParse(result, key, metadata) : PlaySpec.from(result, key, metadata);
+        spec.setEnding(endingDurationMs()).setInitialSpeed(initialPlaybackSpeed());
+        if (parse) player().parse(spec, result, useParse, startPositionMs);
+        else player().start(spec, timeout, startPositionMs);
     }
 
     protected long endingDurationMs() {
         return 0;
+    }
+
+    @Nullable
+    protected Float initialPlaybackSpeed() {
+        return null;
     }
 
     private void bindPlaybackService() {

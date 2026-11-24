@@ -36,6 +36,7 @@ public class PlaySpec {
     private Auth.Context auth;
     private Timeshift timeshift;
     private long endingMs;
+    private Float initialSpeed;
     private int isoEditionIndex = C.INDEX_UNSET;
 
     private PlaySpec(String key, String url, Map<String, String> headers, String format, Drm drm, List<Sub> subs, List<Danmaku> danmakus, MediaMetadata metadata) {
@@ -84,6 +85,16 @@ public class PlaySpec {
 
     public PlaySpec setEnding(long endingMs) {
         this.endingMs = Math.max(0, endingMs);
+        return this;
+    }
+
+    @Nullable
+    public Float getInitialSpeed() {
+        return initialSpeed;
+    }
+
+    public PlaySpec setInitialSpeed(@Nullable Float initialSpeed) {
+        this.initialSpeed = initialSpeed;
         return this;
     }
 
