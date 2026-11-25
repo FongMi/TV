@@ -10,6 +10,7 @@ import com.fongmi.android.tv.server.process.Image;
 import com.fongmi.android.tv.server.process.Local;
 import com.fongmi.android.tv.server.process.Log;
 import com.fongmi.android.tv.server.process.Media;
+import com.fongmi.android.tv.server.process.Ocr;
 import com.fongmi.android.tv.server.process.Parse;
 import com.fongmi.android.tv.server.process.Proxy;
 import com.fongmi.android.tv.server.process.Remote;
@@ -33,6 +34,7 @@ public class Nano extends NanoHTTPD {
     private List<Process> process;
     private final SpiderTest spiderTest = new SpiderTest();
     private final Fetch fetch = new Fetch();
+    private final Ocr ocr = new Ocr();
 
     public Nano(int port) {
         this(port, null);
@@ -117,6 +119,7 @@ public class Nano extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         String url = session.getUri().trim();
+        if (Ocr.isRequest(url)) return ocr.serve(session, url);
         Map<String, String> files = new HashMap<>();
         if (session.getMethod() == Method.POST) parse(session, files);
         if (url.startsWith("/tvbus")) return ok(LiveConfig.getResp());

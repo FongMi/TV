@@ -70,7 +70,7 @@ html, body {
     -webkit-tap-highlight-color: transparent;
 }
 
-html:has(body.logs-page, body.spider-page, body.keypad-page) { scrollbar-gutter: stable; }
+html:has(body.logs-page, body.spider-page, body.keypad-page, body.ocr-page) { scrollbar-gutter: stable; }
 
 /* ══ App Shell ══ */
 #app {

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <title data-i18n="ocrTitle">圖片辨識</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="color-scheme" content="light dark">
+    <meta name="referrer" content="no-referrer">
+    <link rel="stylesheet" href="css/ui.css">
+    <link rel="stylesheet" href="css/ocr.css">
+    <script src="js/i18n.js" defer></script>
+    <script src="js/navigation.js" defer></script>
+    <script src="js/ocr.js" defer></script>
+</head>
+
+<body class="ocr-page">
+    <main class="ocr-app">
+        <header class="ocr-header">
+            <div class="page-heading">
+                <span class="page-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="icons.svg#scan-text"/></svg></span>
+                <h1 id="ocr_title" data-i18n="ocrTitle">圖片辨識</h1>
+            </div>
+            <a id="ocr_return" class="md-btn md-btn-outlined md-icon-button" href="/?tab=settings" data-i18n-label="ocrBack" aria-label="返回設定" title="返回設定"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#back"/></svg></a>
+        </header>
+        <p id="ocr_availability" class="md-card panel-hint" role="status" data-i18n="ocrChecking">正在確認 OCR 模組…</p>
+        <section id="ocr_workspace" class="md-card ocr-content" aria-labelledby="ocr_title" hidden>
+            <div class="ocr-file-picker">
+                <input id="ocr_file" type="file" accept="image/png,image/jpeg,image/bmp,.png,.jpg,.jpeg,.bmp" hidden />
+                <button id="ocr_choose" class="md-btn md-btn-tonal" type="button" aria-describedby="ocr_filename" data-i18n="ocrChoose">選擇圖片</button>
+                <p id="ocr_filename" class="panel-hint" aria-live="polite">PNG / JPEG / BMP</p>
+            </div>
+            <p id="ocr_status" class="panel-hint" role="status" hidden></p>
+            <img id="ocr_preview" class="ocr-preview" alt="原圖預覽" hidden />
+            <div id="ocr_result" class="ocr-result" hidden>
+                <div class="ocr-result-heading">
+                    <label for="ocr_text" data-i18n="ocrResult">辨識結果</label>
+                    <button id="ocr_copy" class="md-btn md-btn-tonal md-icon-button" type="button" data-i18n-label="ocrCopy" aria-label="複製結果" title="複製結果"><svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true"><use href="icons.svg#copy"/></svg></button>
+                </div>
+                <textarea id="ocr_text" class="md-input ocr-result-text" rows="5" readonly></textarea>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

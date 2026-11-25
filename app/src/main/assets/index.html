@@ -13,6 +13,7 @@
     <script src="js/navigation.js" defer></script>
     <script src="js/script.js" defer blocking="render"></script>
     <script src="js/input.js" defer></script>
+    <script src="js/ocr.js" defer></script>
     <script src="js/sha256.min.js" defer></script>
     <script src="js/upload.js" defer></script>
     <script src="js/download.js" defer></script>
@@ -216,6 +217,11 @@
                     <a class="panel-link" href="spider.html">
                         <span class="panel-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m8 5-7 7 7 7 1.4-1.4L3.8 12l5.6-5.6L8 5zm8 0-1.4 1.4 5.6 5.6-5.6 5.6L16 19l7-7-7-7zM14 3l-4 18h2l4-18h-2z"/></svg></span>
                         <span class="panel-link-text"><span data-i18n="spiderTitle">爬蟲測試</span></span>
+                        <svg class="select-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="icons.svg#chevron"/></svg>
+                    </a>
+                    <a id="ocr_entry" class="panel-link" href="ocr.html" hidden>
+                        <span class="panel-link-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="icons.svg#scan-text"/></svg></span>
+                        <span class="panel-link-text"><span data-i18n="ocrTitle">圖片辨識</span></span>
                         <svg class="select-icon" aria-hidden="true" viewBox="0 0 24 24"><use href="icons.svg#chevron"/></svg>
                     </a>
                 </div>
