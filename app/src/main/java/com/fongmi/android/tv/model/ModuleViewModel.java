@@ -28,6 +28,7 @@ import com.fongmi.android.tv.utils.ApkCache;
 import com.fongmi.android.tv.utils.Notify;
 import com.fongmi.android.tv.utils.RuntimeInstaller;
 import com.github.catvod.net.Download;
+import com.github.catvod.runtime.OcrRuntime;
 import com.github.catvod.runtime.PythonRuntime;
 import com.github.catvod.runtime.QuickJsRuntime;
 import com.github.catvod.runtime.ThunderRuntime;
@@ -150,6 +151,7 @@ public final class ModuleViewModel extends AndroidViewModel {
             case QUICKJS -> R.drawable.ic_module_quickjs;
             case THUNDER -> R.drawable.ic_module_thunder;
             case MPV -> R.drawable.ic_module_mpv;
+            case OCR -> R.drawable.ic_module_ocr;
         };
     }
 
@@ -221,6 +223,7 @@ public final class ModuleViewModel extends AndroidViewModel {
             case QUICKJS -> module.entry(QuickJsRuntime.class).check();
             case THUNDER -> module.entry(ThunderRuntime.class).check();
             case MPV -> MpvUtil.loadRuntime();
+            case OCR -> module.entry(OcrRuntime.class, module.requireRevision()).check();
         }
         signal.throwIfCanceled();
         return version;

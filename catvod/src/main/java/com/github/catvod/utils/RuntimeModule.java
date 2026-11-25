@@ -1,5 +1,6 @@
 package com.github.catvod.utils;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -40,7 +41,10 @@ public enum RuntimeModule {
     QUICKJS("quickjs", "QuickJS", "libquickjs-wrapper.so"),
     THUNDER("thunder", "Thunder", "libxl_thunder_sdk.so"),
     MPV("mpv", "MPV", "libplayer.so"),
-    BDJ("bdj", "BD-J", "");
+    BDJ("bdj", "BD-J", ""),
+    OCR("ocr", "OCR", "libmlkit_google_ocr_pipeline.so");
+
+    private static final String OCR_MODEL_PREFIX = "assets/mlkit-google-ocr-models/";
 
     public final String id;
     public final String title;
@@ -80,6 +84,7 @@ public enum RuntimeModule {
             case THUNDER -> "catvod-thunder-plugin-v1";
             case MPV -> "mpv-jni-ffmpeg-shared-v1";
             case BDJ -> "libbluray-1.4.1-openjdk8-zero-v1";
+            case OCR -> "subtitle-ocr-mlkit-v1";
         };
     }
 
@@ -146,8 +151,18 @@ public enum RuntimeModule {
             case NODEJS -> "com.fongmi.nodejs.RuntimeEntry";
             case QUICKJS -> "com.fongmi.quickjs.RuntimeEntry";
             case THUNDER -> "com.xunlei.downloadlib.RuntimeEntry";
+            case OCR -> "com.fongmi.ocr.RuntimeEntry";
             default -> "";
         };
+    }
+
+    public synchronized Context getPackageContext() throws IOException, PackageManager.NameNotFoundException {
+        require();
+        External state = external();
+        Metadata metadata = state.loadedMetadata != null ? state.loadedMetadata : getMetadata();
+        Context context = Runtime.context().createPackageContext(getPackageName(), 0);
+        if (!metadata.info.applicationInfo.sourceDir.equals(context.getApplicationInfo().sourceDir)) throw new IOException(title + " module changed; restart the app");
+        return context;
     }
 
     public static ClassLoader getSpiderClassLoader() {
@@ -160,6 +175,17 @@ public enum RuntimeModule {
         if (name.startsWith("com.fongmi.quickjs.") && !name.startsWith("com.fongmi.quickjs.host.")) return QUICKJS;
         if (name.startsWith("com.xunlei.downloadlib.")) return THUNDER;
         return null;
+    }
+
+    public synchronized String requireRevision() throws IOException {
+        require();
+        if (isRestartRequired()) throw new RestartRequiredException(this);
+        return getMetadata().digest;
+    }
+
+    public synchronized <T extends RuntimePlugin> T entry(Class<T> type, String revision) throws IOException {
+        if (!requireRevision().equals(revision)) throw new IOException(title + " module changed during preparation");
+        return entry(type);
     }
 
     public synchronized <T extends RuntimePlugin> T entry(Class<T> type) {
@@ -427,7 +453,7 @@ public enum RuntimeModule {
         verifyJavaRuntime(json, info);
         String hostCppSha256 = this == MPV ? readHostCppSha256(json.getJSONObject("hostLibraries")) : null;
         String digest = hash(new ByteArrayInputStream(bytes));
-        if (this == BDJ) verifyPayloadSizes(apk, files);
+        if (this == BDJ || this == OCR) verifyPayloadSizes(apk, files);
         return new Metadata(info, abi, digest, List.copyOf(files), hostCppSha256);
     }
 
@@ -529,6 +555,7 @@ public enum RuntimeModule {
                 case PYTHON -> "assets/chaquopy/";
                 case QUICKJS -> "assets/js/";
                 case NODEJS -> "assets/nodejs/";
+                case OCR -> OCR_MODEL_PREFIX;
                 default -> "";
             };
             if (prefix.isEmpty() || !payload.path.startsWith(prefix) || payload.path.contains("..") || payload.path.contains("\\") || payload.path.contains("//") || payload.path.endsWith("/")) throw new IOException("Invalid runtime asset path");
@@ -540,6 +567,7 @@ public enum RuntimeModule {
         if (this == PYTHON) for (String name : List.of("app.imy", "build.json", "bootstrap.imy", "stdlib-common.imy", "stdlib-" + abi + ".imy", "requirements-common.imy", "requirements-" + abi + ".imy", "cacert.pem")) if (!paths.contains("assets/chaquopy/" + name)) throw new IOException("Python asset is missing: " + name);
         if (this == QUICKJS) for (String name : List.of("net.js", "spider.js")) if (!paths.contains("assets/js/lib/" + name)) throw new IOException("QuickJS asset is missing: " + name);
         if (this == NODEJS && !paths.contains("assets/nodejs/bootstrap.js")) throw new IOException("Node.js bootstrap is missing");
+        if (this == OCR && paths.stream().noneMatch(path -> path.startsWith(OCR_MODEL_PREFIX))) throw new IOException("OCR models are missing");
     }
 
     private static final class PluginLoader extends DexClassLoader {
@@ -554,14 +582,33 @@ public enum RuntimeModule {
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
             RuntimeModule owner = moduleForClass(name);
-            boolean owned = owner == module || name.startsWith("j$.") || name.startsWith("com.android.tools.r8.") || module == PYTHON && name.startsWith("kotlin.") || module == NODEJS && name.startsWith("fi.iki.elonen.") || module == QUICKJS && name.startsWith("org.jsoup.");
-            if (!owned) return owner == null ? super.loadClass(name, resolve) : SPIDER_LOADER.loadClass(name);
-            synchronized (this) {
-                Class<?> type = findLoadedClass(name);
-                if (type == null) type = findClass(name);
-                if (resolve) resolveClass(type);
-                return type;
+            if (ownsClass(name, owner)) return loadLocalClass(name, resolve);
+            if (module == OCR && (name.startsWith("com.google.") || name.startsWith("androidx."))) {
+                try {
+                    return loadLocalClass(name, resolve);
+                } catch (ClassNotFoundException e) {
+                    return super.loadClass(name, resolve);
+                }
             }
+            return owner == null ? super.loadClass(name, resolve) : SPIDER_LOADER.loadClass(name);
+        }
+
+        private boolean ownsClass(String name, RuntimeModule owner) {
+            if (owner == module || name.startsWith("j$.") || name.startsWith("com.android.tools.r8.")) return true;
+            return switch (module) {
+                case PYTHON -> name.startsWith("kotlin.");
+                case NODEJS -> name.startsWith("fi.iki.elonen.");
+                case QUICKJS -> name.startsWith("org.jsoup.");
+                case OCR -> name.startsWith("com.fongmi.ocr.") || name.startsWith("kotlin.") || name.startsWith("kotlinx.");
+                default -> false;
+            };
+        }
+
+        private synchronized Class<?> loadLocalClass(String name, boolean resolve) throws ClassNotFoundException {
+            Class<?> type = findLoadedClass(name);
+            if (type == null) type = findClass(name);
+            if (resolve) resolveClass(type);
+            return type;
         }
     }
 
@@ -722,6 +769,13 @@ public enum RuntimeModule {
             getMetadata();
         } catch (IOException e) {
             throw new IllegalStateException("Invalid " + title + " module", e);
+        }
+    }
+
+    public static final class RestartRequiredException extends IOException {
+
+        private RestartRequiredException(RuntimeModule module) {
+            super(module.title + " module requires a restart");
         }
     }
 

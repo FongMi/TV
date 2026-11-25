@@ -25,6 +25,7 @@
         <package android:name="com.fongmi.runtime.quickjs" />
         <package android:name="com.fongmi.runtime.thunder" />
         <package android:name="com.fongmi.runtime.mpv" />
+        <package android:name="com.fongmi.runtime.ocr" />
         <intent>
             <action android:name="android.settings.MANAGE_APP_ALL_FILES_ACCESS_PERMISSION" />
             <data android:scheme="package" />
