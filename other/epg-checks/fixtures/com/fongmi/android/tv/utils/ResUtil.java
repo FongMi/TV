@@ -1,0 +1,1 @@
+package com.fongmi.android.tv.utils; public class ResUtil { public static int dp2px(int n){return n;}public static String getString(int n){return n==1?"No programme information":"Playback unavailable";} }

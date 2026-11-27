@@ -1,0 +1,1 @@
+package com.github.catvod.net;import java.util.*;public class OkHttp {public static final Map<String,String> responses=new HashMap<>();public static String string(String url){if(!responses.containsKey(url))throw new IllegalStateException("Fixture response missing");return responses.get(url);}}
